@@ -654,10 +654,10 @@ export const ReviewScheduleTimeline: React.FC<{
           transition: all 0.3s ease;
         }
         .gap-bar.optimal {
-          background: #4caf50;
+          background: var(--success-600);
         }
         .gap-bar.needs-adjustment {
-          background: #ff9800;
+          background: var(--warn-600);
         }
         .gap-bar:hover {
           filter: brightness(0.8);
@@ -665,7 +665,7 @@ export const ReviewScheduleTimeline: React.FC<{
         .mention-count {
           text-align: right;
           font-size: 12px;
-          color: #666;
+          color: var(--text-main);
           white-space: nowrap;
         }
       `}</style>
@@ -684,12 +684,12 @@ export const PrincipleFindings: React.FC<{
 
   const scoreColor =
     principle.score >= 80
-      ? "#4caf50"
+      ? "var(--success-600)"
       : principle.score >= 60
-      ? "#ffc107"
+      ? "#f59e0b" /* amber-500 */
       : principle.score >= 40
-      ? "#ff9800"
-      : "#f44336";
+      ? "var(--warn-600)"
+      : "var(--danger-600)";
 
   return (
     <div className="principle-card" onClick={() => setExpanded(!expanded)}>
@@ -770,7 +770,7 @@ export const PrincipleFindings: React.FC<{
         }
         .principle-details h5 {
           margin: 10px 0 5px 0;
-          color: #333;
+          color: var(--text-main);
         }
         .finding {
           padding: 5px 0;
@@ -778,19 +778,19 @@ export const PrincipleFindings: React.FC<{
           font-size: 14px;
         }
         .finding-positive {
-          color: #4caf50;
+          color: var(--success-600);
         }
         .finding-warning {
-          color: #ff9800;
+          color: var(--warn-600);
         }
         .finding-critical {
-          color: #f44336;
+          color: var(--danger-600);
         }
         .suggestion {
           padding: 8px;
           margin: 8px 0;
-          background: #f9f9f9;
-          border-left: 3px solid #2196f3;
+          background: #f1f5f9; /* slate-100 */
+          border-left: 3px solid var(--brand-accent);
           border-radius: 4px;
         }
         .suggestion p {
@@ -798,11 +798,11 @@ export const PrincipleFindings: React.FC<{
           font-size: 13px;
         }
         .suggestion-desc {
-          color: #666;
+          color: var(--text-muted);
         }
         .evidence-item {
           font-size: 12px;
-          color: #666;
+          color: var(--text-main);
           margin: 3px 0;
           font-family: monospace;
         }
@@ -972,7 +972,7 @@ export const ChapterAnalysisDashboard: React.FC<{
           }
           .stat p {
             margin: 5px 0 0 0;
-            color: #666;
+            color: var(--text-muted);
             font-size: 12px;
           }
           .recommendation {
@@ -983,23 +983,23 @@ export const ChapterAnalysisDashboard: React.FC<{
             border-radius: 4px;
           }
           .recommendation.rec-high {
-            border-left-color: #f44336;
-            background: #ffebee;
+            border-left-color: var(--danger-600);
+            background: #fef2f2; /* red-50 */
           }
           .recommendation.rec-medium {
-            border-left-color: #ff9800;
-            background: #fff3e0;
+            border-left-color: var(--warn-600);
+            background: #fffbeb; /* amber-50 */
           }
           .recommendation.rec-low {
-            border-left-color: #4caf50;
-            background: #f1f8e9;
+            border-left-color: var(--success-600);
+            background: #f0fdf4; /* green-50 */
           }
           .recommendation h4 {
             margin: 0 0 5px 0;
           }
           .recommendation p {
             margin: 5px 0;
-            color: #666;
+            color: var(--text-main);
             font-size: 14px;
           }
           .rec-meta {

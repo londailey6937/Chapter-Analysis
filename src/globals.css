@@ -25,6 +25,21 @@
     --warn-600: #b45309; /* amber-700 */
     --danger-600: #b91c1c; /* red-700 */
   }
+  /* Greys template: apply by adding class="theme-grey" to <body> or a wrapping container */
+  .theme-grey {
+    --bg-app: #f9fafb; /* gray-50 */
+    --bg-panel: #ffffff; /* white */
+    --text-main: #111827; /* gray-900 */
+    --text-muted: #374151; /* gray-700 */
+    --text-subtle: #4b5563; /* gray-600 */
+    --border-soft: #e5e7eb; /* gray-200 */
+    --brand-navy-600: #4b5563; /* gray-600 */
+    --brand-navy-700: #374151; /* gray-700 */
+    --brand-accent: #6b7280; /* gray-500 */
+    --success-600: #166534; /* green-700 */
+    --warn-600: #b45309; /* amber-700 */
+    --danger-600: #b91c1c; /* red-700 */
+  }
   html {
     @apply scroll-smooth;
   }
@@ -207,4 +222,7 @@
 /* Improve tooltip readability (Recharts renders inline style, but text color can still benefit) */
 .recharts-default-tooltip {
   color: var(--text-main) !important;
+  background: var(--bg-panel) !important;
+  border: 1px solid var(--border-soft) !important;
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.12) !important;
 }
