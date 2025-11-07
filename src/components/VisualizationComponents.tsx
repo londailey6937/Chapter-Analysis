@@ -97,7 +97,9 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
   const points = analysis.visualizations.cognitiveLoadCurve || [];
   const hasData = points.length > 0;
   const data = points.map((point, idx) => ({
-    section: point.sectionId || `S${idx + 1}`,
+    section: (point.heading || point.sectionId || `S${idx + 1}`).length > 28
+      ? (point.heading || point.sectionId || `S${idx + 1}`).slice(0, 25) + '…'
+      : (point.heading || point.sectionId || `S${idx + 1}`),
     load: Math.round(point.load * 100),
     novelConcepts: point.factors.novelConcepts,
     complexity: point.factors.sentenceComplexity,
@@ -116,7 +118,7 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
             margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="section" tick={{ fontSize: 10 }} />
+            <XAxis dataKey="section" tick={{ fontSize: 10 }} interval={0} angle={-35} textAnchor="end" height={70} />
             <YAxis
               label={{ value: "Load %", angle: -90, position: "insideLeft" }}
             />
@@ -130,7 +132,7 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
                 if (name === "New Concepts") return String(value);
                 return String(value);
               }}
-              labelFormatter={(label: any) => `Section: ${label}`}
+              labelFormatter={(label: any) => `Heading: ${label}`}
             />
             <Legend />
             <Line
@@ -727,8 +729,13 @@ export const PrincipleFindings: React.FC<{
             <h5>Evidence:</h5>
             {principle.evidence.map((e, idx) => (
               <p key={idx} className="evidence-item">
-                {e.metric}: {typeof e.value === 'number' ? Math.trunc(e.value) : e.value}{" "}
-                {e.threshold !== undefined && typeof e.threshold === 'number' ? `(target: ${Math.trunc(e.threshold)})` : e.threshold ? `(target: ${e.threshold})` : ''}
+                {e.metric}:{" "}
+                {typeof e.value === "number" ? Math.trunc(e.value) : e.value}{" "}
+                {e.threshold !== undefined && typeof e.threshold === "number"
+                  ? `(target: ${Math.trunc(e.threshold)})`
+                  : e.threshold
+                  ? `(target: ${e.threshold})`
+                  : ""}
               </p>
             ))}
           </div>

@@ -426,6 +426,7 @@ export class AnalysisEngine {
 
       return {
         sectionId: s.id,
+        heading: s.heading || `Section ${i + 1}`,
         position: s.startPosition || 0,
         load: this.clamp(load, 0, 1),
         factors: {

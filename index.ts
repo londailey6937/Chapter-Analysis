@@ -301,6 +301,7 @@ export interface ConceptMapData {
  */
 export interface CognitiveLoadPoint {
   sectionId: string;
+  heading?: string; // Section heading text for display
   position: number;
   load: number;
   factors: {
