@@ -164,6 +164,7 @@ export class ConceptExtractor {
     "also",
     "still",
     "already",
+    "finally",
     "yet",
     "always",
     "never",
@@ -449,6 +450,33 @@ export class ConceptExtractor {
           score -= 10;
         }
 
+        // Penalize generic standalone programming nouns without structural signals
+        const genericPenaltyTerms = new Set([
+          "object",
+          "objects",
+          "property",
+          "properties",
+          "value",
+          "values",
+          "function",
+          "functions",
+          "method",
+          "methods",
+          "variable",
+          "variables",
+          "data",
+          "type",
+          "types",
+        ]);
+        if (
+          genericPenaltyTerms.has(candidate.normalized) &&
+          candidate.fromHeading === 0 &&
+          candidate.inlineDefinitions.length === 0 &&
+          !candidate.isLibraryConcept
+        ) {
+          score -= 30; // strong penalty to push below threshold
+        }
+
         return {
           ...candidate,
           score,
@@ -692,8 +720,36 @@ export class ConceptExtractor {
     if (this.commonWords.has(normalized)) return false;
     if (this.isCommonNonConcept(normalized)) return false;
 
-    // Accept multi-word phrases generously
+    // Additional generic single-word domain-neutral nouns we usually don't treat as standalone concepts
+    const genericSingleNouns = new Set([
+      "object",
+      "objects",
+      "property",
+      "properties",
+      "value",
+      "values",
+      "function",
+      "functions",
+      "method",
+      "methods",
+      "variable",
+      "variables",
+      "data",
+      "type",
+      "types",
+      "concept",
+      "concepts",
+      "thing",
+      "things",
+      "item",
+      "items",
+    ]);
+
+    // Accept multi-word phrases generously (capture domain-specific composites like "object oriented programming")
     if (normalized.includes(" ")) return true;
+
+    // Reject common generic nouns unless they appear in headings or definitions (handled upstream) by disallowing here
+    if (genericSingleNouns.has(normalized)) return false;
 
     // Accept single words that are at least 5 chars (more likely domain terms)
     if (normalized.length >= 5) return true;
@@ -860,6 +916,7 @@ export class ConceptExtractor {
       "third",
       "last",
       "final",
+      "finally",
       "initial",
       "main",
       "key",
@@ -960,8 +1017,30 @@ export class ConceptExtractor {
       minCount: number,
       cap: number
     ) => {
+      const genericPenaltyTerms = new Set([
+        "object",
+        "objects",
+        "property",
+        "properties",
+        "value",
+        "values",
+        "function",
+        "functions",
+        "method",
+        "methods",
+        "variable",
+        "variables",
+        "data",
+        "type",
+        "types",
+      ]);
       Array.from(map.entries())
-        .filter(([, c]) => c >= minCount)
+        .filter(([phrase, c]) => {
+          // Skip phrases consisting solely of generic penalty terms
+          const words = phrase.split(" ");
+          if (words.every((w) => genericPenaltyTerms.has(w))) return false;
+          return c >= minCount;
+        })
         .sort((a, b) => b[1] - a[1])
         .slice(0, cap)
         .forEach(([phrase, count]) => {

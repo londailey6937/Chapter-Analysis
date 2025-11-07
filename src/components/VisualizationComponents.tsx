@@ -97,9 +97,10 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
   const points = analysis.visualizations.cognitiveLoadCurve || [];
   const hasData = points.length > 0;
   const data = points.map((point, idx) => ({
-    section: (point.heading || point.sectionId || `S${idx + 1}`).length > 28
-      ? (point.heading || point.sectionId || `S${idx + 1}`).slice(0, 25) + '…'
-      : (point.heading || point.sectionId || `S${idx + 1}`),
+    section:
+      (point.heading || point.sectionId || `S${idx + 1}`).length > 28
+        ? (point.heading || point.sectionId || `S${idx + 1}`).slice(0, 25) + "…"
+        : point.heading || point.sectionId || `S${idx + 1}`,
     load: Math.round(point.load * 100),
     novelConcepts: point.factors.novelConcepts,
     complexity: point.factors.sentenceComplexity,
@@ -118,7 +119,14 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
             margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="section" tick={{ fontSize: 10 }} interval={0} angle={-35} textAnchor="end" height={70} />
+            <XAxis
+              dataKey="section"
+              tick={{ fontSize: 10 }}
+              interval={0}
+              angle={-35}
+              textAnchor="end"
+              height={70}
+            />
             <YAxis
               label={{ value: "Load %", angle: -90, position: "insideLeft" }}
             />
@@ -520,7 +528,28 @@ export const ReviewScheduleTimeline: React.FC<{
   analysis: ChapterAnalysis;
 }> = ({ analysis }) => {
   const schedule = analysis.visualizations.reviewSchedule;
-  const concepts = schedule.concepts.slice(0, 10);
+  const [showAll, setShowAll] = useState(false);
+  const sortedConcepts = [...schedule.concepts].sort((a, b) => {
+    const devA = a.spacing.length
+      ? a.spacing.reduce(
+          (s, g) => s + Math.abs(g - schedule.optimalSpacing),
+          0
+        ) / a.spacing.length
+      : 0;
+    const devB = b.spacing.length
+      ? b.spacing.reduce(
+          (s, g) => s + Math.abs(g - schedule.optimalSpacing),
+          0
+        ) / b.spacing.length
+      : 0;
+    const priorityA = a.isOptimal ? 0 : 1; // non-optimal first
+    const priorityB = b.isOptimal ? 0 : 1;
+    return priorityB - priorityA || devB - devA || b.mentions - a.mentions;
+  });
+  const defaultLimit = 15;
+  const concepts = showAll
+    ? sortedConcepts
+    : sortedConcepts.slice(0, defaultLimit);
 
   // Build ID -> Name map from conceptMap nodes
   const idToName: Record<string, string> = {};
@@ -597,6 +626,14 @@ export const ReviewScheduleTimeline: React.FC<{
         })}
       </div>
 
+      {!showAll && sortedConcepts.length > defaultLimit && (
+        <div className="show-more-container">
+          <button className="show-more-btn" onClick={() => setShowAll(true)}>
+            Show all {sortedConcepts.length} concepts
+          </button>
+        </div>
+      )}
+
       <style>{`
         .review-timeline {
           margin: 20px 0;
@@ -670,6 +707,17 @@ export const ReviewScheduleTimeline: React.FC<{
           color: var(--text-main);
           white-space: nowrap;
         }
+        .show-more-container { margin-top: 10px; }
+        .show-more-btn {
+          background: var(--accent-600);
+          color: #fff;
+          border: none;
+          padding: 8px 14px;
+          font-size: 13px;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        .show-more-btn:hover { filter: brightness(0.9); }
       `}</style>
     </div>
   );
