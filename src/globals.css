@@ -10,13 +10,30 @@
 
 /* Base layer customizations */
 @layer base {
+  :root {
+    /* Academic palette: neutral greys and dark blues (high contrast) */
+    --bg-app: #f8fafc; /* slate-50 */
+    --bg-panel: #ffffff; /* white */
+    --text-main: #0f172a; /* slate-900 */
+    --text-muted: #334155; /* slate-700 */
+    --text-subtle: #475569; /* slate-600 */
+    --border-soft: #e2e8f0; /* slate-200 */
+    --brand-navy-600: #1e3a8a; /* blue-800 */
+    --brand-navy-700: #1e40af; /* blue-900 */
+    --brand-accent: #0ea5e9; /* sky-500 */
+    --success-600: #166534; /* green-700 */
+    --warn-600: #b45309; /* amber-700 */
+    --danger-600: #b91c1c; /* red-700 */
+  }
   html {
     @apply scroll-smooth;
   }
 
   body {
-    @apply bg-white text-gray-900 font-sans;
+    @apply font-sans;
     font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+    background: var(--bg-app);
+    color: var(--text-main);
   }
 
   h1 {
@@ -29,6 +46,7 @@
 
   h3 {
     @apply text-2xl font-semibold;
+    color: var(--brand-navy-700);
   }
 
   h4 {
@@ -37,6 +55,7 @@
 
   p {
     @apply leading-relaxed;
+    color: var(--text-main);
   }
 }
 
@@ -47,7 +66,15 @@
   }
 
   .btn-primary {
-    @apply btn-base bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:shadow-glow hover:-translate-y-0.5;
+    /* Subtler academic gradient in navy tones for better contrast */
+    @apply btn-base bg-gradient-to-r text-white hover:-translate-y-0.5;
+    background-image: linear-gradient(
+      135deg,
+      var(--brand-navy-600),
+      var(--brand-navy-700)
+    );
+    box-shadow: 0 0 0 1px rgba(30, 58, 138, 0.12),
+      0 6px 16px rgba(2, 6, 23, 0.12);
   }
 
   .btn-secondary {
@@ -59,7 +86,10 @@
   }
 
   .card {
-    @apply bg-white rounded-xl shadow-soft border border-gray-100 hover:shadow-soft-lg transition-shadow duration-200;
+    @apply rounded-xl transition-shadow duration-200;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    box-shadow: 0 2px 8px rgba(2, 6, 23, 0.05);
   }
 
   .card-header {
@@ -75,7 +105,14 @@
   }
 
   .input-base {
-    @apply w-full px-4 py-2.5 rounded-lg border-2 border-gray-200 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100 transition-all duration-200 font-medium disabled:bg-gray-50 disabled:text-gray-400;
+    @apply w-full px-4 py-2.5 rounded-lg border-2 focus:outline-none transition-all duration-200 font-medium disabled:bg-gray-50 disabled:text-gray-400;
+    border-color: var(--border-soft);
+    box-shadow: inset 0 1px 0 rgba(2, 6, 23, 0.02);
+    color: var(--text-main);
+  }
+  .input-base:focus {
+    border-color: var(--brand-navy-600);
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
   }
 
   .badge-base {
@@ -105,6 +142,22 @@
 
 /* Utility animations */
 @layer utilities {
+  /* Academic text helpers */
+  .text-muted {
+    color: var(--text-muted) !important;
+  }
+  .text-subtle {
+    color: var(--text-subtle) !important;
+  }
+  .heading-accent {
+    color: var(--brand-navy-700) !important;
+  }
+  .panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: 0.75rem;
+  }
+
   .animate-spin-slow {
     animation: spin 2s linear infinite;
   }
@@ -120,4 +173,38 @@
   .glass {
     @apply bg-white/80 backdrop-blur-md border border-white/20;
   }
+}
+
+/* Visualization readability overrides (ensure high contrast) */
+/* These target the Analysis page elements commonly used in visualization wrappers */
+.viz-container {
+  background: var(--bg-panel) !important;
+  border: 1px solid var(--border-soft) !important;
+}
+.viz-container h3 {
+  color: var(--brand-navy-700) !important;
+}
+.viz-subtitle {
+  color: var(--text-muted) !important;
+}
+
+/* Legends and small captions */
+.legend-item,
+.rec-meta,
+.review-legend,
+.review-metrics,
+.accessibility-note small {
+  color: var(--text-subtle) !important;
+}
+
+/* Ensure chart axis labels/ticks are darker for readability */
+.recharts-cartesian-axis-tick-value,
+.recharts-legend-item-text {
+  fill: var(--text-main) !important;
+  color: var(--text-main) !important;
+}
+
+/* Improve tooltip readability (Recharts renders inline style, but text color can still benefit) */
+.recharts-default-tooltip {
+  color: var(--text-main) !important;
 }
