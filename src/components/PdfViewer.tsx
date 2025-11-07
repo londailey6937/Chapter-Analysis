@@ -34,7 +34,9 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
 
     const loadPdf = async () => {
       try {
-        const loadedPdf = await getDocument({ data: fileBuffer }).promise;
+        // Clone the buffer to prevent detachment issues when component remounts
+        const bufferCopy = fileBuffer.slice(0);
+        const loadedPdf = await getDocument({ data: bufferCopy }).promise;
         if (!mounted) return;
         setPdf(loadedPdf);
         setNumPages(loadedPdf.numPages);
@@ -71,7 +73,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
       pdf?.cleanup?.();
       pdf?.destroy?.();
     };
-  }, [fileBuffer]);
+  }, [fileBuffer, onTextExtracted]);
 
   return (
     <div className="pdf-viewer" ref={containerRef}>
