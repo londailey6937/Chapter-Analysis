@@ -683,48 +683,110 @@ function parseChapterIntoSections(text: string) {
     depth: number;
   }> = [];
 
-  // Split by major headings (lines starting with # or ALL CAPS or numbered)
-  const headingPattern = /\n(#{1,3}\s+.+|[A-Z][A-Z\s]+|^\d+\.\s+.+)\n/gm;
-  let match;
-  let lastPos = 0;
+  // Enhanced heading detection:
+  // 1. Markdown headings (# ## ###)
+  // 2. Lines in ALL CAPS (at least 3 words, under 60 chars)
+  // 3. Numbered headings (1. 2. 1.1 etc.)
+  // 4. Lines ending with colon followed by newline (e.g., "Introduction:")
+  const lines = text.split("\n");
+  let currentSection: {
+    heading: string;
+    startLine: number;
+    startPosition: number;
+  } | null = null;
 
-  while ((match = headingPattern.exec(text)) !== null) {
-    if (match.index > lastPos) {
-      const heading = match[1].replace(/^#+\s+/, "").trim();
-      const content = text.substring(lastPos, match.index);
-      const words = content.split(/\s+/).length;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    let isHeading = false;
+    let heading = line;
+    let depth = 1;
 
-      sections.push({
-        id: `section-${sections.length}`,
-        heading,
-        content,
-        startPosition: lastPos,
-        endPosition: match.index,
-        wordCount: words,
-        conceptsIntroduced: [],
-        conceptsRevisited: [],
-        depth: (match[1].match(/#+/) || [""])[0].length,
-      });
+    // Check for markdown heading
+    const mdMatch = line.match(/^(#{1,6})\s+(.+)/);
+    if (mdMatch) {
+      isHeading = true;
+      heading = mdMatch[2];
+      depth = mdMatch[1].length;
     }
-    lastPos = match.index + match[0].length;
+    // Check for ALL CAPS heading (3+ words, under 60 chars, not all punctuation)
+    else if (
+      line.length > 5 &&
+      line.length < 60 &&
+      line === line.toUpperCase() &&
+      /[A-Z].*\s+[A-Z].*\s+[A-Z]/.test(line) &&
+      !/^\s*[^A-Za-z0-9\s]+\s*$/.test(line)
+    ) {
+      isHeading = true;
+      heading = line;
+      depth = 1;
+    }
+    // Check for numbered heading (1. or 1.1 etc.)
+    else if (/^\d+(\.\d+)*\.\s+[A-Z]/.test(line) && line.length < 80) {
+      isHeading = true;
+      heading = line.replace(/^\d+(\.\d+)*\.\s+/, "");
+      depth = (line.match(/\./g) || []).length;
+    }
+    // Check for colon-ended heading on its own line
+    else if (
+      /^[A-Z][^:]{2,50}:\s*$/.test(line) &&
+      i < lines.length - 1 &&
+      lines[i + 1].trim().length > 0
+    ) {
+      isHeading = true;
+      heading = line.replace(/:$/, "");
+      depth = 1;
+    }
+
+    if (isHeading) {
+      // Save previous section
+      if (currentSection) {
+        const startPos = currentSection.startPosition;
+        const endLine = i - 1;
+        const endPos = lines.slice(0, i).join("\n").length;
+        const content = text.substring(startPos, endPos).trim();
+        const words = content.split(/\s+/).filter(Boolean).length;
+
+        sections.push({
+          id: `section-${sections.length}`,
+          heading: currentSection.heading,
+          content,
+          startPosition: startPos,
+          endPosition: endPos,
+          wordCount: words,
+          conceptsIntroduced: [],
+          conceptsRevisited: [],
+          depth: 1,
+        });
+      }
+
+      // Start new section
+      const startPos = lines.slice(0, i + 1).join("\n").length + 1;
+      currentSection = {
+        heading,
+        startLine: i,
+        startPosition: startPos,
+      };
+    }
   }
 
   // Add final section
-  if (lastPos < text.length) {
-    const content = text.substring(lastPos);
+  if (currentSection) {
+    const content = text.substring(currentSection.startPosition).trim();
+    const words = content.split(/\s+/).filter(Boolean).length;
     sections.push({
       id: `section-${sections.length}`,
-      heading: "Conclusion",
+      heading: currentSection.heading,
       content,
-      startPosition: lastPos,
+      startPosition: currentSection.startPosition,
       endPosition: text.length,
-      wordCount: content.split(/\s+/).length,
+      wordCount: words,
       conceptsIntroduced: [],
       conceptsRevisited: [],
       depth: 1,
     });
   }
 
+  // If no sections found, treat entire text as one section
   return sections.length > 0
     ? sections
     : [
@@ -734,7 +796,7 @@ function parseChapterIntoSections(text: string) {
           content: text,
           startPosition: 0,
           endPosition: text.length,
-          wordCount: text.split(/\s+/).length,
+          wordCount: text.split(/\s+/).filter(Boolean).length,
           conceptsIntroduced: [],
           conceptsRevisited: [],
           depth: 1,

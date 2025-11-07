@@ -506,6 +506,11 @@ export const ReviewScheduleTimeline: React.FC<{
   const schedule = analysis.visualizations.reviewSchedule;
   const concepts = schedule.concepts.slice(0, 10);
 
+  // Build ID -> Name map from conceptMap nodes
+  const idToName: Record<string, string> = {};
+  const nodes = analysis.visualizations.conceptMap.nodes as any[];
+  nodes.forEach((n) => (idToName[n.id] = n.label));
+
   return (
     <div className="viz-container">
       <h3>Concept Review Schedule</h3>
@@ -535,28 +540,38 @@ export const ReviewScheduleTimeline: React.FC<{
       </div>
 
       <div className="review-timeline">
-        {concepts.map((concept) => (
-          <div key={concept.conceptId} className="concept-timeline">
-            <div className="concept-label">
-              {concept.conceptId.replace("concept-", "C")}
+        {concepts.map((concept) => {
+          const conceptName = idToName[concept.conceptId] || concept.conceptId;
+          return (
+            <div key={concept.conceptId} className="concept-timeline">
+              <div className="concept-label" title={conceptName}>
+                {conceptName.length > 20
+                  ? conceptName.substring(0, 18) + "..."
+                  : conceptName}
+              </div>
+              <div className="mention-bars">
+                {concept.spacing.map((gap, idx) => (
+                  <div
+                    key={idx}
+                    className={`gap-bar ${
+                      concept.isOptimal ? "optimal" : "needs-adjustment"
+                    }`}
+                    style={{
+                      width: `${Math.min((gap / 10000) * 100, 100)}%`,
+                    }}
+                    title={`Gap ${idx + 1}: ${gap} characters between mentions`}
+                  />
+                ))}
+              </div>
+              <div
+                className="mention-count"
+                title={`Total mentions of ${conceptName}`}
+              >
+                {concept.mentions} mentions
+              </div>
             </div>
-            <div className="mention-bars">
-              {concept.spacing.map((gap, idx) => (
-                <div
-                  key={idx}
-                  className={`gap-bar ${
-                    concept.isOptimal ? "optimal" : "needs-adjustment"
-                  }`}
-                  style={{
-                    width: `${Math.min((gap / 10000) * 100, 100)}%`,
-                  }}
-                  title={`Gap: ${gap} characters`}
-                />
-              ))}
-            </div>
-            <div className="mention-count">{concept.mentions} mentions</div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <style>{`
