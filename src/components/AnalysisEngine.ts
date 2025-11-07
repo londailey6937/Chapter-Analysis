@@ -97,6 +97,47 @@ export class AnalysisEngine {
     };
 
     // Build concept analysis (basic defaults from graph/metrics)
+    const reviewPatterns: ReviewPattern[] = conceptGraph.concepts.map(
+      (concept) => {
+        const mentions = concept.mentions.length;
+        const positions = concept.mentions
+          .map((m) => m.position)
+          .sort((a, b) => a - b);
+        const spacing: number[] = [];
+        for (let i = 1; i < positions.length; i++) {
+          spacing.push(positions[i] - positions[i - 1]);
+        }
+        const avgSpacing =
+          spacing.length > 0
+            ? spacing.reduce((a, b) => a + b, 0) / spacing.length
+            : 0;
+        // Heuristic: optimal if 2+ mentions and spacing variance is low
+        const variance =
+          spacing.length > 0
+            ? spacing.reduce(
+                (sum, gap) => sum + Math.pow(gap - avgSpacing, 2),
+                0
+              ) / spacing.length
+            : 0;
+        const isOptimal = mentions >= 2 && variance < avgSpacing * avgSpacing;
+
+        return {
+          conceptId: concept.id,
+          conceptName: concept.name,
+          mentions,
+          firstAppearance: concept.firstMentionPosition,
+          spacing,
+          avgSpacing: Math.round(avgSpacing),
+          isOptimal,
+          recommendation: isOptimal
+            ? undefined
+            : mentions < 2
+            ? "Consider revisiting this concept at least once more"
+            : "Try spacing mentions more evenly",
+        };
+      }
+    );
+
     const conceptAnalysis: ConceptAnalysisResult = {
       totalConceptsIdentified: conceptGraph.concepts.length,
       coreConceptCount: conceptGraph.hierarchy.core.length,
@@ -104,7 +145,7 @@ export class AnalysisEngine {
       novelConceptsPerSection: chapter.sections.map(
         (s) => s.conceptsIntroduced.length
       ),
-      reviewPatterns: [] as ReviewPattern[],
+      reviewPatterns,
       hierarchyBalance: (() => {
         const total =
           conceptGraph.hierarchy.core.length +

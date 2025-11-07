@@ -1,6 +1,6 @@
 /**
  * Core Type Definitions for Chapter Checker Application
- * 
+ *
  * This file contains all TypeScript interfaces and types used throughout
  * the application for type safety and IDE autocompletion.
  */
@@ -15,7 +15,7 @@
 export interface ConceptMention {
   position: number;
   context: string;
-  depth: 'shallow' | 'moderate' | 'deep';
+  depth: "shallow" | "moderate" | "deep";
   isRevisit: boolean;
   associatedConcepts: string[];
 }
@@ -27,7 +27,7 @@ export interface Concept {
   id: string;
   name: string;
   definition: string;
-  importance: 'core' | 'supporting' | 'detail';
+  importance: "core" | "supporting" | "detail";
   firstMentionPosition: number;
   mentions: ConceptMention[];
   relatedConcepts: string[];
@@ -42,7 +42,7 @@ export interface Concept {
 export interface ConceptRelationship {
   source: string;
   target: string;
-  type: 'prerequisite' | 'related' | 'contrasts' | 'extends' | 'example';
+  type: "prerequisite" | "related" | "contrasts" | "extends" | "example";
   strength: number;
 }
 
@@ -73,7 +73,7 @@ export interface ConceptGraph {
  * Metadata about the chapter
  */
 export interface ChapterMetadata {
-  readingLevel: 'beginner' | 'intermediate' | 'advanced';
+  readingLevel: "beginner" | "intermediate" | "advanced";
   domain: string;
   targetAudience: string;
   estimatedReadingTime: number;
@@ -117,22 +117,22 @@ export interface Chapter {
  * Learning principle type
  */
 export type LearningPrinciple =
-  | 'deepProcessing'
-  | 'spacedRepetition'
-  | 'retrievalPractice'
-  | 'interleaving'
-  | 'dualCoding'
-  | 'generativeLearning'
-  | 'metacognition'
-  | 'schemaBuilding'
-  | 'cognitiveLoad'
-  | 'emotionAndRelevance';
+  | "deepProcessing"
+  | "spacedRepetition"
+  | "retrievalPractice"
+  | "interleaving"
+  | "dualCoding"
+  | "generativeLearning"
+  | "metacognition"
+  | "schemaBuilding"
+  | "cognitiveLoad"
+  | "emotionAndRelevance";
 
 /**
  * Finding from principle evaluation
  */
 export interface Finding {
-  type: 'positive' | 'warning' | 'neutral' | 'critical';
+  type: "positive" | "warning" | "neutral" | "critical";
   message: string;
   severity: number;
   location?: {
@@ -148,7 +148,7 @@ export interface Finding {
 export interface Suggestion {
   id: string;
   principle: LearningPrinciple;
-  priority: 'high' | 'medium' | 'low';
+  priority: "high" | "medium" | "low";
   title: string;
   description: string;
   implementation: string;
@@ -161,11 +161,11 @@ export interface Suggestion {
  * Supporting evidence for evaluation
  */
 export interface Evidence {
-  type: 'count' | 'metric' | 'pattern' | 'absence';
+  type: "count" | "metric" | "pattern" | "absence";
   metric: string;
   value: number | string;
   threshold?: number;
-  quality: 'strong' | 'moderate' | 'weak';
+  quality: "strong" | "moderate" | "weak";
 }
 
 /**
@@ -189,6 +189,7 @@ export interface PrincipleEvaluation {
  */
 export interface ReviewPattern {
   conceptId: string;
+  conceptName: string;
   mentions: number;
   firstAppearance: number;
   spacing: number[];
@@ -228,10 +229,10 @@ export interface StructureAnalysisResult {
   sectionCount: number;
   avgSectionLength: number;
   sectionLengthVariance: number;
-  pacing: 'slow' | 'moderate' | 'fast';
+  pacing: "slow" | "moderate" | "fast";
   scaffolding: ScaffoldingAnalysis;
   transitionQuality: number;
-  conceptualization: 'shallow' | 'moderate' | 'deep';
+  conceptualization: "shallow" | "moderate" | "deep";
 }
 
 /**
@@ -239,13 +240,13 @@ export interface StructureAnalysisResult {
  */
 export interface Recommendation {
   id: string;
-  priority: 'high' | 'medium' | 'low';
-  category: 'restructure' | 'enhance' | 'add' | 'clarify' | 'remove';
+  priority: "high" | "medium" | "low";
+  category: "restructure" | "enhance" | "add" | "clarify" | "remove";
   title: string;
   description: string;
   affectedSections: string[];
   affectedConcepts: string[];
-  estimatedEffort: 'low' | 'medium' | 'high';
+  estimatedEffort: "low" | "medium" | "high";
   expectedOutcome: string;
   actionItems: string[];
 }
@@ -260,7 +261,7 @@ export interface Recommendation {
 export interface ConceptNode {
   id: string;
   label: string;
-  importance: 'core' | 'supporting' | 'detail';
+  importance: "core" | "supporting" | "detail";
   size: number;
   color: string;
   firstMention: number;
@@ -272,7 +273,7 @@ export interface ConceptNode {
 export interface ConceptLink {
   source: string;
   target: string;
-  type: 'prerequisite' | 'related' | 'contrasts' | 'extends' | 'example';
+  type: "prerequisite" | "related" | "contrasts" | "extends" | "example";
   strength: number;
 }
 
@@ -410,7 +411,7 @@ export interface ChapterAnalysis {
  */
 export interface AnalysisConfig {
   domain: string;
-  readingLevel: 'beginner' | 'intermediate' | 'advanced';
+  readingLevel: "beginner" | "intermediate" | "advanced";
   focusPrinciples?: LearningPrinciple[];
   enableVisualization: boolean;
   conceptExtractionThreshold: number;
@@ -421,7 +422,7 @@ export interface AnalysisConfig {
  * Export options
  */
 export interface ExportData {
-  format: 'json' | 'markdown' | 'html';
+  format: "json" | "markdown" | "html";
   includeVisualizations: boolean;
   includeSuggestions: boolean;
   includeEvidence: boolean;

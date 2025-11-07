@@ -15,41 +15,203 @@ import {
   Section,
 } from "../../types";
 
+import {
+  createConceptLookup,
+  isChemistryConcept,
+  getConceptDefinition,
+  type ConceptDefinition,
+} from "../data/chemistryConceptLibrary";
+
 // ============================================================================
 // CONCEPT EXTRACTOR
 // ============================================================================
 
 export class ConceptExtractor {
+  // Concept library lookup for matching known concepts
+  private conceptLibrary: Map<string, ConceptDefinition>;
+
+  constructor() {
+    this.conceptLibrary = createConceptLookup();
+  }
+
+  // Comprehensive stopword list - common English words that aren't domain concepts
   private commonWords = new Set([
+    // Articles, determiners
     "the",
     "a",
     "an",
+    "this",
+    "that",
+    "these",
+    "those",
+    "each",
+    "every",
+    "some",
+    "any",
+    // Conjunctions
     "and",
     "or",
     "but",
+    "nor",
+    "so",
+    "yet",
+    "for",
+    // Prepositions
     "in",
     "on",
     "at",
     "to",
-    "for",
-    "of",
+    "from",
+    "by",
+    "with",
+    "about",
+    "against",
+    "between",
+    "into",
+    "through",
+    "during",
+    "before",
+    "after",
+    "above",
+    "below",
+    "up",
+    "down",
+    "out",
+    "off",
+    "over",
+    "under",
+    "near",
+    "far",
+    "around",
+    "behind",
+    "beyond",
+    "within",
+    "without",
+    // Pronouns
+    "i",
+    "you",
+    "he",
+    "she",
+    "it",
+    "we",
+    "they",
+    "who",
+    "what",
+    "which",
+    "whom",
+    "whose",
+    "my",
+    "your",
+    "his",
+    "her",
+    "its",
+    "our",
+    "their",
+    "mine",
+    "yours",
+    "theirs",
+    "ours",
+    "myself",
+    "yourself",
+    "himself",
+    "herself",
+    "itself",
+    "ourselves",
+    "themselves",
+    // Verbs (common auxiliary and linking)
     "is",
     "are",
+    "am",
+    "was",
+    "were",
     "be",
     "been",
+    "being",
     "have",
     "has",
+    "had",
+    "having",
     "do",
     "does",
     "did",
+    "doing",
     "will",
     "would",
-    "could",
+    "shall",
     "should",
     "may",
     "might",
     "must",
     "can",
+    "could",
+    "ought",
+    // Common adverbs/question words
+    "how",
+    "when",
+    "where",
+    "why",
+    "very",
+    "too",
+    "much",
+    "many",
+    "more",
+    "most",
+    "less",
+    "least",
+    "only",
+    "just",
+    "even",
+    "also",
+    "still",
+    "already",
+    "yet",
+    "always",
+    "never",
+    "sometimes",
+    "often",
+    "usually",
+    "rarely",
+    "seldom",
+    // Common adjectives
+    "all",
+    "both",
+    "few",
+    "other",
+    "another",
+    "such",
+    "same",
+    "own",
+    "different",
+    "various",
+    "several",
+    "certain",
+    "similar",
+    "particular",
+    // Other common words
+    "not",
+    "no",
+    "yes",
+    "there",
+    "here",
+    "then",
+    "now",
+    "well",
+    "however",
+    "therefore",
+    "thus",
+    "hence",
+    "whereas",
+    "although",
+    "though",
+    "because",
+    "since",
+    "if",
+    "unless",
+    "until",
+    "while",
+    "as",
+    "than",
+    "like",
   ]);
 
   /**
@@ -89,6 +251,8 @@ export class ConceptExtractor {
 
   /**
    * Phase 1: Identify candidate concepts from text patterns
+   *
+   * NEW APPROACH: Prioritize concepts from the chemistry concept library
    */
   private identifyCandidateConcepts(
     text: string,
@@ -96,40 +260,52 @@ export class ConceptExtractor {
   ): ConceptCandidate[] {
     const candidates: Map<string, ConceptCandidate> = new Map();
 
-    // Extract from section headings (high importance)
+    // STEP 1: Scan for library concepts throughout the text
+    this.extractLibraryConcepts(text, candidates);
+
+    // STEP 2: Extract from section headings (high importance)
     sections.forEach((section) => {
       const headingTerms = this.extractTerms(section.heading);
       headingTerms.forEach((term) => {
-        const existing = candidates.get(term.normalized) || {
-          term: term.original,
-          normalized: term.normalized,
-          frequency: 0,
-          fromHeading: 0,
-          inlineDefinitions: [],
-          positions: [],
-          sentenceContexts: [],
-        };
-        existing.frequency++;
-        existing.fromHeading++;
-        candidates.set(term.normalized, existing);
+        // Only add if it's a library concept or passes strict filters
+        if (this.isValidConcept(term.normalized)) {
+          const existing = candidates.get(term.normalized) || {
+            term: term.original,
+            normalized: term.normalized,
+            frequency: 0,
+            fromHeading: 0,
+            inlineDefinitions: [],
+            positions: [],
+            sentenceContexts: [],
+            isLibraryConcept: this.conceptLibrary.has(term.normalized),
+          };
+          existing.frequency++;
+          existing.fromHeading++;
+          candidates.set(term.normalized, existing);
+        }
       });
     });
 
-    // Extract from sentences with defining patterns
+    // STEP 3: Extract from sentences with defining patterns (only library concepts)
     const sentences = this.splitIntoSentences(text);
     sentences.forEach((sentence, _idx) => {
       const position = text.indexOf(sentence);
 
       // Pattern 1: "X is a/an Y" (definition)
-      const defPattern = /(\w+(?:\s+\w+)*)\s+is\s+(?:a|an|the)\s+([^.!?]+)/gi;
+      const defPattern =
+        /(\w+(?:\s+\w+){0,3})\s+is\s+(?:a|an|the)\s+([^.!?]+)/gi;
       let defMatch;
       while ((defMatch = defPattern.exec(sentence)) !== null) {
         const concept = this.normalizeText(defMatch[1]);
         const definition = defMatch[2].trim();
-        this.addCandidate(candidates, concept, defMatch[1], position, {
-          definition,
-          hasInlineDefinition: true,
-        });
+
+        // Only add if it's a known concept
+        if (this.isValidConcept(concept)) {
+          this.addCandidate(candidates, concept, defMatch[1], position, {
+            definition,
+            hasInlineDefinition: true,
+          });
+        }
       }
 
       // Pattern 2: "X refers to Y"
@@ -148,8 +324,46 @@ export class ConceptExtractor {
       let capMatch;
       while ((capMatch = capitalPattern.exec(sentence)) !== null) {
         const concept = this.normalizeText(capMatch[1]);
-        if (!this.commonWords.has(concept)) {
+        if (
+          !this.commonWords.has(concept) &&
+          !this.isCommonNonConcept(concept)
+        ) {
           this.addCandidate(candidates, concept, capMatch[1], position, {});
+        }
+      }
+
+      // Pattern 4: Chemical formulas (e.g., NaCl, H₂O, CO₂)
+      const chemicalPattern = /\b([A-Z][a-z]?(?:[₀-₉0-9]|[A-Z][a-z]?)*)\b/g;
+      let chemMatch;
+      while ((chemMatch = chemicalPattern.exec(sentence)) !== null) {
+        const formula = chemMatch[1];
+        // Must have at least one capital letter followed by lowercase or number
+        if (/[A-Z][a-z₀-₉0-9]/.test(formula) && formula.length <= 10) {
+          this.addCandidate(
+            candidates,
+            formula.toLowerCase(),
+            formula,
+            position,
+            {
+              isChemicalFormula: true,
+            }
+          );
+        }
+      }
+
+      // Pattern 5: Technical multi-word terms (lowercase, near definitions)
+      const technicalPattern =
+        /\b([a-z]+(?:\s+[a-z]+){1,2})\s+(?:is|are|refers?|means?|involves?)\s/gi;
+      let techMatch;
+      while ((techMatch = technicalPattern.exec(sentence)) !== null) {
+        const concept = this.normalizeText(techMatch[1]);
+        if (
+          !this.commonWords.has(concept) &&
+          !this.isCommonNonConcept(concept)
+        ) {
+          this.addCandidate(candidates, concept, techMatch[1], position, {
+            isTechnicalTerm: true,
+          });
         }
       }
 
@@ -184,11 +398,11 @@ export class ConceptExtractor {
         score += Math.min(tf * 100, 30); // Max 30 points
 
         // Factor 2: From heading (high signal)
-        score += candidate.fromHeading * 20; // 20 points per heading
+        score += candidate.fromHeading * 25; // 25 points per heading appearance
 
         // Factor 3: Has inline definition
         if (candidate.inlineDefinitions.length > 0) {
-          score += 25;
+          score += 30;
         }
 
         // Factor 4: Term length (longer = more specific)
@@ -206,14 +420,38 @@ export class ConceptExtractor {
           score += Math.min(candidate.frequency * 3, 20);
         }
 
+        // Factor 7: HUGE BONUS for library concepts (priority)
+        if (candidate.isLibraryConcept) {
+          score += 50; // Library concepts get massive boost
+        }
+
+        // Factor 8: Chemical formula or technical term bonus
+        if (candidate.isChemicalFormula) {
+          score += 20; // Chemical formulas are likely important
+        }
+        if (candidate.isTechnicalTerm) {
+          score += 15; // Technical terms near definitions are important
+        }
+
+        // Factor 9: Penalize very short single-word terms unless frequently mentioned or library concept
+        if (
+          wordCount === 1 &&
+          candidate.term.length <= 4 &&
+          candidate.frequency < 3 &&
+          !candidate.isLibraryConcept
+        ) {
+          score -= 10;
+        }
+
         return {
           ...candidate,
           score,
           confidence: Math.min(score / 100, 1),
         };
       })
-      .filter((c) => c.score > 15) // Minimum threshold
-      .sort((a, b) => b.score - a.score);
+      .filter((c) => c.score > 20) // Lower threshold since library concepts get +50
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 60); // Increased limit to capture more library concepts
   }
 
   /**
@@ -228,12 +466,20 @@ export class ConceptExtractor {
     scored.forEach((candidate, index) => {
       const mentions = this.findAllMentions(text, candidate.term);
 
+      // Get library definition if available
+      const libraryDef = this.conceptLibrary.get(candidate.normalized);
+      const conceptName = libraryDef?.name || candidate.term;
+      const conceptDefinition = libraryDef
+        ? `${libraryDef.category}${
+            libraryDef.subcategory ? " - " + libraryDef.subcategory : ""
+          }`
+        : candidate.inlineDefinitions[0] ||
+          `A key concept in this material (mentioned ${mentions.length} times)`;
+
       const concept: Concept = {
         id: `concept-${index}`,
-        name: candidate.term,
-        definition:
-          candidate.inlineDefinitions[0] ||
-          `A key concept in this material (mentioned ${mentions.length} times)`,
+        name: conceptName, // Use canonical name from library
+        definition: conceptDefinition,
         importance: this.determineImportance(mentions, candidate, index),
         firstMentionPosition: mentions[0]?.position || 0,
         mentions: mentions,
@@ -387,6 +633,78 @@ export class ConceptExtractor {
   // HELPER METHODS
   // ========================================================================
 
+  /**
+   * Extract all known chemistry concepts from the library that appear in text
+   */
+  private extractLibraryConcepts(
+    text: string,
+    candidates: Map<string, ConceptCandidate>
+  ): void {
+    const lowerText = text.toLowerCase();
+
+    // Check for each concept in the library
+    for (const [conceptKey, conceptDef] of this.conceptLibrary.entries()) {
+      // Create regex pattern for whole word matching
+      const pattern = new RegExp(`\\b${this.escapeRegex(conceptKey)}\\b`, "gi");
+      const matches = text.match(pattern);
+
+      if (matches && matches.length > 0) {
+        // Find all positions
+        const positions: number[] = [];
+        let match;
+        const regex = new RegExp(`\\b${this.escapeRegex(conceptKey)}\\b`, "gi");
+        while ((match = regex.exec(text)) !== null) {
+          positions.push(match.index);
+        }
+
+        const existing = candidates.get(conceptKey) || {
+          term: conceptDef.name, // Use canonical name from library
+          normalized: conceptKey,
+          frequency: 0,
+          fromHeading: 0,
+          inlineDefinitions: [],
+          positions: [],
+          sentenceContexts: [],
+          isLibraryConcept: true,
+        };
+
+        existing.frequency += matches.length;
+        existing.positions.push(...positions);
+        candidates.set(conceptKey, existing);
+      }
+    }
+  }
+
+  /**
+   * Check if a term is a valid concept (either in library or passes strict criteria)
+   */
+  private isValidConcept(normalized: string): boolean {
+    // First check: is it in the concept library?
+    if (this.conceptLibrary.has(normalized)) {
+      return true;
+    }
+
+    // Second check: strict criteria for non-library terms
+    // Must not be a common word
+    if (this.commonWords.has(normalized)) {
+      return false;
+    }
+
+    // Must not be a common non-concept word
+    if (this.isCommonNonConcept(normalized)) {
+      return false;
+    }
+
+    // Must be at least 4 characters (avoid abbreviations unless in library)
+    if (normalized.length < 4) {
+      return false;
+    }
+
+    // For non-library concepts, require them to be multi-word or capitalized context
+    // This is very strict - we primarily want library concepts
+    return false; // Default to rejecting non-library concepts
+  }
+
   private findAllMentions(text: string, term: string): ConceptMention[] {
     const mentions: ConceptMention[] = [];
     const regex = new RegExp(`\\b${this.escapeRegex(term)}\\b`, "gi");
@@ -445,16 +763,137 @@ export class ConceptExtractor {
   private extractTerms(
     text: string
   ): { original: string; normalized: string }[] {
-    // Extract noun phrases and capitalized terms
-    const nounPhrasePattern = /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g;
-    const matches = text.match(nounPhrasePattern) || [];
+    const terms: { original: string; normalized: string }[] = [];
 
-    return matches
-      .filter((m) => !this.commonWords.has(this.normalizeText(m)))
-      .map((m) => ({
-        original: m,
-        normalized: this.normalizeText(m),
-      }));
+    // Pattern 1: Multi-word capitalized terms (e.g., "Lewis Notation", "Octet Rule")
+    const capitalizedPhrasePattern = /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b/g;
+    const capitalizedMatches = text.match(capitalizedPhrasePattern) || [];
+
+    // Pattern 2: Single capitalized terms (e.g., "Sodium", "Chlorine")
+    const singleCapitalPattern = /\b[A-Z][a-z]+\b/g;
+    const singleMatches = text.match(singleCapitalPattern) || [];
+
+    // Pattern 3: Technical terms (lowercase multi-word phrases near definitions)
+    // e.g., "valence electrons", "covalent bonding", "electron configuration"
+    const technicalPattern =
+      /\b([a-z]+(?:\s+[a-z]+){1,3})\b(?=\s+(?:is|are|refers?|means?|involves?))/gi;
+    const technicalMatches = text.match(technicalPattern) || [];
+
+    // Combine and deduplicate
+    const allMatches = [
+      ...capitalizedMatches,
+      ...singleMatches,
+      ...technicalMatches,
+    ];
+    const seen = new Set<string>();
+
+    for (const match of allMatches) {
+      const normalized = this.normalizeText(match);
+
+      // Skip if already seen or is a common word
+      if (seen.has(normalized) || this.commonWords.has(normalized)) continue;
+
+      // Skip single-letter terms or very short terms
+      if (normalized.length <= 2) continue;
+
+      // Skip if it's just a common word even when capitalized
+      if (this.isCommonNonConcept(normalized)) continue;
+
+      seen.add(normalized);
+      terms.push({
+        original: match,
+        normalized: normalized,
+      });
+    }
+
+    return terms;
+  }
+
+  /**
+   * Check if a term is a common word that shouldn't be a concept
+   * even when capitalized (e.g., "Think", "Notice", "Remember")
+   */
+  private isCommonNonConcept(normalized: string): boolean {
+    const nonConceptWords = new Set([
+      "think",
+      "notice",
+      "remember",
+      "understand",
+      "learn",
+      "know",
+      "see",
+      "look",
+      "read",
+      "write",
+      "explain",
+      "ask",
+      "answer",
+      "question",
+      "example",
+      "section",
+      "chapter",
+      "introduction",
+      "conclusion",
+      "summary",
+      "note",
+      "tip",
+      "hint",
+      "practice",
+      "exercise",
+      "review",
+      "test",
+      "quiz",
+      "problem",
+      "solution",
+      "step",
+      "part",
+      "figure",
+      "table",
+      "diagram",
+      "graph",
+      "chart",
+      "image",
+      "following",
+      "above",
+      "below",
+      "next",
+      "previous",
+      "first",
+      "second",
+      "third",
+      "last",
+      "final",
+      "initial",
+      "main",
+      "key",
+      "important",
+      "basic",
+      "simple",
+      "complex",
+      "easy",
+      "hard",
+      "difficult",
+      "quick",
+      "slow",
+      "new",
+      "old",
+      "good",
+      "bad",
+      "better",
+      "best",
+      "worse",
+      "worst",
+      "right",
+      "wrong",
+      "correct",
+      "incorrect",
+      "true",
+      "false",
+      "yes",
+      "no",
+    ]);
+
+    return nonConceptWords.has(normalized);
   }
 
   private normalizeText(text: string): string {
@@ -509,6 +948,10 @@ interface ConceptCandidate {
   inlineDefinitions: string[];
   positions: number[];
   sentenceContexts: string[];
+  isLibraryConcept?: boolean; // NEW: track if concept is from library
+  isTechnicalTerm?: boolean;
+  isChemicalFormula?: boolean;
+  hasInlineDefinition?: boolean;
 }
 
 interface ScoredCandidate extends ConceptCandidate {

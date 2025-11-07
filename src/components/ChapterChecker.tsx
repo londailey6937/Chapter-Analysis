@@ -7,6 +7,10 @@ import React, { useState, useRef } from "react";
 import { AnalysisEngine } from "./AnalysisEngine";
 import { ChapterAnalysisDashboard } from "./VisualizationComponents";
 import { Chapter, ChapterAnalysis } from "@/types";
+import {
+  extractTextFromPdf,
+  extractTextFromPdfArrayBuffer,
+} from "@/utils/pdfText";
 
 // ============================================================================
 // MAIN APPLICATION COMPONENT
@@ -19,6 +23,7 @@ export const ChapterChecker: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragActive, setIsDragActive] = useState(false);
 
   /**
    * Handle chapter analysis
@@ -91,16 +96,31 @@ export const ChapterChecker: React.FC = () => {
   /**
    * Handle file upload
    */
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
-      setChapterText(content);
-    };
-    reader.readAsText(file);
+    try {
+      if (
+        file.type === "application/pdf" ||
+        file.name.toLowerCase().endsWith(".pdf")
+      ) {
+        const text = await extractTextFromPdf(file);
+        setChapterText(text);
+      } else {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const content = event.target?.result as string;
+          setChapterText(content);
+        };
+        reader.readAsText(file);
+      }
+    } catch (err) {
+      setError(
+        `Failed to read file: ${
+          err instanceof Error ? err.message : String(err)
+        }`
+      );
+    }
   };
 
   /**
@@ -130,6 +150,55 @@ export const ChapterChecker: React.FC = () => {
     setError(null);
   };
 
+  /**
+   * Unified file reader for upload and drag-drop
+   */
+  const readFile = async (file: File) => {
+    try {
+      if (
+        file.type === "application/pdf" ||
+        file.name.toLowerCase().endsWith(".pdf")
+      ) {
+        const text = await extractTextFromPdf(file);
+        setChapterText((prev) => (prev ? prev + "\n\n" + text : text));
+      } else {
+        const content = await file.text();
+        setChapterText((prev) => (prev ? prev + "\n\n" + content : content));
+      }
+    } catch (err) {
+      setError(
+        `Failed to process file: ${
+          err instanceof Error ? err.message : String(err)
+        }`
+      );
+    }
+  };
+
+  /** Drag & Drop handlers */
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isDragActive) setIsDragActive(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragActive(false);
+    const files = Array.from(e.dataTransfer?.files || []);
+    if (!files.length) return;
+    for (const file of files) {
+      if (!/(\.txt|\.md|\.pdf)$/i.test(file.name)) continue;
+      await readFile(file);
+    }
+  };
+
   return (
     <div className="chapter-checker">
       <header className="app-header">
@@ -141,7 +210,12 @@ export const ChapterChecker: React.FC = () => {
         {!analysis ? (
           <>
             {/* INPUT SECTION */}
-            <div className="input-section">
+            <div
+              className={`input-section ${isDragActive ? "drag-active" : ""}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
               <div className="editor-controls">
                 <h2>Paste or Upload Your Chapter</h2>
                 <div className="control-buttons">
@@ -150,12 +224,12 @@ export const ChapterChecker: React.FC = () => {
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isAnalyzing}
                   >
-                    📄 Upload File (.txt)
+                    📄 Upload File (.txt, .md, .pdf)
                   </button>
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept=".txt,.md"
+                    accept=".txt,.md,.pdf"
                     onChange={handleFileUpload}
                     style={{ display: "none" }}
                   />
@@ -177,7 +251,47 @@ export const ChapterChecker: React.FC = () => {
                 placeholder="Paste your chapter text here... (minimum 200 words)"
                 className="chapter-textarea"
                 disabled={isAnalyzing}
+                onPaste={async (e) => {
+                  try {
+                    const items = e.clipboardData?.items;
+                    if (!items) return;
+                    for (let i = 0; i < items.length; i++) {
+                      const item = items[i];
+                      if (
+                        item.kind === "file" &&
+                        item.type === "application/pdf"
+                      ) {
+                        e.preventDefault();
+                        const file = item.getAsFile();
+                        if (!file) return;
+                        const buffer = await file.arrayBuffer();
+                        const text = await extractTextFromPdfArrayBuffer(
+                          buffer
+                        );
+                        setChapterText((prev) =>
+                          prev ? prev + "\n\n" + text : text
+                        );
+                        return;
+                      }
+                    }
+                  } catch (err) {
+                    setError(
+                      `Failed to paste PDF: ${
+                        err instanceof Error ? err.message : String(err)
+                      }`
+                    );
+                  }
+                }}
               />
+
+              {/* Drag & Drop hint */}
+              <div className="drop-zone" aria-label="Drag and drop files here">
+                <strong>Drag & Drop</strong> a .txt, .md, or .pdf file anywhere
+                in this box
+                <div className="accepted-note">
+                  Accepted: .txt .md .pdf (PDF text extracted)
+                </div>
+              </div>
 
               <div className="word-count">
                 <span>{chapterText.trim().split(/\s+/).length} words</span>
@@ -325,6 +439,44 @@ export const ChapterChecker: React.FC = () => {
           padding: 30px;
           margin-bottom: 20px;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-section.drag-active {
+          outline: 3px dashed #667eea;
+          outline-offset: 2px;
+          background: linear-gradient(180deg, #ffffff 0%, #f0f4ff 100%);
+        }
+
+        .drop-zone {
+          margin-top: 18px;
+          padding: 14px 16px;
+          border: 2px dashed #cbd5e1;
+          border-radius: 10px;
+          font-size: 14px;
+          text-align: center;
+          color: #334155;
+          background: #f8fafc;
+          transition: background 0.25s, border-color 0.25s;
+          user-select: none;
+        }
+
+        .drag-active .drop-zone {
+          border-color: #667eea;
+          background: #eef2ff;
+        }
+
+        .drop-zone strong {
+          display: block;
+          font-size: 13px;
+          letter-spacing: 0.5px;
+          margin-bottom: 4px;
+          color: #1e3a8a;
+        }
+
+        .accepted-note {
+          margin-top: 6px;
+          font-size: 11px;
+          color: #64748b;
         }
 
         .editor-controls {

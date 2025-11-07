@@ -9,6 +9,7 @@ import {
   Line,
   BarChart,
   Bar,
+  Cell,
   // ScatterChart, // unused
   // Scatter, // unused
   XAxis,
@@ -152,7 +153,7 @@ export const ConceptMentionFrequency: React.FC<{
 }> = ({ analysis }) => {
   const reviewPatterns = analysis.conceptAnalysis.reviewPatterns.slice(0, 15);
   const data = reviewPatterns.map((pattern) => ({
-    concept: pattern.conceptId.replace("concept-", "C"),
+    concept: pattern.conceptName || pattern.conceptId.replace("concept-", "C"),
     mentions: pattern.mentions,
     isOptimal: pattern.isOptimal,
   }));
@@ -161,7 +162,7 @@ export const ConceptMentionFrequency: React.FC<{
     <div className="viz-container">
       <h3>Concept Revisit Frequency</h3>
       <p className="viz-subtitle">
-        Green = optimal spacing, Red = needs adjustment
+        Concept revisit counts (spacing quality indicated by bar color)
       </p>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart
@@ -175,15 +176,35 @@ export const ConceptMentionFrequency: React.FC<{
           />
           <Tooltip
             contentStyle={{ backgroundColor: "#fff", border: "1px solid #ccc" }}
+            formatter={(value: any, _name: any, props: any) => {
+              const entry = props.payload as any;
+              return [
+                value,
+                entry.isOptimal ? "Optimal spacing" : "Needs adjustment",
+              ];
+            }}
           />
-          <Bar
-            dataKey="mentions"
-            fill="#8884d8"
-            radius={[8, 8, 0, 0]}
-            shape={<BarShape isOptimal />}
+          <Bar dataKey="mentions" radius={[6, 6, 0, 0]}>
+            {data.map((entry, idx) => (
+              <Cell
+                key={`cell-${idx}`}
+                fill={entry.isOptimal ? "#16a34a" : "#dc2626"}
+              />
+            ))}
+          </Bar>
+          <Legend
+            verticalAlign="bottom"
+            height={36}
+            content={<RevisitLegend />}
           />
         </BarChart>
       </ResponsiveContainer>
+      <div className="accessibility-note" aria-hidden="true">
+        <small>
+          Legend: Green = optimal spaced revisits; Red = revisit pattern may
+          need adjustment.
+        </small>
+      </div>
     </div>
   );
 };
@@ -198,6 +219,36 @@ const BarShape = (props: { isOptimal?: boolean }): any => {
     );
   };
 };
+
+// Custom legend for revisit frequency
+const RevisitLegend: React.FC<any> = () => {
+  return (
+    <div style={{ display: "flex", gap: "18px", padding: "6px 0" }}>
+      <LegendItem color="#16a34a" label="Optimal spacing" />
+      <LegendItem color="#dc2626" label="Needs adjustment" />
+    </div>
+  );
+};
+
+const LegendItem: React.FC<{ color: string; label: string }> = ({
+  color,
+  label,
+}) => (
+  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+    <span
+      style={{
+        width: 14,
+        height: 14,
+        backgroundColor: color,
+        borderRadius: 3,
+        display: "inline-block",
+        boxShadow: "0 0 0 1px rgba(0,0,0,0.15)",
+      }}
+      aria-hidden="true"
+    />
+    <span style={{ fontSize: 12 }}>{label}</span>
+  </div>
+);
 
 // ============================================================================
 // CONCEPT MAP VISUALIZATION
