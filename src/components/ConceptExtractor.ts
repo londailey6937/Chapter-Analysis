@@ -267,7 +267,7 @@ export class ConceptExtractor {
     sections.forEach((section) => {
       const headingTerms = this.extractTerms(section.heading);
       headingTerms.forEach((term) => {
-        // Only add if it's a library concept or passes strict filters
+        // Allow heading-derived concepts if they pass generic filters
         if (this.isValidConcept(term.normalized)) {
           const existing = candidates.get(term.normalized) || {
             term: term.original,
@@ -285,6 +285,12 @@ export class ConceptExtractor {
         }
       });
     });
+
+    // STEP 2b: Add frequent n-grams (bi/tri-grams) to capture domain-agnostic concepts
+    this.addFrequentPhrases(text, candidates);
+
+    // STEP 2c: Extract code-like identifiers (e.g., Object.create, toString, Map.prototype)
+    this.extractCodeIdentifiers(text, candidates);
 
     // STEP 3: Extract from sentences with defining patterns (only library concepts)
     const sentences = this.splitIntoSentences(text);
@@ -679,30 +685,21 @@ export class ConceptExtractor {
    * Check if a term is a valid concept (either in library or passes strict criteria)
    */
   private isValidConcept(normalized: string): boolean {
-    // First check: is it in the concept library?
-    if (this.conceptLibrary.has(normalized)) {
-      return true;
-    }
+    // If it's in the chemistry library, allow (domain boost handled later)
+    if (this.conceptLibrary.has(normalized)) return true;
 
-    // Second check: strict criteria for non-library terms
-    // Must not be a common word
-    if (this.commonWords.has(normalized)) {
-      return false;
-    }
+    // Generic gating for all domains
+    if (this.commonWords.has(normalized)) return false;
+    if (this.isCommonNonConcept(normalized)) return false;
 
-    // Must not be a common non-concept word
-    if (this.isCommonNonConcept(normalized)) {
-      return false;
-    }
+    // Accept multi-word phrases generously
+    if (normalized.includes(" ")) return true;
 
-    // Must be at least 4 characters (avoid abbreviations unless in library)
-    if (normalized.length < 4) {
-      return false;
-    }
+    // Accept single words that are at least 5 chars (more likely domain terms)
+    if (normalized.length >= 5) return true;
 
-    // For non-library concepts, require them to be multi-word or capitalized context
-    // This is very strict - we primarily want library concepts
-    return false; // Default to rejecting non-library concepts
+    // Reject very short single tokens by default
+    return false;
   }
 
   private findAllMentions(text: string, term: string): ConceptMention[] {
@@ -933,6 +930,92 @@ export class ConceptExtractor {
 
   private escapeRegex(str: string): string {
     return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  // -------------------------
+  // Phrase and code extraction
+  // -------------------------
+  private addFrequentPhrases(
+    text: string,
+    candidates: Map<string, ConceptCandidate>
+  ) {
+    const tokens = (text.toLowerCase().match(/[a-z0-9]+/g) || []).filter(
+      (t) =>
+        t.length > 2 && !this.commonWords.has(t) && !this.isCommonNonConcept(t)
+    );
+    const bigrams: Map<string, number> = new Map();
+    const trigrams: Map<string, number> = new Map();
+    for (let i = 0; i < tokens.length; i++) {
+      if (i + 1 < tokens.length) {
+        const bi = `${tokens[i]} ${tokens[i + 1]}`;
+        bigrams.set(bi, (bigrams.get(bi) || 0) + 1);
+      }
+      if (i + 2 < tokens.length) {
+        const tri = `${tokens[i]} ${tokens[i + 1]} ${tokens[i + 2]}`;
+        trigrams.set(tri, (trigrams.get(tri) || 0) + 1);
+      }
+    }
+    const addTop = (
+      map: Map<string, number>,
+      minCount: number,
+      cap: number
+    ) => {
+      Array.from(map.entries())
+        .filter(([, c]) => c >= minCount)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, cap)
+        .forEach(([phrase, count]) => {
+          const norm = phrase;
+          if (!candidates.has(norm)) {
+            // approximate first position
+            const pos = Math.max(0, text.toLowerCase().indexOf(phrase));
+            candidates.set(norm, {
+              term: phrase,
+              normalized: norm,
+              frequency: count,
+              fromHeading: 0,
+              inlineDefinitions: [],
+              positions: [pos],
+              sentenceContexts: [],
+            });
+          }
+        });
+    };
+    addTop(bigrams, 2, 25);
+    addTop(trigrams, 2, 15);
+  }
+
+  private extractCodeIdentifiers(
+    text: string,
+    candidates: Map<string, ConceptCandidate>
+  ) {
+    // Match identifiers with dots (e.g., Object.create) and camel/Pascal case words used in code
+    const dotted =
+      text.match(/\b[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)+\b/g) || [];
+    const plainIds = text.match(/\b[A-Za-z_$][A-Za-z0-9_$]{3,}\b/g) || [];
+    const codeTerms = new Set<string>([...dotted, ...plainIds]);
+    codeTerms.forEach((original) => {
+      const cleaned = original.replace(/\(.*\)$/g, "");
+      const normalized = this.normalizeText(cleaned);
+      if (
+        !this.isCommonNonConcept(normalized) &&
+        !this.commonWords.has(normalized)
+      ) {
+        const pos = text.indexOf(original);
+        const existing = candidates.get(normalized) || {
+          term: cleaned,
+          normalized,
+          frequency: 0,
+          fromHeading: 0,
+          inlineDefinitions: [],
+          positions: [],
+          sentenceContexts: [],
+        };
+        existing.frequency++;
+        existing.positions.push(pos >= 0 ? pos : 0);
+        candidates.set(normalized, existing);
+      }
+    });
   }
 }
 
