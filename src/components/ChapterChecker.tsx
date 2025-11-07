@@ -6,6 +6,7 @@
 import React, { useState, useRef } from "react";
 import { AnalysisEngine } from "./AnalysisEngine";
 import { ChapterAnalysisDashboard } from "./VisualizationComponents";
+import { PdfViewer } from "./PdfViewer";
 import { Chapter, ChapterAnalysis } from "@/types";
 import {
   extractTextFromPdf,
@@ -22,6 +23,7 @@ export const ChapterChecker: React.FC = () => {
   const [sectionHints, setSectionHints] = useState<
     { title: string; startIndex: number }[] | null
   >(null);
+  const [pdfBuffer, setPdfBuffer] = useState<ArrayBuffer | null>(null);
   const [analysis, setAnalysis] = useState<ChapterAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -111,6 +113,11 @@ export const ChapterChecker: React.FC = () => {
         file.type === "application/pdf" ||
         file.name.toLowerCase().endsWith(".pdf")
       ) {
+        // Store buffer for visual rendering
+        const buffer = await file.arrayBuffer();
+        setPdfBuffer(buffer);
+
+        // Extract structure for analysis
         const { text, pageTexts, outline } = await extractPdfStructure(file);
         if (outline && outline.length > 0) {
           // Compute offsets matching join("\n\n") used by extractor
@@ -132,6 +139,7 @@ export const ChapterChecker: React.FC = () => {
         }
         setChapterText(text);
       } else {
+        setPdfBuffer(null);
         const reader = new FileReader();
         reader.onload = (event) => {
           const content = event.target?.result as string;
@@ -172,8 +180,10 @@ export const ChapterChecker: React.FC = () => {
    */
   const handleClear = () => {
     setChapterText("");
+    setPdfBuffer(null);
     setAnalysis(null);
     setError(null);
+    setSectionHints(null);
   };
 
   /**
@@ -185,7 +195,9 @@ export const ChapterChecker: React.FC = () => {
         file.type === "application/pdf" ||
         file.name.toLowerCase().endsWith(".pdf")
       ) {
-        const text = await extractTextFromPdf(file);
+        const buffer = await file.arrayBuffer();
+        setPdfBuffer(buffer);
+        const text = await extractTextFromPdfArrayBuffer(buffer);
         setChapterText((prev) => (prev ? prev + "\n\n" + text : text));
       } else {
         const content = await file.text();
@@ -271,53 +283,75 @@ export const ChapterChecker: React.FC = () => {
                 </div>
               </div>
 
-              <textarea
-                value={chapterText}
-                onChange={(e) => setChapterText(e.target.value)}
-                placeholder="Paste your chapter text here... (minimum 200 words)"
-                className="chapter-textarea"
-                disabled={isAnalyzing}
-                onPaste={async (e) => {
-                  try {
-                    const items = e.clipboardData?.items;
-                    if (!items) return;
-                    for (let i = 0; i < items.length; i++) {
-                      const item = items[i];
-                      if (
-                        item.kind === "file" &&
-                        item.type === "application/pdf"
-                      ) {
-                        e.preventDefault();
-                        const file = item.getAsFile();
-                        if (!file) return;
-                        const buffer = await file.arrayBuffer();
-                        const text = await extractTextFromPdfArrayBuffer(
-                          buffer
-                        );
-                        setChapterText((prev) =>
-                          prev ? prev + "\n\n" + text : text
-                        );
-                        return;
-                      }
-                    }
-                  } catch (err) {
-                    setError(
-                      `Failed to paste PDF: ${
-                        err instanceof Error ? err.message : String(err)
-                      }`
-                    );
-                  }
-                }}
-              />
-
-              {/* Drag & Drop hint */}
-              <div className="drop-zone" aria-label="Drag and drop files here">
-                <strong>Drag & Drop</strong> a .txt, .md, or .pdf file anywhere
-                in this box
-                <div className="accepted-note">
-                  Accepted: .txt .md .pdf (PDF text extracted)
+              {/* PDF Visual Preview */}
+              {pdfBuffer && (
+                <div className="pdf-preview-section">
+                  <h3>📄 PDF Preview</h3>
+                  <PdfViewer
+                    fileBuffer={pdfBuffer}
+                    onTextExtracted={(text) => {
+                      if (!chapterText) setChapterText(text);
+                    }}
+                  />
                 </div>
-              </div>
+              )}
+
+              {/* Text Editor (hidden when PDF shown) */}
+              {!pdfBuffer && (
+                <>
+                  <textarea
+                    value={chapterText}
+                    onChange={(e) => setChapterText(e.target.value)}
+                    placeholder="Paste your chapter text here... (minimum 200 words)"
+                    className="chapter-textarea"
+                    disabled={isAnalyzing}
+                    onPaste={async (e) => {
+                      try {
+                        const items = e.clipboardData?.items;
+                        if (!items) return;
+                        for (let i = 0; i < items.length; i++) {
+                          const item = items[i];
+                          if (
+                            item.kind === "file" &&
+                            item.type === "application/pdf"
+                          ) {
+                            e.preventDefault();
+                            const file = item.getAsFile();
+                            if (!file) return;
+                            const buffer = await file.arrayBuffer();
+                            setPdfBuffer(buffer);
+                            const text = await extractTextFromPdfArrayBuffer(
+                              buffer
+                            );
+                            setChapterText((prev) =>
+                              prev ? prev + "\n\n" + text : text
+                            );
+                            return;
+                          }
+                        }
+                      } catch (err) {
+                        setError(
+                          `Failed to paste PDF: ${
+                            err instanceof Error ? err.message : String(err)
+                          }`
+                        );
+                      }
+                    }}
+                  />
+
+                  {/* Drag & Drop hint */}
+                  <div
+                    className="drop-zone"
+                    aria-label="Drag and drop files here"
+                  >
+                    <strong>Drag & Drop</strong> a .txt, .md, or .pdf file
+                    anywhere in this box
+                    <div className="accepted-note">
+                      Accepted: .txt .md .pdf (PDF text extracted)
+                    </div>
+                  </div>
+                </>
+              )}
 
               <div className="word-count">
                 <span>{chapterText.trim().split(/\s+/).length} words</span>
@@ -541,6 +575,15 @@ export const ChapterChecker: React.FC = () => {
         .chapter-textarea:disabled {
           background: #f5f5f5;
           color: #999;
+        }
+
+        .pdf-preview-section {
+          margin: 20px 0;
+        }
+
+        .pdf-preview-section h3 {
+          margin-bottom: 12px;
+          color: #333;
         }
 
         .word-count {
