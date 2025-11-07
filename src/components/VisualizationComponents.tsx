@@ -727,8 +727,8 @@ export const PrincipleFindings: React.FC<{
             <h5>Evidence:</h5>
             {principle.evidence.map((e, idx) => (
               <p key={idx} className="evidence-item">
-                {e.metric}: {e.value}{" "}
-                {e.threshold && `(target: ${e.threshold})`}
+                {e.metric}: {typeof e.value === 'number' ? Math.trunc(e.value) : e.value}{" "}
+                {e.threshold !== undefined && typeof e.threshold === 'number' ? `(target: ${Math.trunc(e.threshold)})` : e.threshold ? `(target: ${e.threshold})` : ''}
               </p>
             ))}
           </div>
