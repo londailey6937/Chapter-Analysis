@@ -511,6 +511,13 @@ export const ReviewScheduleTimeline: React.FC<{
   const nodes = analysis.visualizations.conceptMap.nodes as any[];
   nodes.forEach((n) => (idToName[n.id] = n.label));
 
+  // Find max gap for scaling (use reasonable default if data is skewed)
+  const maxGap = Math.max(
+    ...concepts.flatMap((c) => c.spacing),
+    schedule.optimalSpacing * 2,
+    100
+  );
+
   return (
     <div className="viz-container">
       <h3>Concept Review Schedule</h3>
@@ -520,11 +527,11 @@ export const ReviewScheduleTimeline: React.FC<{
       <div className="review-metrics">
         <div>
           <strong>Optimal Spacing (median):</strong> {schedule.optimalSpacing}{" "}
-          chars
+          words
         </div>
         <div>
           <strong>Current Avg Spacing:</strong> {schedule.currentAvgSpacing}{" "}
-          chars
+          words
         </div>
         <div>
           <strong>Concepts Analyzed:</strong> {schedule.concepts.length}
@@ -557,9 +564,9 @@ export const ReviewScheduleTimeline: React.FC<{
                       concept.isOptimal ? "optimal" : "needs-adjustment"
                     }`}
                     style={{
-                      width: `${Math.min((gap / 10000) * 100, 100)}%`,
+                      width: `${Math.min((gap / maxGap) * 100, 100)}%`,
                     }}
-                    title={`Gap ${idx + 1}: ${gap} characters between mentions`}
+                    title={`Gap ${idx + 1}: ${gap} words between mentions`}
                   />
                 ))}
               </div>
@@ -610,15 +617,17 @@ export const ReviewScheduleTimeline: React.FC<{
           background: #ff9800;
         }
         .concept-timeline {
-          display: flex;
+          display: grid;
+          grid-template-columns: 150px 1fr 80px;
           align-items: center;
           margin: 10px 0;
-          gap: 10px;
+          gap: 15px;
         }
         .concept-label {
           font-weight: bold;
-          width: 40px;
-          text-align: center;
+          text-align: left;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
         .mention-bars {
           flex: 1;
@@ -640,10 +649,10 @@ export const ReviewScheduleTimeline: React.FC<{
           filter: brightness(0.8);
         }
         .mention-count {
-          width: 50px;
           text-align: right;
           font-size: 12px;
           color: #666;
+          white-space: nowrap;
         }
       `}</style>
     </div>

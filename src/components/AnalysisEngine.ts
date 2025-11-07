@@ -65,7 +65,13 @@ export class AnalysisEngine {
           .sort((a, b) => a - b);
         const spacing: number[] = [];
         for (let i = 1; i < positions.length; i++) {
-          spacing.push(positions[i] - positions[i - 1]);
+          // Calculate word count between mentions instead of character count
+          const textBetween = chapter.content.substring(
+            positions[i - 1],
+            positions[i]
+          );
+          const wordCount = this.countWords(textBetween);
+          spacing.push(wordCount);
         }
         const avgSpacing =
           spacing.length > 0
