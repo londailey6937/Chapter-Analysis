@@ -15,6 +15,7 @@ import type {
   ConceptAnalysisResult,
   StructureAnalysisResult,
   ReviewPattern,
+  ReviewScheduleData,
 } from "../types";
 
 import {
@@ -54,47 +55,6 @@ export class AnalysisEngine {
         weight: ev.weight ?? 1,
       })
     );
-
-    // Generate visualization data
-    const visualization = this.generateVisualization(
-      chapter,
-      conceptGraph,
-      principleDisplay
-    );
-
-    // Build recommendations based on principle scores and suggestions
-    const recommendations: Recommendation[] = principleEvaluations.flatMap(
-      (p) =>
-        (p.suggestions || [])
-          .filter((s: Suggestion) => s.priority === "high" || p.score < 70)
-          .map((s: Suggestion) => ({
-            id: s.id || `${p.principle}-${s.title.slice(0, 20)}`,
-            priority: s.priority,
-            category: "enhance",
-            title: s.title,
-            description: s.description,
-            affectedSections: [],
-            affectedConcepts: s.relatedConcepts || [],
-            estimatedEffort: "medium",
-            expectedOutcome: s.expectedImpact,
-            actionItems: [s.implementation],
-          }))
-    );
-
-    const overallScore = this.calculateWeightedScoreDisplay(principleDisplay);
-
-    const metrics = {
-      totalWords: chapter.wordCount,
-      readingTime: Math.round(chapter.wordCount / 200),
-      averageSectionLength:
-        chapter.sections.reduce((sum, s) => sum + s.wordCount, 0) /
-        Math.max(1, chapter.sections.length),
-      conceptDensity:
-        conceptGraph.concepts.length / Math.max(1, chapter.wordCount / 1000),
-      readabilityScore: 0,
-      complexityScore: 0,
-      timestamp: new Date(),
-    };
 
     // Build concept analysis (basic defaults from graph/metrics)
     const reviewPatterns: ReviewPattern[] = conceptGraph.concepts.map(
@@ -137,6 +97,50 @@ export class AnalysisEngine {
         };
       }
     );
+
+    // Generate visualization data (after reviewPatterns are available)
+    const visualization = this.generateVisualization(
+      chapter,
+      conceptGraph,
+      principleDisplay,
+      reviewPatterns
+    );
+
+    // Build recommendations based on principle scores and suggestions
+    const recommendations: Recommendation[] = principleEvaluations.flatMap(
+      (p) =>
+        (p.suggestions || [])
+          .filter((s: Suggestion) => s.priority === "high" || p.score < 70)
+          .map((s: Suggestion) => ({
+            id: s.id || `${p.principle}-${s.title.slice(0, 20)}`,
+            priority: s.priority,
+            category: "enhance",
+            title: s.title,
+            description: s.description,
+            affectedSections: [],
+            affectedConcepts: s.relatedConcepts || [],
+            estimatedEffort: "medium",
+            expectedOutcome: s.expectedImpact,
+            actionItems: [s.implementation],
+          }))
+    );
+
+    const overallScore = this.calculateWeightedScoreDisplay(principleDisplay);
+
+    const metrics = {
+      totalWords: chapter.wordCount,
+      readingTime: Math.round(chapter.wordCount / 200),
+      averageSectionLength:
+        chapter.sections.reduce((sum, s) => sum + s.wordCount, 0) /
+        Math.max(1, chapter.sections.length),
+      conceptDensity:
+        conceptGraph.concepts.length / Math.max(1, chapter.wordCount / 1000),
+      readabilityScore: 0,
+      complexityScore: 0,
+      timestamp: new Date(),
+    };
+
+    // reviewPatterns already built above
 
     const conceptAnalysis: ConceptAnalysisResult = {
       totalConceptsIdentified: conceptGraph.concepts.length,
@@ -252,7 +256,8 @@ export class AnalysisEngine {
   private static generateVisualization(
     chapter: Chapter,
     conceptGraph: ConceptGraph,
-    principles: PrincipleScoreDisplay[]
+    principles: PrincipleScoreDisplay[],
+    reviewPatterns: ReviewPattern[]
   ): AnalysisVisualization {
     const cognitiveLoadCurve = this.estimateCognitiveLoad(
       chapter,
@@ -262,6 +267,8 @@ export class AnalysisEngine {
       chapter,
       conceptGraph
     );
+
+    const reviewSchedule = this.estimateReviewSchedule(reviewPatterns);
 
     return {
       conceptMap: {
@@ -283,11 +290,7 @@ export class AnalysisEngine {
       },
       cognitiveLoadCurve,
       interleavingPattern,
-      reviewSchedule: {
-        concepts: [],
-        optimalSpacing: 0,
-        currentAvgSpacing: 0,
-      },
+      reviewSchedule,
       principleScores: {
         principles,
         overallWeightedScore: 0,
@@ -416,6 +419,43 @@ export class AnalysisEngine {
     const longWord = token.length >= 12;
     const hasHyphen = /.+-.+/.test(token);
     return longWord || hasDigit || hasGreek || hasHyphen;
+  }
+
+  /**
+   * Build review schedule data from review patterns.
+   * optimalSpacing: median of avgSpacing for concepts with >=2 mentions.
+   * currentAvgSpacing: overall average of avgSpacing values (>=2 mentions).
+   */
+  private static estimateReviewSchedule(
+    patterns: ReviewPattern[]
+  ): ReviewScheduleData {
+    if (!patterns || patterns.length === 0) {
+      return {
+        concepts: [],
+        optimalSpacing: 0,
+        currentAvgSpacing: 0,
+      };
+    }
+    const multiMention = patterns.filter((p) => p.mentions >= 2);
+    const spacings = multiMention.map((p) => p.avgSpacing).filter((v) => v > 0);
+    spacings.sort((a, b) => a - b);
+    const median = spacings.length
+      ? spacings[Math.floor(spacings.length / 2)]
+      : 0;
+    const avg = spacings.length
+      ? spacings.reduce((a, b) => a + b, 0) / spacings.length
+      : 0;
+
+    return {
+      concepts: patterns.map((p) => ({
+        conceptId: p.conceptId,
+        mentions: p.mentions,
+        spacing: p.spacing,
+        isOptimal: p.isOptimal,
+      })),
+      optimalSpacing: Math.round(median),
+      currentAvgSpacing: Math.round(avg),
+    };
   }
 
   /**
