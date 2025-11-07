@@ -916,13 +916,14 @@ export const ChapterAnalysisDashboard: React.FC<{
             width: 100px;
             height: 100px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--brand-navy-600), var(--brand-navy-700));
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: white;
-            font-weight: bold;
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(2,6,23,0.25);
           }
           .score-number {
             font-size: 36px;
@@ -937,16 +938,16 @@ export const ChapterAnalysisDashboard: React.FC<{
             margin: 30px 0;
           }
           .viz-container {
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--border-soft);
             border-radius: 8px;
             padding: 20px;
-            background: white;
+            background: var(--bg-panel);
           }
           .viz-container h3 {
             margin-top: 0;
           }
           .viz-subtitle {
-            color: #666;
+            color: var(--text-muted);
             font-size: 13px;
             margin: 5px 0 15px 0;
           }
@@ -958,14 +959,16 @@ export const ChapterAnalysisDashboard: React.FC<{
           }
           .stat {
             padding: 15px;
-            background: #f5f5f5;
+            background: #f1f5f9; /* slate-100 */
             border-radius: 8px;
             text-align: center;
+            border: 1px solid var(--border-soft);
           }
           .stat strong {
             font-size: 24px;
-            color: #2196f3;
+            color: var(--brand-navy-700);
             display: block;
+            font-weight: 600;
           }
           .stat p {
             margin: 5px 0 0 0;
