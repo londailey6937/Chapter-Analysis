@@ -94,8 +94,10 @@ export const PrincipleScoresRadar: React.FC<{ analysis: ChapterAnalysis }> = ({
 export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
   analysis,
 }) => {
-  const data = analysis.visualizations.cognitiveLoadCurve.map((point) => ({
-    section: point.sectionId,
+  const points = analysis.visualizations.cognitiveLoadCurve || [];
+  const hasData = points.length > 0;
+  const data = points.map((point, idx) => ({
+    section: point.sectionId || `S${idx + 1}`,
     load: Math.round(point.load * 100),
     novelConcepts: point.factors.novelConcepts,
     complexity: point.factors.sentenceComplexity,
@@ -107,44 +109,56 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
       <p className="viz-subtitle">
         Lower is better; peaks indicate challenging sections
       </p>
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart
-          data={data}
-          margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-          <XAxis dataKey="section" tick={{ fontSize: 10 }} />
-          <YAxis
-            label={{ value: "Load %", angle: -90, position: "insideLeft" }}
-          />
-          <Tooltip
-            contentStyle={{ backgroundColor: "#fff", border: "1px solid #ccc" }}
-            formatter={(value: any, name: string) => {
-              if (name === "Cognitive Load") return `${value}%`;
-              if (name === "New Concepts") return String(value);
-              return String(value);
-            }}
-            labelFormatter={(label: any) => `Section: ${label}`}
-          />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="load"
-            stroke="#ff7c7c"
-            name="Cognitive Load"
-            dot={{ r: 3 }}
-            isAnimationActive={true}
-          />
-          <Line
-            type="monotone"
-            dataKey="novelConcepts"
-            stroke="#82ca9d"
-            name="New Concepts"
-            dot={false}
-            strokeDasharray="5 5"
-          />
-        </LineChart>
-      </ResponsiveContainer>
+      {hasData ? (
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart
+            data={data}
+            margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis dataKey="section" tick={{ fontSize: 10 }} />
+            <YAxis
+              label={{ value: "Load %", angle: -90, position: "insideLeft" }}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#fff",
+                border: "1px solid #ccc",
+              }}
+              formatter={(value: any, name: string) => {
+                if (name === "Cognitive Load") return `${value}%`;
+                if (name === "New Concepts") return String(value);
+                return String(value);
+              }}
+              labelFormatter={(label: any) => `Section: ${label}`}
+            />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="load"
+              stroke="#ff7c7c"
+              name="Cognitive Load"
+              dot={{ r: 3 }}
+              isAnimationActive={true}
+            />
+            <Line
+              type="monotone"
+              dataKey="novelConcepts"
+              stroke="#82ca9d"
+              name="New Concepts"
+              dot={false}
+              strokeDasharray="5 5"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      ) : (
+        <div style={{ padding: "30px", textAlign: "center", color: "#666" }}>
+          <em>
+            No section load data – likely no sections detected or concept
+            extraction empty.
+          </em>
+        </div>
+      )}
     </div>
   );
 };

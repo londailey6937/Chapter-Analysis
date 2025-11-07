@@ -786,22 +786,37 @@ function parseChapterIntoSections(text: string) {
     });
   }
 
-  // If no sections found, treat entire text as one section
-  return sections.length > 0
-    ? sections
-    : [
-        {
-          id: "section-0",
-          heading: "Main Content",
-          content: text,
-          startPosition: 0,
-          endPosition: text.length,
-          wordCount: text.split(/\s+/).filter(Boolean).length,
-          conceptsIntroduced: [],
-          conceptsRevisited: [],
-          depth: 1,
-        },
-      ];
+  // If no headings found, create balanced fallback sections by splitting the text
+  if (sections.length === 0) {
+    const totalWords = text.split(/\s+/).filter(Boolean).length;
+    const totalLen = text.length;
+    // Aim for ~400 words per section, between 3 and 8 sections
+    const estimated = Math.max(3, Math.min(8, Math.ceil(totalWords / 400)));
+    const count = Math.max(2, estimated);
+    const fallback: any[] = [];
+    for (let i = 0; i < count; i++) {
+      const start = Math.floor((i * totalLen) / count);
+      const end =
+        i === count - 1
+          ? totalLen
+          : Math.floor(((i + 1) * totalLen) / count) - 1;
+      const content = text.substring(start, end).trim();
+      const words = content.split(/\s+/).filter(Boolean).length;
+      fallback.push({
+        id: `section-${i}`,
+        heading: `Part ${i + 1}`,
+        content,
+        startPosition: start,
+        endPosition: end,
+        wordCount: words,
+        conceptsIntroduced: [],
+        conceptsRevisited: [],
+        depth: 1,
+      });
+    }
+    return fallback;
+  }
+  return sections;
 }
 
 function estimateReadingLevel(

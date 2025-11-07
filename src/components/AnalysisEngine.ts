@@ -265,6 +265,15 @@ export class AnalysisEngine {
     principles: PrincipleScoreDisplay[],
     reviewPatterns: ReviewPattern[]
   ): AnalysisVisualization {
+    // Ensure section metadata about concept introductions / revisits is populated
+    // (needed for cognitive load waveform – novel concepts factor otherwise 0)
+    try {
+      this.annotateSectionsWithConceptActivity(chapter, conceptGraph);
+    } catch (e) {
+      // Non-fatal – continue without enriched metadata
+      // eslint-disable-next-line no-console
+      console.warn("Section annotation failed", e);
+    }
     const cognitiveLoadCurve = this.estimateCognitiveLoad(
       chapter,
       conceptGraph
@@ -304,6 +313,47 @@ export class AnalysisEngine {
         weakestPrinciples: [],
       },
     };
+  }
+
+  /**
+   * Annotate chapter.sections with conceptsIntroduced and conceptsRevisited arrays.
+   * Introduced = first mention falls inside section; Revisited = any subsequent mentions in that section.
+   */
+  private static annotateSectionsWithConceptActivity(
+    chapter: Chapter,
+    conceptGraph: ConceptGraph
+  ) {
+    if (!chapter.sections || chapter.sections.length === 0) return;
+    const sections = chapter.sections;
+    // Reset arrays to avoid duplicate accumulation on re-run
+    for (const s of sections) {
+      s.conceptsIntroduced = [];
+      s.conceptsRevisited = [];
+    }
+    for (const concept of conceptGraph.concepts) {
+      const firstPos = concept.firstMentionPosition;
+      let introducedSection: string | null = null;
+      // Determine introduction section
+      for (const s of sections) {
+        if (firstPos >= s.startPosition && firstPos <= s.endPosition) {
+          s.conceptsIntroduced.push(concept.id);
+          introducedSection = s.id;
+          break;
+        }
+      }
+      // Subsequent mentions count as revisits (exclude first)
+      concept.mentions.slice(1).forEach((m) => {
+        const sec = sections.find(
+          (s) => m.position >= s.startPosition && m.position <= s.endPosition
+        );
+        if (sec) {
+          // Avoid marking introduction section revisit if same section and no second mention separation
+          if (!sec.conceptsRevisited.includes(concept.id)) {
+            sec.conceptsRevisited.push(concept.id);
+          }
+        }
+      });
+    }
   }
 
   /**
