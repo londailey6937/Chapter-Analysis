@@ -113,11 +113,14 @@ export const ChapterChecker: React.FC = () => {
         file.type === "application/pdf" ||
         file.name.toLowerCase().endsWith(".pdf")
       ) {
-        // Store buffer for visual rendering
-        const buffer = await file.arrayBuffer();
-        setPdfBuffer(buffer);
+        // Read buffer once and clone for separate uses
+        const originalBuffer = await file.arrayBuffer();
 
-        // Extract structure for analysis
+        // Clone for visual rendering (will be transferred to worker)
+        const viewerBuffer = originalBuffer.slice(0);
+        setPdfBuffer(viewerBuffer);
+
+        // Extract structure for analysis using original
         const { text, pageTexts, outline } = await extractPdfStructure(file);
         if (outline && outline.length > 0) {
           // Compute offsets matching join("\n\n") used by extractor
@@ -195,9 +198,11 @@ export const ChapterChecker: React.FC = () => {
         file.type === "application/pdf" ||
         file.name.toLowerCase().endsWith(".pdf")
       ) {
-        const buffer = await file.arrayBuffer();
-        setPdfBuffer(buffer);
-        const text = await extractTextFromPdfArrayBuffer(buffer);
+        const originalBuffer = await file.arrayBuffer();
+        // Clone buffer for viewer (prevents detachment issues)
+        const viewerBuffer = originalBuffer.slice(0);
+        setPdfBuffer(viewerBuffer);
+        const text = await extractTextFromPdfArrayBuffer(originalBuffer);
         setChapterText((prev) => (prev ? prev + "\n\n" + text : text));
       } else {
         const content = await file.text();
@@ -318,10 +323,12 @@ export const ChapterChecker: React.FC = () => {
                             e.preventDefault();
                             const file = item.getAsFile();
                             if (!file) return;
-                            const buffer = await file.arrayBuffer();
-                            setPdfBuffer(buffer);
+                            const originalBuffer = await file.arrayBuffer();
+                            // Clone buffer for viewer
+                            const viewerBuffer = originalBuffer.slice(0);
+                            setPdfBuffer(viewerBuffer);
                             const text = await extractTextFromPdfArrayBuffer(
-                              buffer
+                              originalBuffer
                             );
                             setChapterText((prev) =>
                               prev ? prev + "\n\n" + text : text
