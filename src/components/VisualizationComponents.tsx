@@ -512,6 +512,27 @@ export const ReviewScheduleTimeline: React.FC<{
       <p className="viz-subtitle">
         Optimal spacing helps retention through spaced repetition
       </p>
+      <div className="review-metrics">
+        <div>
+          <strong>Optimal Spacing (median):</strong> {schedule.optimalSpacing}{" "}
+          chars
+        </div>
+        <div>
+          <strong>Current Avg Spacing:</strong> {schedule.currentAvgSpacing}{" "}
+          chars
+        </div>
+        <div>
+          <strong>Concepts Analyzed:</strong> {schedule.concepts.length}
+        </div>
+      </div>
+      <div className="review-legend">
+        <span className="legend-item">
+          <span className="legend-color optimal" /> Optimal spacing pattern
+        </span>
+        <span className="legend-item">
+          <span className="legend-color needs" /> Needs adjustment
+        </span>
+      </div>
 
       <div className="review-timeline">
         {concepts.map((concept) => (
@@ -541,6 +562,37 @@ export const ReviewScheduleTimeline: React.FC<{
       <style>{`
         .review-timeline {
           margin: 20px 0;
+        }
+        .review-metrics {
+          display: flex;
+          gap: 20px;
+          font-size: 13px;
+          margin-top: 6px;
+          flex-wrap: wrap;
+        }
+        .review-legend {
+          display: flex;
+          gap: 20px;
+          margin-top: 10px;
+          font-size: 12px;
+          flex-wrap: wrap;
+        }
+        .legend-item {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .legend-color {
+          width: 16px;
+          height: 16px;
+          border-radius: 3px;
+          display: inline-block;
+        }
+        .legend-color.optimal {
+          background: #4caf50;
+        }
+        .legend-color.needs {
+          background: #ff9800;
         }
         .concept-timeline {
           display: flex;
