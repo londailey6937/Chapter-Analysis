@@ -14,12 +14,12 @@ interface ConceptAnalysisSectionProps {
 
 /**
  * ConceptAnalysisSection Component
- * 
+ *
  * Displays concept extraction and hierarchy analysis results.
  * Shows key metrics about identified concepts and their organization.
- * 
+ *
  * Parent: ChapterAnalysisDashboard
- * 
+ *
  * @param {ConceptAnalysisSectionProps} props - Component props from parent
  * @returns {JSX.Element} Concept analysis section card
  */
@@ -33,19 +33,20 @@ function ConceptAnalysisSection({
    * Gets interpretation text for concept metrics
    */
   const getDensityInterpretation = (densityValue: number): string => {
-    if (densityValue >= 4) return 'High concept density - may need simplification';
-    if (densityValue >= 3) return 'Optimal concept density';
-    if (densityValue >= 2) return 'Moderate concept density';
-    return 'Low concept density - consider adding more concepts';
+    if (densityValue >= 4)
+      return "High concept density - may need simplification";
+    if (densityValue >= 3) return "Optimal concept density";
+    if (densityValue >= 2) return "Moderate concept density";
+    return "Low concept density - consider adding more concepts";
   };
 
   /**
    * Gets balance interpretation
    */
   const getBalanceInterpretation = (balanceValue: number): string => {
-    if (balanceValue >= 0.8) return 'Well-balanced hierarchy';
-    if (balanceValue >= 0.6) return 'Good hierarchy balance';
-    return 'Consider reorganizing concepts for better balance';
+    if (balanceValue >= 0.8) return "Well-balanced hierarchy";
+    if (balanceValue >= 0.6) return "Good hierarchy balance";
+    return "Consider reorganizing concepts for better balance";
   };
 
   return (
@@ -58,16 +59,22 @@ function ConceptAnalysisSection({
           {/* Total Concepts */}
           <div className="text-center">
             <div className="bg-primary-50 rounded-lg p-6 mb-3">
-              <p className="text-4xl font-bold text-primary-600">{totalConcepts}</p>
+              <p className="text-4xl font-bold text-primary-600">
+                {totalConcepts}
+              </p>
             </div>
             <h4 className="font-semibold text-gray-900">Total Concepts</h4>
-            <p className="text-sm text-gray-600 mt-1">Unique concepts identified</p>
+            <p className="text-sm text-gray-600 mt-1">
+              Unique concepts identified
+            </p>
           </div>
 
           {/* Core Concepts */}
           <div className="text-center">
             <div className="bg-secondary-50 rounded-lg p-6 mb-3">
-              <p className="text-4xl font-bold text-secondary-600">{coreConcepts}</p>
+              <p className="text-4xl font-bold text-secondary-600">
+                {coreConcepts}
+              </p>
             </div>
             <h4 className="font-semibold text-gray-900">Core Concepts</h4>
             <p className="text-sm text-gray-600 mt-1">Foundation-level ideas</p>
@@ -76,7 +83,9 @@ function ConceptAnalysisSection({
           {/* Concept Density */}
           <div className="text-center">
             <div className="bg-blue-50 rounded-lg p-6 mb-3">
-              <p className="text-4xl font-bold text-blue-600">{density.toFixed(1)}</p>
+              <p className="text-4xl font-bold text-blue-600">
+                {density.toFixed(1)}
+              </p>
               <p className="text-xs text-blue-600">per 1K words</p>
             </div>
             <h4 className="font-semibold text-gray-900">Density</h4>

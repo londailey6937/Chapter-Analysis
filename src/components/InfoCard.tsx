@@ -10,12 +10,12 @@ interface InfoCardProps {
 
 /**
  * InfoCard Component
- * 
+ *
  * Displays informational content in a styled card with a list of items.
  * Used for tips, features, and benefits display.
- * 
+ *
  * Parent: ChapterInput
- * 
+ *
  * @param {InfoCardProps} props - Component props from parent
  * @returns {JSX.Element} Information card with list of items
  */

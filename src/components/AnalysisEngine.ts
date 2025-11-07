@@ -7,10 +7,14 @@ import type {
   Chapter,
   ChapterAnalysis,
   ConceptGraph,
-  PrincipleScore,
+  PrincipleEvaluation,
+  PrincipleScoreDisplay,
   AnalysisVisualization,
   Recommendation,
   Suggestion,
+  ConceptAnalysisResult,
+  StructureAnalysisResult,
+  ReviewPattern,
 } from "../types";
 
 import {
@@ -39,35 +43,45 @@ export class AnalysisEngine {
       chapter.sections
     );
 
-    // Evaluate all learning principles
-    const principles = this.evaluateAllPrinciples(chapter, conceptGraph);
+    // Evaluate all learning principles (full evaluations used by UI)
+    const principleEvaluations = this.runEvaluators(chapter, conceptGraph);
+    // Derive lightweight display scores for visualization summary
+    const principleDisplay: PrincipleScoreDisplay[] = principleEvaluations.map(
+      (ev) => ({
+        name: ev.principle,
+        displayName: ev.principle,
+        score: ev.score,
+        weight: ev.weight ?? 1,
+      })
+    );
 
     // Generate visualization data
     const visualization = this.generateVisualization(
       chapter,
       conceptGraph,
-      principles
+      principleDisplay
     );
 
     // Build recommendations based on principle scores and suggestions
-    const recommendations: Recommendation[] = principles.flatMap((p) =>
-      (p.suggestions || [])
-        .filter((s: Suggestion) => s.priority === "high" || p.score < 0.7)
-        .map((s: Suggestion) => ({
-          id: s.id || `${p.principle}-${s.title.slice(0, 20)}`,
-          priority: s.priority,
-          category: "enhance",
-          title: s.title,
-          description: s.description,
-          affectedSections: [],
-          affectedConcepts: s.relatedConcepts || [],
-          estimatedEffort: "medium",
-          expectedOutcome: s.expectedImpact,
-          actionItems: [s.implementation],
-        }))
+    const recommendations: Recommendation[] = principleEvaluations.flatMap(
+      (p) =>
+        (p.suggestions || [])
+          .filter((s: Suggestion) => s.priority === "high" || p.score < 70)
+          .map((s: Suggestion) => ({
+            id: s.id || `${p.principle}-${s.title.slice(0, 20)}`,
+            priority: s.priority,
+            category: "enhance",
+            title: s.title,
+            description: s.description,
+            affectedSections: [],
+            affectedConcepts: s.relatedConcepts || [],
+            estimatedEffort: "medium",
+            expectedOutcome: s.expectedImpact,
+            actionItems: [s.implementation],
+          }))
     );
 
-    const overallScore = this.calculateWeightedScore(principles);
+    const overallScore = this.calculateWeightedScoreDisplay(principleDisplay);
 
     const metrics = {
       totalWords: chapter.wordCount,
@@ -82,22 +96,90 @@ export class AnalysisEngine {
       timestamp: new Date(),
     };
 
+    // Build concept analysis (basic defaults from graph/metrics)
+    const conceptAnalysis: ConceptAnalysisResult = {
+      totalConceptsIdentified: conceptGraph.concepts.length,
+      coreConceptCount: conceptGraph.hierarchy.core.length,
+      conceptDensity: metrics.conceptDensity,
+      novelConceptsPerSection: chapter.sections.map(
+        (s) => s.conceptsIntroduced.length
+      ),
+      reviewPatterns: [] as ReviewPattern[],
+      hierarchyBalance: (() => {
+        const total =
+          conceptGraph.hierarchy.core.length +
+          conceptGraph.hierarchy.supporting.length +
+          conceptGraph.hierarchy.detail.length;
+        if (!total) return 0;
+        const ideal = total / 3;
+        const diffs = [
+          Math.abs(conceptGraph.hierarchy.core.length - ideal),
+          Math.abs(conceptGraph.hierarchy.supporting.length - ideal),
+          Math.abs(conceptGraph.hierarchy.detail.length - ideal),
+        ];
+        const maxDiff = ideal; // worst case: all in one bucket
+        const balance =
+          1 - Math.min(1, diffs.reduce((a, b) => a + b, 0) / (3 * maxDiff));
+        return Number(balance.toFixed(2));
+      })(),
+      orphanConcepts: conceptGraph.concepts
+        .filter(
+          (c) =>
+            !conceptGraph.relationships.some(
+              (r) => r.source === c.id || r.target === c.id
+            )
+        )
+        .map((c) => c.id),
+    };
+
+    // Build structure analysis (lightweight heuristics)
+    const lengths = chapter.sections.map((s) => s.wordCount);
+    const avg =
+      metrics.averageSectionLength ||
+      lengths.reduce((a, b) => a + b, 0) / Math.max(1, lengths.length);
+    const variance =
+      lengths.reduce((sum, l) => sum + Math.pow(l - avg, 2), 0) /
+      Math.max(1, lengths.length);
+    const pacing: StructureAnalysisResult["pacing"] =
+      avg < 150 ? "fast" : avg < 350 ? "moderate" : "slow";
+    const structureAnalysis: StructureAnalysisResult = {
+      sectionCount: chapter.sections.length,
+      avgSectionLength: Math.round(avg),
+      sectionLengthVariance: Math.round(variance),
+      pacing,
+      scaffolding: {
+        hasIntroduction: chapter.sections.some((s) =>
+          /intro|overview/i.test(s.heading)
+        ),
+        hasProgression: chapter.sections.length > 1,
+        hasSummary: chapter.sections.some((s) =>
+          /summary|conclusion/i.test(s.heading)
+        ),
+        hasReview: chapter.sections.some((s) =>
+          /review|practice|questions/i.test(s.heading)
+        ),
+        scaffoldingScore: 0.5,
+      },
+      transitionQuality: 0.5,
+      conceptualization: "moderate",
+    };
+
     return {
       chapterId: chapter.id,
-      overallScore,
-      principleScores: principles,
-      recommendations,
-      conceptGraph,
-      metrics,
       timestamp: new Date(),
-      visualization,
-    };
+      overallScore,
+      principles: principleEvaluations,
+      conceptAnalysis,
+      structureAnalysis,
+      recommendations,
+      visualizations: visualization,
+    } as ChapterAnalysis;
   }
 
-  private static evaluateAllPrinciples(
+  private static runEvaluators(
     chapter: Chapter,
     conceptGraph: ConceptGraph
-  ): PrincipleScore[] {
+  ): PrincipleEvaluation[] {
     const evaluators = [
       DeepProcessingEvaluator,
       SpacedRepetitionEvaluator,
@@ -111,25 +193,12 @@ export class AnalysisEngine {
       EmotionAndRelevanceEvaluator,
     ];
 
-    const evaluations = evaluators.map((E) =>
-      E.evaluate(chapter, conceptGraph)
-    );
-
-    // Map PrincipleEvaluation -> PrincipleScore shape
-    const principleScores: PrincipleScore[] = evaluations.map((ev: any) => ({
-      principleId: ev.principle,
-      principle: ev.principle,
-      score: ev.score,
-      weight: ev.weight ?? 1,
-      details: (ev.findings || []).map((f: any) => f.message || String(f)),
-      suggestions: ev.suggestions || [],
-      timestamp: new Date(),
-    }));
-
-    return principleScores;
+    return evaluators.map((E) => E.evaluate(chapter, conceptGraph));
   }
 
-  private static calculateWeightedScore(principles: PrincipleScore[]): number {
+  private static calculateWeightedScoreDisplay(
+    principles: PrincipleScoreDisplay[]
+  ): number {
     if (!principles || principles.length === 0) return 0;
     const total = principles.reduce(
       (sum, p) => sum + p.score * (p.weight ?? 1),
@@ -142,7 +211,7 @@ export class AnalysisEngine {
   private static generateVisualization(
     chapter: Chapter,
     conceptGraph: ConceptGraph,
-    principles: PrincipleScore[]
+    principles: PrincipleScoreDisplay[]
   ): AnalysisVisualization {
     return {
       conceptMap: {
@@ -187,12 +256,7 @@ export class AnalysisEngine {
         currentAvgSpacing: 0,
       },
       principleScores: {
-        principles: principles.map((p) => ({
-          name: p.principleId,
-          displayName: p.principleId,
-          score: p.score,
-          weight: 1,
-        })),
+        principles,
         overallWeightedScore: 0,
         strongestPrinciples: [],
         weakestPrinciples: [],

@@ -322,18 +322,20 @@ export interface Recommendation {
 // VISUALIZATIONS
 // ============================================================================
 
+// NOTE: Duplicate AnalysisVisualization definition above with PrincipleVisualization.
+// To avoid conflicting redeclarations, we consolidate to the richer version.
 export interface AnalysisVisualization {
   conceptMap: ConceptMapData;
   cognitiveLoadCurve: CognitiveLoadPoint[];
   interleavingPattern: InterleavingData;
   reviewSchedule: ReviewScheduleData;
-  principleScores: PrincipleScore[];
+  principleScores: PrincipleVisualization; // unified visualization shape
 }
 
 export interface ConceptMapData {
   nodes: ConceptNode[];
   links: ConceptLink[];
-  clusters: ConceptCluster[];
+  clusters: any[]; // keep loose to prevent conflicting type redeclarations
 }
 
 export interface ConceptNode {

@@ -519,7 +519,17 @@ export const ChapterChecker: React.FC = () => {
 // ============================================================================
 
 function parseChapterIntoSections(text: string) {
-  const sections = [];
+  const sections: Array<{
+    id: string;
+    heading: string;
+    content: string;
+    startPosition: number;
+    endPosition: number;
+    wordCount: number;
+    conceptsIntroduced: string[];
+    conceptsRevisited: string[];
+    depth: number;
+  }> = [];
 
   // Split by major headings (lines starting with # or ALL CAPS or numbered)
   const headingPattern = /\n(#{1,3}\s+.+|[A-Z][A-Z\s]+|^\d+\.\s+.+)\n/gm;

@@ -20,6 +20,7 @@ export default defineConfig({
   build: {
     outDir: "dist",
     sourcemap: false,
-    minify: "terser",
+    // Use esbuild default minify to avoid requiring optional terser dependency
+    minify: true,
   },
 });

@@ -14,12 +14,12 @@ interface AnalyzeButtonProps {
 
 /**
  * AnalyzeButton Component
- * 
+ *
  * Primary action button for starting chapter analysis.
  * Shows loading state and progress message during analysis.
- * 
+ *
  * Parent: ChapterInput
- * 
+ *
  * @param {AnalyzeButtonProps} props - Component props from parent
  * @returns {JSX.Element} Analyze button with loading state
  */
@@ -39,7 +39,7 @@ function AnalyzeButton({
         {isLoading ? (
           <>
             <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            {progress || 'Analyzing...'}
+            {progress || "Analyzing..."}
           </>
         ) : (
           <>🔍 Analyze Chapter</>
@@ -51,11 +51,11 @@ function AnalyzeButton({
             <span className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" />
             <span
               className="w-2 h-2 bg-primary-500 rounded-full animate-bounce"
-              style={{ animationDelay: '0.1s' }}
+              style={{ animationDelay: "0.1s" }}
             />
             <span
               className="w-2 h-2 bg-primary-500 rounded-full animate-bounce"
-              style={{ animationDelay: '0.2s' }}
+              style={{ animationDelay: "0.2s" }}
             />
           </div>
           <span>Analysis in progress...</span>

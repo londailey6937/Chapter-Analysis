@@ -1,2 +1,2 @@
-// Re-export root types.ts so imports using @types/* or src/types/* resolve correctly
-export * from "../../types";
+// Re-export the canonical root index.ts types so imports using @/types resolve consistently
+export * from "../../index";

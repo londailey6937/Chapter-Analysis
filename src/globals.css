@@ -1,13 +1,8 @@
 /* Global styles with Tailwind CSS */
 /* @tailwindcss */
-@font-face {
-  /* Prefer declaring font-face before Tailwind base so the font is available immediately */
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url("https://fonts.gstatic.com/s/inter/v12/UcCz4.woff2") format("woff2");
-}
+/* Inter font served via Google Fonts stylesheet; explicit @font-face not needed here.
+   If you want full control or self-hosting, you can generate static font-face blocks.
+*/
 
 @tailwind base;
 @tailwind components;

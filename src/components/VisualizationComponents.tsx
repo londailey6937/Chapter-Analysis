@@ -666,48 +666,55 @@ export const PrincipleFindings: React.FC<{
 export const ChapterAnalysisDashboard: React.FC<{
   analysis: ChapterAnalysis;
 }> = ({ analysis }) => {
+  // Defensive guards in case analysis shape changes or fields are missing
+  const safeAnalysis = analysis || ({} as ChapterAnalysis);
+  const overallScore = safeAnalysis.overallScore ?? 0;
+  const conceptAnalysis = (safeAnalysis as any).conceptAnalysis || {
+    totalConceptsIdentified: 0,
+    coreConceptCount: 0,
+    conceptDensity: 0,
+    hierarchyBalance: 0,
+  };
+  const recommendations = safeAnalysis.recommendations || [];
+  const principles = (safeAnalysis as any).principles || [];
   return (
     <div className="dashboard">
       <div className="dashboard-header">
         <h2>Chapter Analysis Report</h2>
         <div className="overall-score-display">
           <div className="score-circle">
-            <span className="score-number">
-              {analysis.overallScore.toFixed(1)}
-            </span>
+            <span className="score-number">{overallScore.toFixed(1)}</span>
             <span className="score-label">/100</span>
           </div>
         </div>
       </div>
 
       <div className="viz-grid">
-        <PrincipleScoresRadar analysis={analysis} />
-        <CognitiveLoadCurve analysis={analysis} />
-        <ConceptMentionFrequency analysis={analysis} />
-        <InterleavingPattern analysis={analysis} />
-        <ReviewScheduleTimeline analysis={analysis} />
+        <PrincipleScoresRadar analysis={safeAnalysis} />
+        <CognitiveLoadCurve analysis={safeAnalysis} />
+        <ConceptMentionFrequency analysis={safeAnalysis} />
+        <InterleavingPattern analysis={safeAnalysis} />
+        <ReviewScheduleTimeline analysis={safeAnalysis} />
       </div>
 
       <div className="concepts-section">
         <h3>Concept Analysis</h3>
         <div className="concept-stats">
           <div className="stat">
-            <strong>{analysis.conceptAnalysis.totalConceptsIdentified}</strong>
+            <strong>{conceptAnalysis.totalConceptsIdentified}</strong>
             <p>Total Concepts</p>
           </div>
           <div className="stat">
-            <strong>{analysis.conceptAnalysis.coreConceptCount}</strong>
+            <strong>{conceptAnalysis.coreConceptCount}</strong>
             <p>Core Concepts</p>
           </div>
           <div className="stat">
-            <strong>
-              {analysis.conceptAnalysis.conceptDensity.toFixed(1)}
-            </strong>
+            <strong>{conceptAnalysis.conceptDensity.toFixed(1)}</strong>
             <p>Concepts per 1K words</p>
           </div>
           <div className="stat">
             <strong>
-              {(analysis.conceptAnalysis.hierarchyBalance * 100).toFixed(0)}%
+              {(conceptAnalysis.hierarchyBalance * 100).toFixed(0)}%
             </strong>
             <p>Hierarchy Balance</p>
           </div>
@@ -716,14 +723,14 @@ export const ChapterAnalysisDashboard: React.FC<{
 
       <div className="principles-section">
         <h3>Learning Principles Evaluation</h3>
-        {analysis.principles.map((principle) => (
+        {principles.map((principle: any) => (
           <PrincipleFindings key={principle.principle} principle={principle} />
         ))}
       </div>
 
       <div className="recommendations-section">
-        <h3>Recommendations ({analysis.recommendations.length})</h3>
-        {analysis.recommendations.slice(0, 10).map((rec) => (
+        <h3>Recommendations ({recommendations.length})</h3>
+        {recommendations.slice(0, 10).map((rec) => (
           <div key={rec.id} className={`recommendation rec-${rec.priority}`}>
             <h4>{rec.title}</h4>
             <p>{rec.description}</p>

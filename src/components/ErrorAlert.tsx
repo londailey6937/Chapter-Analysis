@@ -10,12 +10,12 @@ interface ErrorAlertProps {
 
 /**
  * ErrorAlert Component
- * 
+ *
  * Displays error messages in a styled alert box.
  * Provides dismiss button to clear the alert.
- * 
+ *
  * Parent: ChapterInput
- * 
+ *
  * @param {ErrorAlertProps} props - Component props from parent
  * @returns {JSX.Element} Error alert element
  */

@@ -11,7 +11,7 @@ import {
   Chapter,
   ConceptGraph,
   // LearningPrinciple, (unused)
-} from "./types";
+} from "./index";
 
 // ============================================================================
 // DEEP PROCESSING & ELABORATION
@@ -443,7 +443,7 @@ export class SpacedRepetitionEvaluator {
       if (concept.mentions.length < 2) return;
 
       const positions = concept.mentions.map((m) => m.position);
-      const conceptGaps = [];
+      const conceptGaps: number[] = [];
 
       for (let i = 1; i < positions.length; i++) {
         conceptGaps.push(positions[i] - positions[i - 1]);
@@ -453,7 +453,8 @@ export class SpacedRepetitionEvaluator {
 
       // Check if gaps are too varied
       if (conceptGaps.length > 0) {
-        const avgGap = conceptGaps.reduce((a, b) => a + b) / conceptGaps.length;
+        const avgGap =
+          conceptGaps.reduce((a, b) => a + b, 0) / conceptGaps.length;
         const variance =
           conceptGaps.reduce((sum, gap) => sum + Math.pow(gap - avgGap, 2), 0) /
           conceptGaps.length;
@@ -464,7 +465,7 @@ export class SpacedRepetitionEvaluator {
     });
 
     const avgGap =
-      gaps.length > 0 ? gaps.reduce((a, b) => a + b) / gaps.length : 0;
+      gaps.length > 0 ? gaps.reduce((a, b) => a + b, 0) / gaps.length : 0;
     const variance =
       gaps.length > 0
         ? gaps.reduce((sum, gap) => sum + Math.pow(gap - avgGap, 2), 0) /
@@ -707,8 +708,13 @@ export class InterleavingEvaluator {
   }
 
   private static identifyBlockingSegments(sequence: string[]) {
-    const segments = [];
-    let current = { topic: sequence[0], length: 1, start: 0 };
+    const segments: { topic: string; length: number; start: number }[] = [];
+    if (sequence.length === 0) return segments;
+    let current: { topic: string; length: number; start: number } = {
+      topic: sequence[0],
+      length: 1,
+      start: 0,
+    };
 
     for (let i = 1; i < sequence.length; i++) {
       if (sequence[i] === current.topic) {
@@ -719,6 +725,10 @@ export class InterleavingEvaluator {
         }
         current = { topic: sequence[i], length: 1, start: i };
       }
+    }
+
+    if (current.length > 1) {
+      segments.push(current);
     }
 
     return segments;
