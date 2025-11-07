@@ -1,0 +1,118 @@
+import { useState } from "react";
+import { PrincipleEvaluation } from "@/types";
+
+/**
+ * Props interface for PrincipleScoreCard component
+ */
+interface PrincipleScoreCardProps {
+  /** Principle evaluation data */
+  principle: PrincipleEvaluation;
+}
+
+/**
+ * PrincipleScoreCard Component
+ *
+ * Displays score and details for a single learning principle.
+ * Expandable to show findings and suggestions.
+ *
+ * Parent: PrincipleScoresGrid
+ *
+ * @param {PrincipleScoreCardProps} props - Component props from parent
+ * @returns {JSX.Element} Expandable principle score card
+ */
+function PrincipleScoreCard({
+  principle,
+}: PrincipleScoreCardProps): JSX.Element {
+  const [expanded, setExpanded] = useState(false);
+
+  /**
+   * Determines color based on score
+   */
+  const getScoreColor = (score: number): string => {
+    if (score >= 80) return "text-green-600 bg-green-50";
+    if (score >= 60) return "text-blue-600 bg-blue-50";
+    if (score >= 40) return "text-yellow-600 bg-yellow-50";
+    return "text-red-600 bg-red-50";
+  };
+
+  /**
+   * Formats principle name for display
+   */
+  const formatPrincipleName = (name: string): string => {
+    return name
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (str) => str.toUpperCase())
+      .trim();
+  };
+
+  const { score, findings, suggestions } = principle;
+  const scoreColor = getScoreColor(score);
+  const displayName = formatPrincipleName(principle.principle);
+
+  return (
+    <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-soft transition-shadow">
+      {/* Card Header - Always Visible */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+      >
+        <div className="flex-1 text-left">
+          <h4 className="font-semibold text-gray-900 mb-1">{displayName}</h4>
+          <div className="flex items-center gap-2">
+            <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className={`h-full ${getScoreColor(
+                  score
+                )} transition-all duration-500`}
+                style={{ width: `${score}%` }}
+              />
+            </div>
+            <span className={`text-sm font-bold ${scoreColor}`}>
+              {score}/100
+            </span>
+          </div>
+        </div>
+        <span className="text-gray-500 text-xl transition-transform">
+          {expanded ? "−" : "+"}
+        </span>
+      </button>
+
+      {/* Expanded Content */}
+      {expanded && (
+        <div className="border-t border-gray-200 bg-gray-50 p-4 space-y-4">
+          {/* Findings */}
+          {findings && findings.length > 0 && (
+            <div>
+              <h5 className="font-semibold text-gray-900 mb-2 text-sm">
+                Findings
+              </h5>
+              <ul className="space-y-2">
+                {findings.slice(0, 2).map((finding, index) => (
+                  <li key={index} className="text-xs text-gray-700 flex gap-2">
+                    <span className="text-primary-500 flex-shrink-0">•</span>
+                    <span>{finding.message}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Suggestions */}
+          {suggestions && suggestions.length > 0 && (
+            <div>
+              <h5 className="font-semibold text-gray-900 mb-2 text-sm">
+                Top Suggestion
+              </h5>
+              <div className="text-xs bg-primary-50 border border-primary-200 rounded p-2 text-primary-900">
+                <p className="font-medium mb-1">{suggestions[0].title}</p>
+                <p className="text-primary-800">{suggestions[0].description}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default PrincipleScoreCard;
