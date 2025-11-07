@@ -39,7 +39,7 @@ export const PrincipleScoresRadar: React.FC<{ analysis: ChapterAnalysis }> = ({
   analysis,
 }) => {
   const data = analysis.visualizations.principleScores.principles.map((p) => ({
-    name: p.displayName.substring(0, 8),
+    name: p.name,
     score: p.score,
     fullName: p.displayName,
   }));
@@ -119,7 +119,12 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
           />
           <Tooltip
             contentStyle={{ backgroundColor: "#fff", border: "1px solid #ccc" }}
-            formatter={(value: any) => `${value}%`}
+            formatter={(value: any, name: string) => {
+              if (name === "Cognitive Load") return `${value}%`;
+              if (name === "New Concepts") return String(value);
+              return String(value);
+            }}
+            labelFormatter={(label: any) => `Section: ${label}`}
           />
           <Legend />
           <Line
@@ -414,6 +419,11 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
   const pattern = analysis.visualizations.interleavingPattern;
   const sequence = pattern.conceptSequence.slice(0, 30);
 
+  // Build ID -> Name map from conceptMap nodes
+  const idToName: Record<string, string> = {};
+  const nodes = analysis.visualizations.conceptMap.nodes as any[];
+  nodes.forEach((n) => (idToName[n.id] = n.label));
+
   const colorMap: Record<string, string> = {};
   sequence.forEach((conceptId, idx) => {
     const hue = (idx / sequence.length) * 360;
@@ -438,7 +448,8 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
               width: `${100 / sequence.length}%`,
               height: "30px",
             }}
-            title={`Concept ${conceptId}`}
+            title={`Concept: ${idToName[conceptId] || conceptId}`}
+            aria-label={`Concept: ${idToName[conceptId] || conceptId}`}
           />
         ))}
       </div>

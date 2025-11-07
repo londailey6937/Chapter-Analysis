@@ -254,6 +254,15 @@ export class AnalysisEngine {
     conceptGraph: ConceptGraph,
     principles: PrincipleScoreDisplay[]
   ): AnalysisVisualization {
+    const cognitiveLoadCurve = this.estimateCognitiveLoad(
+      chapter,
+      conceptGraph
+    );
+    const interleavingPattern = this.estimateInterleavingPattern(
+      chapter,
+      conceptGraph
+    );
+
     return {
       conceptMap: {
         nodes: conceptGraph.concepts.map((concept) => ({
@@ -272,25 +281,8 @@ export class AnalysisEngine {
         })),
         clusters: [],
       },
-      cognitiveLoadCurve: chapter.sections.map((section) => ({
-        sectionId: section.id,
-        position: 0,
-        load: 0,
-        factors: {
-          novelConcepts: 0,
-          conceptDensity: 0,
-          sentenceComplexity: 0,
-          technicalTerms: 0,
-        },
-      })),
-      interleavingPattern: {
-        conceptSequence: conceptGraph.sequence,
-        blockingSegments: [],
-        blockingRatio: 0,
-        topicSwitches: 0,
-        avgBlockSize: 0,
-        recommendation: "",
-      },
+      cognitiveLoadCurve,
+      interleavingPattern,
       reviewSchedule: {
         concepts: [],
         optimalSpacing: 0,
@@ -302,6 +294,222 @@ export class AnalysisEngine {
         strongestPrinciples: [],
         weakestPrinciples: [],
       },
+    };
+  }
+
+  /**
+   * Estimate cognitive load per section using a simple weighted heuristic.
+   * Factors (normalized 0-1): novel concepts, concept density, sentence complexity, technical terms.
+   */
+  private static estimateCognitiveLoad(
+    chapter: Chapter,
+    conceptGraph: ConceptGraph
+  ) {
+    const sections = chapter.sections;
+
+    // Precompute concept mentions by section boundaries
+    const conceptMentionsPerSection: number[] = sections.map((s) => 0);
+    for (const concept of conceptGraph.concepts) {
+      for (const m of concept.mentions) {
+        const idx = sections.findIndex(
+          (s) => m.position >= s.startPosition && m.position <= s.endPosition
+        );
+        if (idx >= 0) conceptMentionsPerSection[idx]++;
+      }
+    }
+
+    // Compute raw metrics per section
+    const rawNovel: number[] = sections.map((s) => s.conceptsIntroduced.length);
+    const rawDensityPer100: number[] = sections.map((s, i) => {
+      const words = Math.max(1, s.wordCount || this.countWords(s.content));
+      return (conceptMentionsPerSection[i] / words) * 100;
+    });
+    const rawAvgSentenceLen: number[] = sections.map((s) =>
+      this.avgSentenceLength(s.content)
+    );
+    const rawTechPer100: number[] = sections.map((s) => {
+      const words = this.tokenizeWords(s.content);
+      const technical = words.filter((w) => this.isTechnicalToken(w)).length;
+      const denom = Math.max(1, words.length);
+      return (technical / denom) * 100;
+    });
+
+    // Normalization helpers
+    const maxNovel = Math.max(0, ...rawNovel);
+    const maxDensity = Math.max(0.0001, ...rawDensityPer100);
+    const novelNorm = rawNovel.map((v) => (maxNovel > 0 ? v / maxNovel : 0));
+    // Cap density at 1 using observed max to prevent extreme spikes
+    const densityNorm = rawDensityPer100.map((v) =>
+      Math.min(1, v / maxDensity)
+    );
+    // Map avg sentence length roughly: 12 (low) -> 0, 30 (high) -> 1
+    const complexityNorm = rawAvgSentenceLen.map((len) => {
+      const n = (len - 12) / (30 - 12);
+      return this.clamp(n, 0, 1);
+    });
+    // Technical terms per 100 words: cap at 5/100 -> 1
+    const technicalNorm = rawTechPer100.map((v) => Math.min(1, v / 5));
+
+    // Weights sum to 1
+    const W = {
+      novel: 0.3,
+      density: 0.25,
+      complexity: 0.25,
+      technical: 0.2,
+    } as const;
+
+    return sections.map((s, i) => {
+      const load =
+        W.novel * novelNorm[i] +
+        W.density * densityNorm[i] +
+        W.complexity * complexityNorm[i] +
+        W.technical * technicalNorm[i];
+
+      return {
+        sectionId: s.id,
+        position: s.startPosition || 0,
+        load: this.clamp(load, 0, 1),
+        factors: {
+          novelConcepts: rawNovel[i],
+          conceptDensity: Number(densityNorm[i].toFixed(2)),
+          sentenceComplexity: Number(complexityNorm[i].toFixed(2)),
+          technicalTerms: Number(technicalNorm[i].toFixed(2)),
+        },
+      };
+    });
+  }
+
+  // ---------- Local utilities ----------
+  private static clamp(v: number, min: number, max: number) {
+    return Math.max(min, Math.min(max, v));
+  }
+
+  private static tokenizeWords(text: string): string[] {
+    if (!text) return [];
+    return text
+      .toLowerCase()
+      .replace(/[^a-z0-9\-\u0370-\u03FF\s]/g, " ") // keep greek range
+      .split(/\s+/)
+      .filter(Boolean);
+  }
+
+  private static countWords(text: string): number {
+    return this.tokenizeWords(text).length;
+  }
+
+  private static avgSentenceLength(text: string): number {
+    if (!text) return 0;
+    const sentences = text
+      .split(/(?<=[.!?])\s+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const words = this.countWords(text);
+    const sCount = Math.max(1, sentences.length);
+    return words / sCount;
+  }
+
+  private static isTechnicalToken(token: string): boolean {
+    if (!token) return false;
+    // Heuristics: long words, embedded digits/symbols, greek letters, hyphenated compounds
+    const hasDigit = /\d/.test(token);
+    const hasGreek = /[\u0370-\u03FF]/.test(token);
+    const longWord = token.length >= 12;
+    const hasHyphen = /.+-.+/.test(token);
+    return longWord || hasDigit || hasGreek || hasHyphen;
+  }
+
+  /**
+   * Estimate interleaving pattern by analyzing sequence of concept mentions.
+   * Creates blocking segments (>=3 consecutive identical concept mentions).
+   */
+  private static estimateInterleavingPattern(
+    chapter: Chapter,
+    conceptGraph: ConceptGraph
+  ) {
+    const mentionEvents: { conceptId: string; position: number }[] = [];
+    for (const c of conceptGraph.concepts) {
+      for (const m of c.mentions) {
+        mentionEvents.push({ conceptId: c.id, position: m.position });
+      }
+    }
+    mentionEvents.sort((a, b) => a.position - b.position);
+    const totalMentions = mentionEvents.length;
+    if (totalMentions === 0) {
+      return {
+        conceptSequence: [],
+        blockingSegments: [],
+        blockingRatio: 0,
+        topicSwitches: 0,
+        avgBlockSize: 0,
+        recommendation: "No concept mentions detected.",
+      };
+    }
+    const sequence = mentionEvents.map((e) => e.conceptId);
+    const blocks: {
+      conceptId: string;
+      length: number;
+      startPosition: number;
+      endPosition: number;
+    }[] = [];
+    let i = 0;
+    while (i < sequence.length) {
+      const conceptId = sequence[i];
+      const startIdx = i;
+      let j = i + 1;
+      while (j < sequence.length && sequence[j] === conceptId) j++;
+      const endIdx = j - 1;
+      blocks.push({
+        conceptId,
+        length: endIdx - startIdx + 1,
+        startPosition: mentionEvents[startIdx].position,
+        endPosition: mentionEvents[endIdx].position,
+      });
+      i = j;
+    }
+    const BLOCK_THRESHOLD = 3;
+    const blockingBlocks = blocks.filter((b) => b.length >= BLOCK_THRESHOLD);
+    const mentionsInBlocking = blockingBlocks.reduce(
+      (sum, b) => sum + b.length,
+      0
+    );
+    const blockingRatio = mentionsInBlocking / totalMentions;
+    let topicSwitches = 0;
+    for (let k = 1; k < sequence.length; k++) {
+      if (sequence[k] !== sequence[k - 1]) topicSwitches++;
+    }
+    const avgBlockSize =
+      blocks.reduce((sum, b) => sum + b.length, 0) / Math.max(1, blocks.length);
+    let recommendation = "";
+    if (totalMentions < 5) {
+      recommendation = "Few mentions detected; interleaving signal is weak.";
+    } else if (blockingRatio > 0.5) {
+      const worst = blockingBlocks.sort((a, b) => b.length - a.length)[0];
+      recommendation = `High blocking detected (${Math.round(
+        blockingRatio * 100
+      )}%). Break up large blocks like ${worst.conceptId} (run of ${
+        worst.length
+      }).`;
+    } else if (blockingRatio > 0.3) {
+      recommendation = `Moderate blocking (${Math.round(
+        blockingRatio * 100
+      )}%). Consider interleaving shorter segments.`;
+    } else {
+      recommendation =
+        "Good interleaving; keep mixing topics where appropriate.";
+    }
+    return {
+      conceptSequence: sequence,
+      blockingSegments: blockingBlocks.map((b) => ({
+        startPosition: b.startPosition,
+        endPosition: b.endPosition,
+        conceptId: b.conceptId,
+        length: b.length,
+        issue: "blocking",
+      })),
+      blockingRatio,
+      topicSwitches,
+      avgBlockSize,
+      recommendation,
     };
   }
 }
