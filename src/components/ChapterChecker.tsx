@@ -473,7 +473,7 @@ export const ChapterChecker: React.FC = () => {
 
         .chapter-checker {
           min-height: 100vh;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, var(--brand-navy-600) 0%, var(--brand-navy-700) 100%);
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
@@ -509,7 +509,7 @@ export const ChapterChecker: React.FC = () => {
         }
 
         .input-section.drag-active {
-          outline: 3px dashed #667eea;
+          outline: 3px dashed var(--brand-navy-600);
           outline-offset: 2px;
           background: linear-gradient(180deg, #ffffff 0%, #f0f4ff 100%);
         }
@@ -528,7 +528,7 @@ export const ChapterChecker: React.FC = () => {
         }
 
         .drag-active .drop-zone {
-          border-color: #667eea;
+          border-color: var(--brand-navy-600);
           background: #eef2ff;
         }
 
@@ -576,7 +576,7 @@ export const ChapterChecker: React.FC = () => {
 
         .chapter-textarea:focus {
           outline: none;
-          border-color: #667eea;
+          border-color: var(--brand-navy-600);
         }
 
         .chapter-textarea:disabled {
@@ -616,7 +616,7 @@ export const ChapterChecker: React.FC = () => {
         }
 
         .btn-primary {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, var(--brand-navy-600) 0%, var(--brand-navy-700) 100%);
           color: white;
         }
 
@@ -632,8 +632,8 @@ export const ChapterChecker: React.FC = () => {
         }
 
         .btn-secondary:hover:not(:disabled) {
-          border-color: #667eea;
-          color: #667eea;
+          border-color: var(--brand-navy-600);
+          color: var(--brand-navy-600);
         }
 
         .btn-large {
@@ -658,7 +658,7 @@ export const ChapterChecker: React.FC = () => {
           width: 20px;
           height: 20px;
           border: 3px solid #f3f3f3;
-          border-top: 3px solid #667eea;
+          border-top: 3px solid var(--brand-navy-600);
           border-radius: 50%;
           animation: spin 1s linear infinite;
           margin-top: 20px;
@@ -706,7 +706,7 @@ export const ChapterChecker: React.FC = () => {
           content: "✓";
           position: absolute;
           left: 0;
-          color: #667eea;
+          color: var(--brand-navy-600);
           font-weight: bold;
         }
 
