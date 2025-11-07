@@ -293,12 +293,12 @@ export class ConceptExtractor {
     // STEP 2c: Extract code-like identifiers (e.g., Object.create, toString, Map.prototype)
     this.extractCodeIdentifiers(text, candidates);
 
-    // STEP 3: Extract from sentences with defining patterns (only library concepts)
+    // STEP 3: Extract from sentences with defining patterns (enhanced with educational indicators)
     const sentences = this.splitIntoSentences(text);
     sentences.forEach((sentence, _idx) => {
       const position = text.indexOf(sentence);
 
-      // Pattern 1: "X is a/an Y" (definition)
+      // Pattern 1: "X is a/an Y" (definition & classification)
       const defPattern =
         /(\w+(?:\s+\w+){0,3})\s+is\s+(?:a|an|the)\s+([^.!?]+)/gi;
       let defMatch;
@@ -311,6 +311,7 @@ export class ConceptExtractor {
           this.addCandidate(candidates, concept, defMatch[1], position, {
             definition,
             hasInlineDefinition: true,
+            isDefinitionPattern: true,
           });
         }
       }
@@ -323,10 +324,56 @@ export class ConceptExtractor {
         this.addCandidate(candidates, concept, refMatch[1], position, {
           definition: refMatch[2].trim(),
           hasInlineDefinition: true,
+          isDefinitionPattern: true,
         });
       }
 
-      // Pattern 3: Capitalized terms at sentence start or in emphasis
+      // Pattern 3: "X means Y" / "X can be defined as Y" (abstraction indicators)
+      const meansPattern =
+        /(\w+(?:\s+\w+){0,3})\s+(?:means?|can be defined as|is defined as|is characterized by)\s+([^.!?]+)/gi;
+      let meansMatch;
+      while ((meansMatch = meansPattern.exec(sentence)) !== null) {
+        const concept = this.normalizeText(meansMatch[1]);
+        if (this.isValidConcept(concept)) {
+          this.addCandidate(candidates, concept, meansMatch[1], position, {
+            definition: meansMatch[2].trim(),
+            hasInlineDefinition: true,
+            isDefinitionPattern: true,
+          });
+        }
+      }
+
+      // Pattern 4: Classification - "X is a type/kind/form of Y"
+      const classifyPattern =
+        /(\w+(?:\s+\w+){0,3})\s+is\s+(?:a|an)\s+(?:type|kind|form|example|instance|category)\s+of\s+([^.!?]+)/gi;
+      let classifyMatch;
+      while ((classifyMatch = classifyPattern.exec(sentence)) !== null) {
+        const concept = this.normalizeText(classifyMatch[1]);
+        if (this.isValidConcept(concept)) {
+          this.addCandidate(candidates, concept, classifyMatch[1], position, {
+            definition: `Type of ${classifyMatch[2].trim()}`,
+            hasInlineDefinition: true,
+            isClassification: true,
+          });
+        }
+      }
+
+      // Pattern 5: Process patterns - "X is the process of Y"
+      const processPattern =
+        /(\w+(?:\s+\w+){0,3})\s+is\s+(?:the\s+)?(?:process|method|technique|procedure)\s+(?:of|by which|in which)\s+([^.!?]+)/gi;
+      let processMatch;
+      while ((processMatch = processPattern.exec(sentence)) !== null) {
+        const concept = this.normalizeText(processMatch[1]);
+        if (this.isValidConcept(concept)) {
+          this.addCandidate(candidates, concept, processMatch[1], position, {
+            definition: `Process: ${processMatch[2].trim()}`,
+            hasInlineDefinition: true,
+            isDefinitionPattern: true,
+          });
+        }
+      }
+
+      // Pattern 6: Capitalized terms at sentence start or in emphasis
       const capitalPattern = /(?:^|\s)([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g;
       let capMatch;
       while ((capMatch = capitalPattern.exec(sentence)) !== null) {
@@ -440,7 +487,33 @@ export class ConceptExtractor {
           score += 15; // Technical terms near definitions are important
         }
 
-        // Factor 9: Penalize very short single-word terms unless frequently mentioned or library concept
+        // Factor 9: Educational indicator bonuses (abstraction, classification, explanatory weight)
+        if (candidate.isDefinitionPattern) {
+          score += 20; // Strong signal: explicit definition/explanation
+        }
+        if (candidate.isClassification) {
+          score += 15; // Classification pattern ("is a type of")
+        }
+        // Reusability heuristic: multiple mentions across text spread
+        if (candidate.positions.length >= 3) {
+          const spread =
+            Math.max(...candidate.positions) - Math.min(...candidate.positions);
+          const textLength = text.length;
+          if (spread > textLength * 0.3) {
+            score += 10; // Concept reused across substantial portion of text
+          }
+        }
+        // Explanatory weight: Check if concept appears in contexts with explanation keywords
+        const explanatoryContexts = candidate.sentenceContexts.filter((ctx) =>
+          /\b(because|therefore|thus|means?|involves?|enables?|allows?|provides?|results? in|leads to|characterized by)\b/i.test(
+            ctx
+          )
+        ).length;
+        if (explanatoryContexts >= 2) {
+          score += 12; // Concept frequently explained = higher abstraction/importance
+        }
+
+        // Factor 10: Penalize very short single-word terms unless frequently mentioned or library concept
         if (
           wordCount === 1 &&
           candidate.term.length <= 4 &&
@@ -1114,6 +1187,8 @@ interface ConceptCandidate {
   isTechnicalTerm?: boolean;
   isChemicalFormula?: boolean;
   hasInlineDefinition?: boolean;
+  isDefinitionPattern?: boolean; // Educational indicator: explicit definition
+  isClassification?: boolean; // Educational indicator: classification pattern
 }
 
 interface ScoredCandidate extends ConceptCandidate {
