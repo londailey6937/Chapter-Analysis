@@ -10,6 +10,7 @@ import { Chapter, ChapterAnalysis } from "@/types";
 import {
   extractTextFromPdf,
   extractTextFromPdfArrayBuffer,
+  extractPdfStructure,
 } from "@/utils/pdfText";
 
 // ============================================================================
@@ -18,6 +19,9 @@ import {
 
 export const ChapterChecker: React.FC = () => {
   const [chapterText, setChapterText] = useState("");
+  const [sectionHints, setSectionHints] = useState<
+    { title: string; startIndex: number }[] | null
+  >(null);
   const [analysis, setAnalysis] = useState<ChapterAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,8 +50,11 @@ export const ChapterChecker: React.FC = () => {
     try {
       setProgress("Parsing chapter...");
 
-      // Parse chapter into sections
-      const sections = parseChapterIntoSections(chapterText);
+      // Parse chapter into sections (use PDF outline hints if available)
+      const sections = parseChapterIntoSections(
+        chapterText,
+        sectionHints || undefined
+      );
 
       setProgress("Extracting concepts...");
 
@@ -104,13 +111,32 @@ export const ChapterChecker: React.FC = () => {
         file.type === "application/pdf" ||
         file.name.toLowerCase().endsWith(".pdf")
       ) {
-        const text = await extractTextFromPdf(file);
+        const { text, pageTexts, outline } = await extractPdfStructure(file);
+        if (outline && outline.length > 0) {
+          // Compute offsets matching join("\n\n") used by extractor
+          const pageOffsets: number[] = [];
+          let acc = 0;
+          for (let i = 0; i < pageTexts.length; i++) {
+            pageOffsets[i] = acc;
+            acc += pageTexts[i].length + (i < pageTexts.length - 1 ? 2 : 0);
+          }
+          const hints = outline
+            .map((o) => ({
+              title: o.title,
+              startIndex: pageOffsets[Math.max(0, o.pageNumber - 1)] ?? 0,
+            }))
+            .sort((a, b) => a.startIndex - b.startIndex);
+          setSectionHints(hints);
+        } else {
+          setSectionHints(null);
+        }
         setChapterText(text);
       } else {
         const reader = new FileReader();
         reader.onload = (event) => {
           const content = event.target?.result as string;
           setChapterText(content);
+          setSectionHints(null);
         };
         reader.readAsText(file);
       }
@@ -670,7 +696,10 @@ export const ChapterChecker: React.FC = () => {
 // HELPER FUNCTIONS
 // ============================================================================
 
-function parseChapterIntoSections(text: string) {
+function parseChapterIntoSections(
+  text: string,
+  hints?: { title: string; startIndex: number }[]
+) {
   const sections: Array<{
     id: string;
     heading: string;
@@ -694,6 +723,32 @@ function parseChapterIntoSections(text: string) {
     startLine: number;
     startPosition: number;
   } | null = null;
+
+  // If hints provided (e.g., PDF outline), build sections from them directly
+  if (hints && hints.length > 0) {
+    const sorted = [...hints].sort((a, b) => a.startIndex - b.startIndex);
+    for (let i = 0; i < sorted.length; i++) {
+      const start = Math.max(0, sorted[i].startIndex);
+      const end =
+        i < sorted.length - 1
+          ? Math.max(start, sorted[i + 1].startIndex)
+          : text.length;
+      const content = text.substring(start, end).trim();
+      const words = content.split(/\s+/).filter(Boolean).length;
+      sections.push({
+        id: `section-${i}`,
+        heading: sorted[i].title,
+        content,
+        startPosition: start,
+        endPosition: end,
+        wordCount: words,
+        conceptsIntroduced: [],
+        conceptsRevisited: [],
+        depth: 1,
+      });
+    }
+    return sections;
+  }
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
