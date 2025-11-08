@@ -121,6 +121,12 @@ export const ChapterOverviewTimeline: React.FC<{
                   onClick={() => {
                     const pos =
                       (sec as any).position ?? (sec as any).startPosition ?? 0;
+                    console.log("🖱️ Timeline section clicked:", {
+                      sectionName: issue.sectionName,
+                      position: pos,
+                      sectionIndex: idx,
+                      sectionId: sec.sectionId,
+                    });
                     window.dispatchEvent(
                       new CustomEvent("jump-to-position", {
                         detail: {
@@ -1652,7 +1658,8 @@ export const ChapterAnalysisDashboard: React.FC<{
             padding: 20px;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
               sans-serif;
-            max-width: 1400px;
+            width: 100%;
+            max-width: 100%;
             margin: 0 auto;
           }
           .dashboard-header {
@@ -1686,7 +1693,7 @@ export const ChapterAnalysisDashboard: React.FC<{
           }
           .viz-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(min(500px, 100%), 1fr));
             gap: 20px;
             margin: 30px 0;
           }
@@ -1695,6 +1702,8 @@ export const ChapterAnalysisDashboard: React.FC<{
             border-radius: 8px;
             padding: 20px;
             background: var(--bg-panel);
+            max-width: 100%;
+            overflow-x: auto;
           }
           .viz-container h3 {
             margin-top: 0;

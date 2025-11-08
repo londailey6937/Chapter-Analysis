@@ -32,9 +32,12 @@ export async function extractTextFromPdfArrayBuffer(
 /**
  * Structured PDF extraction including per-page text and document outline (bookmarks)
  */
-export async function extractPdfStructure(file: File) {
+export async function extractPdfStructure(
+  file: File,
+  onProgress?: (progress: string) => void
+) {
   const buffer = await file.arrayBuffer();
-  return extractPdfStructureArrayBuffer(buffer);
+  return extractPdfStructureArrayBuffer(buffer, onProgress);
 }
 
 export interface PdfOutlineItem {
@@ -49,21 +52,53 @@ export interface PdfStructureResult {
 }
 
 export async function extractPdfStructureArrayBuffer(
-  buffer: ArrayBuffer
+  buffer: ArrayBuffer,
+  onProgress?: (progress: string) => void
 ): Promise<PdfStructureResult> {
-  const pdf = (await getDocument({ data: buffer }).promise) as PDFDocumentProxy;
+  onProgress?.("Loading PDF document...");
+
+  const pdf = (await getDocument({
+    data: buffer,
+    // Add options to handle problematic PDFs
+    verbosity: 0, // Reduce console warnings
+    useSystemFonts: false, // Prevent font loading issues
+    disableFontFace: true, // Skip custom fonts that cause TT errors
+    cMapUrl: undefined, // Skip character mapping for faster loading
+    standardFontDataUrl: undefined, // Skip standard font loading
+  }).promise) as PDFDocumentProxy;
+
   const maxPages = pdf.numPages;
   const pageTexts: string[] = [];
 
+  onProgress?.(`Extracting text from ${maxPages} pages...`);
+
   for (let pageNum = 1; pageNum <= maxPages; pageNum++) {
-    const page = await pdf.getPage(pageNum);
-    const content = await page.getTextContent({
-      includeMarkedContent: true,
-    } as any);
-    const strings = (content.items || []).map((item: any) => item.str);
-    const text = strings.join(" ").replace(/\s+/g, " ").trim();
-    pageTexts.push(text);
+    try {
+      onProgress?.(`Processing page ${pageNum} of ${maxPages}...`);
+
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent({
+        includeMarkedContent: false, // Skip marked content for speed
+        disableCombineTextItems: false, // Allow combining for faster processing
+      } as any);
+
+      const strings = (content.items || [])
+        .filter((item: any) => item.str && typeof item.str === "string")
+        .map((item: any) => item.str);
+      const text = strings.join(" ").replace(/\s+/g, " ").trim();
+      pageTexts.push(text);
+
+      // Yield every 2 pages to keep UI responsive and update progress
+      if (pageNum % 2 === 0) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+    } catch (pageError) {
+      console.warn(`Failed to extract text from page ${pageNum}:`, pageError);
+      pageTexts.push(""); // Add empty string to maintain page indexing
+    }
   }
+
+  onProgress?.("Extracting document outline...");
 
   let outline: PdfOutlineItem[] = [];
   try {

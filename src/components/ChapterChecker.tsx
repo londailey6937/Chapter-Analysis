@@ -24,12 +24,16 @@ export const ChapterChecker: React.FC = () => {
     { title: string; startIndex: number }[] | null
   >(null);
   const [pdfBuffer, setPdfBuffer] = useState<ArrayBuffer | null>(null);
+  const [pdfPageTexts, setPdfPageTexts] = useState<string[] | null>(null);
   const [analysis, setAnalysis] = useState<ChapterAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<string>("");
+  const [progressPercent, setProgressPercent] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragActive, setIsDragActive] = useState(false);
+  const [isSlowPdf, setIsSlowPdf] = useState(false);
+  const fileProcessingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   /**
    * Handle chapter analysis
@@ -102,17 +106,50 @@ export const ChapterChecker: React.FC = () => {
         const { type } = evt.data;
         if (type === "progress") {
           const { step, detail } = evt.data;
-          setProgress(
-            `${step.replace(/-/g, " ")}${detail ? ": " + detail : ""}`
-          );
+          const progressText = `${step.replace(/-/g, " ")}${
+            detail ? ": " + detail : ""
+          }`;
+          setProgress(progressText);
+
+          // Update progress percentage based on step
+          let percent = 0;
+          switch (step) {
+            case "received":
+              percent = 5;
+              break;
+            case "analysis-start":
+              percent = 10;
+              break;
+            case "extracting-concepts":
+              percent = 25;
+              break;
+            case "evaluating-principles":
+              percent = 50;
+              break;
+            case "building-visualizations":
+              percent = 75;
+              break;
+            case "analyzing-concepts":
+              percent = 85;
+              break;
+            case "analysis-complete":
+              percent = 100;
+              break;
+            default:
+              percent = 30;
+              break;
+          }
+          setProgressPercent(percent);
         } else if (type === "complete") {
           setAnalysis(evt.data.result);
           setProgress("");
+          setProgressPercent(0);
           worker.terminate();
           analysisWorkerRef.current = null;
         } else if (type === "error") {
           setError(`Analysis failed: ${evt.data.message}`);
           setProgress("");
+          setProgressPercent(0);
           worker.terminate();
           analysisWorkerRef.current = null;
         }
@@ -129,25 +166,58 @@ export const ChapterChecker: React.FC = () => {
   };
 
   /**
-   * Handle file upload
+   * Handle file upload with optimized PDF loading
    */
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    setError(null);
+    setProgress("Loading file...");
+    setIsSlowPdf(false);
+
+    // Set a timeout to detect slow PDFs
+    fileProcessingTimeoutRef.current = setTimeout(() => {
+      setIsSlowPdf(true);
+    }, 10000); // 10 seconds
+
     try {
       if (
         file.type === "application/pdf" ||
         file.name.toLowerCase().endsWith(".pdf")
       ) {
-        // Read buffer once and clone for separate uses
+        setProgress("Processing PDF...");
+
+        // Read buffer once for all operations
         const originalBuffer = await file.arrayBuffer();
 
-        // Clone for visual rendering (will be transferred to worker)
-        const viewerBuffer = originalBuffer.slice(0);
-        setPdfBuffer(viewerBuffer);
+        // Set buffer for viewer immediately (no text extraction needed in viewer now)
+        setPdfBuffer(originalBuffer.slice(0));
 
-        // Extract structure for analysis using original
-        const { text, pageTexts, outline } = await extractPdfStructure(file);
+        setProgress("Extracting text and structure...");
+
+        // Extract structure for analysis - this is the only text extraction we need
+        const { text, pageTexts, outline } = await extractPdfStructure(
+          file,
+          (progressText) => {
+            setProgress(progressText);
+            // Extract progress percentage from progress text
+            const match = progressText.match(/(\d+) of (\d+)/);
+            if (match) {
+              const [, current, total] = match;
+              const percent = Math.round(
+                (parseInt(current) / parseInt(total)) * 100
+              );
+              setProgressPercent(percent);
+            }
+          }
+        );
+
+        // Store page texts for later use in analysis view
+        setPdfPageTexts(pageTexts);
+
+        setProgress("Building section outline...");
+
         if (outline && outline.length > 0) {
           // Compute offsets matching join("\n\n") used by extractor
           const pageOffsets: number[] = [];
@@ -166,14 +236,36 @@ export const ChapterChecker: React.FC = () => {
         } else {
           setSectionHints(null);
         }
+
         setChapterText(text);
+        setProgress("");
+        setProgressPercent(0);
+
+        // Clear timeout on success
+        if (fileProcessingTimeoutRef.current) {
+          clearTimeout(fileProcessingTimeoutRef.current);
+          fileProcessingTimeoutRef.current = null;
+        }
+        setIsSlowPdf(false);
+
+        // Clear timeout since processing completed
+        if (fileProcessingTimeoutRef.current) {
+          clearTimeout(fileProcessingTimeoutRef.current);
+          fileProcessingTimeoutRef.current = null;
+        }
+        setIsSlowPdf(false);
       } else {
         setPdfBuffer(null);
+        setPdfPageTexts(null);
+        setProgress("Reading text file...");
+
         const reader = new FileReader();
         reader.onload = (event) => {
           const content = event.target?.result as string;
           setChapterText(content);
           setSectionHints(null);
+          setProgress("");
+          setProgressPercent(0);
         };
         reader.readAsText(file);
       }
@@ -183,6 +275,15 @@ export const ChapterChecker: React.FC = () => {
           err instanceof Error ? err.message : String(err)
         }`
       );
+      setProgress("");
+      setProgressPercent(0);
+
+      // Clear timeout on error
+      if (fileProcessingTimeoutRef.current) {
+        clearTimeout(fileProcessingTimeoutRef.current);
+        fileProcessingTimeoutRef.current = null;
+      }
+      setIsSlowPdf(false);
     }
   };
 
@@ -276,58 +377,73 @@ export const ChapterChecker: React.FC = () => {
       </header>
 
       <div className="app-container">
-        {!analysis ? (
-          <>
-            {/* INPUT SECTION */}
+        <div className="unified-layout">
+          {/* LEFT PANEL: PDF Viewer */}
+          <div className="pdf-panel">
+            {pdfBuffer ? (
+              <>
+                <h3>📄 Chapter PDF</h3>
+                <PdfViewer
+                  fileBuffer={pdfBuffer}
+                  skipTextExtraction={true}
+                  preExtractedPageTexts={pdfPageTexts || undefined}
+                />
+              </>
+            ) : (
+              <div className="pdf-placeholder">
+                <div className="placeholder-content">
+                  <div className="placeholder-icon">📄</div>
+                  <p>Upload a PDF to view it here</p>
+                  <p className="placeholder-hint">
+                    The PDF will remain visible during analysis
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT PANEL: Controls & Analysis */}
+          <div className="control-panel">
+            {/* Upload Controls - Always visible */}
             <div
-              className={`input-section ${isDragActive ? "drag-active" : ""}`}
+              className={`control-section ${isDragActive ? "drag-active" : ""}`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
             >
-              <div className="editor-controls">
-                <h2>Paste or Upload Your Chapter</h2>
-                <div className="control-buttons">
+              <h2>Upload Your Chapter</h2>
+              <div className="control-buttons">
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isAnalyzing}
+                >
+                  📄 Upload File (.txt, .md, .pdf)
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".txt,.md,.pdf"
+                  onChange={handleFileUpload}
+                  style={{ display: "none" }}
+                />
+                {chapterText && (
                   <button
                     className="btn btn-secondary"
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={handleClear}
                     disabled={isAnalyzing}
                   >
-                    📄 Upload File (.txt, .md, .pdf)
+                    🗑️ Clear
                   </button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".txt,.md,.pdf"
-                    onChange={handleFileUpload}
-                    style={{ display: "none" }}
-                  />
-                  {chapterText && (
-                    <button
-                      className="btn btn-secondary"
-                      onClick={handleClear}
-                      disabled={isAnalyzing}
-                    >
-                      🗑️ Clear
-                    </button>
-                  )}
-                </div>
+                )}
+                {analysis && (
+                  <button className="btn btn-secondary" onClick={handleExport}>
+                    📥 Export JSON
+                  </button>
+                )}
               </div>
 
-              {/* PDF Visual Preview */}
-              {pdfBuffer && (
-                <div className="pdf-preview-section">
-                  <h3>📄 PDF Preview</h3>
-                  <PdfViewer
-                    fileBuffer={pdfBuffer}
-                    onTextExtracted={(text) => {
-                      if (!chapterText) setChapterText(text);
-                    }}
-                  />
-                </div>
-              )}
-
-              {/* Text Editor (hidden when PDF shown) */}
+              {/* Text Editor (only when no PDF) */}
               {!pdfBuffer && (
                 <>
                   <textarea
@@ -350,7 +466,6 @@ export const ChapterChecker: React.FC = () => {
                             const file = item.getAsFile();
                             if (!file) return;
                             const originalBuffer = await file.arrayBuffer();
-                            // Clone buffer for viewer
                             const viewerBuffer = originalBuffer.slice(0);
                             setPdfBuffer(viewerBuffer);
                             const text = await extractTextFromPdfArrayBuffer(
@@ -371,17 +486,9 @@ export const ChapterChecker: React.FC = () => {
                       }
                     }}
                   />
-
-                  {/* Drag & Drop hint */}
-                  <div
-                    className="drop-zone"
-                    aria-label="Drag and drop files here"
-                  >
-                    <strong>Drag & Drop</strong> a .txt, .md, or .pdf file
-                    anywhere in this box
-                    <div className="accepted-note">
-                      Accepted: .txt .md .pdf (PDF text extracted)
-                    </div>
+                  <div className="drop-zone">
+                    <strong>Drag & Drop</strong> a .txt, .md, or .pdf file here
+                    <div className="accepted-note">Accepted: .txt .md .pdf</div>
                   </div>
                 </>
               )}
@@ -392,117 +499,92 @@ export const ChapterChecker: React.FC = () => {
 
               {error && <div className="error-message">{error}</div>}
 
+              {progress && !error && (
+                <div className="progress-indicator">
+                  <div className="progress-bar">
+                    <div
+                      className="progress-fill"
+                      style={{
+                        width:
+                          progressPercent > 0 ? `${progressPercent}%` : "30%",
+                      }}
+                    ></div>
+                  </div>
+                  <div className="progress-text">{progress}</div>
+                  {isSlowPdf && (
+                    <div className="slow-pdf-warning">
+                      ⚠️ This PDF is taking longer than expected. This may be
+                      due to complex fonts or encoding. The process will
+                      continue, but it may take several minutes.
+                    </div>
+                  )}
+                </div>
+              )}
+
               <button
                 className="btn btn-primary btn-large"
                 onClick={handleAnalyzeChapter}
                 disabled={isAnalyzing || !chapterText.trim()}
               >
-                {isAnalyzing ? `${progress} ...` : "🔍 Analyze Chapter"}
+                {isAnalyzing ? "Processing..." : "🔍 Analyze Chapter"}
               </button>
 
               {isAnalyzing && <div className="loading-spinner" />}
             </div>
 
-            {/* INFO SECTION */}
-            <div className="info-section">
-              <div className="info-card">
-                <h3>🎓 What This Analyzes</h3>
-                <ul>
-                  <li>
-                    <strong>Deep Processing:</strong> Questions that encourage
-                    deeper thinking
-                  </li>
-                  <li>
-                    <strong>Spaced Repetition:</strong> How concepts are
-                    revisited
-                  </li>
-                  <li>
-                    <strong>Retrieval Practice:</strong> Opportunities for
-                    active recall
-                  </li>
-                  <li>
-                    <strong>Interleaving:</strong> How topics are mixed vs.
-                    blocked
-                  </li>
-                  <li>
-                    <strong>Dual Coding:</strong> Balance of verbal and visual
-                    elements
-                  </li>
-                  <li>
-                    <strong>Generative Learning:</strong> Prompts for
-                    creating/predicting
-                  </li>
-                  <li>
-                    <strong>Schema Building:</strong> Concept hierarchy and
-                    connections
-                  </li>
-                  <li>
-                    <strong>Cognitive Load:</strong> Section complexity and
-                    pacing
-                  </li>
-                  <li>
-                    <strong>Emotion & Relevance:</strong> Personal connection
-                    elements
-                  </li>
-                </ul>
-              </div>
-
-              <div className="info-card">
-                <h3>📊 You'll Get</h3>
-                <ul>
-                  <li>Overall pedagogical effectiveness score</li>
-                  <li>Detailed analysis of each learning principle</li>
-                  <li>Concept extraction and relationship mapping</li>
-                  <li>Cognitive load distribution analysis</li>
-                  <li>Interleaving pattern visualization</li>
-                  <li>Prioritized recommendations for improvement</li>
-                  <li>Detailed evidence and supporting data</li>
-                </ul>
-              </div>
-
-              <div className="info-card">
-                <h3>💡 Tips for Better Results</h3>
-                <ul>
-                  <li>Include complete chapters with proper structure</li>
-                  <li>Ensure sections have clear headings</li>
-                  <li>Include any questions or exercises you have</li>
-                  <li>Use consistent formatting</li>
-                  <li>Minimum 200 words recommended</li>
-                </ul>
-              </div>
-            </div>
-          </>
-        ) : (
-          <>
-            {/* ANALYSIS RESULTS */}
-            <div className="results-controls">
-              <button
-                className="btn btn-secondary"
-                onClick={() => setAnalysis(null)}
-              >
-                ← Back to Editor
-              </button>
-              <button className="btn btn-secondary" onClick={handleExport}>
-                📥 Export as JSON
-              </button>
-            </div>
-
-            <div className="analysis-layout">
-              <div className="analysis-main">
+            {/* Analysis Results - Shows when available */}
+            {analysis ? (
+              <div className="analysis-results">
                 <ChapterAnalysisDashboard analysis={analysis} />
               </div>
-              {pdfBuffer && (
-                <div className="analysis-pdf-panel">
-                  <h3 style={{ marginTop: 0 }}>📄 Source PDF</h3>
-                  <PdfViewer
-                    fileBuffer={pdfBuffer}
-                    onTextExtracted={() => {}}
-                  />
+            ) : (
+              /* Info Section - Shows when no analysis */
+              <div className="info-section">
+                <div className="info-card">
+                  <h3>🎓 What This Analyzes</h3>
+                  <ul>
+                    <li>
+                      <strong>Deep Processing:</strong> Questions that encourage
+                      deeper thinking
+                    </li>
+                    <li>
+                      <strong>Spaced Repetition:</strong> How concepts are
+                      revisited
+                    </li>
+                    <li>
+                      <strong>Retrieval Practice:</strong> Opportunities for
+                      active recall
+                    </li>
+                    <li>
+                      <strong>Interleaving:</strong> How topics are mixed vs.
+                      blocked
+                    </li>
+                    <li>
+                      <strong>Dual Coding:</strong> Balance of verbal and visual
+                      elements
+                    </li>
+                    <li>
+                      <strong>Generative Learning:</strong> Prompts for
+                      creating/predicting
+                    </li>
+                    <li>
+                      <strong>Schema Building:</strong> Concept hierarchy and
+                      connections
+                    </li>
+                    <li>
+                      <strong>Cognitive Load:</strong> Section complexity and
+                      pacing
+                    </li>
+                    <li>
+                      <strong>Emotion & Relevance:</strong> Personal connection
+                      elements
+                    </li>
+                  </ul>
                 </div>
-              )}
-            </div>
-          </>
-        )}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       <style>{`
@@ -534,51 +616,118 @@ export const ChapterChecker: React.FC = () => {
         }
 
         .app-container {
-          max-width: 1400px;
+          max-width: 1800px;
           margin: 0 auto;
-          padding: 20px;
+          padding: 0 20px 40px;
         }
 
-        .input-section {
-          background: white;
-          border-radius: 12px;
-          padding: 30px;
-          margin-bottom: 20px;
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-        .analysis-layout {
+        .unified-layout {
           display: grid;
-          grid-template-columns: 1fr 400px;
-          gap: 28px;
+          grid-template-columns: 900px 1fr;
+          gap: 24px;
           align-items: flex-start;
         }
-        .analysis-main { min-width: 0; }
-        .analysis-pdf-panel {
+
+        /* LEFT PANEL: PDF Viewer */
+        .pdf-panel {
           background: white;
-          border: 1px solid var(--border-soft);
           border-radius: 12px;
-          padding: 14px 16px 20px;
-          box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+          padding: 20px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
           position: sticky;
           top: 20px;
-          max-height: calc(100vh - 80px);
-          overflow: hidden;
+          max-height: calc(100vh - 60px);
+          overflow-y: auto;
+        }
+
+        .pdf-panel h3 {
+          margin: 0 0 16px 0;
+          font-size: 20px;
+          color: #1e293b;
+        }
+
+        .pdf-placeholder {
+          min-height: 500px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 2px dashed #cbd5e1;
+          border-radius: 8px;
+          background: #f8fafc;
+        }
+
+        .placeholder-content {
+          text-align: center;
+          color: #64748b;
+        }
+
+        .placeholder-icon {
+          font-size: 64px;
+          margin-bottom: 16px;
+        }
+
+        .placeholder-content p {
+          margin: 8px 0;
+          font-size: 16px;
+        }
+
+        .placeholder-hint {
+          font-size: 14px;
+          color: #94a3b8;
+        }
+
+        /* RIGHT PANEL: Controls & Analysis */
+        .control-panel {
           display: flex;
           flex-direction: column;
+          gap: 24px;
+          min-width: 0;
+          overflow-x: hidden;
         }
-        .analysis-pdf-panel h3 { font-size: 18px; font-weight: 600; color: var(--brand-navy-700); }
-        .analysis-pdf-panel .pdf-pages { max-height: calc(100vh - 180px); }
-        @media (max-width: 1300px) { .analysis-layout { grid-template-columns: 1fr 340px; } }
-        @media (max-width: 1100px) { .analysis-layout { grid-template-columns: 1fr; } .analysis-pdf-panel { position: relative; top: auto; max-height: none; order: 2; } }
 
-        .input-section.drag-active {
+        .control-section {
+          background: white;
+          border-radius: 12px;
+          padding: 24px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+          min-width: 0;
+        }
+
+        .control-section h2 {
+          margin: 0 0 16px 0;
+          font-size: 22px;
+          color: #1e293b;
+        }
+
+        .analysis-results {
+          background: white;
+          border-radius: 12px;
+          padding: 24px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+          min-width: 0;
+          overflow-x: hidden;
+        }
+
+        /* Responsive: Stack on smaller screens */
+        @media (max-width: 1400px) {
+          .unified-layout {
+            grid-template-columns: 1fr;
+          }
+          .pdf-panel {
+            position: relative;
+            top: 0;
+            max-height: 600px;
+          }
+        }
+
+        .control-section.drag-active {
           outline: 3px dashed var(--brand-navy-600);
           outline-offset: 2px;
           background: linear-gradient(180deg, #ffffff 0%, #f0f4ff 100%);
         }
 
         .drop-zone {
-          margin-top: 18px;
+          margin-top: 12px;
           padding: 14px 16px;
           border: 2px dashed #cbd5e1;
           border-radius: 10px;
@@ -607,19 +756,7 @@ export const ChapterChecker: React.FC = () => {
           margin-top: 6px;
           font-size: 11px;
           color: #64748b;
-        }
-
-        .editor-controls {
-          margin-bottom: 20px;
-        }
-
-        .editor-controls h2 {
-          margin: 0 0 15px 0;
-          font-size: 22px;
-          color: #333;
-        }
-
-        .control-buttons {
+        }        .control-buttons {
           display: flex;
           gap: 10px;
           margin-bottom: 15px;
@@ -645,15 +782,6 @@ export const ChapterChecker: React.FC = () => {
         .chapter-textarea:disabled {
           background: #f5f5f5;
           color: #999;
-        }
-
-        .pdf-preview-section {
-          margin: 20px 0;
-        }
-
-        .pdf-preview-section h3 {
-          margin-bottom: 12px;
-          color: #333;
         }
 
         .word-count {
@@ -727,6 +855,49 @@ export const ChapterChecker: React.FC = () => {
           margin-top: 20px;
         }
 
+        .progress-indicator {
+          margin: 15px 0;
+          padding: 15px;
+          background: #f8f9fa;
+          border: 1px solid #dee2e6;
+          border-radius: 6px;
+        }
+
+        .progress-bar {
+          width: 100%;
+          height: 8px;
+          background: #e5e7eb !important;
+          border-radius: 4px;
+          overflow: hidden;
+          margin-bottom: 8px;
+        }
+
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #2563eb, #06b6d4) !important;
+          border-radius: 4px;
+          transition: width 0.3s ease;
+          min-width: 20px;
+        }
+
+        .progress-text {
+          font-size: 14px;
+          color: #495057;
+          text-align: center;
+          font-weight: 500;
+        }
+
+        .slow-pdf-warning {
+          margin-top: 10px;
+          padding: 10px;
+          background: #fff3cd;
+          border: 1px solid #ffeaa7;
+          border-radius: 4px;
+          color: #856404;
+          font-size: 13px;
+          text-align: left;
+        }
+
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
@@ -771,12 +942,6 @@ export const ChapterChecker: React.FC = () => {
           left: 0;
           color: var(--brand-navy-600);
           font-weight: bold;
-        }
-
-        .results-controls {
-          display: flex;
-          gap: 10px;
-          margin-bottom: 20px;
         }
 
         @media (max-width: 768px) {

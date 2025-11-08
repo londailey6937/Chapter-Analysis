@@ -52,15 +52,34 @@ export class AnalysisEngine {
   /**
    * Main entry point: Analyze a complete chapter
    */
-  static async analyzeChapter(chapter: Chapter): Promise<ChapterAnalysis> {
+  static async analyzeChapter(
+    chapter: Chapter,
+    onProgress?: (step: string, detail?: string) => void
+  ): Promise<ChapterAnalysis> {
+    onProgress?.(
+      "extracting-concepts",
+      "Analyzing chapter structure and extracting concepts"
+    );
+
     // Extract concepts and build graph
     const conceptGraph = await ConceptExtractor.extractConceptsFromChapter(
       chapter.content,
       chapter.sections
     );
 
+    // Yield control periodically
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    onProgress?.(
+      "evaluating-principles",
+      "Evaluating learning science principles"
+    );
+
     // Evaluate all learning principles (full evaluations used by UI)
     const principleEvaluations = this.runEvaluators(chapter, conceptGraph);
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    onProgress?.("building-visualizations", "Creating analysis visualizations");
+
     // Derive lightweight display scores for visualization summary
     const principleDisplay: PrincipleScoreDisplay[] = principleEvaluations.map(
       (ev) => ({
@@ -69,6 +88,12 @@ export class AnalysisEngine {
         score: ev.score,
         weight: ev.weight ?? 1,
       })
+    );
+
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    onProgress?.(
+      "analyzing-concepts",
+      "Analyzing concept patterns and relationships"
     );
 
     // Build concept analysis (basic defaults from graph/metrics)

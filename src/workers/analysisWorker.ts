@@ -8,15 +8,35 @@ interface IncomingMessage {
 
 self.onmessage = async (evt: MessageEvent<IncomingMessage>) => {
   const { chapter } = evt.data;
-  // Basic staged progress notifications
-  (self as any).postMessage({ type: "progress", step: "received", detail: "Chapter received by worker" });
+
+  // Progress reporting function
+  const reportProgress = (step: string, detail?: string) => {
+    (self as any).postMessage({ type: "progress", step, detail });
+  };
+
+  reportProgress("received", "Chapter received by worker");
+
   try {
-    (self as any).postMessage({ type: "progress", step: "analysis-start", detail: "Starting analysis pipeline" });
-    const result = await AnalysisEngine.analyzeChapter(chapter);
-    (self as any).postMessage({ type: "progress", step: "analysis-complete", detail: "Analysis complete" });
+    reportProgress("analysis-start", "Starting analysis pipeline");
+
+    // Yield control to prevent blocking
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    reportProgress(
+      "extracting-concepts",
+      "Extracting concepts and relationships"
+    );
+
+    // Run analysis with progress callbacks
+    const result = await AnalysisEngine.analyzeChapter(chapter, reportProgress);
+
+    reportProgress("analysis-complete", "Analysis complete");
     (self as any).postMessage({ type: "complete", result });
   } catch (err) {
-    (self as any).postMessage({ type: "error", message: err instanceof Error ? err.message : String(err) });
+    (self as any).postMessage({
+      type: "error",
+      message: err instanceof Error ? err.message : String(err),
+    });
   }
 };
 
