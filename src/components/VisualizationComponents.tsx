@@ -501,10 +501,10 @@ export const CognitiveLoadCurve: React.FC<{
             chapter is for learners. The x-axis represents chapter sections
             (headings like "Introduction", "Analysis", etc.), while the y-axis
             shows cognitive load percentage. Managing peaks prevents cognitive
-            overload—balanced cognitive demand keeps working memory free for
-            meaning-making instead of mere survival. High peaks (above 80%)
-            suggest sections with too many new literary elements, complex
-            sentences, or dense analytical content.
+            overload—balanced cognitive demand enables deep comprehension
+            instead of surface-level reading. High peaks (above 80%) suggest
+            sections with too many new literary elements, complex sentences, or
+            dense analytical content.
           </>
         ) : (
           <>
@@ -512,10 +512,9 @@ export const CognitiveLoadCurve: React.FC<{
             chapter is for learners. The x-axis represents chapter sections
             (headings like "Introduction", "Methods", etc.), while the y-axis
             shows cognitive load percentage. Managing peaks prevents cognitive
-            overload—balanced cognitive demand keeps working memory free for
-            meaning-making instead of mere survival. High peaks (above 80%)
-            suggest sections with too many new concepts, complex sentences, or
-            insufficient scaffolding.
+            overload—balanced cognitive demand enables understanding instead of
+            rote memorization. High peaks (above 80%) suggest sections with too
+            many new concepts, complex sentences, or insufficient scaffolding.
           </>
         )}
       </div>
@@ -566,7 +565,13 @@ export const CognitiveLoadCurve: React.FC<{
 
 export const ConceptMentionFrequency: React.FC<{
   analysis: ChapterAnalysis;
-}> = ({ analysis }) => {
+  domain?: Domain;
+}> = ({ analysis, domain = "chemistry" }) => {
+  const singularTerm = domain === "literature" ? "element" : "concept";
+  const pluralTerm = domain === "literature" ? "elements" : "concepts";
+  const pluralTermCapitalized =
+    domain === "literature" ? "Elements" : "Concepts";
+
   const reviewPatterns = analysis.conceptAnalysis.reviewPatterns.slice(0, 15);
   const data = reviewPatterns.map((pattern) => ({
     concept: pattern.conceptName || pattern.conceptId.replace("concept-", "C"),
@@ -576,9 +581,10 @@ export const ConceptMentionFrequency: React.FC<{
 
   return (
     <div className="viz-container">
-      <h3>Concept Revisit Frequency</h3>
+      <h3>{pluralTermCapitalized} Revisit Frequency</h3>
       <p className="viz-subtitle">
-        Concept revisit counts (spacing quality indicated by bar color)
+        {pluralTermCapitalized} revisit counts (spacing quality indicated by bar
+        color)
       </p>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart
@@ -622,9 +628,20 @@ export const ConceptMentionFrequency: React.FC<{
         </small>
       </div>
       <div className="why-matters-block">
-        <strong>Why this matters:</strong> Frequency without strategic spacing
-        can create illusion of mastery; balanced distributed mentions foster
-        durable learning.
+        <strong>Why this matters:</strong>{" "}
+        {domain === "literature" ? (
+          <>
+            Encountering literary elements multiple times with strategic spacing
+            helps students develop deeper analytical skills. Simply mentioning
+            elements repeatedly without spacing can create a false sense of
+            familiarity without true understanding.
+          </>
+        ) : (
+          <>
+            Frequency without strategic spacing can create illusion of mastery;
+            balanced distributed mentions foster durable learning.
+          </>
+        )}
       </div>
       <div className="recommendation-block">
         <strong>Recommendation:</strong>{" "}
@@ -632,11 +649,20 @@ export const ConceptMentionFrequency: React.FC<{
           const optimalCount = data.filter((d) => d.isOptimal).length;
           const totalCount = data.length;
           const optimalRatio = totalCount > 0 ? optimalCount / totalCount : 0;
-          return optimalRatio >= 0.8
-            ? "Excellent spacing patterns—most concepts have optimal revisit distribution."
-            : optimalRatio >= 0.5
-            ? "Good progress; review red-marked concepts and adjust spacing intervals for better retention."
-            : "Many concepts need spacing adjustments—ensure 3-5 spaced revisits per concept with increasing intervals.";
+
+          if (domain === "literature") {
+            return optimalRatio >= 0.8
+              ? `Excellent spacing patterns—most ${pluralTerm} have optimal revisit distribution.`
+              : optimalRatio >= 0.5
+              ? `Good progress; review red-marked ${pluralTerm} and adjust spacing intervals for better retention.`
+              : `Many ${pluralTerm} need spacing adjustments—ensure each key ${singularTerm} is revisited 3-5 times with increasing intervals between mentions.`;
+          } else {
+            return optimalRatio >= 0.8
+              ? `Excellent spacing patterns—most ${pluralTerm} have optimal revisit distribution.`
+              : optimalRatio >= 0.5
+              ? `Good progress; review red-marked ${pluralTerm} and adjust spacing intervals for better retention.`
+              : `Many ${pluralTerm} need spacing adjustments—ensure 3-5 spaced revisits per ${singularTerm} with increasing intervals.`;
+          }
         })()}
       </div>
     </div>
@@ -1659,7 +1685,7 @@ export const ChapterAnalysisDashboard: React.FC<{
       <div className="viz-grid">
         <PrincipleScoresRadar analysis={safeAnalysis} />
         <CognitiveLoadCurve analysis={safeAnalysis} domain={domain} />
-        <ConceptMentionFrequency analysis={safeAnalysis} />
+        <ConceptMentionFrequency analysis={safeAnalysis} domain={domain} />
         <InterleavingPattern analysis={safeAnalysis} />
         <ReviewScheduleTimeline analysis={safeAnalysis} />
       </div>
