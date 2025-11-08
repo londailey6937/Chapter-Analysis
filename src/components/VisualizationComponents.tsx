@@ -396,9 +396,10 @@ export const PrincipleScoresRadar: React.FC<{ analysis: ChapterAnalysis }> = ({
 // COGNITIVE LOAD CURVE
 // ============================================================================
 
-export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
-  analysis,
-}) => {
+export const CognitiveLoadCurve: React.FC<{
+  analysis: ChapterAnalysis;
+  domain?: Domain;
+}> = ({ analysis, domain = "chemistry" }) => {
   const points = analysis.visualizations.cognitiveLoadCurve || [];
   const hasData = points.length > 0;
   const data = points.map((point, idx) => ({
@@ -415,7 +416,8 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
     <div className="viz-container">
       <h3>Cognitive Load Distribution</h3>
       <p className="viz-subtitle">
-        Lower is better; peaks indicate challenging sections
+        Cognitive load across chapter sections—lower is better; peaks indicate
+        challenging sections that may need scaffolding
       </p>
       {hasData ? (
         <ResponsiveContainer width="100%" height={300}>
@@ -426,6 +428,11 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis
               dataKey="section"
+              label={{
+                value: "Chapter Sections",
+                position: "insideBottom",
+                offset: -5,
+              }}
               tick={{ fontSize: 10 }}
               interval={(() => {
                 const n = data.length;
@@ -437,12 +444,12 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
               })()}
               tickFormatter={(value: string, index: number) => {
                 const n = data.length;
-                if (n > 60) return `S${index + 1}`; // compact label
+                if (n > 60) return `Sec ${index + 1}`; // compact label
                 return value;
               }}
               angle={-35}
               textAnchor="end"
-              height={70}
+              height={80}
             />
             <YAxis
               label={{ value: "Load %", angle: -90, position: "insideLeft" }}
@@ -457,7 +464,7 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
                 if (name === "New Concepts") return String(value);
                 return String(value);
               }}
-              labelFormatter={(label: any) => `Heading: ${label}`}
+              labelFormatter={(label: any) => `Section: ${label}`}
             />
             <Legend />
             <Line
@@ -487,9 +494,30 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
         </div>
       )}
       <div className="why-matters-block">
-        <strong>Why this matters:</strong> Managing peaks prevents overload.
-        Balanced cognitive demand keeps working memory free for meaning-making
-        instead of survival.
+        <strong>Why this matters:</strong>{" "}
+        {domain === "literature" ? (
+          <>
+            This graph shows how cognitively demanding each section of your
+            chapter is for learners. The x-axis represents chapter sections
+            (headings like "Introduction", "Analysis", etc.), while the y-axis
+            shows cognitive load percentage. Managing peaks prevents cognitive
+            overload—balanced cognitive demand keeps working memory free for
+            meaning-making instead of mere survival. High peaks (above 80%)
+            suggest sections with too many new literary elements, complex
+            sentences, or dense analytical content.
+          </>
+        ) : (
+          <>
+            This graph shows how cognitively demanding each section of your
+            chapter is for learners. The x-axis represents chapter sections
+            (headings like "Introduction", "Methods", etc.), while the y-axis
+            shows cognitive load percentage. Managing peaks prevents cognitive
+            overload—balanced cognitive demand keeps working memory free for
+            meaning-making instead of mere survival. High peaks (above 80%)
+            suggest sections with too many new concepts, complex sentences, or
+            insufficient scaffolding.
+          </>
+        )}
       </div>
       {hasData &&
         (() => {
@@ -500,15 +528,31 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
           return (
             <div className="recommendation-block">
               <strong>Recommendation:</strong>{" "}
-              {maxLoad > 80
-                ? `Peak load at ${maxLoad}% in "${
-                    peakSection?.section || "a section"
-                  }"—consider breaking dense sections into smaller chunks or adding examples.`
-                : maxLoad > 60
-                ? `Load is manageable but watch sections above 60%${
-                    peakSection ? ` (e.g., "${peakSection.section}")` : ""
-                  }—add scaffolding or worked examples if needed.`
-                : `Excellent! Cognitive load is well-balanced. Current pacing and concept density are optimal for learner comprehension.`}
+              {domain === "literature" ? (
+                <>
+                  {maxLoad > 80
+                    ? `Peak load at ${maxLoad}% in "${
+                        peakSection?.section || "a section"
+                      }"—consider breaking dense sections into smaller chunks or providing more guided analysis.`
+                    : maxLoad > 60
+                    ? `Load is manageable but watch sections above 60%${
+                        peakSection ? ` (e.g., "${peakSection.section}")` : ""
+                      }—consider adding transitional paragraphs or context if needed.`
+                    : `Excellent! Cognitive load is well-balanced. Current pacing and complexity are optimal for learner comprehension.`}
+                </>
+              ) : (
+                <>
+                  {maxLoad > 80
+                    ? `Peak load at ${maxLoad}% in "${
+                        peakSection?.section || "a section"
+                      }"—consider breaking dense sections into smaller chunks or adding examples.`
+                    : maxLoad > 60
+                    ? `Load is manageable but watch sections above 60%${
+                        peakSection ? ` (e.g., "${peakSection.section}")` : ""
+                      }—add scaffolding or worked examples if needed.`
+                    : `Excellent! Cognitive load is well-balanced. Current pacing and concept density are optimal for learner comprehension.`}
+                </>
+              )}
             </div>
           );
         })()}
@@ -1614,7 +1658,7 @@ export const ChapterAnalysisDashboard: React.FC<{
 
       <div className="viz-grid">
         <PrincipleScoresRadar analysis={safeAnalysis} />
-        <CognitiveLoadCurve analysis={safeAnalysis} />
+        <CognitiveLoadCurve analysis={safeAnalysis} domain={domain} />
         <ConceptMentionFrequency analysis={safeAnalysis} />
         <InterleavingPattern analysis={safeAnalysis} />
         <ReviewScheduleTimeline analysis={safeAnalysis} />
