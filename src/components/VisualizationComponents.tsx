@@ -441,79 +441,292 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
   analysis,
 }) => {
   const pattern = analysis.visualizations.interleavingPattern;
-  const sequence = pattern.conceptSequence.slice(0, 30);
+  const sequence = pattern.conceptSequence.slice(0, 50); // Show more for better insight
 
   // Build ID -> Name map from conceptMap nodes
   const idToName: Record<string, string> = {};
   const nodes = analysis.visualizations.conceptMap.nodes as any[];
   nodes.forEach((n) => (idToName[n.id] = n.label));
 
+  // Calculate transition matrix (which concepts follow which)
+  const transitions: Record<string, Record<string, number>> = {};
+  for (let i = 1; i < pattern.conceptSequence.length; i++) {
+    const from = pattern.conceptSequence[i - 1];
+    const to = pattern.conceptSequence[i];
+    if (!transitions[from]) transitions[from] = {};
+    transitions[from][to] = (transitions[from][to] || 0) + 1;
+  }
+
+  // Find top transitions
+  const topTransitions: { from: string; to: string; count: number }[] = [];
+  Object.keys(transitions).forEach((from) => {
+    Object.keys(transitions[from]).forEach((to) => {
+      if (from !== to) {
+        // Only count switches
+        topTransitions.push({ from, to, count: transitions[from][to] });
+      }
+    });
+  });
+  topTransitions.sort((a, b) => b.count - a.count);
+  const top5Transitions = topTransitions.slice(0, 5);
+
+  // Identify blocking issues
+  const blockingSegments = pattern.blockingSegments || [];
+  const worstBlocks = blockingSegments
+    .sort((a, b) => b.length - a.length)
+    .slice(0, 3);
+
+  // Generate color map with consistent hashing
+  const uniqueConcepts = Array.from(new Set(sequence));
   const colorMap: Record<string, string> = {};
-  sequence.forEach((conceptId, idx) => {
-    const hue = (idx / sequence.length) * 360;
+  uniqueConcepts.forEach((conceptId, idx) => {
+    const hue = (idx / uniqueConcepts.length) * 360;
     colorMap[conceptId] = `hsl(${hue}, 70%, 60%)`;
   });
 
+  // Interleaving quality score
+  const interleavingScore = Math.round((1 - pattern.blockingRatio) * 100);
+  const scoreColor =
+    interleavingScore >= 70
+      ? "var(--success-600)"
+      : interleavingScore >= 50
+      ? "var(--warn-600)"
+      : "var(--danger-600)";
+
   return (
     <div className="viz-container">
-      <h3>Topic Interleaving Pattern</h3>
+      <h3>Topic Interleaving Analysis</h3>
       <p className="viz-subtitle">
-        Blocking Ratio: {(pattern.blockingRatio * 100).toFixed(0)}% (lower is
-        better)
+        Evaluates whether concepts are mixed (interleaved) or presented in long
+        blocks
       </p>
 
-      <div className="interleaving-sequence">
-        {sequence.map((conceptId, idx) => (
-          <div
-            key={idx}
-            className="interleaving-block"
-            style={{
-              backgroundColor: colorMap[conceptId],
-              width: `${100 / sequence.length}%`,
-              height: "30px",
-            }}
-            title={`Concept: ${idToName[conceptId] || conceptId}`}
-            aria-label={`Concept: ${idToName[conceptId] || conceptId}`}
-          />
-        ))}
+      <div className="interleaving-metrics-grid">
+        <div className="metric-card">
+          <div className="metric-label">Interleaving Quality</div>
+          <div className="metric-value" style={{ color: scoreColor }}>
+            {interleavingScore}%
+          </div>
+        </div>
+        <div className="metric-card">
+          <div className="metric-label">Topic Switches</div>
+          <div className="metric-value">{pattern.topicSwitches}</div>
+        </div>
+        <div className="metric-card">
+          <div className="metric-label">Avg Block Size</div>
+          <div className="metric-value">{pattern.avgBlockSize.toFixed(1)}</div>
+        </div>
+        <div className="metric-card">
+          <div className="metric-label">Blocking Ratio</div>
+          <div className="metric-value" style={{ color: scoreColor }}>
+            {(pattern.blockingRatio * 100).toFixed(0)}%
+          </div>
+        </div>
       </div>
 
-      <div className="interleaving-stats">
-        <p>
-          <strong>Topic Switches:</strong> {pattern.topicSwitches}
-        </p>
-        <p>
-          <strong>Avg Block Size:</strong> {pattern.avgBlockSize.toFixed(1)}{" "}
-          mentions
-        </p>
-        <p>
-          <strong>Recommendation:</strong> {pattern.recommendation}
-        </p>
+      <div className="section-divider">
+        <h4>Concept Sequence (First 50 mentions)</h4>
+        <div className="interleaving-sequence">
+          {sequence.map((conceptId, idx) => (
+            <div
+              key={idx}
+              className="interleaving-block"
+              style={{
+                backgroundColor: colorMap[conceptId],
+                width: `${100 / sequence.length}%`,
+                height: "40px",
+              }}
+              title={`${idx + 1}. ${idToName[conceptId] || conceptId}`}
+            />
+          ))}
+        </div>
+        <div className="interleaving-legend">
+          {uniqueConcepts.slice(0, 8).map((conceptId) => (
+            <span key={conceptId} className="legend-item">
+              <span
+                className="legend-color"
+                style={{ backgroundColor: colorMap[conceptId] }}
+              />
+              {(idToName[conceptId] || conceptId).substring(0, 20)}
+            </span>
+          ))}
+          {uniqueConcepts.length > 8 && (
+            <span className="legend-item">
+              +{uniqueConcepts.length - 8} more
+            </span>
+          )}
+        </div>
+      </div>
+
+      {worstBlocks.length > 0 && (
+        <div className="section-divider">
+          <h4>⚠️ Blocking Issues Detected</h4>
+          <div className="blocking-issues">
+            {worstBlocks.map((block, idx) => (
+              <div key={idx} className="blocking-issue-card">
+                <div className="blocking-concept">
+                  {idToName[block.conceptId] || block.conceptId}
+                </div>
+                <div className="blocking-detail">
+                  {block.length} consecutive mentions — Consider breaking into
+                  smaller segments
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {top5Transitions.length > 0 && (
+        <div className="section-divider">
+          <h4>Common Concept Transitions</h4>
+          <div className="transitions-list">
+            {top5Transitions.map((trans, idx) => (
+              <div key={idx} className="transition-item">
+                <span className="transition-from">
+                  {(idToName[trans.from] || trans.from).substring(0, 18)}
+                </span>
+                <span className="transition-arrow">→</span>
+                <span className="transition-to">
+                  {(idToName[trans.to] || trans.to).substring(0, 18)}
+                </span>
+                <span className="transition-count">({trans.count}×)</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="recommendation-box">
+        <strong>Recommendation:</strong> {pattern.recommendation}
       </div>
 
       <style>{`
+        .interleaving-metrics-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+          gap: 12px;
+          margin: 20px 0;
+        }
+        .metric-card {
+          background: var(--bg-panel);
+          border: 1px solid var(--border-soft);
+          border-radius: 8px;
+          padding: 12px;
+          text-align: center;
+        }
+        .metric-label {
+          font-size: 11px;
+          color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          margin-bottom: 6px;
+        }
+        .metric-value {
+          font-size: 24px;
+          font-weight: bold;
+          color: var(--text-main);
+        }
+        .section-divider {
+          margin: 24px 0;
+          padding-top: 16px;
+          border-top: 1px solid var(--border-soft);
+        }
+        .section-divider h4 {
+          font-size: 15px;
+          margin-bottom: 12px;
+          color: var(--text-main);
+        }
         .interleaving-sequence {
           display: flex;
-          border-radius: 4px;
+          border-radius: 6px;
           overflow: hidden;
-          margin: 20px 0;
+          margin: 12px 0;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         .interleaving-block {
           transition: all 0.3s ease;
-          border-right: 1px solid rgba(255,255,255,0.5);
+          border-right: 1px solid rgba(255,255,255,0.3);
+          cursor: pointer;
         }
         .interleaving-block:hover {
-          filter: brightness(0.8);
+          filter: brightness(0.85);
+          transform: scaleY(1.1);
         }
-        .interleaving-stats {
-          padding: 15px;
-          background: #f5f5f5;
+        .interleaving-legend {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          font-size: 12px;
+          margin-top: 8px;
+        }
+        .legend-item {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .legend-color {
+          width: 14px;
+          height: 14px;
+          border-radius: 3px;
+          display: inline-block;
+        }
+        .blocking-issues {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        .blocking-issue-card {
+          background: #fff8f0;
+          border-left: 4px solid var(--warn-600);
+          padding: 10px 14px;
           border-radius: 4px;
-          margin-top: 10px;
         }
-        .interleaving-stats p {
-          margin: 5px 0;
+        .blocking-concept {
+          font-weight: 600;
+          color: var(--text-main);
+          margin-bottom: 4px;
+        }
+        .blocking-detail {
+          font-size: 13px;
+          color: var(--text-muted);
+        }
+        .transitions-list {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .transition-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px;
+          background: var(--bg-panel);
+          border: 1px solid var(--border-soft);
+          border-radius: 4px;
+          font-size: 13px;
+        }
+        .transition-from, .transition-to {
+          font-weight: 500;
+          color: var(--text-main);
+        }
+        .transition-arrow {
+          color: var(--text-subtle);
+          font-weight: bold;
+        }
+        .transition-count {
+          margin-left: auto;
+          color: var(--text-muted);
+          font-size: 12px;
+        }
+        .recommendation-box {
+          margin-top: 20px;
+          padding: 12px 16px;
+          background: #f0f9ff;
+          border-left: 4px solid var(--brand-accent);
+          border-radius: 4px;
           font-size: 14px;
+          color: var(--text-main);
         }
       `}</style>
     </div>
