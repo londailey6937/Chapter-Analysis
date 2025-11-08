@@ -183,6 +183,8 @@ export class AnalysisEngine {
         .map((c) => c.id),
     };
 
+    // Build structure analysis (lightweight heuristics)
+
     console.log("AnalysisEngine calculated conceptAnalysis:", {
       totalConceptsIdentified: conceptAnalysis.totalConceptsIdentified,
       coreConceptCount: conceptAnalysis.coreConceptCount,
