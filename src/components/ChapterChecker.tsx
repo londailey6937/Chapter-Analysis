@@ -33,7 +33,9 @@ export const ChapterChecker: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragActive, setIsDragActive] = useState(false);
   const [isSlowPdf, setIsSlowPdf] = useState(false);
+  const [isSlowAnalysis, setIsSlowAnalysis] = useState(false);
   const fileProcessingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const analysisTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   /**
    * Handle chapter analysis
@@ -54,6 +56,12 @@ export const ChapterChecker: React.FC = () => {
     setIsAnalyzing(true);
     setError(null);
     setAnalysis(null);
+    setIsSlowAnalysis(false);
+
+    // Set a timeout to detect slow analysis (30 seconds)
+    analysisTimeoutRef.current = setTimeout(() => {
+      setIsSlowAnalysis(true);
+    }, 30000);
 
     try {
       setProgress("Parsing chapter...");
@@ -109,22 +117,79 @@ export const ChapterChecker: React.FC = () => {
           const progressText = `${step.replace(/-/g, " ")}${
             detail ? ": " + detail : ""
           }`;
+          console.log(
+            `[Progress] Step: ${step}, Detail: ${detail}, Percent will be updated`
+          );
           setProgress(progressText);
 
-          // Update progress percentage based on step
+          // Update progress percentage based on step - 10% intervals for more visibility
           let percent = 0;
           switch (step) {
             case "received":
-              percent = 5;
+              percent = 10;
               break;
             case "analysis-start":
-              percent = 10;
+              percent = 20;
               break;
             case "extracting-concepts":
               percent = 25;
               break;
+            case "concept-phase-1":
+              percent = 27;
+              break;
+            case "concept-phase-2":
+              percent = 29;
+              break;
+            case "concept-phase-3":
+              percent = 31;
+              break;
+            case "concept-phase-4":
+              percent = 33;
+              break;
+            case "concept-phase-5":
+              percent = 35;
+              break;
+            case "concept-phase-6":
+              percent = 37;
+              break;
+            case "concept-analysis-complete":
+              percent = 39;
+              break;
             case "evaluating-principles":
+              percent = 40;
+              break;
+            case "evaluating-1":
+              percent = 42;
+              break;
+            case "evaluating-2":
+              percent = 44;
+              break;
+            case "evaluating-3":
+              percent = 46;
+              break;
+            case "evaluating-4":
+              percent = 48;
+              break;
+            case "evaluating-5":
               percent = 50;
+              break;
+            case "evaluating-6":
+              percent = 52;
+              break;
+            case "evaluating-7":
+              percent = 54;
+              break;
+            case "evaluating-8":
+              percent = 56;
+              break;
+            case "evaluating-9":
+              percent = 58;
+              break;
+            case "evaluating-10":
+              percent = 60;
+              break;
+            case "principles-complete":
+              percent = 65;
               break;
             case "building-visualizations":
               percent = 75;
@@ -132,21 +197,38 @@ export const ChapterChecker: React.FC = () => {
             case "analyzing-concepts":
               percent = 85;
               break;
+            case "finalizing":
+              percent = 95;
+              break;
             case "analysis-complete":
               percent = 100;
               break;
             default:
-              percent = 30;
-              break;
+              // Gradual increment for unknown steps
+              setProgressPercent((prev) => Math.min(prev + 1, 95));
+              return;
           }
+          console.log(
+            `[Progress] Setting progress percent to ${percent}% for step: ${step}`
+          );
           setProgressPercent(percent);
         } else if (type === "complete") {
+          if (analysisTimeoutRef.current) {
+            clearTimeout(analysisTimeoutRef.current);
+            analysisTimeoutRef.current = null;
+          }
+          setIsSlowAnalysis(false);
           setAnalysis(evt.data.result);
           setProgress("");
           setProgressPercent(0);
           worker.terminate();
           analysisWorkerRef.current = null;
         } else if (type === "error") {
+          if (analysisTimeoutRef.current) {
+            clearTimeout(analysisTimeoutRef.current);
+            analysisTimeoutRef.current = null;
+          }
+          setIsSlowAnalysis(false);
           setError(`Analysis failed: ${evt.data.message}`);
           setProgress("");
           setProgressPercent(0);
@@ -156,6 +238,11 @@ export const ChapterChecker: React.FC = () => {
       };
       worker.postMessage({ chapter });
     } catch (err) {
+      if (analysisTimeoutRef.current) {
+        clearTimeout(analysisTimeoutRef.current);
+        analysisTimeoutRef.current = null;
+      }
+      setIsSlowAnalysis(false);
       setError(
         `Analysis failed: ${err instanceof Error ? err.message : String(err)}`
       );
@@ -515,6 +602,13 @@ export const ChapterChecker: React.FC = () => {
                     <div className="slow-pdf-warning">
                       ⚠️ This PDF is taking longer than expected. This may be
                       due to complex fonts or encoding. The process will
+                      continue, but it may take several minutes.
+                    </div>
+                  )}
+                  {isSlowAnalysis && (
+                    <div className="slow-analysis-warning">
+                      ⚠️ This analysis is taking longer than expected. This may
+                      be due to chapter length or complexity. The process will
                       continue, but it may take several minutes.
                     </div>
                   )}
@@ -894,6 +988,17 @@ export const ChapterChecker: React.FC = () => {
           border: 1px solid #ffeaa7;
           border-radius: 4px;
           color: #856404;
+          font-size: 13px;
+          text-align: left;
+        }
+
+        .slow-analysis-warning {
+          margin-top: 10px;
+          padding: 10px;
+          background: #e3f2fd;
+          border: 1px solid #90caf9;
+          border-radius: 4px;
+          color: #1565c0;
           font-size: 13px;
           text-align: left;
         }

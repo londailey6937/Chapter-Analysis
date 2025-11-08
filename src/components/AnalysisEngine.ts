@@ -56,246 +56,301 @@ export class AnalysisEngine {
     chapter: Chapter,
     onProgress?: (step: string, detail?: string) => void
   ): Promise<ChapterAnalysis> {
-    onProgress?.(
-      "extracting-concepts",
-      "Analyzing chapter structure and extracting concepts"
-    );
+    try {
+      onProgress?.("extracting-concepts", "Analyzing chapter structure");
 
-    // Extract concepts and build graph
-    const conceptGraph = await ConceptExtractor.extractConceptsFromChapter(
-      chapter.content,
-      chapter.sections
-    );
+      // Allow UI to update
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
-    // Yield control periodically
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    onProgress?.(
-      "evaluating-principles",
-      "Evaluating learning science principles"
-    );
+      console.log("[AnalysisEngine] Starting concept extraction...");
+      // Extract concepts and build graph with progress reporting
+      const conceptGraph = await ConceptExtractor.extractConceptsFromChapter(
+        chapter.content,
+        chapter.sections,
+        onProgress
+      );
+      console.log(
+        "[AnalysisEngine] Concept extraction complete, found",
+        conceptGraph.concepts.length,
+        "concepts"
+      );
 
-    // Evaluate all learning principles (full evaluations used by UI)
-    const principleEvaluations = this.runEvaluators(chapter, conceptGraph);
+      // Yield control and allow UI to update
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      onProgress?.("concept-analysis-complete", "Concept extraction complete");
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    onProgress?.("building-visualizations", "Creating analysis visualizations");
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      onProgress?.(
+        "evaluating-principles",
+        "Evaluating learning science principles"
+      );
 
-    // Derive lightweight display scores for visualization summary
-    const principleDisplay: PrincipleScoreDisplay[] = principleEvaluations.map(
-      (ev) => ({
-        name: ev.principle,
-        displayName: PRINCIPLE_LABELS[ev.principle] || ev.principle,
-        score: ev.score,
-        weight: ev.weight ?? 1,
-      })
-    );
+      // Allow UI to update before heavy computation
+      await new Promise((resolve) => setTimeout(resolve, 200));
 
-    await new Promise((resolve) => setTimeout(resolve, 0));
-    onProgress?.(
-      "analyzing-concepts",
-      "Analyzing concept patterns and relationships"
-    );
+      console.log("[AnalysisEngine] Starting principle evaluations...");
+      // Evaluate all learning principles (full evaluations used by UI)
+      const principleEvaluations = await this.runEvaluators(
+        chapter,
+        conceptGraph,
+        onProgress
+      );
+      console.log("[AnalysisEngine] Principle evaluations complete");
 
-    // Build concept analysis (basic defaults from graph/metrics)
-    const reviewPatterns: ReviewPattern[] = conceptGraph.concepts.map(
-      (concept) => {
-        const mentions = concept.mentions.length;
-        const positions = concept.mentions
-          .map((m) => m.position)
-          .sort((a, b) => a - b);
-        const spacing: number[] = [];
-        for (let i = 1; i < positions.length; i++) {
-          // Calculate word count between mentions instead of character count
-          const textBetween = chapter.content.substring(
-            positions[i - 1],
-            positions[i]
-          );
-          const wordCount = this.countWords(textBetween);
-          spacing.push(wordCount);
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      onProgress?.("principles-complete", "Principle evaluation complete");
+
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      onProgress?.(
+        "building-visualizations",
+        "Creating analysis visualizations"
+      );
+
+      // Derive lightweight display scores for visualization summary
+      const principleDisplay: PrincipleScoreDisplay[] =
+        principleEvaluations.map((ev) => ({
+          name: ev.principle,
+          displayName: PRINCIPLE_LABELS[ev.principle] || ev.principle,
+          score: ev.score,
+          weight: ev.weight ?? 1,
+        }));
+
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      onProgress?.(
+        "analyzing-concepts",
+        "Analyzing concept patterns and relationships"
+      );
+
+      // Allow UI to update
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      // Build concept analysis (basic defaults from graph/metrics)
+      const reviewPatterns: ReviewPattern[] = conceptGraph.concepts.map(
+        (concept) => {
+          const mentions = concept.mentions.length;
+          const positions = concept.mentions
+            .map((m) => m.position)
+            .sort((a, b) => a - b);
+          const spacing: number[] = [];
+          for (let i = 1; i < positions.length; i++) {
+            // Calculate word count between mentions instead of character count
+            const textBetween = chapter.content.substring(
+              positions[i - 1],
+              positions[i]
+            );
+            const wordCount = this.countWords(textBetween);
+            spacing.push(wordCount);
+          }
+          const avgSpacing =
+            spacing.length > 0
+              ? spacing.reduce((a, b) => a + b, 0) / spacing.length
+              : 0;
+          // Heuristic: optimal if 2+ mentions and spacing variance is low
+          const variance =
+            spacing.length > 0
+              ? spacing.reduce(
+                  (sum, gap) => sum + Math.pow(gap - avgSpacing, 2),
+                  0
+                ) / spacing.length
+              : 0;
+          const isOptimal = mentions >= 2 && variance < avgSpacing * avgSpacing;
+
+          return {
+            conceptId: concept.id,
+            conceptName: concept.name,
+            mentions,
+            firstAppearance: concept.firstMentionPosition,
+            spacing,
+            avgSpacing: Math.round(avgSpacing),
+            isOptimal,
+            recommendation: isOptimal
+              ? undefined
+              : mentions < 2
+              ? "Consider revisiting this concept at least once more"
+              : "Try spacing mentions more evenly",
+          };
         }
-        const avgSpacing =
-          spacing.length > 0
-            ? spacing.reduce((a, b) => a + b, 0) / spacing.length
-            : 0;
-        // Heuristic: optimal if 2+ mentions and spacing variance is low
-        const variance =
-          spacing.length > 0
-            ? spacing.reduce(
-                (sum, gap) => sum + Math.pow(gap - avgSpacing, 2),
-                0
-              ) / spacing.length
-            : 0;
-        const isOptimal = mentions >= 2 && variance < avgSpacing * avgSpacing;
+      );
 
-        return {
-          conceptId: concept.id,
-          conceptName: concept.name,
-          mentions,
-          firstAppearance: concept.firstMentionPosition,
-          spacing,
-          avgSpacing: Math.round(avgSpacing),
-          isOptimal,
-          recommendation: isOptimal
-            ? undefined
-            : mentions < 2
-            ? "Consider revisiting this concept at least once more"
-            : "Try spacing mentions more evenly",
-        };
-      }
-    );
+      // Generate visualization data (after reviewPatterns are available)
+      const visualization = this.generateVisualization(
+        chapter,
+        conceptGraph,
+        principleDisplay,
+        reviewPatterns
+      );
 
-    // Generate visualization data (after reviewPatterns are available)
-    const visualization = this.generateVisualization(
-      chapter,
-      conceptGraph,
-      principleDisplay,
-      reviewPatterns
-    );
+      // Build recommendations based on principle scores and suggestions
+      const recommendations: Recommendation[] = principleEvaluations.flatMap(
+        (p) =>
+          (p.suggestions || [])
+            .filter((s: Suggestion) => s.priority === "high" || p.score < 70)
+            .map((s: Suggestion) => ({
+              id: s.id || `${p.principle}-${s.title.slice(0, 20)}`,
+              priority: s.priority,
+              category: "enhance",
+              title: s.title,
+              description: s.description,
+              affectedSections: [],
+              affectedConcepts: s.relatedConcepts || [],
+              estimatedEffort: "medium",
+              expectedOutcome: s.expectedImpact,
+              actionItems: [s.implementation],
+            }))
+      );
 
-    // Build recommendations based on principle scores and suggestions
-    const recommendations: Recommendation[] = principleEvaluations.flatMap(
-      (p) =>
-        (p.suggestions || [])
-          .filter((s: Suggestion) => s.priority === "high" || p.score < 70)
-          .map((s: Suggestion) => ({
-            id: s.id || `${p.principle}-${s.title.slice(0, 20)}`,
-            priority: s.priority,
-            category: "enhance",
-            title: s.title,
-            description: s.description,
-            affectedSections: [],
-            affectedConcepts: s.relatedConcepts || [],
-            estimatedEffort: "medium",
-            expectedOutcome: s.expectedImpact,
-            actionItems: [s.implementation],
-          }))
-    );
+      const overallScore = this.calculateWeightedScoreDisplay(principleDisplay);
 
-    const overallScore = this.calculateWeightedScoreDisplay(principleDisplay);
+      const metrics = {
+        totalWords: chapter.wordCount,
+        readingTime: Math.round(chapter.wordCount / 200),
+        averageSectionLength:
+          chapter.sections.reduce((sum, s) => sum + s.wordCount, 0) /
+          Math.max(1, chapter.sections.length),
+        conceptDensity:
+          conceptGraph.concepts.length / Math.max(1, chapter.wordCount / 1000),
+        readabilityScore: 0,
+        complexityScore: 0,
+        timestamp: new Date(),
+      };
 
-    const metrics = {
-      totalWords: chapter.wordCount,
-      readingTime: Math.round(chapter.wordCount / 200),
-      averageSectionLength:
-        chapter.sections.reduce((sum, s) => sum + s.wordCount, 0) /
-        Math.max(1, chapter.sections.length),
-      conceptDensity:
-        conceptGraph.concepts.length / Math.max(1, chapter.wordCount / 1000),
-      readabilityScore: 0,
-      complexityScore: 0,
-      timestamp: new Date(),
-    };
+      // reviewPatterns already built above
 
-    // reviewPatterns already built above
-
-    const conceptAnalysis: ConceptAnalysisResult = {
-      totalConceptsIdentified: conceptGraph.concepts.length,
-      coreConceptCount: conceptGraph.hierarchy.core.length,
-      conceptDensity: metrics.conceptDensity,
-      novelConceptsPerSection: chapter.sections.map(
-        (s) => s.conceptsIntroduced.length
-      ),
-      reviewPatterns,
-      hierarchyBalance: (() => {
-        const total =
-          conceptGraph.hierarchy.core.length +
-          conceptGraph.hierarchy.supporting.length +
-          conceptGraph.hierarchy.detail.length;
-        if (!total) return 0;
-        const ideal = total / 3;
-        const diffs = [
-          Math.abs(conceptGraph.hierarchy.core.length - ideal),
-          Math.abs(conceptGraph.hierarchy.supporting.length - ideal),
-          Math.abs(conceptGraph.hierarchy.detail.length - ideal),
-        ];
-        const maxDiff = ideal; // worst case: all in one bucket
-        const balance =
-          1 - Math.min(1, diffs.reduce((a, b) => a + b, 0) / (3 * maxDiff));
-        return Number(balance.toFixed(2));
-      })(),
-      orphanConcepts: conceptGraph.concepts
-        .filter(
-          (c) =>
-            !conceptGraph.relationships.some(
-              (r) => r.source === c.id || r.target === c.id
-            )
-        )
-        .map((c) => c.id),
-    };
-
-    // Build structure analysis (lightweight heuristics)
-
-    console.log("AnalysisEngine calculated conceptAnalysis:", {
-      totalConceptsIdentified: conceptAnalysis.totalConceptsIdentified,
-      coreConceptCount: conceptAnalysis.coreConceptCount,
-      conceptDensity: conceptAnalysis.conceptDensity,
-      hierarchyBalance: conceptAnalysis.hierarchyBalance,
-      conceptGraphLength: conceptGraph.concepts.length,
-      coreLength: conceptGraph.hierarchy.core.length,
-    });
-
-    // Build structure analysis (lightweight heuristics)
-    const lengths = chapter.sections.map((s) => s.wordCount);
-    const avg =
-      metrics.averageSectionLength ||
-      lengths.reduce((a, b) => a + b, 0) / Math.max(1, lengths.length);
-    const variance =
-      lengths.reduce((sum, l) => sum + Math.pow(l - avg, 2), 0) /
-      Math.max(1, lengths.length);
-    const pacing: StructureAnalysisResult["pacing"] =
-      avg < 150 ? "fast" : avg < 350 ? "moderate" : "slow";
-    const structureAnalysis: StructureAnalysisResult = {
-      sectionCount: chapter.sections.length,
-      avgSectionLength: Math.round(avg),
-      sectionLengthVariance: Math.round(variance),
-      pacing,
-      scaffolding: {
-        hasIntroduction: chapter.sections.some((s) =>
-          /intro|overview/i.test(s.heading)
+      const conceptAnalysis: ConceptAnalysisResult = {
+        totalConceptsIdentified: conceptGraph.concepts.length,
+        coreConceptCount: conceptGraph.hierarchy.core.length,
+        conceptDensity: metrics.conceptDensity,
+        novelConceptsPerSection: chapter.sections.map(
+          (s) => s.conceptsIntroduced.length
         ),
-        hasProgression: chapter.sections.length > 1,
-        hasSummary: chapter.sections.some((s) =>
-          /summary|conclusion/i.test(s.heading)
-        ),
-        hasReview: chapter.sections.some((s) =>
-          /review|practice|questions/i.test(s.heading)
-        ),
-        scaffoldingScore: 0.5,
-      },
-      transitionQuality: 0.5,
-      conceptualization: "moderate",
-    };
+        reviewPatterns,
+        hierarchyBalance: (() => {
+          const total =
+            conceptGraph.hierarchy.core.length +
+            conceptGraph.hierarchy.supporting.length +
+            conceptGraph.hierarchy.detail.length;
+          if (!total) return 0;
+          const ideal = total / 3;
+          const diffs = [
+            Math.abs(conceptGraph.hierarchy.core.length - ideal),
+            Math.abs(conceptGraph.hierarchy.supporting.length - ideal),
+            Math.abs(conceptGraph.hierarchy.detail.length - ideal),
+          ];
+          const maxDiff = ideal; // worst case: all in one bucket
+          const balance =
+            1 - Math.min(1, diffs.reduce((a, b) => a + b, 0) / (3 * maxDiff));
+          return Number(balance.toFixed(2));
+        })(),
+        orphanConcepts: conceptGraph.concepts
+          .filter(
+            (c) =>
+              !conceptGraph.relationships.some(
+                (r) => r.source === c.id || r.target === c.id
+              )
+          )
+          .map((c) => c.id),
+      };
 
-    return {
-      chapterId: chapter.id,
-      timestamp: new Date(),
-      overallScore,
-      principles: principleEvaluations,
-      conceptAnalysis,
-      structureAnalysis,
-      recommendations,
-      visualizations: visualization,
-    } as ChapterAnalysis;
+      // Build structure analysis (lightweight heuristics)
+
+      console.log("AnalysisEngine calculated conceptAnalysis:", {
+        totalConceptsIdentified: conceptAnalysis.totalConceptsIdentified,
+        coreConceptCount: conceptAnalysis.coreConceptCount,
+        conceptDensity: conceptAnalysis.conceptDensity,
+        hierarchyBalance: conceptAnalysis.hierarchyBalance,
+        conceptGraphLength: conceptGraph.concepts.length,
+        coreLength: conceptGraph.hierarchy.core.length,
+      });
+
+      // Build structure analysis (lightweight heuristics)
+      const lengths = chapter.sections.map((s) => s.wordCount);
+      const avg =
+        metrics.averageSectionLength ||
+        lengths.reduce((a, b) => a + b, 0) / Math.max(1, lengths.length);
+      const variance =
+        lengths.reduce((sum, l) => sum + Math.pow(l - avg, 2), 0) /
+        Math.max(1, lengths.length);
+      const pacing: StructureAnalysisResult["pacing"] =
+        avg < 150 ? "fast" : avg < 350 ? "moderate" : "slow";
+      const structureAnalysis: StructureAnalysisResult = {
+        sectionCount: chapter.sections.length,
+        avgSectionLength: Math.round(avg),
+        sectionLengthVariance: Math.round(variance),
+        pacing,
+        scaffolding: {
+          hasIntroduction: chapter.sections.some((s) =>
+            /intro|overview/i.test(s.heading)
+          ),
+          hasProgression: chapter.sections.length > 1,
+          hasSummary: chapter.sections.some((s) =>
+            /summary|conclusion/i.test(s.heading)
+          ),
+          hasReview: chapter.sections.some((s) =>
+            /review|practice|questions/i.test(s.heading)
+          ),
+          scaffoldingScore: 0.5,
+        },
+        transitionQuality: 0.5,
+        conceptualization: "moderate",
+      };
+
+      // Allow UI to update before finalizing
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      onProgress?.("finalizing", "Finalizing analysis results");
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      console.log("[AnalysisEngine] Analysis complete!");
+      return {
+        chapterId: chapter.id,
+        timestamp: new Date(),
+        overallScore,
+        principles: principleEvaluations,
+        conceptAnalysis,
+        structureAnalysis,
+        recommendations,
+        visualizations: visualization,
+      } as ChapterAnalysis;
+    } catch (error) {
+      console.error("[AnalysisEngine] Error during analysis:", error);
+      throw error;
+    }
   }
 
-  private static runEvaluators(
+  private static async runEvaluators(
     chapter: Chapter,
-    conceptGraph: ConceptGraph
-  ): PrincipleEvaluation[] {
+    conceptGraph: ConceptGraph,
+    onProgress?: (step: string, detail?: string) => void
+  ): Promise<PrincipleEvaluation[]> {
     const evaluators = [
-      DeepProcessingEvaluator,
-      SpacedRepetitionEvaluator,
-      RetrievalPracticeEvaluator,
-      InterleavingEvaluator,
-      DualCodingEvaluator,
-      GenerativeLearningEvaluator,
-      MetacognitionEvaluator,
-      SchemaBuildingEvaluator,
-      CognitiveLoadEvaluator,
-      EmotionAndRelevanceEvaluator,
+      { name: "Deep Processing", evaluator: DeepProcessingEvaluator },
+      { name: "Spaced Repetition", evaluator: SpacedRepetitionEvaluator },
+      { name: "Retrieval Practice", evaluator: RetrievalPracticeEvaluator },
+      { name: "Interleaving", evaluator: InterleavingEvaluator },
+      { name: "Dual Coding", evaluator: DualCodingEvaluator },
+      { name: "Generative Learning", evaluator: GenerativeLearningEvaluator },
+      { name: "Metacognition", evaluator: MetacognitionEvaluator },
+      { name: "Schema Building", evaluator: SchemaBuildingEvaluator },
+      { name: "Cognitive Load", evaluator: CognitiveLoadEvaluator },
+      { name: "Emotion & Relevance", evaluator: EmotionAndRelevanceEvaluator },
     ];
 
-    return evaluators.map((E) => E.evaluate(chapter, conceptGraph));
+    const results: PrincipleEvaluation[] = [];
+
+    for (let i = 0; i < evaluators.length; i++) {
+      const { name, evaluator } = evaluators[i];
+      onProgress?.(
+        `evaluating-${i + 1}`,
+        `Evaluating ${name} (${i + 1}/${evaluators.length})`
+      );
+
+      const result = evaluator.evaluate(chapter, conceptGraph);
+      results.push(result);
+
+      // Yield control between evaluators to allow UI updates
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+
+    return results;
   }
 
   private static calculateWeightedScoreDisplay(

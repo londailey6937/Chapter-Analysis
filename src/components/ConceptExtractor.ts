@@ -220,28 +220,76 @@ export class ConceptExtractor {
    */
   static async extractConceptsFromChapter(
     chapter: string,
-    sections: Section[]
+    sections: Section[],
+    onProgress?: (step: string, detail?: string) => void
   ): Promise<ConceptGraph> {
+    console.log(
+      "[ConceptExtractor] Starting extraction, chapter length:",
+      chapter.length,
+      "sections:",
+      sections.length
+    );
     const extractor = new ConceptExtractor();
 
     // Phase 1: Identify candidate concepts
+    onProgress?.("concept-phase-1", "Identifying candidate concepts");
+    console.log("[ConceptExtractor] Phase 1: Identifying candidates...");
     const candidates = extractor.identifyCandidateConcepts(chapter, sections);
+    console.log("[ConceptExtractor] Found", candidates.length, "candidates");
+    await new Promise((resolve) => setTimeout(resolve, 100)); // Yield control
 
     // Phase 2: Score and filter candidates
+    onProgress?.("concept-phase-2", "Scoring and filtering concepts");
+    console.log("[ConceptExtractor] Phase 2: Scoring and filtering...");
     const scored = extractor.scoreAndFilterCandidates(candidates, chapter);
+    console.log("[ConceptExtractor] Scored", scored.length, "concepts");
+    await new Promise((resolve) => setTimeout(resolve, 100)); // Yield control
 
     // Phase 3: Create concept objects with mentions
+    onProgress?.("concept-phase-3", "Creating concept objects");
+    console.log("[ConceptExtractor] Phase 3: Creating concept objects...");
     const concepts = extractor.createConceptObjects(scored, chapter);
+    console.log(
+      "[ConceptExtractor] Created",
+      concepts.length,
+      "concept objects"
+    );
+    await new Promise((resolve) => setTimeout(resolve, 100)); // Yield control
 
     // Phase 4: Establish relationships
+    onProgress?.("concept-phase-4", "Establishing concept relationships");
+    console.log("[ConceptExtractor] Phase 4: Establishing relationships...");
     const relationships = extractor.establishRelationships(concepts, chapter);
+    console.log(
+      "[ConceptExtractor] Found",
+      relationships.length,
+      "relationships"
+    );
+    await new Promise((resolve) => setTimeout(resolve, 100)); // Yield control
 
     // Phase 5: Build hierarchy
+    onProgress?.("concept-phase-5", "Building concept hierarchy");
+    console.log("[ConceptExtractor] Phase 5: Building hierarchy...");
     const hierarchy = extractor.buildHierarchy(concepts);
+    console.log(
+      "[ConceptExtractor] Hierarchy built - core:",
+      hierarchy.core.length,
+      "supporting:",
+      hierarchy.supporting.length
+    );
+    await new Promise((resolve) => setTimeout(resolve, 100)); // Yield control
 
     // Phase 6: Extract concept sequence
+    onProgress?.("concept-phase-6", "Extracting concept sequence");
+    console.log("[ConceptExtractor] Phase 6: Extracting sequence...");
     const sequence = extractor.extractConceptSequence(concepts);
+    console.log(
+      "[ConceptExtractor] Sequence extracted, length:",
+      sequence.length
+    );
+    await new Promise((resolve) => setTimeout(resolve, 100)); // Yield control
 
+    console.log("[ConceptExtractor] Extraction complete!");
     return {
       concepts,
       relationships,
