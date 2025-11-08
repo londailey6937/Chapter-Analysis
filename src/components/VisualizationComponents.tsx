@@ -88,6 +88,14 @@ export const PrincipleScoresRadar: React.FC<{ analysis: ChapterAnalysis }> = ({
         pedagogical strengths and exposes missing strategies so revisions target
         the biggest learning impact.
       </div>
+      <div className="recommendation-block">
+        <strong>Recommendation:</strong>{" "}
+        {analysis.overallScore >= 80
+          ? "Excellent principle coverage—maintain this balanced approach in future chapters."
+          : analysis.overallScore >= 60
+          ? "Good foundation; focus on strengthening the lowest-scoring principles for maximum impact."
+          : "Several principles need attention—prioritize adding interleaving, elaboration, and retrieval practice."}
+      </div>
     </div>
   );
 };
@@ -179,6 +187,22 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
         Balanced cognitive demand keeps working memory free for meaning-making
         instead of survival.
       </div>
+      {hasData &&
+        (() => {
+          const maxLoad = Math.max(...data.map((d) => d.load));
+          const avgLoad =
+            data.reduce((sum, d) => sum + d.load, 0) / data.length;
+          return (
+            <div className="recommendation-block">
+              <strong>Recommendation:</strong>{" "}
+              {maxLoad > 80
+                ? `Peak load at ${maxLoad}%—consider breaking dense sections into smaller chunks or adding examples.`
+                : maxLoad > 60
+                ? `Load is manageable but watch sections above 60%—add scaffolding or worked examples if needed.`
+                : `Well-balanced cognitive load; maintain this pacing and concept density.`}
+            </div>
+          );
+        })()}
     </div>
   );
 };
@@ -248,6 +272,19 @@ export const ConceptMentionFrequency: React.FC<{
         <strong>Why this matters:</strong> Frequency without strategic spacing
         can create illusion of mastery; balanced distributed mentions foster
         durable learning.
+      </div>
+      <div className="recommendation-block">
+        <strong>Recommendation:</strong>{" "}
+        {(() => {
+          const optimalCount = data.filter((d) => d.isOptimal).length;
+          const totalCount = data.length;
+          const optimalRatio = totalCount > 0 ? optimalCount / totalCount : 0;
+          return optimalRatio >= 0.8
+            ? "Excellent spacing patterns—most concepts have optimal revisit distribution."
+            : optimalRatio >= 0.5
+            ? "Good progress; review red-marked concepts and adjust spacing intervals for better retention."
+            : "Many concepts need spacing adjustments—ensure 3-5 spaced revisits per concept with increasing intervals.";
+        })()}
       </div>
     </div>
   );
@@ -447,6 +484,19 @@ export const ConceptMapVisualization: React.FC<ConceptMapProps> = ({
       <div className="why-matters-block">
         <strong>Why this matters:</strong> Explicit structure accelerates schema
         formation and transfer; learners remember networks, not isolated facts.
+      </div>
+      <div className="recommendation-block">
+        <strong>Recommendation:</strong>{" "}
+        {(() => {
+          const coreCount = nodes.filter((n) => n.importance === "core").length;
+          const linkCount = links.length;
+          const avgLinks = nodes.length > 0 ? linkCount / nodes.length : 0;
+          return coreCount === 0
+            ? "No core concepts identified—ensure key foundational ideas are emphasized and connected."
+            : avgLinks < 1
+            ? "Sparse connections detected—add more explicit relationships between concepts to build mental models."
+            : "Good concept structure; consider adding prerequisite links to clarify learning sequence.";
+        })()}
       </div>
     </div>
   );
@@ -874,6 +924,25 @@ export const ReviewScheduleTimeline: React.FC<{
         and strengthen consolidation; uneven or absent reviews waste prior
         exposure.
       </div>
+      <div className="recommendation-block">
+        <strong>Recommendation:</strong>{" "}
+        {(() => {
+          const optimalCount = sortedConcepts.filter((c) => c.isOptimal).length;
+          const ratio =
+            sortedConcepts.length > 0
+              ? optimalCount / sortedConcepts.length
+              : 0;
+          const spacingDiff =
+            schedule.currentAvgSpacing - schedule.optimalSpacing;
+          return ratio >= 0.7
+            ? "Excellent spacing—most concepts follow optimal spaced repetition patterns."
+            : spacingDiff > 50
+            ? "Gaps too wide—increase concept revisits to maintain activation and prevent forgetting."
+            : spacingDiff < -30
+            ? "Concepts revisited too frequently—space them out more to leverage forgetting for stronger encoding."
+            : "Moderate spacing issues—focus on red-marked concepts and aim for 3-5 strategically spaced revisits.";
+        })()}
+      </div>
 
       <style>{`
         .review-timeline {
@@ -1032,6 +1101,14 @@ export const PrincipleFindings: React.FC<{
             <strong>Why this matters:</strong> Principle-aligned edits shift
             material from exposure to learning experience—targeting low scores
             yields disproportionate gains.
+          </div>
+          <div className="recommendation-block">
+            <strong>Recommendation:</strong>{" "}
+            {principle.score >= 80
+              ? `Strong ${principle.principle} implementation—maintain this approach.`
+              : principle.score >= 60
+              ? `Good ${principle.principle} foundation—review suggestions to strengthen further.`
+              : `${principle.principle} needs attention—prioritize the highest-priority suggestions above.`}
           </div>
         </div>
       )}
