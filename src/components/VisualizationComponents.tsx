@@ -83,6 +83,11 @@ export const PrincipleScoresRadar: React.FC<{ analysis: ChapterAnalysis }> = ({
       <div className="overall-score">
         <strong>Overall Score: {analysis.overallScore.toFixed(1)}/100</strong>
       </div>
+      <div className="why-matters-block">
+        <strong>Why this matters:</strong> Mapping principle coverage surfaces
+        pedagogical strengths and exposes missing strategies so revisions target
+        the biggest learning impact.
+      </div>
     </div>
   );
 };
@@ -169,6 +174,11 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
           </em>
         </div>
       )}
+      <div className="why-matters-block">
+        <strong>Why this matters:</strong> Managing peaks prevents overload.
+        Balanced cognitive demand keeps working memory free for meaning-making
+        instead of survival.
+      </div>
     </div>
   );
 };
@@ -233,6 +243,11 @@ export const ConceptMentionFrequency: React.FC<{
           Legend: Green = optimal spaced revisits; Red = revisit pattern may
           need adjustment.
         </small>
+      </div>
+      <div className="why-matters-block">
+        <strong>Why this matters:</strong> Frequency without strategic spacing
+        can create illusion of mastery; balanced distributed mentions foster
+        durable learning.
       </div>
     </div>
   );
@@ -429,6 +444,10 @@ export const ConceptMapVisualization: React.FC<ConceptMapProps> = ({
           Details
         </div>
       </div>
+      <div className="why-matters-block">
+        <strong>Why this matters:</strong> Explicit structure accelerates schema
+        formation and transfer; learners remember networks, not isolated facts.
+      </div>
     </div>
   );
 };
@@ -599,6 +618,10 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
 
       <div className="recommendation-box">
         <strong>Recommendation:</strong> {pattern.recommendation}
+      </div>
+      <div className="why-matters-block">
+        <strong>Why this matters:</strong> Interleaving (mixing topics) improves
+        discrimination and long‑term retention compared to blocked sequences.
       </div>
 
       <style>{`
@@ -846,6 +869,11 @@ export const ReviewScheduleTimeline: React.FC<{
           </button>
         </div>
       )}
+      <div className="why-matters-block">
+        <strong>Why this matters:</strong> Spaced revisits interrupt forgetting
+        and strengthen consolidation; uneven or absent reviews waste prior
+        exposure.
+      </div>
 
       <style>{`
         .review-timeline {
@@ -999,6 +1027,11 @@ export const PrincipleFindings: React.FC<{
                   : ""}
               </p>
             ))}
+          </div>
+          <div className="why-matters-block">
+            <strong>Why this matters:</strong> Principle-aligned edits shift
+            material from exposure to learning experience—targeting low scores
+            yields disproportionate gains.
           </div>
         </div>
       )}
