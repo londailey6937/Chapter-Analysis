@@ -816,12 +816,58 @@ export class ConceptExtractor {
       "things",
       "item",
       "items",
+      "array",
+      "arrays",
+      "string",
+      "strings",
+      "number",
+      "numbers",
+      "element",
+      "elements",
+      "create",
+      "set",
+      "get",
+      "add",
+      "remove",
+      "use",
+      "make",
+      "call",
+      "return",
     ]);
 
-    // Accept multi-word phrases generously (capture domain-specific composites like "object oriented programming")
-    if (normalized.includes(" ")) return true;
+    // Filter out grammatical fragments and determiners
+    const fragmentPatterns = [
+      /^(the|a|an|this|that|these|those)\s+/, // starts with determiner
+      /\s+(the|a|an|of|to|from|in|on|at)$/, // ends with preposition/article
+      /^(of|to|from|in|on|at|with|by)\s+/, // starts with preposition
+      /\s+and\s+/, // contains "and" (e.g., "x and y")
+      /^because\s+/i, // starts with "because"
+      /^(first|second|third|fourth|fifth|last|next|previous)\s*$/i, // ordinals alone
+    ];
 
-    // Reject common generic nouns unless they appear in headings or definitions (handled upstream) by disallowing here
+    // Multi-word phrase validation
+    if (normalized.includes(" ")) {
+      // Reject if matches fragment patterns
+      if (fragmentPatterns.some((pattern) => pattern.test(normalized)))
+        return false;
+
+      // Reject if it's just "verb + article + generic noun" (e.g., "create an object")
+      const verbArticleNoun =
+        /^(create|add|remove|set|get|use|make|call|return)\s+(a|an|the)\s+(object|property|function|method|variable|array|string)s?$/;
+      if (verbArticleNoun.test(normalized)) return false;
+
+      // Reject if all words are generic stopwords/nouns
+      const words = normalized.split(/\s+/);
+      const allGeneric = words.every(
+        (w) => this.commonWords.has(w) || genericSingleNouns.has(w)
+      );
+      if (allGeneric) return false;
+
+      // Accept phrases with at least one substantive word
+      return true;
+    }
+
+    // Reject common generic nouns and verbs
     if (genericSingleNouns.has(normalized)) return false;
 
     // Accept single words that are at least 5 chars (more likely domain terms)
@@ -1106,12 +1152,24 @@ export class ConceptExtractor {
         "data",
         "type",
         "types",
+        "array",
+        "arrays",
+        "string",
+        "strings",
+        "number",
+        "numbers",
+        "element",
+        "elements",
+        "name",
+        "names",
       ]);
       Array.from(map.entries())
         .filter(([phrase, c]) => {
           // Skip phrases consisting solely of generic penalty terms
           const words = phrase.split(" ");
           if (words.every((w) => genericPenaltyTerms.has(w))) return false;
+          // Skip if phrase isn't a valid concept (will catch fragments)
+          if (!this.isValidConcept(phrase)) return false;
           return c >= minCount;
         })
         .sort((a, b) => b[1] - a[1])
