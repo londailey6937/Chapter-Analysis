@@ -461,7 +461,20 @@ export const ChapterChecker: React.FC = () => {
               </button>
             </div>
 
-            <ChapterAnalysisDashboard analysis={analysis} />
+            <div className="analysis-layout">
+              <div className="analysis-main">
+                <ChapterAnalysisDashboard analysis={analysis} />
+              </div>
+              {pdfBuffer && (
+                <div className="analysis-pdf-panel">
+                  <h3 style={{ marginTop: 0 }}>📄 Source PDF</h3>
+                  <PdfViewer
+                    fileBuffer={pdfBuffer}
+                    onTextExtracted={() => {}}
+                  />
+                </div>
+              )}
+            </div>
           </>
         )}
       </div>
@@ -507,6 +520,30 @@ export const ChapterChecker: React.FC = () => {
           margin-bottom: 20px;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
+        .analysis-layout {
+          display: grid;
+          grid-template-columns: 1fr 400px;
+          gap: 28px;
+          align-items: flex-start;
+        }
+        .analysis-main { min-width: 0; }
+        .analysis-pdf-panel {
+          background: white;
+          border: 1px solid var(--border-soft);
+          border-radius: 12px;
+          padding: 14px 16px 20px;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+          position: sticky;
+          top: 20px;
+          max-height: calc(100vh - 80px);
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+        }
+        .analysis-pdf-panel h3 { font-size: 18px; font-weight: 600; color: var(--brand-navy-700); }
+        .analysis-pdf-panel .pdf-pages { max-height: calc(100vh - 180px); }
+        @media (max-width: 1300px) { .analysis-layout { grid-template-columns: 1fr 340px; } }
+        @media (max-width: 1100px) { .analysis-layout { grid-template-columns: 1fr; } .analysis-pdf-panel { position: relative; top: auto; max-height: none; order: 2; } }
 
         .input-section.drag-active {
           outline: 3px dashed var(--brand-navy-600);
