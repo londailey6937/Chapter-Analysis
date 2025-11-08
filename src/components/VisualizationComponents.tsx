@@ -1,8 +1,3 @@
-/**
- * React Visualization Components for Chapter Analysis
- * Uses Recharts for charts and custom SVG for graph visualizations
- */
-
 import React, { useState } from "react";
 import {
   LineChart,
@@ -10,8 +5,6 @@ import {
   BarChart,
   Bar,
   Cell,
-  // ScatterChart, // unused
-  // Scatter, // unused
   XAxis,
   YAxis,
   CartesianGrid,
@@ -122,9 +115,33 @@ export const ChapterOverviewTimeline: React.FC<{
                   (sec as any).position ?? (sec as any).startPosition ?? 0;
                 window.dispatchEvent(
                   new CustomEvent("jump-to-position", {
-                    detail: { position: pos },
+                    detail: {
+                      position: pos,
+                      heading: issue.sectionName,
+                      sectionIndex: idx,
+                      sectionId: sec.sectionId,
+                    },
                   })
                 );
+              }}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  const pos =
+                    (sec as any).position ?? (sec as any).startPosition ?? 0;
+                  window.dispatchEvent(
+                    new CustomEvent("jump-to-position", {
+                      detail: {
+                        position: pos,
+                        heading: issue.sectionName,
+                        sectionIndex: idx,
+                        sectionId: sec.sectionId,
+                      },
+                    })
+                  );
+                }
               }}
             >
               <span className="section-index">{idx + 1}</span>

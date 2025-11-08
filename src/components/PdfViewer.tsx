@@ -29,6 +29,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const pageOffsetsRef = useRef<number[] | null>(null);
+  const pageTextsRef = useRef<string[] | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -64,6 +65,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
             sum += pageTexts[i].length + (i < pageTexts.length - 1 ? 2 : 0);
           }
           pageOffsetsRef.current = offsets;
+          pageTextsRef.current = pageTexts;
           onTextExtracted(pageTexts.join("\n\n"));
         }
       } catch (err) {
@@ -90,14 +92,37 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
     const handler = (e: Event) => {
       const ce = e as CustomEvent;
       const pos = ce.detail?.position as number | undefined;
-      if (typeof pos !== "number") return;
+      const heading = ce.detail?.heading as string | undefined;
+      const sectionIndex = ce.detail?.sectionIndex as number | undefined;
       const offsets = pageOffsetsRef.current;
+      const pageTexts = pageTextsRef.current;
       if (!offsets || offsets.length === 0) return;
-      // find the page index whose start offset is <= pos and next start > pos
+
       let pageIdx = 0;
-      for (let i = 0; i < offsets.length; i++) {
-        if (offsets[i] <= pos) pageIdx = i;
-        else break;
+      // Strategy 1: position mapping if provided
+      if (typeof pos === "number") {
+        for (let i = 0; i < offsets.length; i++) {
+          if (offsets[i] <= pos) pageIdx = i;
+          else break;
+        }
+      }
+      // Strategy 2: heading search within pages (case-insensitive)
+      if (heading && pageTexts && pageTexts.length) {
+        const h = heading
+          .toLowerCase()
+          .replace(/[^a-z0-9\s]/gi, "")
+          .slice(0, 60);
+        const found = pageTexts.findIndex((t) => t.toLowerCase().includes(h));
+        if (found >= 0) pageIdx = found;
+      }
+      // Strategy 3: proportional fallback by section index
+      if (typeof sectionIndex === "number" && (!pageIdx || pageIdx === 0)) {
+        // use proportional estimate if position/heading not decisive
+        const est = Math.round(
+          (sectionIndex / Math.max(1, offsets.length - 1)) *
+            (offsets.length - 1)
+        );
+        pageIdx = Math.min(offsets.length - 1, Math.max(0, est));
       }
       const pageNum = pageIdx + 1;
       const container = containerRef.current;
