@@ -885,11 +885,14 @@ export const ConceptMapVisualization: React.FC<ConceptMapProps> = ({
 // INTERLEAVING PATTERN VISUALIZATION
 // ============================================================================
 
-export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
-  analysis,
-}) => {
+export const InterleavingPattern: React.FC<{
+  analysis: ChapterAnalysis;
+  domain?: Domain;
+}> = ({ analysis, domain = "chemistry" }) => {
   const pattern = analysis.visualizations.interleavingPattern;
   const sequence = pattern.conceptSequence.slice(0, 50); // Show more for better insight
+  const pluralTerm = domain === "literature" ? "Elements" : "Concepts";
+  const singularTerm = domain === "literature" ? "Element" : "Concept";
 
   // Build ID -> Name map from conceptMap nodes
   const idToName: Record<string, string> = {};
@@ -917,7 +920,6 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
   });
   topTransitions.sort((a, b) => b.count - a.count);
   const top5Transitions = topTransitions.slice(0, 5);
-
   // Identify blocking issues
   const blockingSegments = pattern.blockingSegments || [];
   // Group blocking segments by concept to avoid listing multiple separate runs of same concept without context
@@ -1078,7 +1080,7 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
 
       {top5Transitions.length > 0 && (
         <div className="section-divider">
-          <h4>Common Concept Transitions</h4>
+          <h4>Common {pluralTerm} Transitions</h4>
           <div className="transitions-list">
             {top5Transitions.map((trans, idx) => (
               <div key={idx} className="transition-item">
@@ -1100,8 +1102,18 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
         <strong>Recommendation:</strong> {pattern.recommendation}
       </div>
       <div className="why-matters-block">
-        <strong>Why this matters:</strong> Interleaving (mixing topics) improves
-        discrimination and long‑term retention compared to blocked sequences.
+        <strong>Why this matters:</strong>{" "}
+        {domain === "literature" ? (
+          <>
+            Revisiting literary elements in varied contexts helps students see
+            patterns and make deeper analytical connections across the text.
+          </>
+        ) : (
+          <>
+            Interleaving (mixing topics) improves discrimination and long‑term
+            retention compared to blocked sequences.
+          </>
+        )}
       </div>
 
       <style>{`
@@ -1686,7 +1698,7 @@ export const ChapterAnalysisDashboard: React.FC<{
         <PrincipleScoresRadar analysis={safeAnalysis} />
         <CognitiveLoadCurve analysis={safeAnalysis} domain={domain} />
         <ConceptMentionFrequency analysis={safeAnalysis} domain={domain} />
-        <InterleavingPattern analysis={safeAnalysis} />
+        <InterleavingPattern analysis={safeAnalysis} domain={domain} />
         <ReviewScheduleTimeline analysis={safeAnalysis} />
       </div>
 
