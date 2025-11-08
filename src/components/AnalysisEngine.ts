@@ -33,6 +33,20 @@ import {
 
 import { ConceptExtractor } from "./ConceptExtractor";
 
+// Human-friendly labels for principle codes used in visualization summaries
+const PRINCIPLE_LABELS: Record<string, string> = {
+  deepProcessing: "Deep Processing",
+  spacedRepetition: "Spaced Repetition",
+  retrievalPractice: "Retrieval Practice",
+  interleaving: "Interleaving",
+  dualCoding: "Dual Coding",
+  generativeLearning: "Generative Learning",
+  metacognition: "Metacognition",
+  schemaBuilding: "Schema Building",
+  cognitiveLoad: "Cognitive Load",
+  emotionAndRelevance: "Emotion & Relevance",
+};
+
 export class AnalysisEngine {
   /**
    * Main entry point: Analyze a complete chapter
@@ -50,7 +64,7 @@ export class AnalysisEngine {
     const principleDisplay: PrincipleScoreDisplay[] = principleEvaluations.map(
       (ev) => ({
         name: ev.principle,
-        displayName: ev.principle,
+        displayName: PRINCIPLE_LABELS[ev.principle] || ev.principle,
         score: ev.score,
         weight: ev.weight ?? 1,
       })
@@ -536,6 +550,37 @@ export class AnalysisEngine {
   ) {
     const mentionEvents: { conceptId: string; position: number }[] = [];
     for (const c of conceptGraph.concepts) {
+      // Defensive skip: exclude stopword/common non-concept labels from interleaving analysis
+      const normName = c.name.toLowerCase();
+      // We replicate ConceptExtractor guards lightly here without importing the class
+      const stopwords = new Set([
+        "the",
+        "a",
+        "an",
+        "and",
+        "or",
+        "but",
+        "for",
+        "nor",
+        "so",
+        "yet",
+        "of",
+        "to",
+        "in",
+        "on",
+        "at",
+        "by",
+        "with",
+        "as",
+        "is",
+        "are",
+        "was",
+        "were",
+        "be",
+        "been",
+        "being",
+      ]);
+      if (stopwords.has(normName)) continue;
       for (const m of c.mentions) {
         mentionEvents.push({ conceptId: c.id, position: m.position });
       }

@@ -747,7 +747,16 @@ export class ConceptExtractor {
    * Phase 6: Extract concept sequence (order of first mention)
    */
   private extractConceptSequence(concepts: Concept[]): string[] {
-    return concepts
+    // Defensive filter: exclude any concept whose normalized label is a stopword/common non-concept.
+    // We look up the original concept objects (their 'term' is canonical; we normalize to compare).
+    const filtered = concepts.filter((c) => {
+      const norm = c.name?.toLowerCase() || c.id.toLowerCase();
+      // Reject if matches commonWords or isCommonNonConcept
+      if (this.commonWords.has(norm)) return false;
+      if (this.isCommonNonConcept(norm)) return false;
+      return true;
+    });
+    return filtered
       .sort((a, b) => a.firstMentionPosition - b.firstMentionPosition)
       .map((c) => c.id);
   }

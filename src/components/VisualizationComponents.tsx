@@ -31,6 +31,20 @@ import {
   PrincipleEvaluation,
 } from "@/types";
 
+// Friendly display names for principle enum codes to avoid raw concatenation (e.g., "dualCoding") in UI copy
+const PRINCIPLE_NAME_MAP: Record<string, string> = {
+  deepProcessing: "Deep Processing",
+  spacedRepetition: "Spaced Repetition",
+  retrievalPractice: "Retrieval Practice",
+  interleaving: "Interleaving",
+  dualCoding: "Dual Coding",
+  generativeLearning: "Generative Learning",
+  metacognition: "Metacognition",
+  schemaBuilding: "Schema Building",
+  cognitiveLoad: "Cognitive Load",
+  emotionAndRelevance: "Emotion & Relevance",
+};
+
 // ============================================================================
 // PRINCIPLE SCORES RADAR CHART
 // ============================================================================
@@ -541,8 +555,25 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
 
   // Identify blocking issues
   const blockingSegments = pattern.blockingSegments || [];
-  const worstBlocks = blockingSegments
-    .sort((a, b) => b.length - a.length)
+  // Group blocking segments by concept to avoid listing multiple separate runs of same concept without context
+  const blockingGroups = Object.values(
+    blockingSegments.reduce(
+      (acc: Record<string, { conceptId: string; lengths: number[] }>, seg) => {
+        if (!acc[seg.conceptId])
+          acc[seg.conceptId] = { conceptId: seg.conceptId, lengths: [] };
+        acc[seg.conceptId].lengths.push(seg.length);
+        return acc;
+      },
+      {}
+    )
+  ).map((g) => ({
+    conceptId: g.conceptId,
+    longest: Math.max(...g.lengths),
+    occurrences: g.lengths.length,
+    lengths: g.lengths.sort((a, b) => b - a),
+  }));
+  const worstBlocks = blockingGroups
+    .sort((a, b) => b.longest - a.longest)
     .slice(0, 3);
 
   // Generate color map with consistent hashing
@@ -631,17 +662,25 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
         <div className="section-divider">
           <h4>⚠️ Blocking Issues Detected</h4>
           <div className="blocking-issues">
-            {worstBlocks.map((block, idx) => (
-              <div key={idx} className="blocking-issue-card">
-                <div className="blocking-concept">
-                  {idToName[block.conceptId] || block.conceptId}
+            {worstBlocks.map((group, idx) => {
+              const name = idToName[group.conceptId] || group.conceptId;
+              return (
+                <div key={idx} className="blocking-issue-card">
+                  <div className="blocking-concept">{name}</div>
+                  <div className="blocking-detail">
+                    Longest run: {group.longest} consecutive mentions
+                    {group.occurrences > 1 &&
+                      ` • ${
+                        group.occurrences
+                      } blocking segments (runs: ${group.lengths
+                        .slice(0, 3)
+                        .join(", ")}${group.lengths.length > 3 ? ", …" : ""})`}
+                    — break these up with contrasting concepts or brief
+                    application prompts.
+                  </div>
                 </div>
-                <div className="blocking-detail">
-                  {block.length} consecutive mentions — Consider breaking into
-                  smaller segments
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -873,7 +912,7 @@ export const ReviewScheduleTimeline: React.FC<{
           <span className="legend-color optimal" /> Optimal spacing pattern
         </span>
         <span className="legend-item">
-          <span className="legend-color needs" /> Needs adjustment
+          <span className="legend-color needs-adjustment" /> Needs adjustment
         </span>
       </div>
 
@@ -974,10 +1013,10 @@ export const ReviewScheduleTimeline: React.FC<{
           display: inline-block;
         }
         .legend-color.optimal {
-          background: #4caf50;
+          background: var(--success-600);
         }
-        .legend-color.needs {
-          background: #ff9800;
+        .legend-color.needs-adjustment {
+          background: var(--warn-600);
         }
         .concept-timeline {
           display: grid;
@@ -1104,11 +1143,15 @@ export const PrincipleFindings: React.FC<{
           </div>
           <div className="recommendation-block">
             <strong>Recommendation:</strong>{" "}
-            {principle.score >= 80
-              ? `Strong ${principle.principle} implementation—maintain this approach.`
-              : principle.score >= 60
-              ? `Good ${principle.principle} foundation—review suggestions to strengthen further.`
-              : `${principle.principle} needs attention—prioritize the highest-priority suggestions above.`}
+            {(() => {
+              const displayName =
+                PRINCIPLE_NAME_MAP[principle.principle] || principle.principle;
+              if (principle.score >= 80)
+                return `Strong ${displayName} implementation—maintain this approach.`;
+              if (principle.score >= 60)
+                return `Good ${displayName} foundation—review suggestions to strengthen further.`;
+              return `${displayName} needs attention—prioritize the highest-priority suggestions above.`;
+            })()}
           </div>
         </div>
       )}
