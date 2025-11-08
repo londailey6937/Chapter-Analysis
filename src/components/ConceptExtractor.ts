@@ -558,7 +558,7 @@ export class ConceptExtractor {
       })
       .filter((c) => c.score > 20) // Lower threshold since library concepts get +50
       .sort((a, b) => b.score - a.score)
-      .slice(0, 60); // Increased limit to capture more library concepts
+      .slice(0, 150); // Increased limit to support larger chapters
   }
 
   /**
