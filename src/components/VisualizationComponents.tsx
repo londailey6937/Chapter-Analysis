@@ -508,7 +508,7 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
                 ? `Load is manageable but watch sections above 60%${
                     peakSection ? ` (e.g., "${peakSection.section}")` : ""
                   }—add scaffolding or worked examples if needed.`
-                : `Well-balanced cognitive load; maintain this pacing and concept density.`}
+                : `Excellent! Cognitive load is well-balanced. Current pacing and concept density are optimal for learner comprehension.`}
             </div>
           );
         })()}

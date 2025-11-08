@@ -46,6 +46,7 @@ export const ChapterChecker: React.FC = () => {
     null
   );
   const [currentMentionIndex, setCurrentMentionIndex] = useState<number>(0);
+  const [hasAnalyzedOnce, setHasAnalyzedOnce] = useState(false);
 
   /**
    * Handle chapter analysis
@@ -67,6 +68,7 @@ export const ChapterChecker: React.FC = () => {
     setError(null);
     setAnalysis(null);
     setIsSlowAnalysis(false);
+    setHasAnalyzedOnce(true); // Stop pulsating animation permanently
 
     // Set a timeout to detect slow analysis (30 seconds)
     analysisTimeoutRef.current = setTimeout(() => {
@@ -798,7 +800,10 @@ export const ChapterChecker: React.FC = () => {
 
               <button
                 className={`btn btn-primary btn-large ${
-                  chapterText.trim() && !isAnalyzing && !analysis
+                  chapterText.trim() &&
+                  !isAnalyzing &&
+                  !analysis &&
+                  !hasAnalyzedOnce
                     ? "attention-pulse"
                     : ""
                 }`}
