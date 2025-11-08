@@ -163,6 +163,11 @@ export interface ChapterAnalysis {
   metrics: AnalysisMetrics;
   timestamp?: Date;
   visualization?: AnalysisVisualization;
+  // Added fields from AnalysisEngine
+  principles?: PrincipleEvaluation[];
+  conceptAnalysis?: ConceptAnalysisResult;
+  structureAnalysis?: StructureAnalysisResult;
+  visualizations?: AnalysisVisualization;
 }
 
 export interface ConceptMapData {

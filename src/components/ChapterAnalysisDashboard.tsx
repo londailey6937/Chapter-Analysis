@@ -30,8 +30,25 @@ function ChapterAnalysisDashboard({
   analysis,
   onReset,
 }: ChapterAnalysisDashboardProps): JSX.Element {
-  const { overallScore, conceptAnalysis, structureAnalysis, recommendations } =
-    analysis;
+  const { overallScore, recommendations } = analysis;
+  const conceptAnalysis = analysis.conceptAnalysis || {
+    totalConceptsIdentified: 0,
+    coreConceptCount: 0,
+    conceptDensity: 0,
+    hierarchyBalance: 0,
+  };
+  const structureAnalysis = analysis.structureAnalysis || {
+    sectionCount: 0,
+    avgSectionLength: 0,
+    pacing: "moderate" as const,
+    scaffolding: {
+      hasIntroduction: false,
+      hasProgression: false,
+      hasSummary: false,
+      hasReview: false,
+      scaffoldingScore: 0,
+    },
+  };
 
   return (
     <div className="space-y-8">

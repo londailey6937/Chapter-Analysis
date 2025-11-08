@@ -1199,14 +1199,14 @@ export const ChapterAnalysisDashboard: React.FC<{
   // Defensive guards in case analysis shape changes or fields are missing
   const safeAnalysis = analysis || ({} as ChapterAnalysis);
   const overallScore = safeAnalysis.overallScore ?? 0;
-  const conceptAnalysis = (safeAnalysis as any).conceptAnalysis || {
+  const conceptAnalysis = safeAnalysis.conceptAnalysis || {
     totalConceptsIdentified: 0,
     coreConceptCount: 0,
     conceptDensity: 0,
     hierarchyBalance: 0,
   };
   const recommendations = safeAnalysis.recommendations || [];
-  const principles = (safeAnalysis as any).principles || [];
+  const principles = safeAnalysis.principles || [];
   return (
     <div className="dashboard">
       <div className="dashboard-header">
