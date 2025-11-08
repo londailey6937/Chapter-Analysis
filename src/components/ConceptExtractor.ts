@@ -188,6 +188,49 @@ export class ConceptExtractor {
     "certain",
     "similar",
     "particular",
+    // Transitional/connective words (NOT concepts - don't group/classify)
+    "instead",
+    "rather",
+    "otherwise",
+    "moreover",
+    "furthermore",
+    "additionally",
+    "likewise",
+    "similarly",
+    "conversely",
+    "nonetheless",
+    "nevertheless",
+    "meanwhile",
+    "accordingly",
+    "consequently",
+    "subsequently",
+    "previously",
+    "formerly",
+    "later",
+    "earlier",
+    "recently",
+    "ultimately",
+    "eventually",
+    "initially",
+    "originally",
+    "generally",
+    "specifically",
+    "particularly",
+    "especially",
+    "namely",
+    "indeed",
+    "certainly",
+    "surely",
+    "obviously",
+    "clearly",
+    "essentially",
+    "basically",
+    "primarily",
+    "mainly",
+    "mostly",
+    "largely",
+    "partly",
+    "partially",
     // Other common words
     "not",
     "no",
@@ -858,6 +901,25 @@ export class ConceptExtractor {
   /**
    * Check if a term is a valid concept (either in library or passes strict criteria)
    */
+  /**
+   * Validates if a term qualifies as a concept according to the definition:
+   * A concept is an abstract mental category used to group things that share
+   * essential features. It functions as a general idea that organizes related
+   * objects, actions, properties, or relationships under a single cognitive label.
+   *
+   * Key criteria:
+   * • Abstraction: Distills common features from specific examples
+   * • Generalization: Applies broadly across instances
+   * • Discrimination: Excludes instances that don't meet defining features
+   * • Function: Helps with reasoning, classification, and communication
+   *
+   * Examples of valid concepts: "tree" (groups oaks, maples, pines),
+   * "enzyme" (groups proteins that catalyze reactions), "oxidation" (groups
+   * reactions involving electron loss)
+   *
+   * NOT concepts: "instead", "rather", "very", "following" (these are
+   * transitional/qualifying words that don't create categorical groupings)
+   */
   private isValidConcept(normalized: string): boolean {
     // If it's in the chemistry library, allow (domain boost handled later)
     if (this.conceptLibrary.has(normalized)) return true;
@@ -865,6 +927,59 @@ export class ConceptExtractor {
     // Generic gating for all domains
     if (this.commonWords.has(normalized)) return false;
     if (this.isCommonNonConcept(normalized)) return false;
+
+    // Additional heuristic filters to ensure conceptual nature
+
+    // Reject pure adverbs (typically end in -ly and don't represent categories)
+    if (
+      /ly$/.test(normalized) &&
+      normalized.length > 4 &&
+      !this.isLikelyNounEndingInLy(normalized)
+    ) {
+      return false;
+    }
+
+    // Reject standalone verbs in base form (concepts should be nouns/noun phrases)
+    const commonVerbs = new Set([
+      "create",
+      "add",
+      "remove",
+      "set",
+      "get",
+      "use",
+      "make",
+      "call",
+      "return",
+      "change",
+      "move",
+      "take",
+      "give",
+      "show",
+      "tell",
+      "become",
+      "seem",
+      "feel",
+      "leave",
+      "put",
+      "bring",
+      "begin",
+      "start",
+      "stop",
+      "end",
+      "happen",
+      "occur",
+      "exist",
+      "appear",
+      "continue",
+      "follow",
+      "remain",
+      "stay",
+      "keep",
+      "hold",
+    ]);
+    if (commonVerbs.has(normalized) && !normalized.includes(" ")) {
+      return false;
+    }
 
     // Additional generic single-word domain-neutral nouns we usually don't treat as standalone concepts
     const genericSingleNouns = new Set([
@@ -897,15 +1012,6 @@ export class ConceptExtractor {
       "numbers",
       "element",
       "elements",
-      "create",
-      "set",
-      "get",
-      "add",
-      "remove",
-      "use",
-      "make",
-      "call",
-      "return",
     ]);
 
     // Filter out grammatical fragments and determiners
@@ -948,6 +1054,25 @@ export class ConceptExtractor {
 
     // Reject very short single tokens by default
     return false;
+  }
+
+  /**
+   * Helper to identify nouns that happen to end in -ly (e.g., "anomaly", "rally")
+   */
+  private isLikelyNounEndingInLy(word: string): boolean {
+    const nounsEndingInLy = new Set([
+      "anomaly",
+      "rally",
+      "ally",
+      "family",
+      "assembly",
+      "monopoly",
+      "melancholy",
+      "folly",
+      "jelly",
+      "belly",
+    ]);
+    return nounsEndingInLy.has(word);
   }
 
   private findAllMentions(text: string, term: string): ConceptMention[] {
@@ -1057,9 +1182,15 @@ export class ConceptExtractor {
   /**
    * Check if a term is a common word that shouldn't be a concept
    * even when capitalized (e.g., "Think", "Notice", "Remember")
+   *
+   * Per the conceptual definition: A concept is an abstract mental category
+   * used to group things that share essential features. Transitional words,
+   * adverbs, and procedural verbs are NOT concepts - they don't represent
+   * categories that group objects/actions/properties by shared features.
    */
   private isCommonNonConcept(normalized: string): boolean {
     const nonConceptWords = new Set([
+      // Metacognitive/instructional verbs (actions, not categories)
       "think",
       "notice",
       "remember",
@@ -1073,6 +1204,7 @@ export class ConceptExtractor {
       "explain",
       "ask",
       "answer",
+      // Document structure terms (not conceptual categories)
       "question",
       "example",
       "section",
@@ -1098,6 +1230,7 @@ export class ConceptExtractor {
       "graph",
       "chart",
       "image",
+      // Positional/ordinal descriptors (not conceptual groupings)
       "following",
       "above",
       "below",
@@ -1110,6 +1243,7 @@ export class ConceptExtractor {
       "final",
       "finally",
       "initial",
+      // Qualitative adjectives (descriptors, not abstract categories)
       "main",
       "key",
       "important",
@@ -1129,6 +1263,7 @@ export class ConceptExtractor {
       "best",
       "worse",
       "worst",
+      // Evaluative terms (not conceptual groupings)
       "right",
       "wrong",
       "correct",
@@ -1137,6 +1272,67 @@ export class ConceptExtractor {
       "false",
       "yes",
       "no",
+      // Temporal/transitional adverbs (NOT concepts per definition)
+      "instead",
+      "rather",
+      "otherwise",
+      "moreover",
+      "furthermore",
+      "however",
+      "therefore",
+      "thus",
+      "hence",
+      "then",
+      "now",
+      "later",
+      "earlier",
+      "before",
+      "after",
+      "during",
+      "meanwhile",
+      "eventually",
+      "ultimately",
+      "initially",
+      "originally",
+      "previously",
+      "subsequently",
+      "recently",
+      "formerly",
+      // Intensifiers/modifiers (not conceptual categories)
+      "very",
+      "quite",
+      "really",
+      "actually",
+      "generally",
+      "specifically",
+      "particularly",
+      "especially",
+      "mainly",
+      "mostly",
+      "largely",
+      "partly",
+      "partially",
+      "completely",
+      "entirely",
+      "totally",
+      "absolutely",
+      "exactly",
+      "precisely",
+      // Other non-conceptual terms
+      "certain",
+      "certain",
+      "perhaps",
+      "maybe",
+      "probably",
+      "possibly",
+      "definitely",
+      "surely",
+      "clearly",
+      "obviously",
+      "indeed",
+      "essentially",
+      "basically",
+      "primarily",
     ]);
 
     return nonConceptWords.has(normalized);

@@ -7,7 +7,8 @@ import React, { useState, useRef } from "react";
 import { AnalysisEngine } from "./AnalysisEngine"; // retained for types / future direct calls
 import { ChapterAnalysisDashboard } from "./VisualizationComponents";
 import { PdfViewer } from "./PdfViewer";
-import { Chapter, ChapterAnalysis } from "@/types";
+import { ConceptList } from "./ConceptList";
+import { Chapter, ChapterAnalysis, Concept } from "@/types";
 import {
   extractTextFromPdf,
   extractTextFromPdfArrayBuffer,
@@ -36,6 +37,9 @@ export const ChapterChecker: React.FC = () => {
   const [isSlowAnalysis, setIsSlowAnalysis] = useState(false);
   const fileProcessingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const analysisTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [highlightedConcept, setHighlightedConcept] = useState<Concept | null>(
+    null
+  );
 
   /**
    * Handle chapter analysis
@@ -474,6 +478,8 @@ export const ChapterChecker: React.FC = () => {
                   fileBuffer={pdfBuffer}
                   skipTextExtraction={true}
                   preExtractedPageTexts={pdfPageTexts || undefined}
+                  highlightedConcept={highlightedConcept}
+                  chapterText={chapterText}
                 />
               </>
             ) : (
@@ -629,6 +635,21 @@ export const ChapterChecker: React.FC = () => {
             {/* Analysis Results - Shows when available */}
             {analysis ? (
               <div className="analysis-results">
+                {/* Concept List with click-to-highlight */}
+                {analysis.conceptGraph?.concepts &&
+                  analysis.conceptGraph.concepts.length > 0 && (
+                    <ConceptList
+                      concepts={analysis.conceptGraph.concepts}
+                      onConceptClick={(concept) => {
+                        console.log(
+                          "[ChapterChecker] Concept clicked:",
+                          concept.name
+                        );
+                        setHighlightedConcept(concept);
+                      }}
+                      highlightedConceptId={highlightedConcept?.id}
+                    />
+                  )}
                 <ChapterAnalysisDashboard analysis={analysis} />
               </div>
             ) : (

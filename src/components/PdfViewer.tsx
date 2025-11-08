@@ -11,6 +11,7 @@ import {
 } from "pdfjs-dist";
 import { GlobalWorkerOptions } from "pdfjs-dist";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+import type { Concept } from "@/types";
 
 GlobalWorkerOptions.workerSrc = workerUrl;
 
@@ -19,6 +20,8 @@ interface PdfViewerProps {
   onTextExtracted?: (text: string) => void;
   skipTextExtraction?: boolean; // New prop to skip text extraction when already done
   preExtractedPageTexts?: string[]; // Pre-extracted page texts to avoid re-processing
+  highlightedConcept?: Concept | null; // Concept to highlight in the PDF
+  chapterText?: string; // Full chapter text for position mapping
 }
 
 // Simple cache for PDF documents to avoid re-parsing
@@ -29,6 +32,8 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
   onTextExtracted,
   skipTextExtraction = false,
   preExtractedPageTexts,
+  highlightedConcept,
+  chapterText,
 }) => {
   const [pdf, setPdf] = useState<PDFDocumentProxy | null>(null);
   const [numPages, setNumPages] = useState(0);
@@ -39,6 +44,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
   const pageOffsetsRef = useRef<number[] | null>(null);
   const pageTextsRef = useRef<string[] | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const highlightCanvasRefs = useRef<Map<number, HTMLCanvasElement>>(new Map());
 
   useEffect(() => {
     let mounted = true;
@@ -273,6 +279,79 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
       window.removeEventListener("jump-to-position", handler as EventListener);
     };
   }, []);
+
+  // Scroll to highlighted concept when it changes
+  useEffect(() => {
+    if (!highlightedConcept || !highlightedConcept.mentions.length) {
+      return;
+    }
+
+    const offsets = pageOffsetsRef.current;
+    if (!offsets || offsets.length === 0) {
+      console.warn("⚠️ No page offsets available for concept navigation");
+      return;
+    }
+
+    // Get the first mention position
+    const firstMention = highlightedConcept.mentions[0];
+    const position = firstMention.position;
+
+    console.log("🎯 Scrolling to concept:", {
+      name: highlightedConcept.name,
+      position,
+      mentions: highlightedConcept.mentions.length,
+    });
+
+    // Find which page contains this position
+    let pageIdx = 0;
+    for (let i = 0; i < offsets.length; i++) {
+      if (offsets[i] <= position) {
+        pageIdx = i;
+      } else {
+        break;
+      }
+    }
+
+    const pageNum = pageIdx + 1;
+    const container = containerRef.current;
+    if (!container) {
+      console.warn("⚠️ No container ref for concept scroll");
+      return;
+    }
+
+    // Find the target page element
+    const pageEl = container.querySelector(
+      `[data-pdf-page="${pageNum}"]`
+    ) as HTMLElement | null;
+
+    if (pageEl) {
+      // Find the scrollable parent
+      const pdfPanel = container.closest(".pdf-panel") as HTMLElement | null;
+      const scrollContainer = pdfPanel || container;
+
+      console.log("📜 Scrolling to concept page:", {
+        conceptName: highlightedConcept.name,
+        pageNum,
+        pageIdx,
+      });
+
+      const containerRect = scrollContainer.getBoundingClientRect();
+      const pageRect = pageEl.getBoundingClientRect();
+      const scrollTop =
+        scrollContainer.scrollTop + (pageRect.top - containerRect.top) - 100;
+
+      scrollContainer.scrollTo({
+        top: Math.max(0, scrollTop),
+        behavior: "smooth",
+      });
+
+      // Flash highlight to draw attention
+      pageEl.classList.add("flash-highlight");
+      setTimeout(() => pageEl.classList.remove("flash-highlight"), 2000);
+    } else {
+      console.warn("⚠️ Page element not found for concept:", pageNum);
+    }
+  }, [highlightedConcept]);
 
   return (
     <div className="pdf-viewer" ref={containerRef}>

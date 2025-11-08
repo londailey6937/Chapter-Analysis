@@ -401,6 +401,7 @@ export interface ChapterAnalysis {
   structureAnalysis: StructureAnalysisResult;
   recommendations: Recommendation[];
   visualizations: AnalysisVisualization;
+  conceptGraph: ConceptGraph; // Added for concept highlighting feature
 }
 
 // ============================================================================

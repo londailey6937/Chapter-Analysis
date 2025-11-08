@@ -309,6 +309,7 @@ export class AnalysisEngine {
         structureAnalysis,
         recommendations,
         visualizations: visualization,
+        conceptGraph, // Include conceptGraph for concept highlighting
       } as ChapterAnalysis;
     } catch (error) {
       console.error("[AnalysisEngine] Error during analysis:", error);
