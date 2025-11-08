@@ -14,6 +14,8 @@ import {
   extractTextFromPdfArrayBuffer,
   extractPdfStructure,
 } from "@/utils/pdfText";
+import { Domain, getAvailableDomains } from "@/data/conceptLibraryRegistry";
+import type { ConceptDefinition } from "@/data/conceptLibraryRegistry";
 
 // ============================================================================
 // MAIN APPLICATION COMPONENT
@@ -21,6 +23,9 @@ import {
 
 export const ChapterChecker: React.FC = () => {
   const [chapterText, setChapterText] = useState("");
+  const [selectedDomain, setSelectedDomain] = useState<Domain>("chemistry");
+  const [includeCrossDomain, setIncludeCrossDomain] = useState(true);
+  const [customConcepts, setCustomConcepts] = useState<ConceptDefinition[]>([]);
   const [sectionHints, setSectionHints] = useState<
     { title: string; startIndex: number }[] | null
   >(null);
@@ -40,6 +45,7 @@ export const ChapterChecker: React.FC = () => {
   const [highlightedConcept, setHighlightedConcept] = useState<Concept | null>(
     null
   );
+  const [currentMentionIndex, setCurrentMentionIndex] = useState<number>(0);
 
   /**
    * Handle chapter analysis
@@ -70,19 +76,22 @@ export const ChapterChecker: React.FC = () => {
     try {
       setProgress("Parsing chapter...");
 
+      // Filter out TOC before parsing sections
+      const filteredText = filterOutTOC(chapterText);
+
       // Parse chapter into sections (use PDF outline hints if available)
       const sections = parseChapterIntoSections(
-        chapterText,
+        filteredText,
         sectionHints || undefined
       );
 
       setProgress("Extracting concepts...");
 
-      // Create chapter object
+      // Create chapter object (use ORIGINAL text for concept extraction)
       const chapter: Chapter = {
         id: `chapter-${Date.now()}`,
         title: "Analyzed Chapter",
-        content: chapterText,
+        content: chapterText, // Use original text for concept extraction
         wordCount: chapterText.split(/\s+/).length,
         sections,
         conceptGraph: {
@@ -118,7 +127,11 @@ export const ChapterChecker: React.FC = () => {
         const { type } = evt.data;
         if (type === "progress") {
           const { step, detail } = evt.data;
-          const progressText = `${step.replace(/-/g, " ")}${
+          // Capitalize first letter of step text for display
+          const stepText = step.replace(/-/g, " ");
+          const capitalizedStep =
+            stepText.charAt(0).toUpperCase() + stepText.slice(1);
+          const progressText = `${capitalizedStep}${
             detail ? ": " + detail : ""
           }`;
           console.log(
@@ -240,7 +253,12 @@ export const ChapterChecker: React.FC = () => {
           analysisWorkerRef.current = null;
         }
       };
-      worker.postMessage({ chapter });
+      worker.postMessage({
+        chapter,
+        domain: selectedDomain,
+        includeCrossDomain,
+        customConcepts,
+      });
     } catch (err) {
       if (analysisTimeoutRef.current) {
         clearTimeout(analysisTimeoutRef.current);
@@ -480,17 +498,25 @@ export const ChapterChecker: React.FC = () => {
                   preExtractedPageTexts={pdfPageTexts || undefined}
                   highlightedConcept={highlightedConcept}
                   chapterText={chapterText}
+                  currentMentionIndex={currentMentionIndex}
                 />
               </>
             ) : (
               <div className="pdf-placeholder">
                 <div className="placeholder-content">
                   <div className="placeholder-icon">📄</div>
-                  <p>Upload a PDF to view it here</p>
+                  <p>Upload a PDF &gt;&gt;&gt;&gt; to view it here</p>
                   <p className="placeholder-hint">
                     The PDF will remain visible during analysis
                   </p>
                 </div>
+                {/* Arrow pointing to Analyze button */}
+                {pdfBuffer && chapterText.trim() && !analysis && (
+                  <div className="analyze-arrow-pointer">
+                    <div className="arrow-curve"></div>
+                    <div className="arrow-text">Click Analyze →</div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -505,6 +531,155 @@ export const ChapterChecker: React.FC = () => {
               onDrop={handleDrop}
             >
               <h2>Upload Your Chapter</h2>
+
+              {/* Domain Selector */}
+              <div className="domain-selector">
+                <label htmlFor="domain-select">
+                  <strong>📚 Select Domain:</strong>
+                </label>
+                <select
+                  id="domain-select"
+                  value={selectedDomain}
+                  onChange={(e) => setSelectedDomain(e.target.value as Domain)}
+                  disabled={isAnalyzing}
+                  className="domain-dropdown"
+                >
+                  {getAvailableDomains()
+                    .filter((d) => d.id !== "cross-domain")
+                    .map((domain) => (
+                      <option key={domain.id} value={domain.id}>
+                        {domain.icon} {domain.label}
+                      </option>
+                    ))}
+                </select>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    checked={includeCrossDomain}
+                    onChange={(e) => setIncludeCrossDomain(e.target.checked)}
+                    disabled={isAnalyzing}
+                  />
+                  <span>Include Cross-Domain Concepts</span>
+                </label>
+              </div>
+
+              {/* Custom Concepts Input */}
+              <div className="custom-concepts-section">
+                <details>
+                  <summary className="custom-concepts-header">
+                    <strong>➕ Add Custom Concepts</strong>
+                    <span className="custom-count">
+                      ({customConcepts.length} added)
+                    </span>
+                  </summary>
+                  <div className="custom-concepts-form">
+                    <p className="form-hint">
+                      Add domain-specific concepts unique to your chapter
+                    </p>
+                    <div className="form-row">
+                      <input
+                        type="text"
+                        placeholder="Concept name (e.g., mitochondria)"
+                        id="custom-concept-name"
+                        className="form-input"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Aliases (comma-separated)"
+                        id="custom-concept-aliases"
+                        className="form-input"
+                      />
+                    </div>
+                    <div className="form-row">
+                      <input
+                        type="text"
+                        placeholder="Category (e.g., Cell Biology)"
+                        id="custom-concept-category"
+                        className="form-input"
+                      />
+                      <select
+                        id="custom-concept-importance"
+                        className="form-input"
+                      >
+                        <option value="core">Core Concept</option>
+                        <option value="supporting">Supporting</option>
+                        <option value="detail">Detail</option>
+                      </select>
+                    </div>
+                    <button
+                      className="btn-add-concept"
+                      onClick={() => {
+                        const nameEl = document.getElementById(
+                          "custom-concept-name"
+                        ) as HTMLInputElement;
+                        const aliasesEl = document.getElementById(
+                          "custom-concept-aliases"
+                        ) as HTMLInputElement;
+                        const categoryEl = document.getElementById(
+                          "custom-concept-category"
+                        ) as HTMLInputElement;
+                        const importanceEl = document.getElementById(
+                          "custom-concept-importance"
+                        ) as HTMLSelectElement;
+
+                        const name = nameEl?.value.trim();
+                        if (!name) {
+                          alert("Please enter a concept name");
+                          return;
+                        }
+
+                        const newConcept: ConceptDefinition = {
+                          name,
+                          aliases: aliasesEl?.value
+                            .split(",")
+                            .map((s) => s.trim())
+                            .filter(Boolean),
+                          category: categoryEl?.value.trim() || "Custom",
+                          importance: (importanceEl?.value || "supporting") as
+                            | "core"
+                            | "supporting"
+                            | "detail",
+                        };
+
+                        setCustomConcepts([...customConcepts, newConcept]);
+
+                        // Clear form
+                        if (nameEl) nameEl.value = "";
+                        if (aliasesEl) aliasesEl.value = "";
+                        if (categoryEl) categoryEl.value = "";
+                      }}
+                    >
+                      ➕ Add Concept
+                    </button>
+
+                    {customConcepts.length > 0 && (
+                      <div className="custom-concepts-list">
+                        <h4>Added Concepts:</h4>
+                        {customConcepts.map((concept, idx) => (
+                          <div key={idx} className="custom-concept-item">
+                            <span className="concept-name">{concept.name}</span>
+                            <span className="concept-category">
+                              {concept.category}
+                            </span>
+                            <button
+                              className="btn-remove"
+                              onClick={() => {
+                                setCustomConcepts(
+                                  customConcepts.filter((_, i) => i !== idx)
+                                );
+                              }}
+                              title="Remove concept"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </details>
+              </div>
+
               <div className="control-buttons">
                 <button
                   className="btn btn-secondary"
@@ -622,7 +797,11 @@ export const ChapterChecker: React.FC = () => {
               )}
 
               <button
-                className="btn btn-primary btn-large"
+                className={`btn btn-primary btn-large ${
+                  chapterText.trim() && !isAnalyzing && !analysis
+                    ? "attention-pulse"
+                    : ""
+                }`}
                 onClick={handleAnalyzeChapter}
                 disabled={isAnalyzing || !chapterText.trim()}
               >
@@ -640,14 +819,18 @@ export const ChapterChecker: React.FC = () => {
                   analysis.conceptGraph.concepts.length > 0 && (
                     <ConceptList
                       concepts={analysis.conceptGraph.concepts}
-                      onConceptClick={(concept) => {
+                      onConceptClick={(concept, mentionIndex) => {
                         console.log(
                           "[ChapterChecker] Concept clicked:",
-                          concept.name
+                          concept.name,
+                          "mention",
+                          mentionIndex
                         );
                         setHighlightedConcept(concept);
+                        setCurrentMentionIndex(mentionIndex);
                       }}
                       highlightedConceptId={highlightedConcept?.id}
+                      currentMentionIndex={currentMentionIndex}
                     />
                   )}
                 <ChapterAnalysisDashboard analysis={analysis} />
@@ -791,6 +974,66 @@ export const ChapterChecker: React.FC = () => {
           color: #94a3b8;
         }
 
+        /* Arrow pointing from PDF placeholder to Analyze button */
+        .analyze-arrow-pointer {
+          position: absolute;
+          right: -120px;
+          top: 50%;
+          transform: translateY(-50%);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          animation: bounceRight 1.5s ease-in-out infinite;
+          z-index: 100;
+        }
+
+        .arrow-curve {
+          width: 80px;
+          height: 2px;
+          background: linear-gradient(90deg, #3b82f6 0%, #0ea5e9 100%);
+          position: relative;
+          box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+        }
+
+        .arrow-curve::after {
+          content: '➤';
+          position: absolute;
+          right: -8px;
+          top: -9px;
+          font-size: 20px;
+          color: #0ea5e9;
+          text-shadow: 0 0 10px rgba(14, 165, 233, 0.6);
+        }
+
+        .arrow-text {
+          font-size: 13px;
+          font-weight: 700;
+          color: #0ea5e9;
+          white-space: nowrap;
+          background: rgba(14, 165, 233, 0.1);
+          padding: 4px 10px;
+          border-radius: 6px;
+          border: 2px solid #0ea5e9;
+          box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+        }
+
+        @keyframes bounceRight {
+          0%, 100% {
+            transform: translateY(-50%) translateX(0);
+            opacity: 1;
+          }
+          50% {
+            transform: translateY(-50%) translateX(12px);
+            opacity: 0.8;
+          }
+        }
+
+        @media (max-width: 1400px) {
+          .analyze-arrow-pointer {
+            display: none; /* Hide arrow on smaller screens */
+          }
+        }
+
         /* RIGHT PANEL: Controls & Analysis */
         .control-panel {
           display: flex;
@@ -812,6 +1055,206 @@ export const ChapterChecker: React.FC = () => {
           margin: 0 0 16px 0;
           font-size: 22px;
           color: #1e293b;
+        }
+
+        .domain-selector {
+          background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+          border: 2px solid #cbd5e1;
+          border-radius: 12px;
+          padding: 16px;
+          margin-bottom: 20px;
+        }
+
+        .domain-selector label {
+          display: block;
+          margin-bottom: 8px;
+          color: #1e293b;
+          font-size: 14px;
+        }
+
+        .domain-dropdown {
+          width: 100%;
+          padding: 10px 14px;
+          font-size: 16px;
+          border: 2px solid #cbd5e1;
+          border-radius: 8px;
+          background: white;
+          cursor: pointer;
+          transition: all 0.2s;
+          margin-bottom: 12px;
+        }
+
+        .domain-dropdown:hover:not(:disabled) {
+          border-color: var(--brand-navy-600);
+        }
+
+        .domain-dropdown:focus {
+          outline: none;
+          border-color: var(--brand-navy-600);
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .domain-dropdown:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .checkbox-label {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          cursor: pointer;
+          user-select: none;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+          width: 18px;
+          height: 18px;
+          cursor: pointer;
+        }
+
+        .checkbox-label span {
+          font-size: 14px;
+          color: #475569;
+        }
+
+        /* Custom Concepts Section */
+        .custom-concepts-section {
+          margin-top: 16px;
+          border-top: 2px solid #e2e8f0;
+          padding-top: 16px;
+        }
+
+        .custom-concepts-header {
+          cursor: pointer;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px;
+          background: #f1f5f9;
+          border-radius: 8px;
+          transition: background 0.2s;
+        }
+
+        .custom-concepts-header:hover {
+          background: #e2e8f0;
+        }
+
+        .custom-count {
+          font-size: 12px;
+          color: #64748b;
+          font-weight: normal;
+        }
+
+        .custom-concepts-form {
+          padding: 16px;
+          background: #f8fafc;
+          border-radius: 8px;
+          margin-top: 12px;
+        }
+
+        .form-hint {
+          font-size: 13px;
+          color: #64748b;
+          margin-bottom: 12px;
+        }
+
+        .form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 8px;
+          margin-bottom: 8px;
+        }
+
+        .form-input {
+          padding: 8px 12px;
+          font-size: 14px;
+          border: 2px solid #cbd5e1;
+          border-radius: 6px;
+          transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+          outline: none;
+          border-color: var(--brand-navy-600);
+        }
+
+        .btn-add-concept {
+          width: 100%;
+          padding: 10px;
+          background: var(--brand-navy-600);
+          color: white;
+          border: none;
+          border-radius: 6px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+          margin-top: 8px;
+        }
+
+        .btn-add-concept:hover {
+          background: var(--brand-navy-700);
+          transform: translateY(-1px);
+        }
+
+        .custom-concepts-list {
+          margin-top: 16px;
+          padding-top: 16px;
+          border-top: 1px solid #e2e8f0;
+        }
+
+        .custom-concepts-list h4 {
+          font-size: 13px;
+          color: #475569;
+          margin-bottom: 8px;
+        }
+
+        .custom-concept-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 8px 12px;
+          background: white;
+          border: 1px solid #e2e8f0;
+          border-radius: 6px;
+          margin-bottom: 6px;
+        }
+
+        .concept-name {
+          font-weight: 600;
+          color: #1e293b;
+          flex: 1;
+        }
+
+        .concept-category {
+          font-size: 12px;
+          color: #64748b;
+          padding: 2px 8px;
+          background: #f1f5f9;
+          border-radius: 4px;
+        }
+
+        .btn-remove {
+          width: 24px;
+          height: 24px;
+          padding: 0;
+          background: #fee2e2;
+          color: #dc2626;
+          border: none;
+          border-radius: 4px;
+          font-size: 18px;
+          font-weight: bold;
+          cursor: pointer;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          line-height: 1;
+        }
+
+        .btn-remove:hover {
+          background: #fecaca;
+          transform: scale(1.1);
         }
 
         .analysis-results {
@@ -947,6 +1390,48 @@ export const ChapterChecker: React.FC = () => {
           padding: 15px;
           font-size: 16px;
           margin-top: 20px;
+        }
+
+        /* Attention-grabbing pulse animation for Analyze button */
+        .attention-pulse {
+          animation: attentionPulse 2s ease-in-out infinite;
+          position: relative;
+        }
+
+        .attention-pulse::before {
+          content: '';
+          position: absolute;
+          top: -4px;
+          left: -4px;
+          right: -4px;
+          bottom: -4px;
+          background: linear-gradient(135deg, var(--brand-navy-600), #3b82f6);
+          border-radius: 8px;
+          opacity: 0;
+          animation: attentionGlow 2s ease-in-out infinite;
+          z-index: -1;
+        }
+
+        @keyframes attentionPulse {
+          0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 2px 5px rgba(102, 126, 234, 0.2);
+          }
+          50% {
+            transform: scale(1.03);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5),
+                        0 0 30px rgba(59, 130, 246, 0.3);
+          }
+        }
+
+        @keyframes attentionGlow {
+          0%, 100% {
+            opacity: 0;
+          }
+          50% {
+            opacity: 0.6;
+            filter: blur(10px);
+          }
         }
 
         .error-message {
@@ -1099,6 +1584,39 @@ export const ChapterChecker: React.FC = () => {
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
+
+/**
+ * Remove Table of Contents patterns from text
+ * Filters out lines that look like TOC entries (dots, page numbers)
+ */
+function filterOutTOC(text: string): string {
+  const lines = text.split("\n");
+  const filtered: string[] = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    // Skip TOC-like patterns:
+    // 1. Lines with lots of dots/periods followed by numbers (Chapter 1 ........... 5)
+    // 2. Very short lines (< 30 chars) ending with page numbers
+    // 3. Lines with multiple page number patterns (1.1, 1.2, 1.3)
+    const hasDotLeader = /\.{3,}/.test(trimmed) && /\d+\s*$/.test(trimmed);
+    const shortWithPageNum =
+      trimmed.length < 30 && /^\S.*\s+\d+\s*$/.test(trimmed);
+    const multipleNumberedItems =
+      (trimmed.match(/\d+\.\d+/g) || []).length >= 3;
+
+    if (hasDotLeader || shortWithPageNum || multipleNumberedItems) {
+      // Skip this TOC line
+      continue;
+    }
+
+    filtered.push(line);
+  }
+
+  return filtered.join("\n");
+}
 
 function parseChapterIntoSections(
   text: string,

@@ -3,25 +3,45 @@
  * Displays all identified concepts with click-to-highlight functionality
  */
 
-import React from "react";
+import React, { useState } from "react";
 import type { Concept } from "@/types";
 
 interface ConceptListProps {
   concepts: Concept[];
-  onConceptClick: (concept: Concept) => void;
+  onConceptClick: (concept: Concept, mentionIndex: number) => void;
   highlightedConceptId?: string | null;
+  currentMentionIndex?: number;
 }
 
 export const ConceptList: React.FC<ConceptListProps> = ({
   concepts,
   onConceptClick,
   highlightedConceptId,
+  currentMentionIndex = 0,
 }) => {
+  // Find the highlighted concept to show navigation
+  const highlightedConcept = concepts.find(
+    (c) => c.id === highlightedConceptId
+  );
+  const totalMentions = highlightedConcept?.mentions.length || 0;
+
   // Group concepts by importance
   const groupedConcepts = {
     core: concepts.filter((c) => c.importance === "core"),
     supporting: concepts.filter((c) => c.importance === "supporting"),
     detail: concepts.filter((c) => c.importance === "detail"),
+  };
+
+  const handlePrevious = () => {
+    if (highlightedConcept && currentMentionIndex > 0) {
+      onConceptClick(highlightedConcept, currentMentionIndex - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (highlightedConcept && currentMentionIndex < totalMentions - 1) {
+      onConceptClick(highlightedConcept, currentMentionIndex + 1);
+    }
   };
 
   const renderConceptGroup = (
@@ -38,7 +58,7 @@ export const ConceptList: React.FC<ConceptListProps> = ({
           {groupConcepts.map((concept) => (
             <button
               key={concept.id}
-              onClick={() => onConceptClick(concept)}
+              onClick={() => onConceptClick(concept, 0)}
               className={`concept-badge ${colorClass} ${
                 highlightedConceptId === concept.id
                   ? "ring-2 ring-offset-2 ring-blue-500 font-bold"
@@ -65,6 +85,37 @@ export const ConceptList: React.FC<ConceptListProps> = ({
           <p className="text-sm text-gray-600 mt-1">
             Click a concept to highlight it in the PDF
           </p>
+
+          {/* Navigation controls when a concept is selected */}
+          {highlightedConcept && totalMentions > 1 && (
+            <div className="mt-3 flex items-center justify-between bg-blue-50 rounded-lg p-3">
+              <div className="text-sm font-medium text-gray-700">
+                <span className="font-bold text-blue-600">
+                  {highlightedConcept.name}
+                </span>
+                {" - "}
+                Mention {currentMentionIndex + 1} of {totalMentions}
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={handlePrevious}
+                  disabled={currentMentionIndex === 0}
+                  className="nav-button"
+                  title="Previous mention"
+                >
+                  ← Prev
+                </button>
+                <button
+                  onClick={handleNext}
+                  disabled={currentMentionIndex >= totalMentions - 1}
+                  className="nav-button"
+                  title="Next mention"
+                >
+                  Next →
+                </button>
+              </div>
+            </div>
+          )}
         </div>
         <div className="card-body">
           {renderConceptGroup(
@@ -133,6 +184,32 @@ export const ConceptList: React.FC<ConceptListProps> = ({
 
         .concept-badge-detail:hover {
           background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+        }
+
+        .nav-button {
+          padding: 6px 12px;
+          border-radius: 6px;
+          background: white;
+          border: 2px solid #3b82f6;
+          color: #3b82f6;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .nav-button:hover:not(:disabled) {
+          background: #3b82f6;
+          color: white;
+          transform: translateY(-1px);
+          box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+        }
+
+        .nav-button:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+          border-color: #d1d5db;
+          color: #9ca3af;
         }
       `}</style>
     </div>

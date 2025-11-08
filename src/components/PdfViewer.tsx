@@ -22,6 +22,7 @@ interface PdfViewerProps {
   preExtractedPageTexts?: string[]; // Pre-extracted page texts to avoid re-processing
   highlightedConcept?: Concept | null; // Concept to highlight in the PDF
   chapterText?: string; // Full chapter text for position mapping
+  currentMentionIndex?: number; // Index of the mention to scroll to
 }
 
 // Simple cache for PDF documents to avoid re-parsing
@@ -34,6 +35,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
   preExtractedPageTexts,
   highlightedConcept,
   chapterText,
+  currentMentionIndex = 0,
 }) => {
   const [pdf, setPdf] = useState<PDFDocumentProxy | null>(null);
   const [numPages, setNumPages] = useState(0);
@@ -267,9 +269,9 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
           behavior: "smooth",
         });
 
-        // flash highlight
+        // flash highlight - increased duration for better visibility
         pageEl.classList.add("flash-highlight");
-        setTimeout(() => pageEl.classList.remove("flash-highlight"), 1500);
+        setTimeout(() => pageEl.classList.remove("flash-highlight"), 3000); // Increased from 1500 to 3000ms
       } else {
         console.warn("⚠️ Page element not found:", pageNum);
       }
@@ -292,14 +294,19 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
       return;
     }
 
-    // Get the first mention position
-    const firstMention = highlightedConcept.mentions[0];
-    const position = firstMention.position;
+    // Get the mention at the specified index (default to first mention)
+    const mentionIdx = Math.min(
+      currentMentionIndex,
+      highlightedConcept.mentions.length - 1
+    );
+    const targetMention = highlightedConcept.mentions[mentionIdx];
+    const position = targetMention.position;
 
     console.log("🎯 Scrolling to concept:", {
       name: highlightedConcept.name,
+      mentionIndex: mentionIdx + 1,
+      totalMentions: highlightedConcept.mentions.length,
       position,
-      mentions: highlightedConcept.mentions.length,
     });
 
     // Find which page contains this position
@@ -331,6 +338,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
 
       console.log("📜 Scrolling to concept page:", {
         conceptName: highlightedConcept.name,
+        mentionIndex: mentionIdx + 1,
         pageNum,
         pageIdx,
       });
@@ -345,13 +353,31 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
         behavior: "smooth",
       });
 
-      // Flash highlight to draw attention
-      pageEl.classList.add("flash-highlight");
-      setTimeout(() => pageEl.classList.remove("flash-highlight"), 2000);
+      // Create a concept indicator overlay instead of highlighting the whole page
+      const existingIndicator = pageEl.querySelector(".concept-indicator");
+      if (existingIndicator) {
+        existingIndicator.remove();
+      }
+
+      const indicator = document.createElement("div");
+      indicator.className = "concept-indicator";
+      indicator.innerHTML = `
+        <div class="concept-indicator-content">
+          <div class="concept-indicator-label">📍 ${highlightedConcept.name}</div>
+          <div class="concept-indicator-pulse"></div>
+        </div>
+      `;
+      pageEl.appendChild(indicator);
+
+      // Remove indicator after animation completes
+      setTimeout(() => {
+        indicator.classList.add("fade-out");
+        setTimeout(() => indicator.remove(), 500);
+      }, 3500);
     } else {
       console.warn("⚠️ Page element not found for concept:", pageNum);
     }
-  }, [highlightedConcept]);
+  }, [highlightedConcept, currentMentionIndex]);
 
   return (
     <div className="pdf-viewer" ref={containerRef}>
@@ -440,9 +466,135 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
           gap: 20px;
         }
         .flash-highlight {
-          outline: 3px solid #0ea5e9;
-          transition: outline-color 1s ease;
+          animation: flashHighlight 2s ease-in-out;
+          outline: 4px solid #0ea5e9 !important;
+          outline-offset: 4px;
+          box-shadow: 0 0 20px rgba(14, 165, 233, 0.6),
+                      0 0 40px rgba(14, 165, 233, 0.4),
+                      inset 0 0 20px rgba(14, 165, 233, 0.2) !important;
+          border-radius: 8px;
+          position: relative;
+          z-index: 10;
         }
+
+        /* Concept indicator overlay - appears in center of page with concept name */
+        .concept-indicator {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 1000;
+          pointer-events: none;
+          animation: indicatorFadeIn 0.3s ease-out;
+        }
+
+        .concept-indicator.fade-out {
+          animation: indicatorFadeOut 0.5s ease-out forwards;
+        }
+
+        .concept-indicator-content {
+          position: relative;
+        }
+
+        .concept-indicator-label {
+          background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+          color: white;
+          padding: 12px 24px;
+          border-radius: 12px;
+          font-weight: 600;
+          font-size: 16px;
+          box-shadow: 0 4px 20px rgba(14, 165, 233, 0.4),
+                      0 0 60px rgba(14, 165, 233, 0.3);
+          animation: conceptBounce 0.6s ease-out;
+          white-space: nowrap;
+          text-align: center;
+          position: relative;
+          z-index: 2;
+        }
+
+        .concept-indicator-pulse {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 120px;
+          height: 120px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(14, 165, 233, 0.4) 0%, rgba(14, 165, 233, 0) 70%);
+          animation: conceptPulse 2s ease-out infinite;
+          z-index: 1;
+        }
+
+        @keyframes indicatorFadeIn {
+          from {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.8);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
+
+        @keyframes indicatorFadeOut {
+          from {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+          }
+          to {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.9);
+          }
+        }
+
+        @keyframes conceptBounce {
+          0% {
+            transform: scale(0.8) translateY(20px);
+            opacity: 0;
+          }
+          50% {
+            transform: scale(1.05) translateY(0);
+          }
+          100% {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+          }
+        }
+
+        @keyframes conceptPulse {
+          0% {
+            transform: translate(-50%, -50%) scale(0.5);
+            opacity: 0.8;
+          }
+          50% {
+            transform: translate(-50%, -50%) scale(2);
+            opacity: 0.4;
+          }
+          100% {
+            transform: translate(-50%, -50%) scale(3);
+            opacity: 0;
+          }
+        }
+
+        @keyframes flashHighlight {
+          0%, 100% {
+            outline-color: transparent;
+            box-shadow: none;
+          }
+          10%, 30%, 50% {
+            outline-color: #0ea5e9;
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.6),
+                        0 0 40px rgba(14, 165, 233, 0.4),
+                        inset 0 0 20px rgba(14, 165, 233, 0.2);
+          }
+          20%, 40%, 60% {
+            outline-color: #06b6d4;
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.7),
+                        0 0 50px rgba(6, 182, 212, 0.5),
+                        inset 0 0 30px rgba(6, 182, 212, 0.3);
+          }
+        }
+
         .error-message {
           padding: 15px;
           background: #fee;

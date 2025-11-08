@@ -25,6 +25,120 @@ export class DeepProcessingEvaluator {
     const findings: Finding[] = [];
     const evidence: Evidence[] = [];
 
+    // NEW: Bloom's Taxonomy Classification
+    const bloomsAnalysis = this.classifyQuestionsByBloomsLevel(chapter.content);
+    evidence.push({
+      type: "metric",
+      metric: "blooms_higher_order",
+      value: bloomsAnalysis.higherOrderPercentage,
+      threshold: 40,
+      quality:
+        bloomsAnalysis.higherOrderPercentage >= 40
+          ? "strong"
+          : bloomsAnalysis.higherOrderPercentage >= 25
+          ? "moderate"
+          : "weak",
+    });
+
+    if (bloomsAnalysis.higherOrderPercentage < 25) {
+      findings.push({
+        type: "critical",
+        message: `Only ${bloomsAnalysis.higherOrderPercentage.toFixed(
+          0
+        )}% of questions target higher-order thinking (Analyze/Evaluate/Create)`,
+        severity: 0.85,
+        evidence: `Found: ${bloomsAnalysis.analyze} analyze, ${bloomsAnalysis.evaluate} evaluate, ${bloomsAnalysis.create} create questions`,
+      });
+    } else if (bloomsAnalysis.higherOrderPercentage >= 40) {
+      findings.push({
+        type: "positive",
+        message: `✓ Excellent: ${bloomsAnalysis.higherOrderPercentage.toFixed(
+          0
+        )}% of questions promote higher-order thinking`,
+        severity: 0,
+        evidence: `Strong balance across Bloom's levels (Apply: ${bloomsAnalysis.apply}, Analyze: ${bloomsAnalysis.analyze}, Evaluate: ${bloomsAnalysis.evaluate}, Create: ${bloomsAnalysis.create})`,
+      });
+    }
+
+    // NEW: Elaborative Interrogation Detection
+    const elaborativeQuestions = this.detectElaborativeInterrogation(
+      chapter.content
+    );
+    evidence.push({
+      type: "count",
+      metric: "elaborative_interrogation",
+      value: elaborativeQuestions.count,
+      threshold: Math.ceil(chapter.sections.length * 1.5),
+      quality:
+        elaborativeQuestions.count >= chapter.sections.length
+          ? "strong"
+          : "weak",
+    });
+
+    if (elaborativeQuestions.count < chapter.sections.length) {
+      findings.push({
+        type: "warning",
+        message: "Limited elaborative interrogation prompts",
+        severity: 0.7,
+        evidence: `Only ${elaborativeQuestions.count} "why/how/what if" prompts encourage explanation generation`,
+      });
+    }
+
+    // NEW: Worked Example Detection
+    const workedExamples = this.detectWorkedExamples(chapter.content);
+    evidence.push({
+      type: "count",
+      metric: "worked_examples",
+      value: workedExamples.count,
+      threshold: Math.max(2, Math.ceil(chapter.sections.length / 3)),
+      quality: workedExamples.count >= 2 ? "strong" : "weak",
+    });
+
+    if (workedExamples.count === 0) {
+      findings.push({
+        type: "warning",
+        message: "No worked examples with step-by-step reasoning",
+        severity: 0.65,
+        evidence: "Worked examples model expert thinking patterns",
+      });
+    } else {
+      findings.push({
+        type: "positive",
+        message: `✓ Found ${workedExamples.count} worked examples modeling problem-solving`,
+        severity: 0,
+        evidence: workedExamples.examples.slice(0, 2).join("; "),
+      });
+    }
+
+    // NEW: Explanation Depth Analysis
+    const explanationDepth = this.measureExplanationDepth(
+      chapter.content,
+      concepts
+    );
+    evidence.push({
+      type: "metric",
+      metric: "explanation_depth_score",
+      value: explanationDepth.avgDepth,
+      threshold: 3,
+      quality:
+        explanationDepth.avgDepth >= 3
+          ? "strong"
+          : explanationDepth.avgDepth >= 2
+          ? "moderate"
+          : "weak",
+    });
+
+    if (explanationDepth.avgDepth < 2) {
+      findings.push({
+        type: "warning",
+        message: "Shallow explanations - concepts lack multi-level elaboration",
+        severity: 0.6,
+        evidence: `Average depth: ${explanationDepth.avgDepth.toFixed(
+          1
+        )}/5 (definition → example → mechanism → connection → application)`,
+      });
+    }
+
     // Check 1: Questions that invite thinking ("Why?", "How?")
     const whyHowQuestions = this.countWhyHowQuestions(chapter.content);
     evidence.push({
@@ -131,20 +245,79 @@ export class DeepProcessingEvaluator {
       });
     }
 
-    // Calculate score
-    let score = 50;
-    score += whyHowQuestions > 0 ? 15 : 0;
+    // Calculate score (enhanced with new metrics)
+    let score = 30; // Base score
+
+    // Bloom's taxonomy (0-25 points)
+    score += bloomsAnalysis.higherOrderPercentage * 0.25;
+
+    // Elaborative interrogation (0-15 points)
+    const elaborationRatio =
+      elaborativeQuestions.count / Math.max(chapter.sections.length, 1);
+    score += Math.min(elaborationRatio * 10, 15);
+
+    // Worked examples (0-10 points)
+    score += Math.min(workedExamples.count * 3, 10);
+
+    // Explanation depth (0-15 points)
+    score += explanationDepth.avgDepth * 3;
+
+    // Original metrics (0-35 points)
+    score += whyHowQuestions > 0 ? 10 : 0;
     score +=
       explanationMethods.uniqueMethods >= 3
-        ? 15
+        ? 10
         : explanationMethods.uniqueMethods >= 2
-        ? 8
+        ? 5
         : 0;
-    score += connections.count > 2 ? 10 : connections.count > 0 ? 5 : 0;
-    score += analogies.count > 0 ? 10 : 0;
+    score += connections.count > 2 ? 8 : connections.count > 0 ? 4 : 0;
+    score += analogies.count > 0 ? 7 : 0;
     score = Math.min(score, 100);
 
     const suggestions: Suggestion[] = [];
+
+    if (bloomsAnalysis.higherOrderPercentage < 25) {
+      suggestions.push({
+        id: "deep-proc-0",
+        principle: "deepProcessing",
+        priority: "high",
+        title: "Elevate to Higher-Order Thinking",
+        description:
+          "Add more questions that require analysis, evaluation, and creation (Bloom's higher levels)",
+        implementation:
+          'Replace "What is X?" with "How does X compare to Y?", "Why would X be more effective than Y?", "Design a solution using X"',
+        expectedImpact:
+          "Promotes critical thinking and deeper understanding rather than memorization",
+        relatedConcepts: concepts.hierarchy.core.map((c) => c.id),
+        examples: [
+          "Analyze: Compare and contrast X with Y",
+          "Evaluate: Which approach would be most effective and why?",
+          "Create: Design an experiment to test this hypothesis",
+        ],
+      });
+    }
+
+    if (workedExamples.count === 0) {
+      suggestions.push({
+        id: "deep-proc-0.5",
+        principle: "deepProcessing",
+        priority: "high",
+        title: "Add Worked Examples",
+        description:
+          "Include step-by-step demonstrations that model expert problem-solving",
+        implementation:
+          'Create examples with explicit reasoning: "Step 1: First, we identify... Step 2: Next, we apply... because..."',
+        expectedImpact:
+          "Learners observe expert thinking patterns and build mental models for problem-solving",
+        relatedConcepts: concepts.hierarchy.core.map((c) => c.id).slice(0, 3),
+        examples: [
+          "Example 1: Let's solve this problem step-by-step...",
+          "Work through: How would an expert approach this?",
+          "Demonstration: Watch how we break this down systematically",
+        ],
+      });
+    }
+
     if (whyHowQuestions === 0) {
       suggestions.push({
         id: "deep-proc-1",
@@ -286,6 +459,235 @@ export class DeepProcessingEvaluator {
       }, 0),
     };
   }
+
+  // NEW: Bloom's Taxonomy Classification
+  private static classifyQuestionsByBloomsLevel(text: string): {
+    remember: number;
+    understand: number;
+    apply: number;
+    analyze: number;
+    evaluate: number;
+    create: number;
+    higherOrderPercentage: number;
+  } {
+    // Remember: recall facts, terms, basic concepts
+    const rememberPatterns = [
+      /what is\s+(?:the\s+)?definition/gi,
+      /list\s+(?:the|all)/gi,
+      /name\s+(?:the|all)/gi,
+      /identify\s+(?:the|all)/gi,
+      /recall/gi,
+      /define/gi,
+    ];
+
+    // Understand: explain ideas, summarize
+    const understandPatterns = [
+      /explain\s+(?:why|how|what)/gi,
+      /describe\s+(?:the|how)/gi,
+      /summarize/gi,
+      /paraphrase/gi,
+      /what does\s+\w+\s+mean/gi,
+    ];
+
+    // Apply: use information in new situations
+    const applyPatterns = [
+      /apply\s+this/gi,
+      /use\s+(?:the|this|these)/gi,
+      /demonstrate/gi,
+      /solve\s+(?:the|this)/gi,
+      /calculate/gi,
+      /how would you\s+(?:use|apply)/gi,
+    ];
+
+    // Analyze: draw connections, examine structure
+    const analyzePatterns = [
+      /analyze/gi,
+      /compare\s+(?:and\s+contrast)?/gi,
+      /categorize/gi,
+      /what is the relationship/gi,
+      /distinguish\s+between/gi,
+      /examine/gi,
+      /why\s+(?:does|do|is|are)/gi,
+    ];
+
+    // Evaluate: justify decisions, critique
+    const evaluatePatterns = [
+      /evaluate/gi,
+      /judge/gi,
+      /critique/gi,
+      /justify/gi,
+      /which is better/gi,
+      /assess/gi,
+      /defend/gi,
+      /what would you recommend/gi,
+    ];
+
+    // Create: produce new work, design
+    const createPatterns = [
+      /create/gi,
+      /design/gi,
+      /construct/gi,
+      /develop\s+a/gi,
+      /propose/gi,
+      /formulate/gi,
+      /generate\s+a/gi,
+      /what if/gi,
+    ];
+
+    const countMatches = (patterns: RegExp[]) =>
+      patterns.reduce((sum, p) => sum + (text.match(p) || []).length, 0);
+
+    const remember = countMatches(rememberPatterns);
+    const understand = countMatches(understandPatterns);
+    const apply = countMatches(applyPatterns);
+    const analyze = countMatches(analyzePatterns);
+    const evaluate = countMatches(evaluatePatterns);
+    const create = countMatches(createPatterns);
+
+    const total = remember + understand + apply + analyze + evaluate + create;
+    const higherOrder = analyze + evaluate + create;
+    const higherOrderPercentage = total > 0 ? (higherOrder / total) * 100 : 0;
+
+    return {
+      remember,
+      understand,
+      apply,
+      analyze,
+      evaluate,
+      create,
+      higherOrderPercentage,
+    };
+  }
+
+  // NEW: Detect Elaborative Interrogation (prompts that encourage explanation)
+  private static detectElaborativeInterrogation(text: string): {
+    count: number;
+    examples: string[];
+  } {
+    const patterns = [
+      /why\s+(?:is|are|does|do|would|might|should)/gi,
+      /how\s+(?:does|do|would|might|could|can)/gi,
+      /what\s+if/gi,
+      /what\s+causes/gi,
+      /what\s+would\s+happen\s+if/gi,
+      /explain\s+why/gi,
+      /can\s+you\s+explain/gi,
+    ];
+
+    let count = 0;
+    const examples: string[] = [];
+
+    patterns.forEach((pattern) => {
+      const matches = text.match(pattern) || [];
+      count += matches.length;
+      if (matches.length > 0 && matches[0]) {
+        examples.push(matches[0]);
+      }
+    });
+
+    return { count, examples: examples.slice(0, 3) };
+  }
+
+  // NEW: Detect Worked Examples (step-by-step demonstrations)
+  private static detectWorkedExamples(text: string): {
+    count: number;
+    examples: string[];
+  } {
+    const patterns = [
+      /(?:step\s+\d+|first|second|third|next|then|finally)/gi,
+      /(?:let's\s+)?work\s+through/gi,
+      /(?:for\s+)?example[:\s]+/gi,
+      /solution:/gi,
+      /procedure:/gi,
+    ];
+
+    // Look for sequences of step indicators
+    const stepSequences = text.match(
+      /(?:step\s+1|first).{50,500}(?:step\s+2|second|next)/gi
+    );
+    const workThroughs = text.match(/work\s+through[^.]{20,200}\./gi);
+    const exampleSolutions = text.match(/example[:\s]+[^.]{50,300}\./gi);
+
+    const count =
+      (stepSequences?.length || 0) +
+      (workThroughs?.length || 0) +
+      (exampleSolutions?.length || 0);
+
+    const examples: string[] = [];
+    if (stepSequences) examples.push("Multi-step procedure");
+    if (workThroughs) examples.push("Worked-through problem");
+    if (exampleSolutions) examples.push("Example with solution");
+
+    return { count, examples };
+  }
+
+  // NEW: Measure Explanation Depth (layers of explanation)
+  private static measureExplanationDepth(
+    text: string,
+    concepts: ConceptGraph
+  ): {
+    avgDepth: number;
+    depths: number[];
+  } {
+    const depths: number[] = [];
+
+    // For each core concept, measure explanation depth
+    concepts.hierarchy.core.forEach((concept) => {
+      let depth = 0;
+
+      // Level 1: Definition present
+      if (
+        new RegExp(
+          `${concept.name}\\s+(?:is|are|refers?\\s+to|means?)`,
+          "i"
+        ).test(text)
+      ) {
+        depth++;
+      }
+
+      // Level 2: Example provided
+      if (
+        new RegExp(
+          `(?:for\\s+example|such\\s+as|like|e\\.g\\.).*${concept.name}`,
+          "i"
+        ).test(text)
+      ) {
+        depth++;
+      }
+
+      // Level 3: Mechanism/process explained
+      if (
+        new RegExp(
+          `(?:how|why).*${concept.name}|${concept.name}.*(?:because|works\\s+by|occurs\\s+when)`,
+          "i"
+        ).test(text)
+      ) {
+        depth++;
+      }
+
+      // Level 4: Connection to other concepts
+      if (concept.relatedConcepts && concept.relatedConcepts.length > 0) {
+        depth++;
+      }
+
+      // Level 5: Application/real-world use
+      if (
+        new RegExp(
+          `(?:apply|use|real-world|practical).*${concept.name}`,
+          "i"
+        ).test(text)
+      ) {
+        depth++;
+      }
+
+      depths.push(depth);
+    });
+
+    const avgDepth =
+      depths.length > 0 ? depths.reduce((a, b) => a + b, 0) / depths.length : 0;
+
+    return { avgDepth, depths };
+  }
 }
 
 // ============================================================================
@@ -300,7 +702,100 @@ export class SpacedRepetitionEvaluator {
     const findings: Finding[] = [];
     const evidence: Evidence[] = [];
 
-    // Analyze concept mention patterns
+    // NEW: Optimal Spacing Interval Analysis
+    const spacingIntervals = this.calculateOptimalSpacingIntervals(
+      chapter,
+      concepts
+    );
+    evidence.push({
+      type: "metric",
+      metric: "optimal_spacing_alignment",
+      value: spacingIntervals.alignmentScore,
+      threshold: 0.6,
+      quality:
+        spacingIntervals.alignmentScore >= 0.6
+          ? "strong"
+          : spacingIntervals.alignmentScore >= 0.4
+          ? "moderate"
+          : "weak",
+    });
+
+    if (spacingIntervals.alignmentScore < 0.4) {
+      findings.push({
+        type: "critical",
+        message: `Poor spacing alignment (${(
+          spacingIntervals.alignmentScore * 100
+        ).toFixed(0)}%) - concepts not revisited at optimal intervals`,
+        severity: 0.85,
+        evidence: `Recommended: 1 day, 1 week, 1 month spacing. Found: ${spacingIntervals.actualPattern}`,
+      });
+    } else if (spacingIntervals.alignmentScore >= 0.7) {
+      findings.push({
+        type: "positive",
+        message: `✓ Excellent spacing: ${(
+          spacingIntervals.alignmentScore * 100
+        ).toFixed(0)}% alignment with optimal intervals`,
+        severity: 0,
+        evidence: `Concepts revisited at approximately: ${spacingIntervals.actualPattern}`,
+      });
+    }
+
+    // NEW: Forgetting Curve Analysis
+    const forgettingCurve = this.analyzeForgettingCurve(chapter, concepts);
+    evidence.push({
+      type: "metric",
+      metric: "forgetting_prevention_score",
+      value: forgettingCurve.preventionScore,
+      threshold: 0.65,
+      quality: forgettingCurve.preventionScore >= 0.65 ? "strong" : "moderate",
+    });
+
+    if (forgettingCurve.preventionScore < 0.5) {
+      findings.push({
+        type: "warning",
+        message:
+          "High forgetting risk - concepts not reinforced before memory decay",
+        severity: 0.75,
+        evidence: `${forgettingCurve.conceptsAtRisk} concepts likely forgotten before re-encountered`,
+      });
+    }
+
+    // NEW: Massed vs. Distributed Practice Detection
+    const practiceType = this.detectMassedVsDistributed(chapter, concepts);
+    evidence.push({
+      type: "metric",
+      metric: "distributed_practice_ratio",
+      value: practiceType.distributedRatio,
+      threshold: 0.7,
+      quality:
+        practiceType.distributedRatio >= 0.7
+          ? "strong"
+          : practiceType.distributedRatio >= 0.5
+          ? "moderate"
+          : "weak",
+    });
+
+    if (practiceType.distributedRatio < 0.5) {
+      findings.push({
+        type: "critical",
+        message: `Too much massed practice (${(
+          practiceType.massedRatio * 100
+        ).toFixed(0)}%) - cramming detected`,
+        severity: 0.8,
+        evidence: `${practiceType.massedSegments.length} segments show concept clustering without spacing`,
+      });
+    } else if (practiceType.distributedRatio >= 0.7) {
+      findings.push({
+        type: "positive",
+        message: `✓ Good distribution: ${(
+          practiceType.distributedRatio * 100
+        ).toFixed(0)}% of practice is spaced`,
+        severity: 0,
+        evidence: "Concepts spread throughout chapter rather than clustered",
+      });
+    }
+
+    // Analyze concept mention patterns (existing)
     const conceptMentionStats = this.analyzeConceptMentionPatterns(
       chapter,
       concepts
@@ -377,17 +872,66 @@ export class SpacedRepetitionEvaluator {
       });
     }
 
-    // Calculate score
-    let score = 50;
+    // Calculate score (enhanced with new metrics)
+    let score = 20; // Base score
+
+    // Optimal spacing intervals (0-25 points)
+    score += spacingIntervals.alignmentScore * 25;
+
+    // Forgetting curve prevention (0-20 points)
+    score += forgettingCurve.preventionScore * 20;
+
+    // Distributed vs massed practice (0-20 points)
+    score += practiceType.distributedRatio * 20;
+
+    // Original metrics (0-35 points)
     score +=
       conceptMentionStats.avgMentions >= 2 &&
       conceptMentionStats.avgMentions <= 5
-        ? 25
-        : 10;
+        ? 20
+        : 8;
     score += spacingAnalysis.evenSpacing ? 15 : 5;
     score = Math.min(score, 100);
 
     const suggestions: Suggestion[] = [];
+
+    if (spacingIntervals.alignmentScore < 0.4) {
+      suggestions.push({
+        id: "spaced-rep-0",
+        principle: "spacedRepetition",
+        priority: "high",
+        title: "Implement Optimal Spacing Intervals",
+        description:
+          "Revisit concepts at scientifically-validated intervals: ~1 day, ~1 week, ~1 month",
+        implementation:
+          "For each core concept: (1) Initial introduction, (2) Revisit after 300-500 words (minutes later), (3) Mid-chapter callback (days), (4) End-chapter summary (weeks)",
+        expectedImpact:
+          "Aligns with memory consolidation research - maximizes retention with minimal repetition",
+        relatedConcepts: concepts.hierarchy.core.map((c) => c.id),
+        examples: [
+          "Day 1: Introduce concept\nDay 2-3: Brief review question\nWeek 1: Apply in new context\nMonth 1: Synthesis problem",
+        ],
+      });
+    }
+
+    if (practiceType.distributedRatio < 0.5) {
+      suggestions.push({
+        id: "spaced-rep-0.5",
+        principle: "spacedRepetition",
+        priority: "high",
+        title: "Reduce Massed Practice",
+        description:
+          "Break up concept clusters - avoid presenting too much related content at once",
+        implementation: `Redistribute the ${practiceType.massedSegments.length} massed practice segments throughout the chapter with spacing between repetitions`,
+        expectedImpact:
+          "Distributed practice produces 2-3x better long-term retention than cramming",
+        relatedConcepts: practiceType.massedConcepts.slice(0, 5),
+        examples: [
+          "Instead of: A, A, A, B, B, B\nUse: A, B, A, B, A, B (interleaved + spaced)",
+        ],
+      });
+    }
+
     if (conceptMentionStats.avgMentions < 2) {
       suggestions.push({
         id: "spaced-rep-1",
@@ -481,6 +1025,184 @@ export class SpacedRepetitionEvaluator {
       unevenConcepts,
     };
   }
+
+  // NEW: Calculate Optimal Spacing Intervals
+  private static calculateOptimalSpacingIntervals(
+    _chapter: Chapter,
+    concepts: ConceptGraph
+  ): {
+    alignmentScore: number;
+    actualPattern: string;
+    optimalPattern: string;
+  } {
+    // Optimal spacing based on research: immediate, ~10min, ~1 day, ~1 week, ~1 month
+    // In text: characters represent time (rough proxy)
+    // Optimal gaps: 500 chars (minutes), 2000 chars (hours), 5000 chars (days)
+
+    const optimalGaps = [500, 2000, 5000]; // Short, medium, long
+    let totalAlignment = 0;
+    let conceptsAnalyzed = 0;
+
+    concepts.hierarchy.core.forEach((concept) => {
+      if (concept.mentions.length < 2) return;
+
+      const positions = concept.mentions
+        .map((m) => m.position)
+        .sort((a, b) => a - b);
+      const gaps: number[] = [];
+
+      for (let i = 1; i < positions.length; i++) {
+        gaps.push(positions[i] - positions[i - 1]);
+      }
+
+      // Score each gap against optimal ranges
+      gaps.forEach((gap) => {
+        let bestMatch = 0;
+        optimalGaps.forEach((optimalGap) => {
+          const ratio = Math.min(gap, optimalGap) / Math.max(gap, optimalGap);
+          bestMatch = Math.max(bestMatch, ratio);
+        });
+        totalAlignment += bestMatch;
+      });
+
+      conceptsAnalyzed += gaps.length;
+    });
+
+    const alignmentScore =
+      conceptsAnalyzed > 0 ? totalAlignment / conceptsAnalyzed : 0;
+    const avgActualGap =
+      conceptsAnalyzed > 0 ? (totalAlignment / conceptsAnalyzed) * 2500 : 0;
+
+    return {
+      alignmentScore,
+      actualPattern:
+        avgActualGap > 0
+          ? `~${Math.round(avgActualGap)} chars between revisits`
+          : "no pattern",
+      optimalPattern: "500 (min), 2000 (hours), 5000+ (days) chars",
+    };
+  }
+
+  // NEW: Analyze Forgetting Curve Alignment
+  private static analyzeForgettingCurve(
+    _chapter: Chapter,
+    concepts: ConceptGraph
+  ): {
+    preventionScore: number;
+    conceptsAtRisk: number;
+  } {
+    // Forgetting curve: ~50% forgotten after 1 day, ~70% after 1 week without review
+    // Estimate: concepts need revisit within ~3000 chars to prevent forgetting
+
+    const FORGETTING_THRESHOLD = 3000; // chars before significant forgetting
+    let conceptsAtRisk = 0;
+    let totalGaps = 0;
+    let safeGaps = 0;
+
+    concepts.hierarchy.core.forEach((concept) => {
+      if (concept.mentions.length < 2) {
+        conceptsAtRisk++;
+        return;
+      }
+
+      const positions = concept.mentions
+        .map((m) => m.position)
+        .sort((a, b) => a - b);
+
+      for (let i = 1; i < positions.length; i++) {
+        const gap = positions[i] - positions[i - 1];
+        totalGaps++;
+
+        if (gap <= FORGETTING_THRESHOLD) {
+          safeGaps++;
+        } else {
+          // Long gap = forgetting likely occurred
+          conceptsAtRisk++;
+        }
+      }
+    });
+
+    const preventionScore = totalGaps > 0 ? safeGaps / totalGaps : 0;
+
+    return {
+      preventionScore,
+      conceptsAtRisk,
+    };
+  }
+
+  // NEW: Detect Massed vs Distributed Practice
+  private static detectMassedVsDistributed(
+    _chapter: Chapter,
+    concepts: ConceptGraph
+  ): {
+    massedRatio: number;
+    distributedRatio: number;
+    massedSegments: Array<{ concept: string; length: number }>;
+    massedConcepts: string[];
+  } {
+    // Massed practice: 3+ mentions within 1000 characters
+    // Distributed practice: mentions spread > 1000 characters apart
+
+    const MASSED_THRESHOLD = 1000;
+    let massedCount = 0;
+    let distributedCount = 0;
+    const massedSegments: Array<{ concept: string; length: number }> = [];
+    const massedConcepts: string[] = [];
+
+    concepts.concepts.forEach((concept) => {
+      if (concept.mentions.length < 3) {
+        distributedCount += concept.mentions.length;
+        return;
+      }
+
+      const positions = concept.mentions
+        .map((m) => m.position)
+        .sort((a, b) => a - b);
+      let massedStreak = 1;
+
+      for (let i = 1; i < positions.length; i++) {
+        const gap = positions[i] - positions[i - 1];
+
+        if (gap <= MASSED_THRESHOLD) {
+          massedStreak++;
+        } else {
+          if (massedStreak >= 3) {
+            massedCount += massedStreak;
+            massedSegments.push({
+              concept: concept.name,
+              length: massedStreak,
+            });
+            massedConcepts.push(concept.name);
+          } else {
+            distributedCount += massedStreak;
+          }
+          massedStreak = 1;
+        }
+      }
+
+      // Handle final streak
+      if (massedStreak >= 3) {
+        massedCount += massedStreak;
+        massedSegments.push({ concept: concept.name, length: massedStreak });
+        if (!massedConcepts.includes(concept.name)) {
+          massedConcepts.push(concept.name);
+        }
+      } else {
+        distributedCount += massedStreak;
+      }
+    });
+
+    const total = massedCount + distributedCount;
+    const massedRatio = total > 0 ? massedCount / total : 0;
+    const distributedRatio = total > 0 ? distributedCount / total : 1;
+
+    return {
+      massedRatio,
+      distributedRatio,
+      massedSegments,
+      massedConcepts,
+    };
+  }
 }
 
 // ============================================================================
@@ -495,7 +1217,110 @@ export class RetrievalPracticeEvaluator {
     const findings: Finding[] = [];
     const evidence: Evidence[] = [];
 
-    // Check 1: Direct questions
+    // NEW: Classify Retrieval Types (Recognition vs Recall)
+    const retrievalTypes = this.classifyRetrievalTypes(chapter.content);
+    evidence.push({
+      type: "metric",
+      metric: "recall_vs_recognition_ratio",
+      value: retrievalTypes.recallRatio,
+      threshold: 0.6,
+      quality:
+        retrievalTypes.recallRatio >= 0.6
+          ? "strong"
+          : retrievalTypes.recallRatio >= 0.4
+          ? "moderate"
+          : "weak",
+    });
+
+    if (retrievalTypes.recallRatio < 0.4) {
+      findings.push({
+        type: "warning",
+        message: `Too many recognition tasks (${retrievalTypes.recognition}), not enough recall (${retrievalTypes.recall})`,
+        severity: 0.7,
+        evidence:
+          "Recall is 2-3x more effective than recognition for long-term retention",
+      });
+    } else if (retrievalTypes.recallRatio >= 0.6) {
+      findings.push({
+        type: "positive",
+        message: `✓ Good balance: ${retrievalTypes.recall} recall vs ${retrievalTypes.recognition} recognition tasks`,
+        severity: 0,
+        evidence: `${(retrievalTypes.recallRatio * 100).toFixed(
+          0
+        )}% recall-based retrieval promotes deeper encoding`,
+      });
+    }
+
+    // NEW: Measure Retrieval Strength by Difficulty
+    const retrievalStrength = this.assessRetrievalStrength(chapter.content);
+    evidence.push({
+      type: "metric",
+      metric: "retrieval_difficulty_score",
+      value: retrievalStrength.difficultyScore,
+      threshold: 0.5,
+      quality: retrievalStrength.difficultyScore >= 0.5 ? "strong" : "moderate",
+    });
+
+    if (retrievalStrength.difficultyScore < 0.3) {
+      findings.push({
+        type: "warning",
+        message: "Retrieval tasks too easy - insufficient desirable difficulty",
+        severity: 0.6,
+        evidence: `Only ${retrievalStrength.challengingQuestions} challenging questions found`,
+      });
+    }
+
+    // NEW: Detect Testing Effect Opportunities
+    const testingEffect = this.detectTestingEffectOpportunities(
+      chapter,
+      concepts
+    );
+    evidence.push({
+      type: "count",
+      metric: "testing_effect_opportunities",
+      value: testingEffect.count,
+      threshold: Math.max(3, chapter.sections.length),
+      quality:
+        testingEffect.count >= chapter.sections.length ? "strong" : "weak",
+    });
+
+    if (testingEffect.count < chapter.sections.length) {
+      findings.push({
+        type: "warning",
+        message: `Limited testing effect opportunities (${testingEffect.count} found, ${chapter.sections.length} recommended)`,
+        severity: 0.65,
+        evidence:
+          "Self-testing produces better retention than repeated studying",
+      });
+    } else {
+      findings.push({
+        type: "positive",
+        message: `✓ Excellent: ${testingEffect.count} testing opportunities throughout`,
+        severity: 0,
+        evidence: "Regular self-testing triggers the testing effect",
+      });
+    }
+
+    // NEW: Low-Stakes Testing Detection
+    const lowStakesTesting = this.detectLowStakesTesting(chapter.content);
+    evidence.push({
+      type: "count",
+      metric: "low_stakes_tests",
+      value: lowStakesTesting.count,
+      threshold: 2,
+      quality: lowStakesTesting.count >= 2 ? "strong" : "weak",
+    });
+
+    if (lowStakesTesting.count === 0) {
+      findings.push({
+        type: "warning",
+        message: "No low-stakes practice tests or self-checks",
+        severity: 0.7,
+        evidence: 'Add: "Check your understanding" or "Self-quiz" sections',
+      });
+    }
+
+    // Check 1: Direct questions (original)
     const directQuestions = this.countDirectQuestions(chapter.content);
     evidence.push({
       type: "count",
@@ -552,13 +1377,74 @@ export class RetrievalPracticeEvaluator {
       quality: applicationPrompts.count > 0 ? "moderate" : "weak",
     });
 
-    let score = 40;
-    score += directQuestions > 0 ? 30 : 0;
-    score += summaryPrompts.count > 0 ? 15 : 0;
-    score += applicationPrompts.count > 0 ? 15 : 0;
+    // Calculate score (enhanced with new metrics)
+    let score = 20; // Base score
+
+    // Recall vs recognition balance (0-20 points)
+    score += retrievalTypes.recallRatio * 20;
+
+    // Retrieval difficulty (0-15 points)
+    score += retrievalStrength.difficultyScore * 15;
+
+    // Testing effect opportunities (0-20 points)
+    const testingRatio =
+      testingEffect.count / Math.max(chapter.sections.length, 1);
+    score += Math.min(testingRatio, 1) * 20;
+
+    // Low-stakes testing (0-10 points)
+    score += Math.min(lowStakesTesting.count * 3, 10);
+
+    // Original metrics (0-35 points)
+    score += directQuestions > 0 ? 20 : 0;
+    score += summaryPrompts.count > 0 ? 8 : 0;
+    score += applicationPrompts.count > 0 ? 7 : 0;
     score = Math.min(score, 100);
 
     const suggestions: Suggestion[] = [];
+
+    if (retrievalTypes.recallRatio < 0.4) {
+      suggestions.push({
+        id: "retrieval-0",
+        principle: "retrievalPractice",
+        priority: "high",
+        title: "Shift from Recognition to Recall",
+        description:
+          "Replace multiple-choice with free recall questions - recall is 2-3x more effective",
+        implementation:
+          'Instead of "Which is correct: A, B, C?" use "Explain in your own words..." or "List the three main..."',
+        expectedImpact:
+          "Forces active memory reconstruction rather than passive recognition",
+        relatedConcepts: concepts.hierarchy.core.map((c) => c.id),
+        examples: [
+          "Recall: What are the key components? (vs. Which component: A, B, C?)",
+          "Recall: Explain how X works (vs. Is X true or false?)",
+          "Recall: Draw a diagram of Y from memory",
+        ],
+      });
+    }
+
+    if (testingEffect.count < chapter.sections.length) {
+      suggestions.push({
+        id: "retrieval-0.5",
+        principle: "retrievalPractice",
+        priority: "high",
+        title: "Add More Testing Opportunities",
+        description:
+          "Insert self-test checkpoints after each major section to trigger the testing effect",
+        implementation: `Add ${
+          chapter.sections.length - testingEffect.count
+        } more "Stop and Test Yourself" moments throughout the chapter`,
+        expectedImpact:
+          "The act of retrieval itself strengthens memory - testing is learning, not just assessment",
+        relatedConcepts: testingEffect.missingConcepts.slice(0, 5),
+        examples: [
+          "Quick Check: Without looking back, list the three principles we just covered",
+          "Self-Test: Explain the difference between X and Y from memory",
+          "Practice Recall: What real-world example illustrates this concept?",
+        ],
+      });
+    }
+
     if (directQuestions === 0) {
       suggestions.push({
         id: "retrieval-1",
@@ -639,6 +1525,169 @@ export class RetrievalPracticeEvaluator {
 
     return { count };
   }
+
+  // NEW: Classify Retrieval Types (Recognition vs Recall)
+  private static classifyRetrievalTypes(text: string): {
+    recognition: number;
+    recall: number;
+    recallRatio: number;
+  } {
+    // Recognition patterns (multiple choice, true/false, matching)
+    const recognitionPatterns = [
+      /(?:a\)|b\)|c\)|d\))/gi, // Multiple choice options
+      /true\s+or\s+false/gi,
+      /match\s+the\s+following/gi,
+      /which\s+of\s+the\s+following/gi,
+      /select\s+(?:the|all)/gi,
+    ];
+
+    // Recall patterns (free response, explain, describe)
+    const recallPatterns = [
+      /explain\s+(?:why|how|what)/gi,
+      /describe\s+(?:the|how)/gi,
+      /what\s+(?:are|is)\s+(?:the)?(?!.*(?:a\)|b\)|c\)))/gi, // What is... but not multiple choice
+      /list\s+the/gi,
+      /define/gi,
+      /in\s+your\s+own\s+words/gi,
+    ];
+
+    const recognition = recognitionPatterns.reduce(
+      (sum, p) => sum + (text.match(p) || []).length,
+      0
+    );
+    const recall = recallPatterns.reduce(
+      (sum, p) => sum + (text.match(p) || []).length,
+      0
+    );
+    const total = recognition + recall;
+    const recallRatio = total > 0 ? recall / total : 0;
+
+    return { recognition, recall, recallRatio };
+  }
+
+  // NEW: Assess Retrieval Strength by Difficulty
+  private static assessRetrievalStrength(text: string): {
+    difficultyScore: number;
+    challengingQuestions: number;
+  } {
+    // Easy retrieval (direct, single fact)
+    const easyPatterns = [
+      /what\s+is\s+the\s+definition/gi,
+      /true\s+or\s+false/gi,
+    ];
+
+    // Moderate retrieval (application, relationships)
+    const moderatePatterns = [
+      /how\s+does/gi,
+      /explain\s+the\s+relationship/gi,
+      /compare/gi,
+    ];
+
+    // Challenging retrieval (synthesis, evaluation, creation)
+    const challengingPatterns = [
+      /why\s+would/gi,
+      /design\s+a/gi,
+      /evaluate/gi,
+      /what\s+if/gi,
+      /predict/gi,
+    ];
+
+    const easy = easyPatterns.reduce(
+      (sum, p) => sum + (text.match(p) || []).length,
+      0
+    );
+    const moderate = moderatePatterns.reduce(
+      (sum, p) => sum + (text.match(p) || []).length,
+      0
+    );
+    const challenging = challengingPatterns.reduce(
+      (sum, p) => sum + (text.match(p) || []).length,
+      0
+    );
+
+    const total = easy + moderate + challenging;
+    // Weight: easy=0.2, moderate=0.5, challenging=1.0
+    const difficultyScore =
+      total > 0 ? (easy * 0.2 + moderate * 0.5 + challenging * 1.0) / total : 0;
+
+    return { difficultyScore, challengingQuestions: challenging };
+  }
+
+  // NEW: Detect Testing Effect Opportunities
+  private static detectTestingEffectOpportunities(
+    chapter: Chapter,
+    concepts: ConceptGraph
+  ): {
+    count: number;
+    missingConcepts: string[];
+  } {
+    // Testing effect: retrieval attempts after learning
+    // Look for self-test prompts, practice problems, review questions
+    const testingPatterns = [
+      /(?:self-)?test\s+yourself/gi,
+      /practice\s+(?:question|problem)/gi,
+      /check\s+your\s+understanding/gi,
+      /review\s+question/gi,
+      /quiz/gi,
+    ];
+
+    let count = testingPatterns.reduce(
+      (sum, p) => sum + (chapter.content.match(p) || []).length,
+      0
+    );
+
+    // Also count sections with questions
+    chapter.sections.forEach((section) => {
+      const questionCount = (section.content.match(/\?/g) || []).length;
+      if (questionCount >= 2) {
+        count++;
+      }
+    });
+
+    // Identify concepts without testing opportunities
+    const missingConcepts = concepts.hierarchy.core
+      .filter((concept) => {
+        const conceptPattern = new RegExp(concept.name, "i");
+        return !testingPatterns.some((p) => {
+          const testSections =
+            chapter.content.match(
+              new RegExp(`.{0,200}${p.source}.{0,200}`, "gi")
+            ) || [];
+          return testSections.some((section) => conceptPattern.test(section));
+        });
+      })
+      .map((c) => c.name);
+
+    return { count, missingConcepts };
+  }
+
+  // NEW: Detect Low-Stakes Testing
+  private static detectLowStakesTesting(text: string): {
+    count: number;
+    examples: string[];
+  } {
+    // Low-stakes = practice without consequences, formative assessment
+    const patterns = [
+      /practice\s+(?:quiz|test|problem)/gi,
+      /self-(?:check|quiz|test|assessment)/gi,
+      /formative\s+assessment/gi,
+      /(?:not\s+graded|no\s+grade|for\s+practice)/gi,
+      /check\s+your\s+(?:understanding|knowledge)/gi,
+    ];
+
+    let count = 0;
+    const examples: string[] = [];
+
+    patterns.forEach((pattern) => {
+      const matches = text.match(pattern) || [];
+      count += matches.length;
+      if (matches.length > 0 && matches[0]) {
+        examples.push(matches[0]);
+      }
+    });
+
+    return { count, examples: examples.slice(0, 3) };
+  }
 }
 
 // ============================================================================
@@ -647,7 +1696,7 @@ export class RetrievalPracticeEvaluator {
 
 export class InterleavingEvaluator {
   static evaluate(
-    _chapter: Chapter,
+    chapter: Chapter,
     concepts: ConceptGraph
   ): PrincipleEvaluation {
     const sequence = concepts.sequence;
@@ -661,6 +1710,48 @@ export class InterleavingEvaluator {
 
     const findings: Finding[] = [];
     const evidence: Evidence[] = [];
+
+    // NEW: Interleaving Density by Section
+    const interleavingDensity = this.calculateInterleavingDensity(
+      chapter,
+      concepts
+    );
+    evidence.push({
+      type: "metric",
+      metric: "interleaving_density_score",
+      value: interleavingDensity.densityScore,
+      threshold: 0.6,
+      quality:
+        interleavingDensity.densityScore >= 0.6
+          ? "strong"
+          : interleavingDensity.densityScore >= 0.4
+          ? "moderate"
+          : "weak",
+    });
+
+    // NEW: Discrimination Practice Opportunities
+    const discriminationPractice = this.detectDiscriminationPractice(
+      chapter.content,
+      concepts
+    );
+    evidence.push({
+      type: "count",
+      metric: "discrimination_opportunities",
+      value: discriminationPractice.count,
+      threshold: Math.max(3, Math.ceil(concepts.hierarchy.core.length / 3)),
+      quality: discriminationPractice.count >= 3 ? "strong" : "weak",
+    });
+
+    if (discriminationPractice.count === 0) {
+      findings.push({
+        type: "warning",
+        message:
+          "No discrimination practice detected - learners may confuse similar concepts",
+        severity: 0.7,
+        evidence:
+          "Comparing/contrasting similar concepts strengthens discrimination ability",
+      });
+    }
 
     evidence.push({
       type: "metric",
@@ -690,19 +1781,40 @@ export class InterleavingEvaluator {
         message: "✓ Excellent interleaving: Topics well-mixed",
         severity: 0,
         evidence: `Topics switch every ${(
-          totalPositions / blockingSegments.length
+          totalPositions / Math.max(blockingSegments.length, 1)
         ).toFixed(1)} concepts`,
       });
     }
 
-    let score = 50 + (1 - blockingRatio) * 50;
+    // Enhanced score calculation
+    let score = 30; // Base
+    score += (1 - blockingRatio) * 35; // Blocking ratio (0-35)
+    score += interleavingDensity.densityScore * 20; // Density (0-20)
+    score += Math.min(discriminationPractice.count * 3, 15); // Discrimination (0-15)
+
+    const suggestions: any[] = [];
+    if (blockingRatio > 0.6) {
+      suggestions.push({
+        id: "interleaving-1",
+        principle: "interleaving",
+        priority: "high",
+        title: "Reduce Blocking - Mix Topics",
+        description:
+          "Break up blocked content segments and interleave different concepts",
+        implementation: `Redistribute ${blockingSegments.length} blocked segments throughout chapter`,
+        expectedImpact:
+          "Interleaving produces 40-50% better long-term retention than blocking",
+        relatedConcepts: blockingSegments.map((s) => s.topic).slice(0, 5),
+        examples: ["Instead of: AAA BBB CCC, Use: ABC ABC ABC"],
+      });
+    }
 
     return {
       principle: "interleaving",
       score: Math.min(score, 100),
       weight: 0.85,
       findings,
-      suggestions: [],
+      suggestions,
       evidence,
     };
   }
@@ -732,6 +1844,86 @@ export class InterleavingEvaluator {
     }
 
     return segments;
+  }
+
+  // NEW: Calculate Interleaving Density
+  private static calculateInterleavingDensity(
+    chapter: Chapter,
+    concepts: ConceptGraph
+  ): {
+    densityScore: number;
+    sectionScores: number[];
+  } {
+    const sectionScores: number[] = [];
+
+    chapter.sections.forEach((section) => {
+      const sectionConcepts = new Set<string>();
+      const sectionStart = chapter.content.indexOf(section.content);
+      const sectionEnd = sectionStart + section.content.length;
+
+      concepts.concepts.forEach((concept) => {
+        concept.mentions.forEach((mention) => {
+          if (
+            mention.position >= sectionStart &&
+            mention.position < sectionEnd
+          ) {
+            sectionConcepts.add(concept.name);
+          }
+        });
+      });
+
+      // Score based on concept diversity in section
+      const diversityScore =
+        sectionConcepts.size >= 3 ? 1 : sectionConcepts.size / 3;
+      sectionScores.push(diversityScore);
+    });
+
+    const densityScore =
+      sectionScores.length > 0
+        ? sectionScores.reduce((a, b) => a + b, 0) / sectionScores.length
+        : 0;
+
+    return { densityScore, sectionScores };
+  }
+
+  // NEW: Detect Discrimination Practice
+  private static detectDiscriminationPractice(
+    text: string,
+    concepts: ConceptGraph
+  ): {
+    count: number;
+    examples: string[];
+  } {
+    const patterns = [
+      /(?:compare|contrast)\s+(?:and\s+contrast\s+)?/gi,
+      /(?:difference|distinguish)\s+between/gi,
+      /(?:similar|different)\s+(?:to|from)/gi,
+      /(?:unlike|whereas|however)/gi,
+    ];
+
+    let count = 0;
+    const examples: string[] = [];
+
+    patterns.forEach((pattern) => {
+      const matches = text.match(pattern) || [];
+      count += matches.length;
+    });
+
+    // Check if core concepts are compared
+    const coreConcepts = concepts.hierarchy.core.map((c) => c.name);
+    for (let i = 0; i < coreConcepts.length - 1; i++) {
+      for (let j = i + 1; j < coreConcepts.length; j++) {
+        const regex = new RegExp(
+          `${coreConcepts[i]}.{0,100}(?:vs|versus|and|compared to).{0,100}${coreConcepts[j]}`,
+          "i"
+        );
+        if (regex.test(text)) {
+          examples.push(`${coreConcepts[i]} vs ${coreConcepts[j]}`);
+        }
+      }
+    }
+
+    return { count, examples: examples.slice(0, 3) };
   }
 }
 

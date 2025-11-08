@@ -1,10 +1,9 @@
 /**
  * Concept Extraction Engine
- * Identifies key concepts from chapter text using:
- * - NLP pattern matching
- * - Semantic analysis
- * - Structural signals (headings, emphasis)
- * - Frequency and TF-IDF analysis
+ * Identifies key concepts from chapter text using domain-specific libraries
+ * - Library-based matching for chemistry, literature, physics, etc.
+ * - Cross-domain concept frameworks (logic, systems, methodology)
+ * - Custom user-added concepts
  */
 
 import {
@@ -16,22 +15,42 @@ import {
 } from "../../types";
 
 import {
-  createConceptLookup,
-  isChemistryConcept,
-  getConceptDefinition,
-  type ConceptDefinition,
-} from "../data/chemistryConceptLibrary";
+  Domain,
+  ConceptLibrary,
+  ConceptDefinition,
+  getLibraryByDomain,
+} from "../data/conceptLibraryRegistry";
 
 // ============================================================================
-// CONCEPT EXTRACTOR
+// LIBRARY-BASED CONCEPT EXTRACTOR
 // ============================================================================
 
 export class ConceptExtractor {
-  // Concept library lookup for matching known concepts
-  private conceptLibrary: Map<string, ConceptDefinition>;
+  private domain: Domain;
+  private includeCrossDomain: boolean;
+  private customConcepts: ConceptDefinition[];
+  private conceptLibrary: ConceptDefinition[];
 
-  constructor() {
-    this.conceptLibrary = createConceptLookup();
+  constructor(
+    domain: Domain = "chemistry",
+    includeCrossDomain: boolean = true,
+    customConcepts: ConceptDefinition[] = []
+  ) {
+    this.domain = domain;
+    this.includeCrossDomain = includeCrossDomain;
+    this.customConcepts = customConcepts;
+
+    // Load library concepts
+    const domainLib = getLibraryByDomain(domain);
+    const crossDomainLib = includeCrossDomain
+      ? getLibraryByDomain("cross-domain")
+      : null;
+
+    this.conceptLibrary = [
+      ...(domainLib?.concepts || []),
+      ...(crossDomainLib?.concepts || []),
+      ...customConcepts,
+    ];
   }
 
   // Comprehensive stopword list - common English words that aren't domain concepts
@@ -1263,6 +1282,84 @@ export class ConceptExtractor {
       "best",
       "worse",
       "worst",
+      // Generic descriptive adjectives (NOT concepts)
+      "popular",
+      "common",
+      "rare",
+      "frequent",
+      "unusual",
+      "normal",
+      "typical",
+      "standard",
+      "regular",
+      "ordinary",
+      "special",
+      "unique",
+      "general",
+      "specific",
+      "particular",
+      "certain",
+      "various",
+      "different",
+      "similar",
+      "same",
+      "other",
+      "another",
+      "such",
+      "own",
+      "several",
+      "few",
+      "many",
+      "much",
+      "little",
+      "large",
+      "small",
+      "big",
+      "tiny",
+      "huge",
+      "great",
+      "long",
+      "short",
+      "high",
+      "low",
+      "deep",
+      "shallow",
+      "wide",
+      "narrow",
+      "thick",
+      "thin",
+      "heavy",
+      "light",
+      "strong",
+      "weak",
+      "hard",
+      "soft",
+      "rough",
+      "smooth",
+      "hot",
+      "cold",
+      "warm",
+      "cool",
+      "wet",
+      "dry",
+      "clean",
+      "dirty",
+      "full",
+      "empty",
+      "open",
+      "closed",
+      "complete",
+      "incomplete",
+      "whole",
+      "partial",
+      "total",
+      "entire",
+      "perfect",
+      "imperfect",
+      "pure",
+      "mixed",
+      "simple",
+      "complicated",
       // Evaluative terms (not conceptual groupings)
       "right",
       "wrong",

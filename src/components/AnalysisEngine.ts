@@ -32,7 +32,9 @@ import {
   EmotionAndRelevanceEvaluator,
 } from "../../LearningPrincipleEvaluators";
 
-import { ConceptExtractor } from "./ConceptExtractor";
+import { ConceptExtractor } from "./ConceptExtractorLibrary";
+import type { Domain } from "@/data/conceptLibraryRegistry";
+import type { ConceptDefinition } from "@/data/conceptLibraryRegistry";
 
 // Human-friendly labels for principle codes used in visualization summaries
 const PRINCIPLE_LABELS: Record<string, string> = {
@@ -54,7 +56,10 @@ export class AnalysisEngine {
    */
   static async analyzeChapter(
     chapter: Chapter,
-    onProgress?: (step: string, detail?: string) => void
+    onProgress?: (step: string, detail?: string) => void,
+    domain: Domain = "chemistry",
+    includeCrossDomain: boolean = true,
+    customConcepts: ConceptDefinition[] = []
   ): Promise<ChapterAnalysis> {
     try {
       onProgress?.("extracting-concepts", "Analyzing chapter structure");
@@ -62,12 +67,18 @@ export class AnalysisEngine {
       // Allow UI to update
       await new Promise((resolve) => setTimeout(resolve, 200));
 
-      console.log("[AnalysisEngine] Starting concept extraction...");
+      console.log(
+        "[AnalysisEngine] Starting concept extraction with domain:",
+        domain
+      );
       // Extract concepts and build graph with progress reporting
       const conceptGraph = await ConceptExtractor.extractConceptsFromChapter(
         chapter.content,
         chapter.sections,
-        onProgress
+        onProgress,
+        domain,
+        includeCrossDomain,
+        customConcepts
       );
       console.log(
         "[AnalysisEngine] Concept extraction complete, found",
