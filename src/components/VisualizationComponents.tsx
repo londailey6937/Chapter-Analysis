@@ -46,6 +46,158 @@ const PRINCIPLE_NAME_MAP: Record<string, string> = {
 };
 
 // ============================================================================
+// CHAPTER OVERVIEW TIMELINE
+// ============================================================================
+
+export const ChapterOverviewTimeline: React.FC<{
+  analysis: ChapterAnalysis;
+}> = ({ analysis }) => {
+  const sections = analysis.visualizations.cognitiveLoadCurve || [];
+  const blockingSegments =
+    analysis.visualizations.interleavingPattern.blockingSegments || [];
+
+  // Build section issue severity map
+  const sectionIssues: Record<
+    string,
+    { load: number; hasBlocking: boolean; sectionName: string }
+  > = {};
+
+  sections.forEach((sec: any) => {
+    sectionIssues[sec.sectionId] = {
+      load: sec.load,
+      hasBlocking: false,
+      sectionName: sec.heading || sec.sectionId,
+    };
+  });
+
+  // Mark sections with blocking issues
+  blockingSegments.forEach((block: any) => {
+    if (block.sectionId && sectionIssues[block.sectionId]) {
+      sectionIssues[block.sectionId].hasBlocking = true;
+    }
+  });
+
+  // Determine color for each section based on issues
+  const getSectionColor = (load: number, hasBlocking: boolean): string => {
+    if (load > 0.8 || hasBlocking) return "var(--danger-600)"; // red: high load or blocking
+    if (load > 0.6) return "var(--warn-600)"; // amber: moderate load
+    return "var(--success-600)"; // green: good
+  };
+
+  const getSectionLabel = (load: number, hasBlocking: boolean): string => {
+    if (load > 0.8 && hasBlocking) return "High load + blocking";
+    if (load > 0.8) return "High cognitive load";
+    if (hasBlocking) return "Blocking detected";
+    if (load > 0.6) return "Moderate load";
+    return "Well-balanced";
+  };
+
+  if (sections.length === 0) return null;
+
+  return (
+    <div className="viz-container chapter-timeline">
+      <h3>Chapter Structure Overview</h3>
+      <p className="viz-subtitle">
+        Color-coded sections show where improvements are needed
+      </p>
+      <div className="timeline-bar">
+        {sections.map((sec: any, idx: number) => {
+          const issue = sectionIssues[sec.sectionId] || {
+            load: 0,
+            hasBlocking: false,
+            sectionName: sec.heading,
+          };
+          const color = getSectionColor(issue.load, issue.hasBlocking);
+          const label = getSectionLabel(issue.load, issue.hasBlocking);
+          const width = `${100 / sections.length}%`;
+
+          return (
+            <div
+              key={sec.sectionId || idx}
+              className="timeline-section"
+              style={{ width, backgroundColor: color }}
+              title={`${issue.sectionName}: ${label}`}
+            >
+              <span className="section-index">{idx + 1}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="timeline-legend">
+        <div className="legend-item">
+          <span
+            className="legend-dot"
+            style={{ backgroundColor: "var(--success-600)" }}
+          />
+          Well-balanced
+        </div>
+        <div className="legend-item">
+          <span
+            className="legend-dot"
+            style={{ backgroundColor: "var(--warn-600)" }}
+          />
+          Moderate load
+        </div>
+        <div className="legend-item">
+          <span
+            className="legend-dot"
+            style={{ backgroundColor: "var(--danger-600)" }}
+          />
+          High load or blocking
+        </div>
+      </div>
+      <style>{`
+        .chapter-timeline {
+          margin-bottom: 24px;
+        }
+        .timeline-bar {
+          display: flex;
+          height: 40px;
+          border-radius: 6px;
+          overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+          margin: 16px 0;
+        }
+        .timeline-section {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-right: 1px solid rgba(255,255,255,0.3);
+          transition: all 0.2s ease;
+          cursor: pointer;
+          position: relative;
+        }
+        .timeline-section:hover {
+          filter: brightness(0.85);
+          transform: scaleY(1.15);
+          z-index: 1;
+        }
+        .section-index {
+          color: white;
+          font-size: 11px;
+          font-weight: 600;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        .timeline-legend {
+          display: flex;
+          gap: 20px;
+          flex-wrap: wrap;
+          font-size: 12px;
+          margin-top: 10px;
+        }
+        .legend-dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          display: inline-block;
+          margin-right: 6px;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+// ============================================================================
 // PRINCIPLE SCORES RADAR CHART
 // ============================================================================
 
@@ -206,13 +358,18 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
           const maxLoad = Math.max(...data.map((d) => d.load));
           const avgLoad =
             data.reduce((sum, d) => sum + d.load, 0) / data.length;
+          const peakSection = data.find((d) => d.load === maxLoad);
           return (
             <div className="recommendation-block">
               <strong>Recommendation:</strong>{" "}
               {maxLoad > 80
-                ? `Peak load at ${maxLoad}%—consider breaking dense sections into smaller chunks or adding examples.`
+                ? `Peak load at ${maxLoad}% in "${
+                    peakSection?.section || "a section"
+                  }"—consider breaking dense sections into smaller chunks or adding examples.`
                 : maxLoad > 60
-                ? `Load is manageable but watch sections above 60%—add scaffolding or worked examples if needed.`
+                ? `Load is manageable but watch sections above 60%${
+                    peakSection ? ` (e.g., "${peakSection.section}")` : ""
+                  }—add scaffolding or worked examples if needed.`
                 : `Well-balanced cognitive load; maintain this pacing and concept density.`}
             </div>
           );
@@ -558,10 +715,26 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
   // Group blocking segments by concept to avoid listing multiple separate runs of same concept without context
   const blockingGroups = Object.values(
     blockingSegments.reduce(
-      (acc: Record<string, { conceptId: string; lengths: number[] }>, seg) => {
+      (
+        acc: Record<
+          string,
+          { conceptId: string; lengths: number[]; sections: string[] }
+        >,
+        seg: any
+      ) => {
         if (!acc[seg.conceptId])
-          acc[seg.conceptId] = { conceptId: seg.conceptId, lengths: [] };
+          acc[seg.conceptId] = {
+            conceptId: seg.conceptId,
+            lengths: [],
+            sections: [],
+          };
         acc[seg.conceptId].lengths.push(seg.length);
+        if (
+          seg.sectionHeading &&
+          !acc[seg.conceptId].sections.includes(seg.sectionHeading)
+        ) {
+          acc[seg.conceptId].sections.push(seg.sectionHeading);
+        }
         return acc;
       },
       {}
@@ -571,6 +744,7 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
     longest: Math.max(...g.lengths),
     occurrences: g.lengths.length,
     lengths: g.lengths.sort((a, b) => b - a),
+    sections: g.sections,
   }));
   const worstBlocks = blockingGroups
     .sort((a, b) => b.longest - a.longest)
@@ -675,8 +849,17 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
                       } blocking segments (runs: ${group.lengths
                         .slice(0, 3)
                         .join(", ")}${group.lengths.length > 3 ? ", …" : ""})`}
-                    — break these up with contrasting concepts or brief
-                    application prompts.
+                    {group.sections && group.sections.length > 0 && (
+                      <div className="blocking-location">
+                        📍 Found in: {group.sections.slice(0, 2).join(", ")}
+                        {group.sections.length > 2 &&
+                          ` (+${group.sections.length - 2} more)`}
+                      </div>
+                    )}
+                    <div className="blocking-suggestion">
+                      Break these up with contrasting concepts or brief
+                      application prompts.
+                    </div>
                   </div>
                 </div>
               );
@@ -802,6 +985,20 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
         .blocking-detail {
           font-size: 13px;
           color: var(--text-muted);
+        }
+        .blocking-location {
+          margin-top: 6px;
+          padding: 4px 8px;
+          background: rgba(14, 165, 233, 0.1);
+          border-radius: 4px;
+          font-size: 12px;
+          color: var(--brand-accent);
+          display: inline-block;
+        }
+        .blocking-suggestion {
+          margin-top: 6px;
+          font-style: italic;
+          color: var(--text-subtle);
         }
         .transitions-list {
           display: flex;
@@ -1263,6 +1460,8 @@ export const ChapterAnalysisDashboard: React.FC<{
         </div>
       </div>
 
+      <ChapterOverviewTimeline analysis={safeAnalysis} />
+
       <div className="viz-grid">
         <PrincipleScoresRadar analysis={safeAnalysis} />
         <CognitiveLoadCurve analysis={safeAnalysis} />
@@ -1445,6 +1644,7 @@ export const ChapterAnalysisDashboard: React.FC<{
 };
 
 export default {
+  ChapterOverviewTimeline,
   PrincipleScoresRadar,
   CognitiveLoadCurve,
   ConceptMentionFrequency,

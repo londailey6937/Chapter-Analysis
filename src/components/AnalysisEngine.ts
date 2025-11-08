@@ -16,6 +16,7 @@ import type {
   StructureAnalysisResult,
   ReviewPattern,
   ReviewScheduleData,
+  Section,
 } from "../types";
 
 import {
@@ -585,6 +586,13 @@ export class AnalysisEngine {
         mentionEvents.push({ conceptId: c.id, position: m.position });
       }
     }
+
+    // Helper: map position to section
+    const findSectionForPosition = (pos: number): Section | undefined => {
+      return chapter.sections.find(
+        (s) => pos >= s.startPosition && pos <= s.endPosition
+      );
+    };
     mentionEvents.sort((a, b) => a.position - b.position);
     const totalMentions = mentionEvents.length;
     if (totalMentions === 0) {
@@ -652,13 +660,18 @@ export class AnalysisEngine {
     }
     return {
       conceptSequence: sequence,
-      blockingSegments: blockingBlocks.map((b) => ({
-        startPosition: b.startPosition,
-        endPosition: b.endPosition,
-        conceptId: b.conceptId,
-        length: b.length,
-        issue: "blocking",
-      })),
+      blockingSegments: blockingBlocks.map((b) => {
+        const section = findSectionForPosition(b.startPosition);
+        return {
+          startPosition: b.startPosition,
+          endPosition: b.endPosition,
+          conceptId: b.conceptId,
+          length: b.length,
+          issue: "blocking",
+          sectionId: section?.id,
+          sectionHeading: section?.heading,
+        };
+      }),
       blockingRatio,
       topicSwitches,
       avgBlockSize,
