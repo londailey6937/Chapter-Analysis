@@ -28,6 +28,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
   const [scale, setScale] = useState(1.5);
   const [error, setError] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const pageOffsetsRef = useRef<number[] | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -54,6 +55,15 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
               .trim();
             pageTexts.push(text);
           }
+          // Build cumulative page start offsets for jump-to-position mapping
+          const offsets: number[] = [];
+          let sum = 0;
+          for (let i = 0; i < pageTexts.length; i++) {
+            offsets.push(sum);
+            // account for the two newlines we insert between pages in join
+            sum += pageTexts[i].length + (i < pageTexts.length - 1 ? 2 : 0);
+          }
+          pageOffsetsRef.current = offsets;
           onTextExtracted(pageTexts.join("\n\n"));
         }
       } catch (err) {
@@ -74,6 +84,39 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
       pdf?.destroy?.();
     };
   }, [fileBuffer, onTextExtracted]);
+
+  // Listen for jump-to-position events from overview/timeline and scroll to page
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent;
+      const pos = ce.detail?.position as number | undefined;
+      if (typeof pos !== "number") return;
+      const offsets = pageOffsetsRef.current;
+      if (!offsets || offsets.length === 0) return;
+      // find the page index whose start offset is <= pos and next start > pos
+      let pageIdx = 0;
+      for (let i = 0; i < offsets.length; i++) {
+        if (offsets[i] <= pos) pageIdx = i;
+        else break;
+      }
+      const pageNum = pageIdx + 1;
+      const container = containerRef.current;
+      if (!container) return;
+      const pageEl = container.querySelector(
+        `[data-pdf-page="${pageNum}"]`
+      ) as HTMLElement | null;
+      if (pageEl) {
+        pageEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        // flash highlight
+        pageEl.classList.add("flash-highlight");
+        setTimeout(() => pageEl.classList.remove("flash-highlight"), 1500);
+      }
+    };
+    window.addEventListener("jump-to-position", handler as EventListener);
+    return () => {
+      window.removeEventListener("jump-to-position", handler as EventListener);
+    };
+  }, []);
 
   return (
     <div className="pdf-viewer" ref={containerRef}>
@@ -134,6 +177,10 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
           align-items: center;
           gap: 20px;
         }
+        .flash-highlight {
+          outline: 3px solid #0ea5e9;
+          transition: outline-color 1s ease;
+        }
       `}</style>
     </div>
   );
@@ -188,7 +235,7 @@ const PdfPage: React.FC<PdfPageProps> = ({ pdf, pageNum, scale }) => {
   }, [pdf, pageNum, scale]);
 
   return (
-    <div className="pdf-page-container">
+    <div className="pdf-page-container" data-pdf-page={pageNum}>
       {isLoading && (
         <div className="page-loading">Loading page {pageNum}...</div>
       )}

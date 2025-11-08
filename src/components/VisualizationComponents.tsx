@@ -117,6 +117,15 @@ export const ChapterOverviewTimeline: React.FC<{
               className="timeline-section"
               style={{ width, backgroundColor: color }}
               title={`${issue.sectionName}: ${label}`}
+              onClick={() => {
+                const pos =
+                  (sec as any).position ?? (sec as any).startPosition ?? 0;
+                window.dispatchEvent(
+                  new CustomEvent("jump-to-position", {
+                    detail: { position: pos },
+                  })
+                );
+              }}
             >
               <span className="section-index">{idx + 1}</span>
             </div>
