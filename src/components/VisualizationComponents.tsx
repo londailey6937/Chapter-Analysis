@@ -46,6 +46,7 @@ export const ChapterOverviewTimeline: React.FC<{
   analysis: ChapterAnalysis;
 }> = ({ analysis }) => {
   const sections = analysis.visualizations.cognitiveLoadCurve || [];
+  const [zoom, setZoom] = useState(1);
   const blockingSegments =
     analysis.visualizations.interleavingPattern.blockingSegments || [];
 
@@ -87,48 +88,94 @@ export const ChapterOverviewTimeline: React.FC<{
 
   if (sections.length === 0) return null;
 
+  const isScrollable = sections.length > 60;
+  const baseWidth = 26;
+  const perWidth = Math.max(8, Math.min(60, Math.round(baseWidth * zoom)));
+
   return (
     <div className="viz-container chapter-timeline">
       <h3>Chapter Structure Overview</h3>
       <p className="viz-subtitle">
         Color-coded sections show where improvements are needed
       </p>
-      <div className="timeline-bar">
-        {sections.map((sec: any, idx: number) => {
-          const issue = sectionIssues[sec.sectionId] || {
-            load: 0,
-            hasBlocking: false,
-            sectionName: sec.heading,
-          };
-          const color = getSectionColor(issue.load, issue.hasBlocking);
-          const label = getSectionLabel(issue.load, issue.hasBlocking);
-          const width = `${100 / sections.length}%`;
-
-          return (
-            <div
-              key={sec.sectionId || idx}
-              className="timeline-section"
-              style={{ width, backgroundColor: color }}
-              title={`${issue.sectionName}: ${label}`}
-              onClick={() => {
-                const pos =
-                  (sec as any).position ?? (sec as any).startPosition ?? 0;
-                window.dispatchEvent(
-                  new CustomEvent("jump-to-position", {
-                    detail: {
-                      position: pos,
-                      heading: issue.sectionName,
-                      sectionIndex: idx,
-                      sectionId: sec.sectionId,
-                    },
-                  })
-                );
-              }}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
+      <div className={`timeline-bar ${isScrollable ? "scrollable" : ""}`}>
+        {isScrollable ? (
+          <div
+            className="timeline-track"
+            style={{ width: `${sections.length * perWidth}px` }}
+          >
+            {sections.map((sec: any, idx: number) => {
+              const issue = sectionIssues[sec.sectionId] || {
+                load: 0,
+                hasBlocking: false,
+                sectionName: sec.heading,
+              };
+              const color = getSectionColor(issue.load, issue.hasBlocking);
+              const label = getSectionLabel(issue.load, issue.hasBlocking);
+              return (
+                <div
+                  key={sec.sectionId || idx}
+                  className="timeline-section"
+                  style={{ width: `${perWidth}px`, backgroundColor: color }}
+                  title={`${issue.sectionName}: ${label}`}
+                  onClick={() => {
+                    const pos =
+                      (sec as any).position ?? (sec as any).startPosition ?? 0;
+                    window.dispatchEvent(
+                      new CustomEvent("jump-to-position", {
+                        detail: {
+                          position: pos,
+                          heading: issue.sectionName,
+                          sectionIndex: idx,
+                          sectionId: sec.sectionId,
+                        },
+                      })
+                    );
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      const pos =
+                        (sec as any).position ??
+                        (sec as any).startPosition ??
+                        0;
+                      window.dispatchEvent(
+                        new CustomEvent("jump-to-position", {
+                          detail: {
+                            position: pos,
+                            heading: issue.sectionName,
+                            sectionIndex: idx,
+                            sectionId: sec.sectionId,
+                          },
+                        })
+                      );
+                    }
+                  }}
+                >
+                  <span className="section-index">{idx + 1}</span>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          sections.map((sec: any, idx: number) => {
+            const issue = sectionIssues[sec.sectionId] || {
+              load: 0,
+              hasBlocking: false,
+              sectionName: sec.heading,
+            };
+            const color = getSectionColor(issue.load, issue.hasBlocking);
+            const label = getSectionLabel(issue.load, issue.hasBlocking);
+            const width = `${100 / sections.length}%`;
+            return (
+              <div
+                key={sec.sectionId || idx}
+                className="timeline-section"
+                style={{ width, backgroundColor: color }}
+                title={`${issue.sectionName}: ${label}`}
+                onClick={() => {
                   const pos =
                     (sec as any).position ?? (sec as any).startPosition ?? 0;
                   window.dispatchEvent(
@@ -141,14 +188,54 @@ export const ChapterOverviewTimeline: React.FC<{
                       },
                     })
                   );
-                }
-              }}
-            >
-              <span className="section-index">{idx + 1}</span>
-            </div>
-          );
-        })}
+                }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    const pos =
+                      (sec as any).position ?? (sec as any).startPosition ?? 0;
+                    window.dispatchEvent(
+                      new CustomEvent("jump-to-position", {
+                        detail: {
+                          position: pos,
+                          heading: issue.sectionName,
+                          sectionIndex: idx,
+                          sectionId: sec.sectionId,
+                        },
+                      })
+                    );
+                  }
+                }}
+              >
+                <span className="section-index">{idx + 1}</span>
+              </div>
+            );
+          })
+        )}
       </div>
+      {isScrollable && (
+        <div className="timeline-controls">
+          <button
+            className="zoom-btn"
+            onClick={() =>
+              setZoom((z) => Math.max(0.4, Number((z - 0.15).toFixed(2))))
+            }
+          >
+            −
+          </button>
+          <div className="zoom-meter">{Math.round(perWidth)}px</div>
+          <button
+            className="zoom-btn"
+            onClick={() =>
+              setZoom((z) => Math.min(3, Number((z + 0.15).toFixed(2))))
+            }
+          >
+            +
+          </button>
+        </div>
+      )}
       <div className="timeline-legend">
         <div className="legend-item">
           <span
@@ -183,7 +270,10 @@ export const ChapterOverviewTimeline: React.FC<{
           overflow: hidden;
           box-shadow: 0 2px 8px rgba(0,0,0,0.1);
           margin: 16px 0;
+          position: relative;
         }
+        .timeline-bar.scrollable { overflow-x: auto; overflow-y: hidden; }
+        .timeline-track { display: flex; height: 100%; }
         .timeline-section {
           display: flex;
           align-items: center;
@@ -218,6 +308,10 @@ export const ChapterOverviewTimeline: React.FC<{
           display: inline-block;
           margin-right: 6px;
         }
+        .timeline-controls { display:flex; align-items:center; gap:8px; justify-content:flex-end; margin-top:4px; }
+        .zoom-btn { border:1px solid var(--border-soft); background:white; border-radius:6px; width:28px; height:28px; cursor:pointer; font-size:16px; line-height:1; }
+        .zoom-btn:hover { background:#f3f4f6; }
+        .zoom-meter { font-size:12px; color: var(--text-subtle); min-width:48px; text-align:center; }
       `}</style>
     </div>
   );
@@ -327,7 +421,19 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
             <XAxis
               dataKey="section"
               tick={{ fontSize: 10 }}
-              interval={0}
+              interval={(() => {
+                const n = data.length;
+                if (n > 200) return Math.ceil(n / 20); // show ~20 ticks
+                if (n > 100) return Math.ceil(n / 15);
+                if (n > 60) return Math.ceil(n / 12);
+                if (n > 35) return Math.ceil(n / 10);
+                return 0;
+              })()}
+              tickFormatter={(value: string, index: number) => {
+                const n = data.length;
+                if (n > 60) return `S${index + 1}`; // compact label
+                return value;
+              }}
               angle={-35}
               textAnchor="end"
               height={70}
