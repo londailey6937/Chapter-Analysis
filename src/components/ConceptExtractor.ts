@@ -558,7 +558,23 @@ export class ConceptExtractor {
       })
       .filter((c) => c.score > 20) // Lower threshold since library concepts get +50
       .sort((a, b) => b.score - a.score)
-      .slice(0, 150); // Increased limit to support larger chapters
+      .slice(0, this.dynamicConceptCap(text)); // Dynamic cap based on chapter size
+  }
+
+  /**
+   * Dynamically determine the concept cap based on chapter length.
+   * Rationale: Avoid overloading UI while scaling extraction for large books.
+   * Heuristic: Base allowance grows sublinearly with word count to favor the most salient concepts.
+   *  - Base: 180
+   *  - Add: sqrt(words) * 2 (grows slowly)
+   *  - Clamp: 180 .. 900 (upper bound for very large books ~ >300k words)
+   */
+  private dynamicConceptCap(text: string): number {
+    const words = Math.max(1, text.split(/\s+/).length);
+    const base = 180;
+    const additional = Math.sqrt(words) * 2; // sublinear growth
+    const raw = Math.round(base + additional);
+    return Math.min(900, Math.max(180, raw));
   }
 
   /**
