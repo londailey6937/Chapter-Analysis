@@ -183,6 +183,15 @@ export class AnalysisEngine {
         .map((c) => c.id),
     };
 
+    console.log("AnalysisEngine calculated conceptAnalysis:", {
+      totalConceptsIdentified: conceptAnalysis.totalConceptsIdentified,
+      coreConceptCount: conceptAnalysis.coreConceptCount,
+      conceptDensity: conceptAnalysis.conceptDensity,
+      hierarchyBalance: conceptAnalysis.hierarchyBalance,
+      conceptGraphLength: conceptGraph.concepts.length,
+      coreLength: conceptGraph.hierarchy.core.length,
+    });
+
     // Build structure analysis (lightweight heuristics)
     const lengths = chapter.sections.map((s) => s.wordCount);
     const avg =

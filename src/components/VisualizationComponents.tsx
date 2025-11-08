@@ -1205,6 +1205,17 @@ export const ChapterAnalysisDashboard: React.FC<{
     conceptDensity: 0,
     hierarchyBalance: 0,
   };
+
+  // Debug logging
+  console.log("Dashboard received analysis:", {
+    hasConceptAnalysis: !!safeAnalysis.conceptAnalysis,
+    conceptAnalysisData: safeAnalysis.conceptAnalysis,
+    totalConcepts: conceptAnalysis.totalConceptsIdentified,
+    coreConcepts: conceptAnalysis.coreConceptCount,
+    density: conceptAnalysis.conceptDensity,
+    balance: conceptAnalysis.hierarchyBalance,
+  });
+
   const recommendations = safeAnalysis.recommendations || [];
   const principles = safeAnalysis.principles || [];
   return (
