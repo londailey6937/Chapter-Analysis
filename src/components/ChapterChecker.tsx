@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useRef } from "react";
-import { AnalysisEngine } from "./AnalysisEngine";
+import { AnalysisEngine } from "./AnalysisEngine"; // retained for types / future direct calls
 import { ChapterAnalysisDashboard } from "./VisualizationComponents";
 import { PdfViewer } from "./PdfViewer";
 import { Chapter, ChapterAnalysis } from "@/types";
@@ -34,6 +34,8 @@ export const ChapterChecker: React.FC = () => {
   /**
    * Handle chapter analysis
    */
+  const analysisWorkerRef = useRef<Worker | null>(null);
+
   const handleAnalyzeChapter = async () => {
     if (!chapterText.trim()) {
       setError("Please enter chapter text to analyze");
@@ -85,13 +87,37 @@ export const ChapterChecker: React.FC = () => {
         },
       };
 
-      setProgress("Evaluating learning principles...");
+      setProgress("Dispatching to analysis worker...");
 
-      // Run analysis
-      const result = await AnalysisEngine.analyzeChapter(chapter);
-
-      setProgress("");
-      setAnalysis(result);
+      // Spawn worker (terminate previous if still around)
+      if (analysisWorkerRef.current) {
+        analysisWorkerRef.current.terminate();
+      }
+      const worker = new Worker(
+        new URL("../workers/analysisWorker.ts", import.meta.url),
+        { type: "module" }
+      );
+      analysisWorkerRef.current = worker;
+      worker.onmessage = (evt) => {
+        const { type } = evt.data;
+        if (type === "progress") {
+          const { step, detail } = evt.data;
+          setProgress(
+            `${step.replace(/-/g, " ")}${detail ? ": " + detail : ""}`
+          );
+        } else if (type === "complete") {
+          setAnalysis(evt.data.result);
+          setProgress("");
+          worker.terminate();
+          analysisWorkerRef.current = null;
+        } else if (type === "error") {
+          setError(`Analysis failed: ${evt.data.message}`);
+          setProgress("");
+          worker.terminate();
+          analysisWorkerRef.current = null;
+        }
+      };
+      worker.postMessage({ chapter });
     } catch (err) {
       setError(
         `Analysis failed: ${err instanceof Error ? err.message : String(err)}`

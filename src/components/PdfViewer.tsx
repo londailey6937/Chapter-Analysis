@@ -30,6 +30,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const pageOffsetsRef = useRef<number[] | null>(null);
   const pageTextsRef = useRef<string[] | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -43,9 +44,10 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
         setPdf(loadedPdf);
         setNumPages(loadedPdf.numPages);
 
-        // Extract text in background for analysis
+        // Extract text in background for analysis, yielding between batches
         if (onTextExtracted) {
           const pageTexts: string[] = [];
+          const batchSize = 8;
           for (let i = 1; i <= loadedPdf.numPages; i++) {
             const page = await loadedPdf.getPage(i);
             const content = await page.getTextContent();
@@ -55,13 +57,15 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
               .replace(/\s+/g, " ")
               .trim();
             pageTexts.push(text);
+            // Yield every batch to keep UI responsive
+            if (i % batchSize === 0) {
+              await new Promise((r) => setTimeout(r, 0));
+            }
           }
-          // Build cumulative page start offsets for jump-to-position mapping
           const offsets: number[] = [];
           let sum = 0;
           for (let i = 0; i < pageTexts.length; i++) {
             offsets.push(sum);
-            // account for the two newlines we insert between pages in join
             sum += pageTexts[i].length + (i < pageTexts.length - 1 ? 2 : 0);
           }
           pageOffsetsRef.current = offsets;
@@ -159,10 +163,10 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
 
       {error && <div className="error-message">{error}</div>}
 
-      <div className="pdf-pages">
+      <div className="pdf-pages" id="pdf-pages">
         {pdf &&
           Array.from({ length: numPages }, (_, i) => (
-            <PdfPage key={i} pdf={pdf} pageNum={i + 1} scale={scale} />
+            <LazyPdfPage key={i} pdf={pdf} pageNum={i + 1} scale={scale} />
           ))}
       </div>
 
@@ -206,6 +210,42 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
           outline: 3px solid #0ea5e9;
           transition: outline-color 1s ease;
         }
+      `}</style>
+    </div>
+  );
+};
+// Lazy page that only renders canvas when visible
+const LazyPdfPage: React.FC<PdfPageProps> = ({ pdf, pageNum, scale }) => {
+  const [shouldRender, setShouldRender] = useState(false);
+  const holderRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = holderRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setShouldRender(true);
+          else if (entry.boundingClientRect.top > 0) {
+            // optionally pause rendering when far away
+          }
+        });
+      },
+      { root: el.closest(".pdf-pages") as Element | null, rootMargin: "400px 0px", threshold: 0.01 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <div ref={holderRef} className="pdf-page-container" data-pdf-page={pageNum}>
+      {shouldRender ? (
+        <PdfPage pdf={pdf} pageNum={pageNum} scale={scale} />
+      ) : (
+        <div className="page-loading">Loading page {pageNum}...</div>
+      )}
+      <style>{`
+        .pdf-page-container { position: relative; }
       `}</style>
     </div>
   );
