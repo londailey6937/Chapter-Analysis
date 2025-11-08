@@ -396,10 +396,9 @@ export const PrincipleScoresRadar: React.FC<{ analysis: ChapterAnalysis }> = ({
 // COGNITIVE LOAD CURVE
 // ============================================================================
 
-export const CognitiveLoadCurve: React.FC<{
-  analysis: ChapterAnalysis;
-  domain?: Domain;
-}> = ({ analysis, domain = "chemistry" }) => {
+export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
+  analysis,
+}) => {
   const points = analysis.visualizations.cognitiveLoadCurve || [];
   const hasData = points.length > 0;
   const data = points.map((point, idx) => ({
@@ -416,8 +415,7 @@ export const CognitiveLoadCurve: React.FC<{
     <div className="viz-container">
       <h3>Cognitive Load Distribution</h3>
       <p className="viz-subtitle">
-        Cognitive load across chapter sections—lower is better; peaks indicate
-        challenging sections that may need scaffolding
+        Lower is better; peaks indicate challenging sections
       </p>
       {hasData ? (
         <ResponsiveContainer width="100%" height={300}>
@@ -428,11 +426,6 @@ export const CognitiveLoadCurve: React.FC<{
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis
               dataKey="section"
-              label={{
-                value: "Chapter Sections",
-                position: "insideBottom",
-                offset: -5,
-              }}
               tick={{ fontSize: 10 }}
               interval={(() => {
                 const n = data.length;
@@ -444,12 +437,12 @@ export const CognitiveLoadCurve: React.FC<{
               })()}
               tickFormatter={(value: string, index: number) => {
                 const n = data.length;
-                if (n > 60) return `Sec ${index + 1}`; // compact label
+                if (n > 60) return `S${index + 1}`; // compact label
                 return value;
               }}
               angle={-35}
               textAnchor="end"
-              height={80}
+              height={70}
             />
             <YAxis
               label={{ value: "Load %", angle: -90, position: "insideLeft" }}
@@ -464,7 +457,7 @@ export const CognitiveLoadCurve: React.FC<{
                 if (name === "New Concepts") return String(value);
                 return String(value);
               }}
-              labelFormatter={(label: any) => `Section: ${label}`}
+              labelFormatter={(label: any) => `Heading: ${label}`}
             />
             <Legend />
             <Line
@@ -494,29 +487,9 @@ export const CognitiveLoadCurve: React.FC<{
         </div>
       )}
       <div className="why-matters-block">
-        <strong>Why this matters:</strong>{" "}
-        {domain === "literature" ? (
-          <>
-            This graph shows how cognitively demanding each section of your
-            chapter is for learners. The x-axis represents chapter sections
-            (headings like "Introduction", "Analysis", etc.), while the y-axis
-            shows cognitive load percentage. Managing peaks prevents cognitive
-            overload—balanced cognitive demand enables deep comprehension
-            instead of surface-level reading. High peaks (above 80%) suggest
-            sections with too many new literary elements, complex sentences, or
-            dense analytical content.
-          </>
-        ) : (
-          <>
-            This graph shows how cognitively demanding each section of your
-            chapter is for learners. The x-axis represents chapter sections
-            (headings like "Introduction", "Methods", etc.), while the y-axis
-            shows cognitive load percentage. Managing peaks prevents cognitive
-            overload—balanced cognitive demand enables understanding instead of
-            rote memorization. High peaks (above 80%) suggest sections with too
-            many new concepts, complex sentences, or insufficient scaffolding.
-          </>
-        )}
+        <strong>Why this matters:</strong> Managing peaks prevents overload.
+        Balanced cognitive demand keeps working memory free for meaning-making
+        instead of survival.
       </div>
       {hasData &&
         (() => {
@@ -527,31 +500,15 @@ export const CognitiveLoadCurve: React.FC<{
           return (
             <div className="recommendation-block">
               <strong>Recommendation:</strong>{" "}
-              {domain === "literature" ? (
-                <>
-                  {maxLoad > 80
-                    ? `Peak load at ${maxLoad}% in "${
-                        peakSection?.section || "a section"
-                      }"—consider breaking dense sections into smaller chunks or providing more guided analysis.`
-                    : maxLoad > 60
-                    ? `Load is manageable but watch sections above 60%${
-                        peakSection ? ` (e.g., "${peakSection.section}")` : ""
-                      }—consider adding transitional paragraphs or context if needed.`
-                    : `Excellent! Cognitive load is well-balanced. Current pacing and complexity are optimal for learner comprehension.`}
-                </>
-              ) : (
-                <>
-                  {maxLoad > 80
-                    ? `Peak load at ${maxLoad}% in "${
-                        peakSection?.section || "a section"
-                      }"—consider breaking dense sections into smaller chunks or adding examples.`
-                    : maxLoad > 60
-                    ? `Load is manageable but watch sections above 60%${
-                        peakSection ? ` (e.g., "${peakSection.section}")` : ""
-                      }—add scaffolding or worked examples if needed.`
-                    : `Excellent! Cognitive load is well-balanced. Current pacing and concept density are optimal for learner comprehension.`}
-                </>
-              )}
+              {maxLoad > 80
+                ? `Peak load at ${maxLoad}% in "${
+                    peakSection?.section || "a section"
+                  }"—consider breaking dense sections into smaller chunks or adding examples.`
+                : maxLoad > 60
+                ? `Load is manageable but watch sections above 60%${
+                    peakSection ? ` (e.g., "${peakSection.section}")` : ""
+                  }—add scaffolding or worked examples if needed.`
+                : `Excellent! Cognitive load is well-balanced. Current pacing and concept density are optimal for learner comprehension.`}
             </div>
           );
         })()}
@@ -565,13 +522,7 @@ export const CognitiveLoadCurve: React.FC<{
 
 export const ConceptMentionFrequency: React.FC<{
   analysis: ChapterAnalysis;
-  domain?: Domain;
-}> = ({ analysis, domain = "chemistry" }) => {
-  const singularTerm = domain === "literature" ? "element" : "concept";
-  const pluralTerm = domain === "literature" ? "elements" : "concepts";
-  const pluralTermCapitalized =
-    domain === "literature" ? "Elements" : "Concepts";
-
+}> = ({ analysis }) => {
   const reviewPatterns = analysis.conceptAnalysis.reviewPatterns.slice(0, 15);
   const data = reviewPatterns.map((pattern) => ({
     concept: pattern.conceptName || pattern.conceptId.replace("concept-", "C"),
@@ -581,10 +532,9 @@ export const ConceptMentionFrequency: React.FC<{
 
   return (
     <div className="viz-container">
-      <h3>{pluralTermCapitalized} Revisit Frequency</h3>
+      <h3>Concept Revisit Frequency</h3>
       <p className="viz-subtitle">
-        {pluralTermCapitalized} revisit counts (spacing quality indicated by bar
-        color)
+        Concept revisit counts (spacing quality indicated by bar color)
       </p>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart
@@ -628,20 +578,9 @@ export const ConceptMentionFrequency: React.FC<{
         </small>
       </div>
       <div className="why-matters-block">
-        <strong>Why this matters:</strong>{" "}
-        {domain === "literature" ? (
-          <>
-            Encountering literary elements multiple times with strategic spacing
-            helps students develop deeper analytical skills. Simply mentioning
-            elements repeatedly without spacing can create a false sense of
-            familiarity without true understanding.
-          </>
-        ) : (
-          <>
-            Frequency without strategic spacing can create illusion of mastery;
-            balanced distributed mentions foster durable learning.
-          </>
-        )}
+        <strong>Why this matters:</strong> Frequency without strategic spacing
+        can create illusion of mastery; balanced distributed mentions foster
+        durable learning.
       </div>
       <div className="recommendation-block">
         <strong>Recommendation:</strong>{" "}
@@ -649,20 +588,11 @@ export const ConceptMentionFrequency: React.FC<{
           const optimalCount = data.filter((d) => d.isOptimal).length;
           const totalCount = data.length;
           const optimalRatio = totalCount > 0 ? optimalCount / totalCount : 0;
-
-          if (domain === "literature") {
-            return optimalRatio >= 0.8
-              ? `Excellent spacing patterns—most ${pluralTerm} have optimal revisit distribution.`
-              : optimalRatio >= 0.5
-              ? `Good progress; review red-marked ${pluralTerm} and adjust spacing intervals for better retention.`
-              : `Many ${pluralTerm} need spacing adjustments—ensure each key ${singularTerm} is revisited 3-5 times with increasing intervals between mentions.`;
-          } else {
-            return optimalRatio >= 0.8
-              ? `Excellent spacing patterns—most ${pluralTerm} have optimal revisit distribution.`
-              : optimalRatio >= 0.5
-              ? `Good progress; review red-marked ${pluralTerm} and adjust spacing intervals for better retention.`
-              : `Many ${pluralTerm} need spacing adjustments—ensure 3-5 spaced revisits per ${singularTerm} with increasing intervals.`;
-          }
+          return optimalRatio >= 0.8
+            ? "Excellent spacing patterns—most concepts have optimal revisit distribution."
+            : optimalRatio >= 0.5
+            ? "Good progress; review red-marked concepts and adjust spacing intervals for better retention."
+            : "Many concepts need spacing adjustments—ensure 3-5 spaced revisits per concept with increasing intervals.";
         })()}
       </div>
     </div>
@@ -885,14 +815,11 @@ export const ConceptMapVisualization: React.FC<ConceptMapProps> = ({
 // INTERLEAVING PATTERN VISUALIZATION
 // ============================================================================
 
-export const InterleavingPattern: React.FC<{
-  analysis: ChapterAnalysis;
-  domain?: Domain;
-}> = ({ analysis, domain = "chemistry" }) => {
+export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
+  analysis,
+}) => {
   const pattern = analysis.visualizations.interleavingPattern;
   const sequence = pattern.conceptSequence.slice(0, 50); // Show more for better insight
-  const pluralTerm = domain === "literature" ? "Elements" : "Concepts";
-  const singularTerm = domain === "literature" ? "Element" : "Concept";
 
   // Build ID -> Name map from conceptMap nodes
   const idToName: Record<string, string> = {};
@@ -920,6 +847,7 @@ export const InterleavingPattern: React.FC<{
   });
   topTransitions.sort((a, b) => b.count - a.count);
   const top5Transitions = topTransitions.slice(0, 5);
+
   // Identify blocking issues
   const blockingSegments = pattern.blockingSegments || [];
   // Group blocking segments by concept to avoid listing multiple separate runs of same concept without context
@@ -1080,7 +1008,7 @@ export const InterleavingPattern: React.FC<{
 
       {top5Transitions.length > 0 && (
         <div className="section-divider">
-          <h4>Common {pluralTerm} Transitions</h4>
+          <h4>Common Concept Transitions</h4>
           <div className="transitions-list">
             {top5Transitions.map((trans, idx) => (
               <div key={idx} className="transition-item">
@@ -1102,18 +1030,8 @@ export const InterleavingPattern: React.FC<{
         <strong>Recommendation:</strong> {pattern.recommendation}
       </div>
       <div className="why-matters-block">
-        <strong>Why this matters:</strong>{" "}
-        {domain === "literature" ? (
-          <>
-            Revisiting literary elements in varied contexts helps students see
-            patterns and make deeper analytical connections across the text.
-          </>
-        ) : (
-          <>
-            Interleaving (mixing topics) improves discrimination and long‑term
-            retention compared to blocked sequences.
-          </>
-        )}
+        <strong>Why this matters:</strong> Interleaving (mixing topics) improves
+        discrimination and long‑term retention compared to blocked sequences.
       </div>
 
       <style>{`
@@ -1653,21 +1571,9 @@ export const PrincipleFindings: React.FC<{
 // MAIN DASHBOARD COMPONENT
 // ============================================================================
 
-import { Domain } from "@/data/conceptLibraryRegistry";
-import {
-  getPluralTermCapitalized,
-  getCorePluralTerm,
-  getSingularTerm,
-} from "@/utils/domainTerminology";
-
 export const ChapterAnalysisDashboard: React.FC<{
   analysis: ChapterAnalysis;
-  domain?: Domain;
-}> = ({ analysis, domain = "chemistry" }) => {
-  const pluralTerm = getPluralTermCapitalized(domain);
-  const singularTerm = getSingularTerm(domain);
-  const corePluralTerm = getCorePluralTerm(domain);
-
+}> = ({ analysis }) => {
   // Defensive guards in case analysis shape changes or fields are missing
   const safeAnalysis = analysis || ({} as ChapterAnalysis);
   const overallScore = safeAnalysis.overallScore ?? 0;
@@ -1696,26 +1602,26 @@ export const ChapterAnalysisDashboard: React.FC<{
 
       <div className="viz-grid">
         <PrincipleScoresRadar analysis={safeAnalysis} />
-        <CognitiveLoadCurve analysis={safeAnalysis} domain={domain} />
-        <ConceptMentionFrequency analysis={safeAnalysis} domain={domain} />
-        <InterleavingPattern analysis={safeAnalysis} domain={domain} />
+        <CognitiveLoadCurve analysis={safeAnalysis} />
+        <ConceptMentionFrequency analysis={safeAnalysis} />
+        <InterleavingPattern analysis={safeAnalysis} />
         <ReviewScheduleTimeline analysis={safeAnalysis} />
       </div>
 
       <div className="concepts-section">
-        <h3>{pluralTerm} Analysis</h3>
+        <h3>Concept Analysis</h3>
         <div className="concept-stats">
           <div className="stat">
             <strong>{conceptAnalysis.totalConceptsIdentified}</strong>
-            <p>Total {pluralTerm}</p>
+            <p>Total Concepts</p>
           </div>
           <div className="stat">
             <strong>{conceptAnalysis.coreConceptCount}</strong>
-            <p className="capitalize">{corePluralTerm}</p>
+            <p>Core Concepts</p>
           </div>
           <div className="stat">
             <strong>{conceptAnalysis.conceptDensity.toFixed(1)}</strong>
-            <p>{pluralTerm} per 1K words</p>
+            <p>Concepts per 1K words</p>
           </div>
           <div className="stat">
             <strong>

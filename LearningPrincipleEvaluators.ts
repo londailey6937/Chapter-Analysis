@@ -24,8 +24,6 @@ export class DeepProcessingEvaluator {
   ): PrincipleEvaluation {
     const findings: Finding[] = [];
     const evidence: Evidence[] = [];
-    const isLiterature =
-      chapter.metadata?.domain?.toLowerCase() === "literature";
 
     // NEW: Bloom's Taxonomy Classification
     const bloomsAnalysis = this.classifyQuestionsByBloomsLevel(chapter.content);
@@ -45,26 +43,18 @@ export class DeepProcessingEvaluator {
     if (bloomsAnalysis.higherOrderPercentage < 25) {
       findings.push({
         type: "critical",
-        message: isLiterature
-          ? `Only ${bloomsAnalysis.higherOrderPercentage.toFixed(
-              0
-            )}% of prompts encourage analytical or interpretive thinking`
-          : `Only ${bloomsAnalysis.higherOrderPercentage.toFixed(
-              0
-            )}% of questions target higher-order thinking (Analyze/Evaluate/Create)`,
+        message: `Only ${bloomsAnalysis.higherOrderPercentage.toFixed(
+          0
+        )}% of questions target higher-order thinking (Analyze/Evaluate/Create)`,
         severity: 0.85,
         evidence: `Found: ${bloomsAnalysis.analyze} analyze, ${bloomsAnalysis.evaluate} evaluate, ${bloomsAnalysis.create} create questions`,
       });
     } else if (bloomsAnalysis.higherOrderPercentage >= 40) {
       findings.push({
         type: "positive",
-        message: isLiterature
-          ? `✓ Excellent: ${bloomsAnalysis.higherOrderPercentage.toFixed(
-              0
-            )}% of prompts promote close reading and critical interpretation`
-          : `✓ Excellent: ${bloomsAnalysis.higherOrderPercentage.toFixed(
-              0
-            )}% of questions promote higher-order thinking`,
+        message: `✓ Excellent: ${bloomsAnalysis.higherOrderPercentage.toFixed(
+          0
+        )}% of questions promote higher-order thinking`,
         severity: 0,
         evidence: `Strong balance across Bloom's levels (Apply: ${bloomsAnalysis.apply}, Analyze: ${bloomsAnalysis.analyze}, Evaluate: ${bloomsAnalysis.evaluate}, Create: ${bloomsAnalysis.create})`,
       });
@@ -94,32 +84,30 @@ export class DeepProcessingEvaluator {
       });
     }
 
-    // NEW: Worked Example Detection (skip for literature)
-    if (!isLiterature) {
-      const workedExamples = this.detectWorkedExamples(chapter.content);
-      evidence.push({
-        type: "count",
-        metric: "worked_examples",
-        value: workedExamples.count,
-        threshold: Math.max(2, Math.ceil(chapter.sections.length / 3)),
-        quality: workedExamples.count >= 2 ? "strong" : "weak",
-      });
+    // NEW: Worked Example Detection
+    const workedExamples = this.detectWorkedExamples(chapter.content);
+    evidence.push({
+      type: "count",
+      metric: "worked_examples",
+      value: workedExamples.count,
+      threshold: Math.max(2, Math.ceil(chapter.sections.length / 3)),
+      quality: workedExamples.count >= 2 ? "strong" : "weak",
+    });
 
-      if (workedExamples.count === 0) {
-        findings.push({
-          type: "warning",
-          message: "No worked examples with step-by-step reasoning",
-          severity: 0.65,
-          evidence: "Worked examples model expert thinking patterns",
-        });
-      } else {
-        findings.push({
-          type: "positive",
-          message: `✓ Found ${workedExamples.count} worked examples modeling problem-solving`,
-          severity: 0,
-          evidence: workedExamples.examples.slice(0, 2).join("; "),
-        });
-      }
+    if (workedExamples.count === 0) {
+      findings.push({
+        type: "warning",
+        message: "No worked examples with step-by-step reasoning",
+        severity: 0.65,
+        evidence: "Worked examples model expert thinking patterns",
+      });
+    } else {
+      findings.push({
+        type: "positive",
+        message: `✓ Found ${workedExamples.count} worked examples modeling problem-solving`,
+        severity: 0,
+        evidence: workedExamples.examples.slice(0, 2).join("; "),
+      });
     }
 
     // NEW: Explanation Depth Analysis
@@ -143,17 +131,11 @@ export class DeepProcessingEvaluator {
     if (explanationDepth.avgDepth < 2) {
       findings.push({
         type: "warning",
-        message: isLiterature
-          ? "Shallow analysis - literary elements lack multi-level interpretation"
-          : "Shallow explanations - concepts lack multi-level elaboration",
+        message: "Shallow explanations - concepts lack multi-level elaboration",
         severity: 0.6,
-        evidence: isLiterature
-          ? `Average depth: ${explanationDepth.avgDepth.toFixed(
-              1
-            )}/5 (identification → context → analysis → connection → interpretation)`
-          : `Average depth: ${explanationDepth.avgDepth.toFixed(
-              1
-            )}/5 (definition → example → mechanism → connection → application)`,
+        evidence: `Average depth: ${explanationDepth.avgDepth.toFixed(
+          1
+        )}/5 (definition → example → mechanism → connection → application)`,
       });
     }
 
@@ -274,14 +256,8 @@ export class DeepProcessingEvaluator {
       elaborativeQuestions.count / Math.max(chapter.sections.length, 1);
     score += Math.min(elaborationRatio * 10, 15);
 
-    // Worked examples (0-10 points) - only for non-literature
-    if (!isLiterature) {
-      const workedExamples = this.detectWorkedExamples(chapter.content);
-      score += Math.min(workedExamples.count * 3, 10);
-    } else {
-      // For literature, give baseline points since worked examples don't apply
-      score += 8;
-    }
+    // Worked examples (0-10 points)
+    score += Math.min(workedExamples.count * 3, 10);
 
     // Explanation depth (0-15 points)
     score += explanationDepth.avgDepth * 3;
@@ -305,56 +281,41 @@ export class DeepProcessingEvaluator {
         id: "deep-proc-0",
         principle: "deepProcessing",
         priority: "high",
-        title: isLiterature
-          ? "Elevate to Deeper Literary Analysis"
-          : "Elevate to Higher-Order Thinking",
-        description: isLiterature
-          ? "Add more prompts that require close reading, interpretation, and textual analysis"
-          : "Add more questions that require analysis, evaluation, and creation (Bloom's higher levels)",
-        implementation: isLiterature
-          ? 'Replace "Who is the narrator?" with "How does the narrative perspective shape the reader\'s understanding?", "What does this symbolize and why?", "How do these themes interconnect?"'
-          : 'Replace "What is X?" with "How does X compare to Y?", "Why would X be more effective than Y?", "Design a solution using X"',
-        expectedImpact: isLiterature
-          ? "Promotes critical interpretation and deeper textual engagement"
-          : "Promotes critical thinking and deeper understanding rather than memorization",
+        title: "Elevate to Higher-Order Thinking",
+        description:
+          "Add more questions that require analysis, evaluation, and creation (Bloom's higher levels)",
+        implementation:
+          'Replace "What is X?" with "How does X compare to Y?", "Why would X be more effective than Y?", "Design a solution using X"',
+        expectedImpact:
+          "Promotes critical thinking and deeper understanding rather than memorization",
         relatedConcepts: concepts.hierarchy.core.map((c) => c.id),
-        examples: isLiterature
-          ? [
-              "Analyze: How does the author use imagery to convey meaning?",
-              "Evaluate: Which interpretation is better supported by the text?",
-              "Create: Write an alternative ending that maintains thematic consistency",
-            ]
-          : [
-              "Analyze: Compare and contrast X with Y",
-              "Evaluate: Which approach would be most effective and why?",
-              "Create: Design an experiment to test this hypothesis",
-            ],
+        examples: [
+          "Analyze: Compare and contrast X with Y",
+          "Evaluate: Which approach would be most effective and why?",
+          "Create: Design an experiment to test this hypothesis",
+        ],
       });
     }
 
-    // Only suggest worked examples for non-literature domains
-    if (!isLiterature) {
-      const workedExamples = this.detectWorkedExamples(chapter.content);
-      if (workedExamples.count === 0) {
-        suggestions.push({
-          id: "deep-proc-0.5",
-          principle: "deepProcessing",
-          priority: "high",
-          title: "Add Worked Examples",
-          description:
-            "Include step-by-step demonstrations that model expert problem-solving",
-          implementation:
-            'Create examples with explicit reasoning: "Step 1: First, we identify... Step 2: Next, we apply... because..."',
-          expectedImpact:
-            "Learners observe expert thinking patterns and build mental models for problem-solving",
-          relatedConcepts: concepts.hierarchy.core.map((c) => c.id).slice(0, 3),
-          examples: [
-            "Example 1: Let's solve this problem step-by-step...",
-            "Work through: How would an expert approach this?",
-            "Demonstration: Watch how we break this down systematically",
-          ],
-        });
-      }
+    if (workedExamples.count === 0) {
+      suggestions.push({
+        id: "deep-proc-0.5",
+        principle: "deepProcessing",
+        priority: "high",
+        title: "Add Worked Examples",
+        description:
+          "Include step-by-step demonstrations that model expert problem-solving",
+        implementation:
+          'Create examples with explicit reasoning: "Step 1: First, we identify... Step 2: Next, we apply... because..."',
+        expectedImpact:
+          "Learners observe expert thinking patterns and build mental models for problem-solving",
+        relatedConcepts: concepts.hierarchy.core.map((c) => c.id).slice(0, 3),
+        examples: [
+          "Example 1: Let's solve this problem step-by-step...",
+          "Work through: How would an expert approach this?",
+          "Demonstration: Watch how we break this down systematically",
+        ],
+      });
     }
 
     if (whyHowQuestions === 0) {
@@ -740,10 +701,6 @@ export class SpacedRepetitionEvaluator {
   ): PrincipleEvaluation {
     const findings: Finding[] = [];
     const evidence: Evidence[] = [];
-    const isLiterature =
-      chapter.metadata?.domain?.toLowerCase() === "literature";
-    const term = isLiterature ? "elements" : "concepts";
-    const termCapitalized = isLiterature ? "Elements" : "Concepts";
 
     // NEW: Optimal Spacing Interval Analysis
     const spacingIntervals = this.calculateOptimalSpacingIntervals(
@@ -766,15 +723,9 @@ export class SpacedRepetitionEvaluator {
     if (spacingIntervals.alignmentScore < 0.4) {
       findings.push({
         type: "critical",
-        message: isLiterature
-          ? `Poor spacing alignment (${(
-              spacingIntervals.alignmentScore * 100
-            ).toFixed(
-              0
-            )}%) - literary ${term} not revisited at effective intervals`
-          : `Poor spacing alignment (${(
-              spacingIntervals.alignmentScore * 100
-            ).toFixed(0)}%) - concepts not revisited at optimal intervals`,
+        message: `Poor spacing alignment (${(
+          spacingIntervals.alignmentScore * 100
+        ).toFixed(0)}%) - concepts not revisited at optimal intervals`,
         severity: 0.85,
         evidence: `Recommended: 1 day, 1 week, 1 month spacing. Found: ${spacingIntervals.actualPattern}`,
       });
@@ -785,7 +736,7 @@ export class SpacedRepetitionEvaluator {
           spacingIntervals.alignmentScore * 100
         ).toFixed(0)}% alignment with optimal intervals`,
         severity: 0,
-        evidence: `${termCapitalized} revisited at approximately: ${spacingIntervals.actualPattern}`,
+        evidence: `Concepts revisited at approximately: ${spacingIntervals.actualPattern}`,
       });
     }
 
@@ -802,11 +753,10 @@ export class SpacedRepetitionEvaluator {
     if (forgettingCurve.preventionScore < 0.5) {
       findings.push({
         type: "warning",
-        message: isLiterature
-          ? `High forgetting risk - literary ${term} not reinforced before students forget`
-          : "High forgetting risk - concepts not reinforced before memory decay",
+        message:
+          "High forgetting risk - concepts not reinforced before memory decay",
         severity: 0.75,
-        evidence: `${forgettingCurve.conceptsAtRisk} ${term} likely forgotten before re-encountered`,
+        evidence: `${forgettingCurve.conceptsAtRisk} concepts likely forgotten before re-encountered`,
       });
     }
 
@@ -828,28 +778,20 @@ export class SpacedRepetitionEvaluator {
     if (practiceType.distributedRatio < 0.5) {
       findings.push({
         type: "critical",
-        message: isLiterature
-          ? `Too much clustering (${(practiceType.massedRatio * 100).toFixed(
-              0
-            )}%) - literary ${term} need more distribution`
-          : `Too much massed practice (${(
-              practiceType.massedRatio * 100
-            ).toFixed(0)}%) - cramming detected`,
+        message: `Too much massed practice (${(
+          practiceType.massedRatio * 100
+        ).toFixed(0)}%) - cramming detected`,
         severity: 0.8,
-        evidence: `${practiceType.massedSegments.length} segments show ${term} clustering without spacing`,
+        evidence: `${practiceType.massedSegments.length} segments show concept clustering without spacing`,
       });
     } else if (practiceType.distributedRatio >= 0.7) {
       findings.push({
         type: "positive",
-        message: isLiterature
-          ? `✓ Good distribution: ${(
-              practiceType.distributedRatio * 100
-            ).toFixed(0)}% of ${term} are well-distributed`
-          : `✓ Good distribution: ${(
-              practiceType.distributedRatio * 100
-            ).toFixed(0)}% of practice is spaced`,
+        message: `✓ Good distribution: ${(
+          practiceType.distributedRatio * 100
+        ).toFixed(0)}% of practice is spaced`,
         severity: 0,
-        evidence: `${termCapitalized} spread throughout chapter rather than clustered`,
+        evidence: "Concepts spread throughout chapter rather than clustered",
       });
     }
 
@@ -874,7 +816,7 @@ export class SpacedRepetitionEvaluator {
     if (conceptMentionStats.avgMentions < 2) {
       findings.push({
         type: "warning",
-        message: `${termCapitalized} mentioned too infrequently (avg ${conceptMentionStats.avgMentions.toFixed(
+        message: `Concepts mentioned too infrequently (avg ${conceptMentionStats.avgMentions.toFixed(
           1
         )} times)`,
         severity: 0.7,
@@ -886,18 +828,16 @@ export class SpacedRepetitionEvaluator {
     ) {
       findings.push({
         type: "positive",
-        message: `✓ Good spacing: ${termCapitalized} revisited ${conceptMentionStats.avgMentions.toFixed(
+        message: `✓ Good spacing: Concepts revisited ${conceptMentionStats.avgMentions.toFixed(
           1
         )} times on average`,
         severity: 0,
-        evidence: isLiterature
-          ? "Effective distribution for building understanding"
-          : "Follows spaced repetition principles",
+        evidence: "Follows spaced repetition principles",
       });
     } else if (conceptMentionStats.avgMentions > 5) {
       findings.push({
         type: "warning",
-        message: `${termCapitalized} repeated too frequently (${conceptMentionStats.avgMentions.toFixed(
+        message: `Concepts repeated too frequently (${conceptMentionStats.avgMentions.toFixed(
           1
         )} times)`,
         severity: 0.4,
@@ -918,16 +858,15 @@ export class SpacedRepetitionEvaluator {
     if (spacingAnalysis.evenSpacing) {
       findings.push({
         type: "positive",
-        message: `✓ ${termCapitalized} spread evenly throughout chapter`,
+        message: "✓ Concepts spread evenly throughout chapter",
         severity: 0,
         evidence: `Spacing gaps are consistent (${spacingAnalysis.avgGap} characters)`,
       });
     } else {
       findings.push({
         type: "warning",
-        message: isLiterature
-          ? "Uneven distribution: Some elements revisited early, others underdeveloped"
-          : "Uneven spacing: Some concepts revisited early, others abandoned",
+        message:
+          "Uneven spacing: Some concepts revisited early, others abandoned",
         severity: 0.5,
         evidence: spacingAnalysis.unevenConcepts.slice(0, 2).join(", "),
       });
@@ -961,26 +900,17 @@ export class SpacedRepetitionEvaluator {
         id: "spaced-rep-0",
         principle: "spacedRepetition",
         priority: "high",
-        title: isLiterature
-          ? "Implement Effective Distribution Patterns"
-          : "Implement Optimal Spacing Intervals",
-        description: isLiterature
-          ? "Revisit literary elements at strategic points to deepen understanding and help students see patterns across the text"
-          : "Revisit concepts at scientifically-validated intervals: ~1 day, ~1 week, ~1 month",
-        implementation: isLiterature
-          ? "For each key element: (1) Initial introduction with context, (2) Revisit after 300-500 words with new example, (3) Mid-chapter analysis showing connections, (4) End-chapter synthesis tying themes together"
-          : "For each core concept: (1) Initial introduction, (2) Revisit after 300-500 words (minutes later), (3) Mid-chapter callback (days), (4) End-chapter summary (weeks)",
-        expectedImpact: isLiterature
-          ? "Helps students build deeper analytical skills by seeing elements in multiple contexts throughout the reading"
-          : "Aligns with memory consolidation research - maximizes retention with minimal repetition",
+        title: "Implement Optimal Spacing Intervals",
+        description:
+          "Revisit concepts at scientifically-validated intervals: ~1 day, ~1 week, ~1 month",
+        implementation:
+          "For each core concept: (1) Initial introduction, (2) Revisit after 300-500 words (minutes later), (3) Mid-chapter callback (days), (4) End-chapter summary (weeks)",
+        expectedImpact:
+          "Aligns with memory consolidation research - maximizes retention with minimal repetition",
         relatedConcepts: concepts.hierarchy.core.map((c) => c.id),
-        examples: isLiterature
-          ? [
-              "Introduction: Define metaphor with initial example\nMid-chapter: Revisit with contrasting metaphor\nLater: Ask students to identify new metaphors\nEnd: Synthesize how metaphors reveal themes",
-            ]
-          : [
-              "Day 1: Introduce concept\nDay 2-3: Brief review question\nWeek 1: Apply in new context\nMonth 1: Synthesis problem",
-            ],
+        examples: [
+          "Day 1: Introduce concept\nDay 2-3: Brief review question\nWeek 1: Apply in new context\nMonth 1: Synthesis problem",
+        ],
       });
     }
 
@@ -989,26 +919,16 @@ export class SpacedRepetitionEvaluator {
         id: "spaced-rep-0.5",
         principle: "spacedRepetition",
         priority: "high",
-        title: isLiterature
-          ? "Distribute Literary Elements More Evenly"
-          : "Reduce Massed Practice",
-        description: isLiterature
-          ? "Break up clusters of similar content - avoid overwhelming students with too many related elements at once"
-          : "Break up concept clusters - avoid presenting too much related content at once",
-        implementation: isLiterature
-          ? `Redistribute the ${practiceType.massedSegments.length} concentrated segments throughout the chapter with varied contexts between revisits`
-          : `Redistribute the ${practiceType.massedSegments.length} massed practice segments throughout the chapter with spacing between repetitions`,
-        expectedImpact: isLiterature
-          ? "Distributed exposure helps students absorb complex ideas better than concentrating them in one section"
-          : "Distributed practice produces 2-3x better long-term retention than cramming",
+        title: "Reduce Massed Practice",
+        description:
+          "Break up concept clusters - avoid presenting too much related content at once",
+        implementation: `Redistribute the ${practiceType.massedSegments.length} massed practice segments throughout the chapter with spacing between repetitions`,
+        expectedImpact:
+          "Distributed practice produces 2-3x better long-term retention than cramming",
         relatedConcepts: practiceType.massedConcepts.slice(0, 5),
-        examples: isLiterature
-          ? [
-              "Instead of: Symbolism, Symbolism, Symbolism, Metaphor, Metaphor, Metaphor\nUse: Symbolism, Metaphor, Symbolism, Metaphor, Symbolism, Metaphor (varied + distributed)",
-            ]
-          : [
-              "Instead of: A, A, A, B, B, B\nUse: A, B, A, B, A, B (interleaved + spaced)",
-            ],
+        examples: [
+          "Instead of: A, A, A, B, B, B\nUse: A, B, A, B, A, B (interleaved + spaced)",
+        ],
       });
     }
 
@@ -1017,26 +937,17 @@ export class SpacedRepetitionEvaluator {
         id: "spaced-rep-1",
         principle: "spacedRepetition",
         priority: "high",
-        title: isLiterature
-          ? `Increase ${termCapitalized} Revisits`
-          : "Increase Concept Revisits",
-        description: isLiterature
-          ? `Revisit key literary ${term} at strategic points throughout the chapter to build understanding`
-          : "Revisit core concepts at strategic intervals throughout the chapter",
-        implementation: isLiterature
-          ? `After introducing an element, plan to revisit it after 300-500 words with a new example or context, then again near the chapter conclusion to synthesize understanding`
-          : "After introducing a concept, plan to mention it again after 300-500 words, then again near the chapter conclusion",
-        expectedImpact: isLiterature
-          ? "Repeated exposure to elements in varied contexts deepens analytical skills and comprehension"
-          : "Spaced repetition strengthens neural pathways and prevents forgetting",
+        title: "Increase Concept Revisits",
+        description:
+          "Revisit core concepts at strategic intervals throughout the chapter",
+        implementation:
+          "After introducing a concept, plan to mention it again after 300-500 words, then again near the chapter conclusion",
+        expectedImpact:
+          "Spaced repetition strengthens neural pathways and prevents forgetting",
         relatedConcepts: concepts.hierarchy.core.map((c) => c.id),
-        examples: isLiterature
-          ? [
-              'Section 1: Introduce symbolism in opening scene\nSection 3: "Notice how this symbol connects to the earlier one..."\nSection 5 (conclusion): "We\'ve traced this symbol\'s evolution through...',
-            ]
-          : [
-              'Section 1: Introduce concept X\nSection 3: "Recall that X is important because..."\nSection 5 (conclusion): "We\'ve seen X applied in...',
-            ],
+        examples: [
+          'Section 1: Introduce concept X\nSection 3: "Recall that X is important because..."\nSection 5 (conclusion): "We\'ve seen X applied in...',
+        ],
       });
     }
 
@@ -1303,9 +1214,6 @@ export class RetrievalPracticeEvaluator {
     chapter: Chapter,
     concepts: ConceptGraph
   ): PrincipleEvaluation {
-    const isLiterature =
-      chapter.metadata?.domain?.toLowerCase() === "literature";
-
     const findings: Finding[] = [];
     const evidence: Evidence[] = [];
 
@@ -1327,26 +1235,19 @@ export class RetrievalPracticeEvaluator {
     if (retrievalTypes.recallRatio < 0.4) {
       findings.push({
         type: "warning",
-        message: isLiterature
-          ? `Too many simple prompts (${retrievalTypes.recognition}), not enough analytical questions (${retrievalTypes.recall})`
-          : `Too many recognition tasks (${retrievalTypes.recognition}), not enough recall (${retrievalTypes.recall})`,
+        message: `Too many recognition tasks (${retrievalTypes.recognition}), not enough recall (${retrievalTypes.recall})`,
         severity: 0.7,
-        evidence: isLiterature
-          ? "Open-ended questions requiring analysis are more effective for developing critical thinking"
-          : "Recall is 2-3x more effective than recognition for long-term retention",
+        evidence:
+          "Recall is 2-3x more effective than recognition for long-term retention",
       });
     } else if (retrievalTypes.recallRatio >= 0.6) {
       findings.push({
         type: "positive",
-        message: isLiterature
-          ? `✓ Good balance: ${retrievalTypes.recall} analytical vs ${retrievalTypes.recognition} simple prompts`
-          : `✓ Good balance: ${retrievalTypes.recall} recall vs ${retrievalTypes.recognition} recognition tasks`,
+        message: `✓ Good balance: ${retrievalTypes.recall} recall vs ${retrievalTypes.recognition} recognition tasks`,
         severity: 0,
-        evidence: `${(retrievalTypes.recallRatio * 100).toFixed(0)}% ${
-          isLiterature
-            ? "analytical prompts promote deeper thinking"
-            : "recall-based retrieval promotes deeper encoding"
-        }`,
+        evidence: `${(retrievalTypes.recallRatio * 100).toFixed(
+          0
+        )}% recall-based retrieval promotes deeper encoding`,
       });
     }
 
@@ -1363,9 +1264,7 @@ export class RetrievalPracticeEvaluator {
     if (retrievalStrength.difficultyScore < 0.3) {
       findings.push({
         type: "warning",
-        message: isLiterature
-          ? "Prompts too simple - need more analytical depth"
-          : "Retrieval tasks too easy - insufficient desirable difficulty",
+        message: "Retrieval tasks too easy - insufficient desirable difficulty",
         severity: 0.6,
         evidence: `Only ${retrievalStrength.challengingQuestions} challenging questions found`,
       });
@@ -1388,24 +1287,17 @@ export class RetrievalPracticeEvaluator {
     if (testingEffect.count < chapter.sections.length) {
       findings.push({
         type: "warning",
-        message: isLiterature
-          ? `Limited reflection prompts (${testingEffect.count} found, ${chapter.sections.length} recommended)`
-          : `Limited testing effect opportunities (${testingEffect.count} found, ${chapter.sections.length} recommended)`,
+        message: `Limited testing effect opportunities (${testingEffect.count} found, ${chapter.sections.length} recommended)`,
         severity: 0.65,
-        evidence: isLiterature
-          ? "Regular reflection questions help students consolidate understanding"
-          : "Self-testing produces better retention than repeated studying",
+        evidence:
+          "Self-testing produces better retention than repeated studying",
       });
     } else {
       findings.push({
         type: "positive",
-        message: isLiterature
-          ? `✓ Excellent: ${testingEffect.count} reflection opportunities throughout`
-          : `✓ Excellent: ${testingEffect.count} testing opportunities throughout`,
+        message: `✓ Excellent: ${testingEffect.count} testing opportunities throughout`,
         severity: 0,
-        evidence: isLiterature
-          ? "Regular reflection questions deepen comprehension"
-          : "Regular self-testing triggers the testing effect",
+        evidence: "Regular self-testing triggers the testing effect",
       });
     }
 
@@ -1422,13 +1314,9 @@ export class RetrievalPracticeEvaluator {
     if (lowStakesTesting.count === 0) {
       findings.push({
         type: "warning",
-        message: isLiterature
-          ? "No reflection pauses or comprehension checks"
-          : "No low-stakes practice tests or self-checks",
+        message: "No low-stakes practice tests or self-checks",
         severity: 0.7,
-        evidence: isLiterature
-          ? 'Add: "Pause and reflect" or "Check your understanding" sections'
-          : 'Add: "Check your understanding" or "Self-quiz" sections',
+        evidence: 'Add: "Check your understanding" or "Self-quiz" sections',
       });
     }
 
@@ -1448,24 +1336,17 @@ export class RetrievalPracticeEvaluator {
     if (directQuestions === 0) {
       findings.push({
         type: "critical",
-        message: isLiterature
-          ? "No direct analytical questions found"
-          : "No direct recall questions found",
+        message: "No direct recall questions found",
         severity: 0.9,
-        evidence: isLiterature
-          ? 'Questions like "How does...", "Why did...", or "What is the significance of..." are absent'
-          : 'Questions like "What is...", "Which of...", or "Answer this:" are absent',
+        evidence:
+          'Questions like "What is...", "Which of...", or "Answer this:" are absent',
       });
     } else {
       findings.push({
         type: "positive",
-        message: isLiterature
-          ? `✓ Found ${directQuestions} direct analytical questions`
-          : `✓ Found ${directQuestions} direct recall questions`,
+        message: `✓ Found ${directQuestions} direct recall questions`,
         severity: 0,
-        evidence: isLiterature
-          ? `Encourages active analysis of the text`
-          : `Encourages active recall without reference materials`,
+        evidence: `Encourages active recall without reference materials`,
       });
     }
 
@@ -1818,11 +1699,6 @@ export class InterleavingEvaluator {
     chapter: Chapter,
     concepts: ConceptGraph
   ): PrincipleEvaluation {
-    const isLiterature =
-      chapter.metadata?.domain?.toLowerCase() === "literature";
-    const pluralTerm = isLiterature ? "elements" : "concepts";
-    const singularTerm = isLiterature ? "element" : "concept";
-
     const sequence = concepts.sequence;
     const blockingSegments = this.identifyBlockingSegments(sequence);
     const totalPositions = sequence.length;
@@ -1869,13 +1745,11 @@ export class InterleavingEvaluator {
     if (discriminationPractice.count === 0) {
       findings.push({
         type: "warning",
-        message: isLiterature
-          ? "No comparison/contrast detected - learners may miss connections between similar elements"
-          : "No discrimination practice detected - learners may confuse similar concepts",
+        message:
+          "No discrimination practice detected - learners may confuse similar concepts",
         severity: 0.7,
-        evidence: isLiterature
-          ? "Comparing and contrasting literary elements helps students develop analytical skills"
-          : "Comparing/contrasting similar concepts strengthens discrimination ability",
+        evidence:
+          "Comparing/contrasting similar concepts strengthens discrimination ability",
       });
     }
 
@@ -1895,9 +1769,7 @@ export class InterleavingEvaluator {
     if (blockingRatio > 0.7) {
       findings.push({
         type: "critical",
-        message: isLiterature
-          ? "Too much isolation detected: Elements need more varied distribution"
-          : "Heavy blocking detected: Topics too isolated from each other",
+        message: "Heavy blocking detected: Topics too isolated from each other",
         severity: 0.8,
         evidence: `${(blockingRatio * 100).toFixed(
           0
@@ -1906,13 +1778,11 @@ export class InterleavingEvaluator {
     } else if (blockingRatio < 0.4) {
       findings.push({
         type: "positive",
-        message: isLiterature
-          ? "✓ Excellent variety: Elements well-mixed throughout chapter"
-          : "✓ Excellent interleaving: Topics well-mixed",
+        message: "✓ Excellent interleaving: Topics well-mixed",
         severity: 0,
         evidence: `Topics switch every ${(
           totalPositions / Math.max(blockingSegments.length, 1)
-        ).toFixed(1)} ${pluralTerm}`,
+        ).toFixed(1)} concepts`,
       });
     }
 
@@ -1928,24 +1798,14 @@ export class InterleavingEvaluator {
         id: "interleaving-1",
         principle: "interleaving",
         priority: "high",
-        title: isLiterature
-          ? "Increase Variety - Mix Literary Elements"
-          : "Reduce Blocking - Mix Topics",
-        description: isLiterature
-          ? "Break up isolated content segments and weave different literary elements together"
-          : "Break up blocked content segments and interleave different concepts",
-        implementation: `Redistribute ${blockingSegments.length} ${
-          isLiterature ? "isolated" : "blocked"
-        } segments throughout chapter`,
-        expectedImpact: isLiterature
-          ? "Varied distribution helps students see connections and develop deeper analytical understanding"
-          : "Interleaving produces 40-50% better long-term retention than blocking",
+        title: "Reduce Blocking - Mix Topics",
+        description:
+          "Break up blocked content segments and interleave different concepts",
+        implementation: `Redistribute ${blockingSegments.length} blocked segments throughout chapter`,
+        expectedImpact:
+          "Interleaving produces 40-50% better long-term retention than blocking",
         relatedConcepts: blockingSegments.map((s) => s.topic).slice(0, 5),
-        examples: isLiterature
-          ? [
-              "Instead of: All symbolism together, then all metaphor\nUse: Symbolism, Metaphor, Symbolism, Metaphor (mixed)",
-            ]
-          : ["Instead of: AAA BBB CCC, Use: ABC ABC ABC"],
+        examples: ["Instead of: AAA BBB CCC, Use: ABC ABC ABC"],
       });
     }
 

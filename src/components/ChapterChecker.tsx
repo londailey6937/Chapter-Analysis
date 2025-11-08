@@ -16,7 +16,6 @@ import {
 } from "@/utils/pdfText";
 import { Domain, getAvailableDomains } from "@/data/conceptLibraryRegistry";
 import type { ConceptDefinition } from "@/data/conceptLibraryRegistry";
-import { getExtractionPhrase } from "@/utils/domainTerminology";
 
 // ============================================================================
 // MAIN APPLICATION COMPONENT
@@ -25,7 +24,7 @@ import { getExtractionPhrase } from "@/utils/domainTerminology";
 export const ChapterChecker: React.FC = () => {
   const [chapterText, setChapterText] = useState("");
   const [selectedDomain, setSelectedDomain] = useState<Domain>("chemistry");
-  const [includeCrossDomain, setIncludeCrossDomain] = useState(false);
+  const [includeCrossDomain, setIncludeCrossDomain] = useState(true);
   const [customConcepts, setCustomConcepts] = useState<ConceptDefinition[]>([]);
   const [sectionHints, setSectionHints] = useState<
     { title: string; startIndex: number }[] | null
@@ -88,7 +87,7 @@ export const ChapterChecker: React.FC = () => {
         sectionHints || undefined
       );
 
-      setProgress(getExtractionPhrase(selectedDomain) + "...");
+      setProgress("Extracting concepts...");
 
       // Create chapter object (use ORIGINAL text for concept extraction)
       const chapter: Chapter = {
@@ -837,13 +836,9 @@ export const ChapterChecker: React.FC = () => {
                       }}
                       highlightedConceptId={highlightedConcept?.id}
                       currentMentionIndex={currentMentionIndex}
-                      domain={selectedDomain}
                     />
                   )}
-                <ChapterAnalysisDashboard
-                  analysis={analysis}
-                  domain={selectedDomain}
-                />
+                <ChapterAnalysisDashboard analysis={analysis} />
               </div>
             ) : (
               /* Info Section - Shows when no analysis */

@@ -1,10 +1,3 @@
-import { Domain } from "@/data/conceptLibraryRegistry";
-import {
-  getPluralTermCapitalized,
-  getCorePluralTerm,
-  getSingularTerm,
-} from "@/utils/domainTerminology";
-
 /**
  * Props interface for ConceptAnalysisSection component
  */
@@ -17,8 +10,6 @@ interface ConceptAnalysisSectionProps {
   density: number;
   /** Hierarchy balance score (0-1) */
   balance: number;
-  /** Domain being analyzed (for terminology) */
-  domain: Domain;
 }
 
 /**
@@ -37,21 +28,16 @@ function ConceptAnalysisSection({
   coreConcepts,
   density,
   balance,
-  domain,
 }: ConceptAnalysisSectionProps): JSX.Element {
-  const pluralTerm = getPluralTermCapitalized(domain);
-  const singularTerm = getSingularTerm(domain);
-  const corePluralTerm = getCorePluralTerm(domain);
-
   /**
    * Gets interpretation text for concept metrics
    */
   const getDensityInterpretation = (densityValue: number): string => {
     if (densityValue >= 4)
-      return `High ${singularTerm} density - may need simplification`;
-    if (densityValue >= 3) return `Optimal ${singularTerm} density`;
-    if (densityValue >= 2) return `Moderate ${singularTerm} density`;
-    return `Low ${singularTerm} density - consider adding more ${singularTerm}s`;
+      return "High concept density - may need simplification";
+    if (densityValue >= 3) return "Optimal concept density";
+    if (densityValue >= 2) return "Moderate concept density";
+    return "Low concept density - consider adding more concepts";
   };
 
   /**
@@ -60,13 +46,13 @@ function ConceptAnalysisSection({
   const getBalanceInterpretation = (balanceValue: number): string => {
     if (balanceValue >= 0.8) return "Well-balanced hierarchy";
     if (balanceValue >= 0.6) return "Good hierarchy balance";
-    return `Consider reorganizing ${singularTerm}s for better balance`;
+    return "Consider reorganizing concepts for better balance";
   };
 
   return (
     <div className="card">
       <div className="card-header">
-        <h2 className="text-2xl font-bold">{pluralTerm} Analysis</h2>
+        <h2 className="text-2xl font-bold">Concept Analysis</h2>
       </div>
       <div className="card-body">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -77,9 +63,9 @@ function ConceptAnalysisSection({
                 {totalConcepts}
               </p>
             </div>
-            <h4 className="font-semibold text-gray-900">Total {pluralTerm}</h4>
+            <h4 className="font-semibold text-gray-900">Total Concepts</h4>
             <p className="text-sm text-gray-600 mt-1">
-              Unique {singularTerm}s identified
+              Unique concepts identified
             </p>
           </div>
 
@@ -90,9 +76,7 @@ function ConceptAnalysisSection({
                 {coreConcepts}
               </p>
             </div>
-            <h4 className="font-semibold text-gray-900 capitalize">
-              {corePluralTerm}
-            </h4>
+            <h4 className="font-semibold text-gray-900">Core Concepts</h4>
             <p className="text-sm text-gray-600 mt-1">Foundation-level ideas</p>
           </div>
 
