@@ -76,7 +76,8 @@ export const AVAILABLE_DOMAINS: DomainInfo[] = [
   {
     id: "mathematics",
     label: "Mathematics",
-    description: "Math concepts (function, set, proof, theorem, etc.)",
+    description:
+      "Algebra & Trigonometry concepts (equations, functions, trig identities, etc.)",
     icon: "🔢",
   },
   {
