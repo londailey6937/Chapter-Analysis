@@ -25,7 +25,7 @@ import { getExtractionPhrase } from "@/utils/domainTerminology";
 export const ChapterChecker: React.FC = () => {
   const [chapterText, setChapterText] = useState("");
   const [selectedDomain, setSelectedDomain] = useState<Domain>("chemistry");
-  const [includeCrossDomain, setIncludeCrossDomain] = useState(true);
+  const [includeCrossDomain, setIncludeCrossDomain] = useState(false);
   const [customConcepts, setCustomConcepts] = useState<ConceptDefinition[]>([]);
   const [sectionHints, setSectionHints] = useState<
     { title: string; startIndex: number }[] | null

@@ -24,6 +24,8 @@ export class DeepProcessingEvaluator {
   ): PrincipleEvaluation {
     const findings: Finding[] = [];
     const evidence: Evidence[] = [];
+    const isLiterature =
+      chapter.metadata?.domain?.toLowerCase() === "literature";
 
     // NEW: Bloom's Taxonomy Classification
     const bloomsAnalysis = this.classifyQuestionsByBloomsLevel(chapter.content);
@@ -43,18 +45,26 @@ export class DeepProcessingEvaluator {
     if (bloomsAnalysis.higherOrderPercentage < 25) {
       findings.push({
         type: "critical",
-        message: `Only ${bloomsAnalysis.higherOrderPercentage.toFixed(
-          0
-        )}% of questions target higher-order thinking (Analyze/Evaluate/Create)`,
+        message: isLiterature
+          ? `Only ${bloomsAnalysis.higherOrderPercentage.toFixed(
+              0
+            )}% of prompts encourage analytical or interpretive thinking`
+          : `Only ${bloomsAnalysis.higherOrderPercentage.toFixed(
+              0
+            )}% of questions target higher-order thinking (Analyze/Evaluate/Create)`,
         severity: 0.85,
         evidence: `Found: ${bloomsAnalysis.analyze} analyze, ${bloomsAnalysis.evaluate} evaluate, ${bloomsAnalysis.create} create questions`,
       });
     } else if (bloomsAnalysis.higherOrderPercentage >= 40) {
       findings.push({
         type: "positive",
-        message: `✓ Excellent: ${bloomsAnalysis.higherOrderPercentage.toFixed(
-          0
-        )}% of questions promote higher-order thinking`,
+        message: isLiterature
+          ? `✓ Excellent: ${bloomsAnalysis.higherOrderPercentage.toFixed(
+              0
+            )}% of prompts promote close reading and critical interpretation`
+          : `✓ Excellent: ${bloomsAnalysis.higherOrderPercentage.toFixed(
+              0
+            )}% of questions promote higher-order thinking`,
         severity: 0,
         evidence: `Strong balance across Bloom's levels (Apply: ${bloomsAnalysis.apply}, Analyze: ${bloomsAnalysis.analyze}, Evaluate: ${bloomsAnalysis.evaluate}, Create: ${bloomsAnalysis.create})`,
       });
@@ -84,30 +94,32 @@ export class DeepProcessingEvaluator {
       });
     }
 
-    // NEW: Worked Example Detection
-    const workedExamples = this.detectWorkedExamples(chapter.content);
-    evidence.push({
-      type: "count",
-      metric: "worked_examples",
-      value: workedExamples.count,
-      threshold: Math.max(2, Math.ceil(chapter.sections.length / 3)),
-      quality: workedExamples.count >= 2 ? "strong" : "weak",
-    });
+    // NEW: Worked Example Detection (skip for literature)
+    if (!isLiterature) {
+      const workedExamples = this.detectWorkedExamples(chapter.content);
+      evidence.push({
+        type: "count",
+        metric: "worked_examples",
+        value: workedExamples.count,
+        threshold: Math.max(2, Math.ceil(chapter.sections.length / 3)),
+        quality: workedExamples.count >= 2 ? "strong" : "weak",
+      });
 
-    if (workedExamples.count === 0) {
-      findings.push({
-        type: "warning",
-        message: "No worked examples with step-by-step reasoning",
-        severity: 0.65,
-        evidence: "Worked examples model expert thinking patterns",
-      });
-    } else {
-      findings.push({
-        type: "positive",
-        message: `✓ Found ${workedExamples.count} worked examples modeling problem-solving`,
-        severity: 0,
-        evidence: workedExamples.examples.slice(0, 2).join("; "),
-      });
+      if (workedExamples.count === 0) {
+        findings.push({
+          type: "warning",
+          message: "No worked examples with step-by-step reasoning",
+          severity: 0.65,
+          evidence: "Worked examples model expert thinking patterns",
+        });
+      } else {
+        findings.push({
+          type: "positive",
+          message: `✓ Found ${workedExamples.count} worked examples modeling problem-solving`,
+          severity: 0,
+          evidence: workedExamples.examples.slice(0, 2).join("; "),
+        });
+      }
     }
 
     // NEW: Explanation Depth Analysis
@@ -131,11 +143,17 @@ export class DeepProcessingEvaluator {
     if (explanationDepth.avgDepth < 2) {
       findings.push({
         type: "warning",
-        message: "Shallow explanations - concepts lack multi-level elaboration",
+        message: isLiterature
+          ? "Shallow analysis - literary elements lack multi-level interpretation"
+          : "Shallow explanations - concepts lack multi-level elaboration",
         severity: 0.6,
-        evidence: `Average depth: ${explanationDepth.avgDepth.toFixed(
-          1
-        )}/5 (definition → example → mechanism → connection → application)`,
+        evidence: isLiterature
+          ? `Average depth: ${explanationDepth.avgDepth.toFixed(
+              1
+            )}/5 (identification → context → analysis → connection → interpretation)`
+          : `Average depth: ${explanationDepth.avgDepth.toFixed(
+              1
+            )}/5 (definition → example → mechanism → connection → application)`,
       });
     }
 
@@ -256,8 +274,14 @@ export class DeepProcessingEvaluator {
       elaborativeQuestions.count / Math.max(chapter.sections.length, 1);
     score += Math.min(elaborationRatio * 10, 15);
 
-    // Worked examples (0-10 points)
-    score += Math.min(workedExamples.count * 3, 10);
+    // Worked examples (0-10 points) - only for non-literature
+    if (!isLiterature) {
+      const workedExamples = this.detectWorkedExamples(chapter.content);
+      score += Math.min(workedExamples.count * 3, 10);
+    } else {
+      // For literature, give baseline points since worked examples don't apply
+      score += 8;
+    }
 
     // Explanation depth (0-15 points)
     score += explanationDepth.avgDepth * 3;
@@ -281,41 +305,56 @@ export class DeepProcessingEvaluator {
         id: "deep-proc-0",
         principle: "deepProcessing",
         priority: "high",
-        title: "Elevate to Higher-Order Thinking",
-        description:
-          "Add more questions that require analysis, evaluation, and creation (Bloom's higher levels)",
-        implementation:
-          'Replace "What is X?" with "How does X compare to Y?", "Why would X be more effective than Y?", "Design a solution using X"',
-        expectedImpact:
-          "Promotes critical thinking and deeper understanding rather than memorization",
+        title: isLiterature
+          ? "Elevate to Deeper Literary Analysis"
+          : "Elevate to Higher-Order Thinking",
+        description: isLiterature
+          ? "Add more prompts that require close reading, interpretation, and textual analysis"
+          : "Add more questions that require analysis, evaluation, and creation (Bloom's higher levels)",
+        implementation: isLiterature
+          ? 'Replace "Who is the narrator?" with "How does the narrative perspective shape the reader\'s understanding?", "What does this symbolize and why?", "How do these themes interconnect?"'
+          : 'Replace "What is X?" with "How does X compare to Y?", "Why would X be more effective than Y?", "Design a solution using X"',
+        expectedImpact: isLiterature
+          ? "Promotes critical interpretation and deeper textual engagement"
+          : "Promotes critical thinking and deeper understanding rather than memorization",
         relatedConcepts: concepts.hierarchy.core.map((c) => c.id),
-        examples: [
-          "Analyze: Compare and contrast X with Y",
-          "Evaluate: Which approach would be most effective and why?",
-          "Create: Design an experiment to test this hypothesis",
-        ],
+        examples: isLiterature
+          ? [
+              "Analyze: How does the author use imagery to convey meaning?",
+              "Evaluate: Which interpretation is better supported by the text?",
+              "Create: Write an alternative ending that maintains thematic consistency",
+            ]
+          : [
+              "Analyze: Compare and contrast X with Y",
+              "Evaluate: Which approach would be most effective and why?",
+              "Create: Design an experiment to test this hypothesis",
+            ],
       });
     }
 
-    if (workedExamples.count === 0) {
-      suggestions.push({
-        id: "deep-proc-0.5",
-        principle: "deepProcessing",
-        priority: "high",
-        title: "Add Worked Examples",
-        description:
-          "Include step-by-step demonstrations that model expert problem-solving",
-        implementation:
-          'Create examples with explicit reasoning: "Step 1: First, we identify... Step 2: Next, we apply... because..."',
-        expectedImpact:
-          "Learners observe expert thinking patterns and build mental models for problem-solving",
-        relatedConcepts: concepts.hierarchy.core.map((c) => c.id).slice(0, 3),
-        examples: [
-          "Example 1: Let's solve this problem step-by-step...",
-          "Work through: How would an expert approach this?",
-          "Demonstration: Watch how we break this down systematically",
-        ],
-      });
+    // Only suggest worked examples for non-literature domains
+    if (!isLiterature) {
+      const workedExamples = this.detectWorkedExamples(chapter.content);
+      if (workedExamples.count === 0) {
+        suggestions.push({
+          id: "deep-proc-0.5",
+          principle: "deepProcessing",
+          priority: "high",
+          title: "Add Worked Examples",
+          description:
+            "Include step-by-step demonstrations that model expert problem-solving",
+          implementation:
+            'Create examples with explicit reasoning: "Step 1: First, we identify... Step 2: Next, we apply... because..."',
+          expectedImpact:
+            "Learners observe expert thinking patterns and build mental models for problem-solving",
+          relatedConcepts: concepts.hierarchy.core.map((c) => c.id).slice(0, 3),
+          examples: [
+            "Example 1: Let's solve this problem step-by-step...",
+            "Work through: How would an expert approach this?",
+            "Demonstration: Watch how we break this down systematically",
+          ],
+        });
+      }
     }
 
     if (whyHowQuestions === 0) {
