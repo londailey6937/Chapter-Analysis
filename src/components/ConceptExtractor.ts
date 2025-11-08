@@ -29,7 +29,7 @@ export class ConceptExtractor {
   private domain: Domain;
   private includeCrossDomain: boolean;
   private customConcepts: ConceptDefinition[];
-  private conceptLibrary: ConceptDefinition[];
+  private conceptLibrary: Map<string, ConceptDefinition>;
 
   constructor(
     domain: Domain = "chemistry",
@@ -46,11 +46,24 @@ export class ConceptExtractor {
       ? getLibraryByDomain("cross-domain")
       : null;
 
-    this.conceptLibrary = [
+    // Convert to Map for efficient lookups
+    const allConcepts = [
       ...(domainLib?.concepts || []),
       ...(crossDomainLib?.concepts || []),
       ...customConcepts,
     ];
+
+    this.conceptLibrary = new Map();
+    for (const concept of allConcepts) {
+      const key = concept.name.toLowerCase();
+      this.conceptLibrary.set(key, concept);
+      // Also add aliases
+      if (concept.aliases) {
+        for (const alias of concept.aliases) {
+          this.conceptLibrary.set(alias.toLowerCase(), concept);
+        }
+      }
+    }
   }
 
   // Comprehensive stopword list - common English words that aren't domain concepts
