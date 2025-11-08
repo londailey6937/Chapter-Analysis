@@ -5,12 +5,18 @@
 
 import React, { useState } from "react";
 import type { Concept } from "@/types";
+import type { Domain } from "@/data/conceptLibraryRegistry";
+import {
+  getPluralTermCapitalized,
+  getCorePluralTerm,
+} from "@/utils/domainTerminology";
 
 interface ConceptListProps {
   concepts: Concept[];
   onConceptClick: (concept: Concept, mentionIndex: number) => void;
   highlightedConceptId?: string | null;
   currentMentionIndex?: number;
+  domain: Domain;
 }
 
 export const ConceptList: React.FC<ConceptListProps> = ({
@@ -18,7 +24,11 @@ export const ConceptList: React.FC<ConceptListProps> = ({
   onConceptClick,
   highlightedConceptId,
   currentMentionIndex = 0,
+  domain,
 }) => {
+  const pluralTerm = getPluralTermCapitalized(domain);
+  const corePluralTerm = getCorePluralTerm(domain);
+
   // Find the highlighted concept to show navigation
   const highlightedConcept = concepts.find(
     (c) => c.id === highlightedConceptId
@@ -81,9 +91,10 @@ export const ConceptList: React.FC<ConceptListProps> = ({
     <div className="concept-list">
       <div className="card">
         <div className="card-header">
-          <h3 className="text-xl font-bold">📚 Identified Concepts</h3>
+          <h3 className="text-xl font-bold">📚 Identified {pluralTerm}</h3>
           <p className="text-sm text-gray-600 mt-1">
-            Click a concept to highlight it in the PDF
+            Click a {pluralTerm.toLowerCase().slice(0, -1)} to highlight it in
+            the PDF
           </p>
 
           {/* Navigation controls when a concept is selected */}
@@ -119,12 +130,12 @@ export const ConceptList: React.FC<ConceptListProps> = ({
         </div>
         <div className="card-body">
           {renderConceptGroup(
-            "Core Concepts",
+            corePluralTerm.charAt(0).toUpperCase() + corePluralTerm.slice(1),
             groupedConcepts.core,
             "concept-badge-core"
           )}
           {renderConceptGroup(
-            "Supporting Concepts",
+            `Supporting ${pluralTerm}`,
             groupedConcepts.supporting,
             "concept-badge-supporting"
           )}
@@ -135,7 +146,7 @@ export const ConceptList: React.FC<ConceptListProps> = ({
           )}
           {concepts.length === 0 && (
             <p className="text-gray-500 text-center py-4">
-              No concepts identified yet
+              No {pluralTerm.toLowerCase()} identified yet
             </p>
           )}
         </div>

@@ -1571,9 +1571,21 @@ export const PrincipleFindings: React.FC<{
 // MAIN DASHBOARD COMPONENT
 // ============================================================================
 
+import { Domain } from "@/data/conceptLibraryRegistry";
+import {
+  getPluralTermCapitalized,
+  getCorePluralTerm,
+  getSingularTerm,
+} from "@/utils/domainTerminology";
+
 export const ChapterAnalysisDashboard: React.FC<{
   analysis: ChapterAnalysis;
-}> = ({ analysis }) => {
+  domain?: Domain;
+}> = ({ analysis, domain = "chemistry" }) => {
+  const pluralTerm = getPluralTermCapitalized(domain);
+  const singularTerm = getSingularTerm(domain);
+  const corePluralTerm = getCorePluralTerm(domain);
+
   // Defensive guards in case analysis shape changes or fields are missing
   const safeAnalysis = analysis || ({} as ChapterAnalysis);
   const overallScore = safeAnalysis.overallScore ?? 0;
@@ -1609,19 +1621,19 @@ export const ChapterAnalysisDashboard: React.FC<{
       </div>
 
       <div className="concepts-section">
-        <h3>Concept Analysis</h3>
+        <h3>{pluralTerm} Analysis</h3>
         <div className="concept-stats">
           <div className="stat">
             <strong>{conceptAnalysis.totalConceptsIdentified}</strong>
-            <p>Total Concepts</p>
+            <p>Total {pluralTerm}</p>
           </div>
           <div className="stat">
             <strong>{conceptAnalysis.coreConceptCount}</strong>
-            <p>Core Concepts</p>
+            <p className="capitalize">{corePluralTerm}</p>
           </div>
           <div className="stat">
             <strong>{conceptAnalysis.conceptDensity.toFixed(1)}</strong>
-            <p>Concepts per 1K words</p>
+            <p>{pluralTerm} per 1K words</p>
           </div>
           <div className="stat">
             <strong>

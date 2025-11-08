@@ -1,4 +1,5 @@
 import { ChapterAnalysis } from "@/types";
+import { Domain } from "@/data/conceptLibraryRegistry";
 import OverallScoreCard from "./OverallScoreCard";
 import PrincipleScoresGrid from "./PrincipleScoresGrid";
 import ConceptAnalysisSection from "./ConceptAnalysisSection";
@@ -12,6 +13,8 @@ interface ChapterAnalysisDashboardProps {
   analysis: ChapterAnalysis;
   /** Callback to reset and go back to input */
   onReset: () => void;
+  /** Domain being analyzed (for terminology) */
+  domain: Domain;
 }
 
 /**
@@ -29,6 +32,7 @@ interface ChapterAnalysisDashboardProps {
 function ChapterAnalysisDashboard({
   analysis,
   onReset,
+  domain,
 }: ChapterAnalysisDashboardProps): JSX.Element {
   const { overallScore, recommendations } = analysis;
   const conceptAnalysis = analysis.conceptAnalysis || {
@@ -72,6 +76,7 @@ function ChapterAnalysisDashboard({
         coreConcepts={conceptAnalysis.coreConceptCount}
         density={conceptAnalysis.conceptDensity}
         balance={conceptAnalysis.hierarchyBalance}
+        domain={domain}
       />
 
       {/* Structure Analysis */}

@@ -16,6 +16,7 @@ import {
 } from "@/utils/pdfText";
 import { Domain, getAvailableDomains } from "@/data/conceptLibraryRegistry";
 import type { ConceptDefinition } from "@/data/conceptLibraryRegistry";
+import { getExtractionPhrase } from "@/utils/domainTerminology";
 
 // ============================================================================
 // MAIN APPLICATION COMPONENT
@@ -87,7 +88,7 @@ export const ChapterChecker: React.FC = () => {
         sectionHints || undefined
       );
 
-      setProgress("Extracting concepts...");
+      setProgress(getExtractionPhrase(selectedDomain) + "...");
 
       // Create chapter object (use ORIGINAL text for concept extraction)
       const chapter: Chapter = {
@@ -836,9 +837,13 @@ export const ChapterChecker: React.FC = () => {
                       }}
                       highlightedConceptId={highlightedConcept?.id}
                       currentMentionIndex={currentMentionIndex}
+                      domain={selectedDomain}
                     />
                   )}
-                <ChapterAnalysisDashboard analysis={analysis} />
+                <ChapterAnalysisDashboard
+                  analysis={analysis}
+                  domain={selectedDomain}
+                />
               </div>
             ) : (
               /* Info Section - Shows when no analysis */
