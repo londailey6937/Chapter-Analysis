@@ -19,10 +19,12 @@ import {
 } from "recharts";
 import {
   ChapterAnalysis,
+  Concept,
   ConceptNode,
   ConceptLink,
   PrincipleEvaluation,
 } from "@/types";
+import { ConceptList } from "./ConceptList";
 
 // Friendly display names for principle enum codes to avoid raw concatenation (e.g., "dualCoding") in UI copy
 const PRINCIPLE_NAME_MAP: Record<string, string> = {
@@ -38,6 +40,73 @@ const PRINCIPLE_NAME_MAP: Record<string, string> = {
   emotionAndRelevance: "Emotion & Relevance",
 };
 
+// Definitions and examples for each learning principle
+const PRINCIPLE_DEFINITIONS: Record<
+  string,
+  { definition: string; example: string }
+> = {
+  deepProcessing: {
+    definition:
+      "Engaging with material at a meaningful level through elaboration, connecting to prior knowledge, and asking 'why' questions rather than surface-level memorization.",
+    example:
+      "Instead of memorizing 'mitochondria = powerhouse of cell,' explain how ATP production enables cellular processes and why certain cells have more mitochondria.",
+  },
+  spacedRepetition: {
+    definition:
+      "Distributing practice and review over time with increasing intervals, leveraging the spacing effect to combat forgetting and strengthen long-term retention.",
+    example:
+      "Review key concepts after 1 day, then 3 days, then 1 week, rather than cramming all practice into a single session.",
+  },
+  retrievalPractice: {
+    definition:
+      "Actively recalling information from memory without looking at notes, which strengthens neural pathways and reveals gaps in understanding.",
+    example:
+      "Close the book and write down everything you remember about photosynthesis, then check for accuracy—don't just re-read highlighted passages.",
+  },
+  interleaving: {
+    definition:
+      "Mixing different topics or problem types during practice rather than blocking similar items together, improving discrimination and transfer.",
+    example:
+      "Practice problems alternating between derivatives, integrals, and limits, rather than doing 20 derivative problems in a row.",
+  },
+  dualCoding: {
+    definition:
+      "Combining verbal and visual representations of information to create multiple memory pathways and deepen understanding through complementary formats.",
+    example:
+      "Pair a written explanation of the water cycle with a diagram showing evaporation, condensation, and precipitation with arrows indicating flow.",
+  },
+  generativeLearning: {
+    definition:
+      "Creating new content, making predictions, or explaining concepts in your own words to actively construct understanding rather than passively receiving information.",
+    example:
+      "Before reading about natural selection, predict how trait frequencies might change in a population, then compare your reasoning to the actual mechanism.",
+  },
+  metacognition: {
+    definition:
+      "Thinking about your own thinking—monitoring comprehension, planning learning strategies, evaluating what you know and don't know, and adjusting approaches accordingly.",
+    example:
+      "After each section, pause to ask: 'What's still confusing? What strategy should I try? Can I explain this concept to someone else?'",
+  },
+  schemaBuilding: {
+    definition:
+      "Organizing information into connected mental frameworks that show relationships between concepts, building from foundational ideas to complex applications.",
+    example:
+      "Create a concept map showing how cell structure, organelles, metabolism, and reproduction all connect to the central theme of maintaining life.",
+  },
+  cognitiveLoad: {
+    definition:
+      "Managing the amount of information processed simultaneously, reducing extraneous load from distractions while optimizing germane load for learning-relevant processing.",
+    example:
+      "Introduce the basic equation first, work through examples, then add special cases—rather than presenting all variations and exceptions simultaneously.",
+  },
+  emotionAndRelevance: {
+    definition:
+      "Connecting content to personal experiences, goals, and emotions to increase motivation, attention, and memory formation through meaningful engagement.",
+    example:
+      "Relate chemical reactions to cooking food you love, or connect economic principles to managing your own budget and financial goals.",
+  },
+};
+
 // ============================================================================
 // CHAPTER OVERVIEW TIMELINE
 // ============================================================================
@@ -45,8 +114,20 @@ const PRINCIPLE_NAME_MAP: Record<string, string> = {
 export const ChapterOverviewTimeline: React.FC<{
   analysis: ChapterAnalysis;
 }> = ({ analysis }) => {
-  const sections = analysis.visualizations.cognitiveLoadCurve || [];
+  const allSections = analysis.visualizations.cognitiveLoadCurve || [];
   const [zoom, setZoom] = useState(1);
+
+  // Filter out TOC and front matter sections
+  const sections = allSections.filter((sec: any) => {
+    const heading = (sec.heading || sec.sectionId || "").toLowerCase();
+    return (
+      !heading.includes("table of contents") &&
+      !heading.includes("contents") &&
+      !heading.match(/^(toc|contents|index)$/i) &&
+      !heading.match(/^page \d+$/i)
+    ); // Filter out "Page N" sections
+  });
+
   const blockingSegments =
     analysis.visualizations.interleavingPattern.blockingSegments || [];
 
@@ -812,6 +893,75 @@ export const ConceptMapVisualization: React.FC<ConceptMapProps> = ({
 };
 
 // ============================================================================
+// BLOCKING ISSUE CARD COMPONENT
+// ============================================================================
+
+interface BlockingIssueCardProps {
+  conceptName: string;
+  longestRun: number;
+  occurrences: number;
+  lengths: number[];
+  sections?: string[];
+}
+
+const BlockingIssueCard: React.FC<BlockingIssueCardProps> = ({
+  conceptName,
+  longestRun,
+  occurrences,
+  lengths,
+  sections = [],
+}) => {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="blocking-card" onClick={() => setExpanded(!expanded)}>
+      <div className="blocking-header">
+        <h5 className="blocking-concept-name">{conceptName}</h5>
+        <div className="blocking-badge">{longestRun} consecutive</div>
+      </div>
+
+      {expanded && (
+        <div className="blocking-details">
+          <div className="blocking-stats">
+            <p>
+              <strong>Longest run:</strong> {longestRun} consecutive mentions
+            </p>
+            {occurrences > 1 && (
+              <p>
+                <strong>Blocking segments:</strong> {occurrences} total (runs:{" "}
+                {lengths.slice(0, 3).join(", ")}
+                {lengths.length > 3 ? ", …" : ""})
+              </p>
+            )}
+            {sections.length > 0 && (
+              <p className="blocking-location">
+                📍 <strong>Found in:</strong> {sections.slice(0, 2).join(", ")}
+                {sections.length > 2 && ` (+${sections.length - 2} more)`}
+              </p>
+            )}
+          </div>
+
+          <div className="blocking-why-matters">
+            <strong>Why this matters:</strong> Blocked practice (repeating the
+            same concept many times in a row) creates an illusion of mastery but
+            leads to poor long-term retention and difficulty distinguishing
+            between similar concepts.
+          </div>
+
+          <div className="blocking-suggestion-box">
+            <strong>How to fix:</strong> Break these up with contrasting
+            concepts or brief application prompts. For example, after 3-4
+            mentions of "{conceptName}", introduce a different but related
+            concept, then return to "{conceptName}" later. This interleaving
+            strengthens learning.
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================================================
 // INTERLEAVING PATTERN VISUALIZATION
 // ============================================================================
 
@@ -909,16 +1059,21 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
     <div className="viz-container">
       <h3>Topic Interleaving Analysis</h3>
       <p className="viz-subtitle">
-        Evaluates whether concepts are mixed (interleaved) or presented in long
-        blocks
+        Measures how well concepts are mixed vs. presented in isolated blocks.
+        <br />
+        <em style={{ fontSize: "12px", color: "var(--text-subtle)" }}>
+          Note: Learning Principle score also considers interleaving density and
+          discrimination practice.
+        </em>
       </p>
 
       <div className="interleaving-metrics-grid">
         <div className="metric-card">
-          <div className="metric-label">Interleaving Quality</div>
+          <div className="metric-label">Basic Interleaving</div>
           <div className="metric-value" style={{ color: scoreColor }}>
             {interleavingScore}%
           </div>
+          <div className="metric-note">(1 - blocking ratio)</div>
         </div>
         <div className="metric-card">
           <div className="metric-label">Topic Switches</div>
@@ -971,44 +1126,43 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
       </div>
 
       {worstBlocks.length > 0 && (
-        <div className="section-divider">
-          <h4>⚠️ Blocking Issues Detected</h4>
-          <div className="blocking-issues">
-            {worstBlocks.map((group, idx) => {
-              const name = idToName[group.conceptId] || group.conceptId;
-              return (
-                <div key={idx} className="blocking-issue-card">
-                  <div className="blocking-concept">{name}</div>
-                  <div className="blocking-detail">
-                    Longest run: {group.longest} consecutive mentions
-                    {group.occurrences > 1 &&
-                      ` • ${
-                        group.occurrences
-                      } blocking segments (runs: ${group.lengths
-                        .slice(0, 3)
-                        .join(", ")}${group.lengths.length > 3 ? ", …" : ""})`}
-                    {group.sections && group.sections.length > 0 && (
-                      <div className="blocking-location">
-                        📍 Found in: {group.sections.slice(0, 2).join(", ")}
-                        {group.sections.length > 2 &&
-                          ` (+${group.sections.length - 2} more)`}
-                      </div>
-                    )}
-                    <div className="blocking-suggestion">
-                      Break these up with contrasting concepts or brief
-                      application prompts.
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        <div className="blocking-section">
+          <h4 className="blocking-section-title">
+            ⚠️ Blocking Issues Detected
+          </h4>
+          <p className="blocking-section-subtitle">
+            Click each concept to see details and recommendations
+          </p>
+          {worstBlocks.map((group, idx) => {
+            const name = idToName[group.conceptId] || group.conceptId;
+            return (
+              <BlockingIssueCard
+                key={idx}
+                conceptName={name}
+                longestRun={group.longest}
+                occurrences={group.occurrences}
+                lengths={group.lengths}
+                sections={group.sections}
+              />
+            );
+          })}
         </div>
       )}
 
+      <div className="recommendation-box">
+        <strong>Recommendation:</strong> {pattern.recommendation}
+      </div>
+      <div className="why-matters-block">
+        <strong>Why this matters:</strong> Interleaving (mixing topics) improves
+        discrimination and long‑term retention compared to blocked sequences.
+      </div>
+
       {top5Transitions.length > 0 && (
-        <div className="section-divider">
+        <div className="transitions-section">
           <h4>Common Concept Transitions</h4>
+          <p className="transitions-subtitle">
+            Shows how concepts connect in your chapter
+          </p>
           <div className="transitions-list">
             {top5Transitions.map((trans, idx) => (
               <div key={idx} className="transition-item">
@@ -1023,16 +1177,15 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
               </div>
             ))}
           </div>
+          <div className="transitions-why-matters">
+            <strong>Why this matters:</strong> Understanding your concept flow
+            patterns helps identify natural connections students make.
+            High-frequency transitions reveal your chapter's conceptual
+            narrative—use this to reinforce effective bridges between ideas or
+            to spot opportunities for more diverse interleaving.
+          </div>
         </div>
       )}
-
-      <div className="recommendation-box">
-        <strong>Recommendation:</strong> {pattern.recommendation}
-      </div>
-      <div className="why-matters-block">
-        <strong>Why this matters:</strong> Interleaving (mixing topics) improves
-        discrimination and long‑term retention compared to blocked sequences.
-      </div>
 
       <style>{`
         .interleaving-metrics-grid {
@@ -1059,6 +1212,12 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
           font-size: 24px;
           font-weight: bold;
           color: var(--text-main);
+        }
+        .metric-note {
+          font-size: 10px;
+          color: var(--text-subtle);
+          margin-top: 4px;
+          font-style: italic;
         }
         .section-divider {
           margin: 24px 0;
@@ -1173,6 +1332,123 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
           border-left: 4px solid var(--brand-accent);
           border-radius: 4px;
           font-size: 14px;
+          color: var(--text-main);
+        }
+        /* Blocking Section Styles */
+        .blocking-section {
+          margin: 30px 0;
+        }
+        .blocking-section-title {
+          font-size: 20px;
+          font-weight: 600;
+          color: var(--danger-600);
+          margin: 0 0 5px 0;
+        }
+        .blocking-section-subtitle {
+          color: var(--text-muted);
+          font-size: 13px;
+          margin: 0 0 15px 0;
+          font-style: italic;
+        }
+        .blocking-card {
+          border: 1px solid #fecaca;
+          border-radius: 8px;
+          margin: 10px 0;
+          padding: 15px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          background: #fef2f2;
+        }
+        .blocking-card:hover {
+          box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15);
+          border-color: var(--danger-600);
+        }
+        .blocking-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .blocking-concept-name {
+          margin: 0;
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--danger-600);
+        }
+        .blocking-badge {
+          padding: 4px 10px;
+          border-radius: 12px;
+          background: var(--danger-600);
+          color: white;
+          font-weight: 600;
+          font-size: 12px;
+        }
+        .blocking-details {
+          margin-top: 15px;
+          padding-top: 15px;
+          border-top: 1px solid #fecaca;
+        }
+        .blocking-stats p {
+          margin: 8px 0;
+          font-size: 14px;
+          color: var(--text-main);
+        }
+        .blocking-location {
+          margin-top: 8px;
+          padding: 6px 10px;
+          background: rgba(14, 165, 233, 0.1);
+          border-radius: 4px;
+          font-size: 13px;
+          color: var(--brand-accent);
+          display: inline-block;
+        }
+        .blocking-why-matters {
+          margin-top: 12px;
+          padding: 10px;
+          background: #fffbeb;
+          border-left: 3px solid var(--warn-600);
+          border-radius: 4px;
+          font-size: 13px;
+          line-height: 1.5;
+          color: var(--text-main);
+        }
+        .blocking-suggestion-box {
+          margin-top: 12px;
+          padding: 10px;
+          background: #f0f9ff;
+          border-left: 3px solid var(--brand-accent);
+          border-radius: 4px;
+          font-size: 13px;
+          line-height: 1.5;
+          color: var(--text-main);
+        }
+        /* Transitions Section Styles */
+        .transitions-section {
+          margin: 30px 0;
+          padding: 20px;
+          background: #f8fafc;
+          border-radius: 8px;
+          border: 1px solid var(--border-soft);
+        }
+        .transitions-section h4 {
+          margin: 0 0 5px 0;
+          font-size: 18px;
+          font-weight: 600;
+          color: var(--text-main);
+        }
+        .transitions-subtitle {
+          color: var(--text-muted);
+          font-size: 13px;
+          margin: 0 0 15px 0;
+          font-style: italic;
+        }
+        .transitions-why-matters {
+          margin-top: 15px;
+          padding: 12px;
+          background: white;
+          border-left: 3px solid var(--brand-navy-600);
+          border-radius: 4px;
+          font-size: 13px;
+          line-height: 1.6;
           color: var(--text-main);
         }
       `}</style>
@@ -1425,6 +1701,8 @@ export const PrincipleFindings: React.FC<{
       ? "var(--warn-600)"
       : "var(--danger-600)";
 
+  const principleInfo = PRINCIPLE_DEFINITIONS[principle.principle];
+
   return (
     <div className="principle-card" onClick={() => setExpanded(!expanded)}>
       <div className="principle-header">
@@ -1436,6 +1714,16 @@ export const PrincipleFindings: React.FC<{
 
       {expanded && (
         <div className="principle-details">
+          {principleInfo && (
+            <div className="principle-definition">
+              <h5>What this means:</h5>
+              <p className="definition-text">{principleInfo.definition}</p>
+              <p className="example-text">
+                <strong>Example:</strong> {principleInfo.example}
+              </p>
+            </div>
+          )}
+
           <div className="findings">
             <h5>Findings:</h5>
             {principle.findings.map((finding, idx) => (
@@ -1447,14 +1735,18 @@ export const PrincipleFindings: React.FC<{
 
           <div className="suggestions">
             <h5>Suggestions:</h5>
-            {principle.suggestions.map((suggestion) => (
-              <div key={suggestion.id} className="suggestion">
-                <p>
-                  <strong>{suggestion.title}</strong> ({suggestion.priority})
-                </p>
-                <p className="suggestion-desc">{suggestion.description}</p>
-              </div>
-            ))}
+            {principle.suggestions.length > 0 ? (
+              principle.suggestions.map((suggestion) => (
+                <div key={suggestion.id} className="suggestion">
+                  <p>
+                    <strong>{suggestion.title}</strong> ({suggestion.priority})
+                  </p>
+                  <p className="suggestion-desc">{suggestion.description}</p>
+                </div>
+              ))
+            ) : (
+              <p className="no-suggestions">None</p>
+            )}
           </div>
 
           <div className="evidence">
@@ -1462,9 +1754,19 @@ export const PrincipleFindings: React.FC<{
             {principle.evidence.map((e, idx) => (
               <p key={idx} className="evidence-item">
                 {e.metric}:{" "}
-                {typeof e.value === "number" ? Math.trunc(e.value) : e.value}{" "}
+                {typeof e.value === "number"
+                  ? e.value < 1 && e.value > 0
+                    ? e.value.toFixed(2)
+                    : e.value < 10
+                    ? e.value.toFixed(1)
+                    : Math.trunc(e.value)
+                  : e.value}{" "}
                 {e.threshold !== undefined && typeof e.threshold === "number"
-                  ? `(target: ${Math.trunc(e.threshold)})`
+                  ? `(target: ${
+                      e.threshold < 1
+                        ? e.threshold.toFixed(2)
+                        : Math.trunc(e.threshold)
+                    })`
                   : e.threshold
                   ? `(target: ${e.threshold})`
                   : ""}
@@ -1562,6 +1864,32 @@ export const PrincipleFindings: React.FC<{
           margin: 3px 0;
           font-family: monospace;
         }
+        .no-suggestions {
+          color: var(--success-600);
+          font-weight: 600;
+          font-size: 14px;
+          margin: 5px 0;
+        }
+        .principle-definition {
+          background: #f8fafc;
+          padding: 12px;
+          border-radius: 6px;
+          margin-bottom: 15px;
+          border-left: 3px solid var(--brand-navy-600);
+        }
+        .definition-text {
+          font-size: 14px;
+          line-height: 1.6;
+          color: var(--text-main);
+          margin: 5px 0;
+        }
+        .example-text {
+          font-size: 13px;
+          line-height: 1.5;
+          color: var(--text-muted);
+          margin: 8px 0 0 0;
+          font-style: italic;
+        }
       `}</style>
     </div>
   );
@@ -1573,7 +1901,17 @@ export const PrincipleFindings: React.FC<{
 
 export const ChapterAnalysisDashboard: React.FC<{
   analysis: ChapterAnalysis;
-}> = ({ analysis }) => {
+  concepts: Concept[];
+  onConceptClick: (concept: Concept, mentionIndex: number) => void;
+  highlightedConceptId?: string | null;
+  currentMentionIndex?: number;
+}> = ({
+  analysis,
+  concepts,
+  onConceptClick,
+  highlightedConceptId,
+  currentMentionIndex = 0,
+}) => {
   // Defensive guards in case analysis shape changes or fields are missing
   const safeAnalysis = analysis || ({} as ChapterAnalysis);
   const overallScore = safeAnalysis.overallScore ?? 0;
@@ -1600,6 +1938,13 @@ export const ChapterAnalysisDashboard: React.FC<{
 
       <ChapterOverviewTimeline analysis={safeAnalysis} />
 
+      <div className="viz-grid">
+        <PrincipleScoresRadar analysis={safeAnalysis} />
+        <CognitiveLoadCurve analysis={safeAnalysis} />
+        <ConceptMentionFrequency analysis={safeAnalysis} />
+        <InterleavingPattern analysis={safeAnalysis} />
+      </div>
+
       <div className="principles-section">
         <h3>Learning Principles Evaluation</h3>
         <p className="section-subtitle">
@@ -1610,40 +1955,11 @@ export const ChapterAnalysisDashboard: React.FC<{
         ))}
       </div>
 
-      <div className="viz-grid">
-        <PrincipleScoresRadar analysis={safeAnalysis} />
-        <CognitiveLoadCurve analysis={safeAnalysis} />
-        <ConceptMentionFrequency analysis={safeAnalysis} />
-        <InterleavingPattern analysis={safeAnalysis} />
-        <ReviewScheduleTimeline analysis={safeAnalysis} />
-      </div>
-
-      <div className="concepts-section">
-        <h3>Identified Concepts</h3>
-        <div className="concept-stats">
-          <div className="stat">
-            <strong>{conceptAnalysis.totalConceptsIdentified}</strong>
-            <p>Total Concepts</p>
-          </div>
-          <div className="stat">
-            <strong>{conceptAnalysis.coreConceptCount}</strong>
-            <p>Core Concepts</p>
-          </div>
-          <div className="stat">
-            <strong>{conceptAnalysis.conceptDensity.toFixed(1)}</strong>
-            <p>Concepts per 1K words</p>
-          </div>
-          <div className="stat">
-            <strong>
-              {(conceptAnalysis.hierarchyBalance * 100).toFixed(0)}%
-            </strong>
-            <p>Hierarchy Balance</p>
-          </div>
-        </div>
-      </div>
-
       <div className="recommendations-section">
-        <h3>Recommendations ({recommendations.length})</h3>
+        <h3>📋 Recommendations ({recommendations.length})</h3>
+        <p className="section-subtitle">
+          Prioritized suggestions to enhance learning effectiveness
+        </p>
         {recommendations.slice(0, 10).map((rec) => (
           <div key={rec.id} className={`recommendation rec-${rec.priority}`}>
             <h4>{rec.title}</h4>
@@ -1655,6 +1971,46 @@ export const ChapterAnalysisDashboard: React.FC<{
           </div>
         ))}
       </div>
+
+      <div className="concepts-section">
+        <h3>📚 Concept Overview</h3>
+        <p className="section-subtitle">
+          Summary metrics for identified concepts
+        </p>
+        <div className="concept-stats">
+          <div className="stat">
+            <strong>{conceptAnalysis.totalConceptsIdentified}</strong>
+            <p>Total Concepts</p>
+          </div>
+          <div className="stat">
+            <strong>{conceptAnalysis.coreConceptCount}</strong>
+            <p>Core Concepts</p>
+            <p className="stat-note">Repeated 3+ times</p>
+          </div>
+          <div className="stat">
+            <strong>{conceptAnalysis.conceptDensity.toFixed(1)}</strong>
+            <p>Concepts per 1K words</p>
+            <p className="stat-note">Target: 2-4</p>
+          </div>
+          <div className="stat">
+            <strong>
+              {(conceptAnalysis.hierarchyBalance * 100).toFixed(0)}%
+            </strong>
+            <p>Hierarchy Balance</p>
+            <p className="stat-note">Target: 60-80%</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Concept List with click-to-highlight */}
+      {concepts && concepts.length > 0 && (
+        <ConceptList
+          concepts={concepts}
+          onConceptClick={onConceptClick}
+          highlightedConceptId={highlightedConceptId}
+          currentMentionIndex={currentMentionIndex}
+        />
+      )}
 
       <style>{`
           .dashboard {
@@ -1722,6 +2078,24 @@ export const ChapterAnalysisDashboard: React.FC<{
             margin: -5px 0 15px 0;
             font-style: italic;
           }
+          .principles-section {
+            margin: 30px 0;
+          }
+          .principles-section h3 {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0 0 10px 0;
+          }
+          .recommendations-section h3,
+          .concepts-section h3 {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0 0 10px 0;
+          }
           .concept-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -1745,6 +2119,12 @@ export const ChapterAnalysisDashboard: React.FC<{
             margin: 5px 0 0 0;
             color: var(--text-muted);
             font-size: 12px;
+          }
+          .stat-note {
+            margin: 2px 0 0 0 !important;
+            color: #64748b !important; /* slate-500 */
+            font-size: 11px !important;
+            font-style: italic;
           }
           .recommendation {
             border-left: 4px solid #ccc;

@@ -565,123 +565,6 @@ export const ChapterChecker: React.FC = () => {
                 </label>
               </div>
 
-              {/* Custom Concepts Input */}
-              <div className="custom-concepts-section">
-                <details>
-                  <summary className="custom-concepts-header">
-                    <strong>➕ Add Custom Concepts</strong>
-                    <span className="custom-count">
-                      ({customConcepts.length} added)
-                    </span>
-                  </summary>
-                  <div className="custom-concepts-form">
-                    <p className="form-hint">
-                      Add domain-specific concepts unique to your chapter
-                    </p>
-                    <div className="form-row">
-                      <input
-                        type="text"
-                        placeholder="Concept name (e.g., mitochondria)"
-                        id="custom-concept-name"
-                        className="form-input"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Aliases (comma-separated)"
-                        id="custom-concept-aliases"
-                        className="form-input"
-                      />
-                    </div>
-                    <div className="form-row">
-                      <input
-                        type="text"
-                        placeholder="Category (e.g., Cell Biology)"
-                        id="custom-concept-category"
-                        className="form-input"
-                      />
-                      <select
-                        id="custom-concept-importance"
-                        className="form-input"
-                      >
-                        <option value="core">Core Concept</option>
-                        <option value="supporting">Supporting</option>
-                        <option value="detail">Detail</option>
-                      </select>
-                    </div>
-                    <button
-                      className="btn-add-concept"
-                      onClick={() => {
-                        const nameEl = document.getElementById(
-                          "custom-concept-name"
-                        ) as HTMLInputElement;
-                        const aliasesEl = document.getElementById(
-                          "custom-concept-aliases"
-                        ) as HTMLInputElement;
-                        const categoryEl = document.getElementById(
-                          "custom-concept-category"
-                        ) as HTMLInputElement;
-                        const importanceEl = document.getElementById(
-                          "custom-concept-importance"
-                        ) as HTMLSelectElement;
-
-                        const name = nameEl?.value.trim();
-                        if (!name) {
-                          alert("Please enter a concept name");
-                          return;
-                        }
-
-                        const newConcept: ConceptDefinition = {
-                          name,
-                          aliases: aliasesEl?.value
-                            .split(",")
-                            .map((s) => s.trim())
-                            .filter(Boolean),
-                          category: categoryEl?.value.trim() || "Custom",
-                          importance: (importanceEl?.value || "supporting") as
-                            | "core"
-                            | "supporting"
-                            | "detail",
-                        };
-
-                        setCustomConcepts([...customConcepts, newConcept]);
-
-                        // Clear form
-                        if (nameEl) nameEl.value = "";
-                        if (aliasesEl) aliasesEl.value = "";
-                        if (categoryEl) categoryEl.value = "";
-                      }}
-                    >
-                      ➕ Add Concept
-                    </button>
-
-                    {customConcepts.length > 0 && (
-                      <div className="custom-concepts-list">
-                        <h4>Added Concepts:</h4>
-                        {customConcepts.map((concept, idx) => (
-                          <div key={idx} className="custom-concept-item">
-                            <span className="concept-name">{concept.name}</span>
-                            <span className="concept-category">
-                              {concept.category}
-                            </span>
-                            <button
-                              className="btn-remove"
-                              onClick={() => {
-                                setCustomConcepts(
-                                  customConcepts.filter((_, i) => i !== idx)
-                                );
-                              }}
-                              title="Remove concept"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </details>
-              </div>
-
               <div className="control-buttons">
                 <button
                   className="btn btn-secondary"
@@ -819,26 +702,140 @@ export const ChapterChecker: React.FC = () => {
             {/* Analysis Results - Shows when available */}
             {analysis ? (
               <div className="analysis-results">
-                {/* Concept List with click-to-highlight */}
-                {analysis.conceptGraph?.concepts &&
-                  analysis.conceptGraph.concepts.length > 0 && (
-                    <ConceptList
-                      concepts={analysis.conceptGraph.concepts}
-                      onConceptClick={(concept, mentionIndex) => {
-                        console.log(
-                          "[ChapterChecker] Concept clicked:",
-                          concept.name,
-                          "mention",
-                          mentionIndex
-                        );
-                        setHighlightedConcept(concept);
-                        setCurrentMentionIndex(mentionIndex);
-                      }}
-                      highlightedConceptId={highlightedConcept?.id}
-                      currentMentionIndex={currentMentionIndex}
-                    />
-                  )}
-                <ChapterAnalysisDashboard analysis={analysis} />
+                <ChapterAnalysisDashboard
+                  analysis={analysis}
+                  concepts={analysis.conceptGraph?.concepts || []}
+                  onConceptClick={(concept, mentionIndex) => {
+                    console.log(
+                      "[ChapterChecker] Concept clicked:",
+                      concept.name,
+                      "mention",
+                      mentionIndex
+                    );
+                    setHighlightedConcept(concept);
+                    setCurrentMentionIndex(mentionIndex);
+                  }}
+                  highlightedConceptId={highlightedConcept?.id}
+                  currentMentionIndex={currentMentionIndex}
+                />
+
+                {/* Custom Concepts Input - Separate section after analysis */}
+                <div className="custom-concepts-section custom-concepts-after-analysis">
+                  <details>
+                    <summary className="custom-concepts-header">
+                      <strong>➕ Add Custom Concepts</strong>
+                      <span className="custom-count">
+                        ({customConcepts.length} added)
+                      </span>
+                    </summary>
+                    <div className="custom-concepts-form">
+                      <p className="form-hint">
+                        Add domain-specific concepts unique to your chapter and
+                        re-analyze
+                      </p>
+                      <div className="form-row">
+                        <input
+                          type="text"
+                          placeholder="Concept name (e.g., mitochondria)"
+                          id="custom-concept-name"
+                          className="form-input"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Aliases (comma-separated)"
+                          id="custom-concept-aliases"
+                          className="form-input"
+                        />
+                      </div>
+                      <div className="form-row">
+                        <input
+                          type="text"
+                          placeholder="Category (e.g., Cell Biology)"
+                          id="custom-concept-category"
+                          className="form-input"
+                        />
+                        <select
+                          id="custom-concept-importance"
+                          className="form-input"
+                        >
+                          <option value="core">Core Concept</option>
+                          <option value="supporting">Supporting</option>
+                          <option value="detail">Detail</option>
+                        </select>
+                      </div>
+                      <button
+                        className="btn-add-concept"
+                        onClick={() => {
+                          const nameEl = document.getElementById(
+                            "custom-concept-name"
+                          ) as HTMLInputElement;
+                          const aliasesEl = document.getElementById(
+                            "custom-concept-aliases"
+                          ) as HTMLInputElement;
+                          const categoryEl = document.getElementById(
+                            "custom-concept-category"
+                          ) as HTMLInputElement;
+                          const importanceEl = document.getElementById(
+                            "custom-concept-importance"
+                          ) as HTMLSelectElement;
+
+                          const name = nameEl?.value.trim();
+                          if (!name) {
+                            alert("Please enter a concept name");
+                            return;
+                          }
+
+                          const newConcept: ConceptDefinition = {
+                            name,
+                            aliases: aliasesEl?.value
+                              .split(",")
+                              .map((s) => s.trim())
+                              .filter(Boolean),
+                            category: categoryEl?.value.trim() || "Custom",
+                            importance: (importanceEl?.value ||
+                              "supporting") as "core" | "supporting" | "detail",
+                          };
+
+                          setCustomConcepts([...customConcepts, newConcept]);
+
+                          // Clear form
+                          if (nameEl) nameEl.value = "";
+                          if (aliasesEl) aliasesEl.value = "";
+                          if (categoryEl) categoryEl.value = "";
+                        }}
+                      >
+                        ➕ Add Concept
+                      </button>
+
+                      {customConcepts.length > 0 && (
+                        <div className="custom-concepts-list">
+                          <h4>Added Concepts:</h4>
+                          {customConcepts.map((concept, idx) => (
+                            <div key={idx} className="custom-concept-item">
+                              <span className="concept-name">
+                                {concept.name}
+                              </span>
+                              <span className="concept-category">
+                                {concept.category}
+                              </span>
+                              <button
+                                className="btn-remove"
+                                onClick={() => {
+                                  setCustomConcepts(
+                                    customConcepts.filter((_, i) => i !== idx)
+                                  );
+                                }}
+                                title="Remove concept"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </details>
+                </div>
               </div>
             ) : (
               /* Info Section - Shows when no analysis */
@@ -1128,6 +1125,26 @@ export const ChapterChecker: React.FC = () => {
           margin-top: 16px;
           border-top: 2px solid #e2e8f0;
           padding-top: 16px;
+        }
+
+        /* Custom Concepts After Analysis - Separate styling */
+        .custom-concepts-after-analysis {
+          margin: 30px 0;
+          padding: 20px;
+          background: white;
+          border: 2px solid #e0e7ff;
+          border-radius: 12px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .custom-concepts-after-analysis .custom-concepts-header {
+          background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+          padding: 16px;
+          font-size: 16px;
+        }
+
+        .custom-concepts-after-analysis .custom-concepts-header:hover {
+          background: linear-gradient(135deg, #e0e7ff 0%, #d0d9ff 100%);
         }
 
         .custom-concepts-header {

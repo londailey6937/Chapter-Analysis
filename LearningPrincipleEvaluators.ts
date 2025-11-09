@@ -2378,25 +2378,124 @@ export class CognitiveLoadEvaluator {
     const segmentAnalysis = this.analyzeSectionSegmentation(chapter);
     const findings: Finding[] = [];
     const evidence: Evidence[] = [];
+    const suggestions: Suggestion[] = [];
 
     evidence.push({
       type: "metric",
-      metric: "avg_section_length",
-      value: segmentAnalysis.avgLength,
+      metric: "Avg Section Length",
+      value: Math.round(segmentAnalysis.avgLength),
       threshold: 500,
       quality: segmentAnalysis.avgLength < 800 ? "strong" : "moderate",
     });
+
+    evidence.push({
+      type: "count",
+      metric: "Sections Over 1000 Words",
+      value: segmentAnalysis.tooLong,
+      quality:
+        segmentAnalysis.tooLong === 0
+          ? "strong"
+          : segmentAnalysis.tooLong < 3
+          ? "moderate"
+          : "weak",
+    });
+
+    // Generate findings based on section lengths
+    if (segmentAnalysis.avgLength < 600) {
+      findings.push({
+        type: "positive",
+        severity: 0.2,
+        message: `Excellent section sizing: Average section length of ${Math.round(
+          segmentAnalysis.avgLength
+        )} words prevents cognitive overload and maintains focus.`,
+        evidence: `Sections average ${Math.round(
+          segmentAnalysis.avgLength
+        )} words, well within the optimal 400-600 word range for maintaining working memory capacity.`,
+      });
+    } else if (segmentAnalysis.avgLength < 1000) {
+      findings.push({
+        type: "warning",
+        severity: 0.5,
+        message: `Moderate section lengths: Average of ${Math.round(
+          segmentAnalysis.avgLength
+        )} words. Consider breaking longer sections to reduce cognitive load.`,
+        evidence: `At ${Math.round(
+          segmentAnalysis.avgLength
+        )} words average, sections approach the upper limit where working memory begins to strain.`,
+      });
+    } else {
+      findings.push({
+        type: "critical",
+        severity: 0.9,
+        message: `High cognitive load risk: Average section length of ${Math.round(
+          segmentAnalysis.avgLength
+        )} words may overwhelm working memory. Sections should ideally be under 800 words.`,
+        evidence: `Average section length of ${Math.round(
+          segmentAnalysis.avgLength
+        )} words significantly exceeds the 800-word threshold for effective cognitive processing.`,
+      });
+    }
+
+    if (segmentAnalysis.tooLong > 0) {
+      findings.push({
+        type: "warning",
+        severity: segmentAnalysis.tooLong > 3 ? 0.8 : 0.6,
+        message: `${segmentAnalysis.tooLong} section${
+          segmentAnalysis.tooLong > 1 ? "s" : ""
+        } exceed${
+          segmentAnalysis.tooLong === 1 ? "s" : ""
+        } 1000 words. Long sections increase extraneous cognitive load and reduce retention.`,
+        evidence: `${segmentAnalysis.tooLong} section${
+          segmentAnalysis.tooLong > 1 ? "s exceed" : " exceeds"
+        } 1000 words, forcing students to maintain too much information in working memory simultaneously.`,
+      });
+
+      suggestions.push({
+        id: "cl-break-long",
+        principle: "cognitiveLoad",
+        title: "Break up long sections",
+        description: `Divide the ${segmentAnalysis.tooLong} lengthy section${
+          segmentAnalysis.tooLong > 1 ? "s" : ""
+        } into smaller chunks of 400-800 words. Use clear subheadings to mark transitions and give students mental "breathing room."`,
+        priority: segmentAnalysis.tooLong > 3 ? "high" : "medium",
+        implementation:
+          "Insert subheadings every 400-600 words, creating natural pause points. Each subsection should cover one key idea.",
+        expectedImpact:
+          "Reduces cognitive overload and improves comprehension by chunking information into manageable units.",
+        relatedConcepts: [],
+      });
+    }
+
+    if (segmentAnalysis.avgLength > 800) {
+      suggestions.push({
+        id: "cl-reduce-average",
+        principle: "cognitiveLoad",
+        title: "Reduce average section length",
+        description:
+          "Aim for 400-600 words per section. Add strategic breaks with summaries, examples, or practice problems to prevent cognitive overload and improve information processing.",
+        priority: "medium",
+        implementation:
+          "Review longer sections and divide them at natural conceptual boundaries. Add transition sentences to maintain flow between subsections.",
+        expectedImpact:
+          "Improves retention by keeping content within working memory limits and providing mental processing breaks.",
+        relatedConcepts: [],
+      });
+    }
 
     let score = 50;
     if (segmentAnalysis.avgLength < 600) score += 30;
     else if (segmentAnalysis.avgLength < 1000) score += 15;
 
+    // Penalize for too many long sections
+    if (segmentAnalysis.tooLong > 5) score -= 15;
+    else if (segmentAnalysis.tooLong > 2) score -= 10;
+
     return {
       principle: "cognitiveLoad",
-      score: Math.min(score, 100),
+      score: Math.min(Math.max(score, 0), 100),
       weight: 0.8,
       findings,
-      suggestions: [],
+      suggestions,
       evidence,
     };
   }

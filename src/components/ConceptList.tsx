@@ -83,7 +83,8 @@ export const ConceptList: React.FC<ConceptListProps> = ({
         <div className="card-header">
           <h3 className="text-xl font-bold">📚 Identified Concepts</h3>
           <p className="text-sm text-gray-600 mt-1">
-            Click a concept to highlight it in the PDF
+            Overview of concepts covered - Click a concept to highlight it in
+            the PDF
           </p>
 
           {/* Navigation controls when a concept is selected */}
