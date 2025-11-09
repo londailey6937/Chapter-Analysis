@@ -841,43 +841,76 @@ export const ChapterChecker: React.FC = () => {
               /* Info Section - Shows when no analysis */
               <div className="info-section">
                 <div className="info-card">
-                  <h3>🎓 What This Analyzes</h3>
+                  <h3>🎓 How the Analyzer Works</h3>
+                  <p
+                    style={{
+                      fontSize: "14px",
+                      color: "#64748b",
+                      marginBottom: "20px",
+                    }}
+                  >
+                    Chapter Checker evaluates your content against 10
+                    evidence-based learning principles from cognitive science
+                    research:
+                  </p>
                   <ul>
                     <li>
-                      <strong>Deep Processing:</strong> Questions that encourage
-                      deeper thinking
+                      <strong>Deep Processing:</strong> Measures the presence of
+                      "why" and "how" questions, worked examples, and prompts
+                      that encourage elaboration beyond memorization. Deeper
+                      processing leads to stronger, more flexible understanding.
                     </li>
                     <li>
-                      <strong>Spaced Repetition:</strong> How concepts are
-                      revisited
+                      <strong>Spaced Repetition:</strong> Analyzes how concepts
+                      are revisited across the chapter with increasing time
+                      intervals. Strategic spacing combats the forgetting curve
+                      and strengthens long-term retention more effectively than
+                      massed practice.
                     </li>
                     <li>
-                      <strong>Retrieval Practice:</strong> Opportunities for
-                      active recall
+                      <strong>Retrieval Practice:</strong> Identifies
+                      opportunities for students to actively recall information
+                      from memory through questions, prompts, and application
+                      exercises. Retrieval strengthens memory pathways better
+                      than passive re-reading.
                     </li>
                     <li>
-                      <strong>Interleaving:</strong> How topics are mixed vs.
-                      blocked
+                      <strong>Interleaving:</strong> Evaluates whether different
+                      topics are mixed together rather than presented in
+                      isolated blocks. Interleaving improves discrimination
+                      between concepts and enhances transfer to new situations.
                     </li>
                     <li>
-                      <strong>Dual Coding:</strong> Balance of verbal and visual
-                      elements
+                      <strong>Dual Coding:</strong> Assesses the balance between
+                      verbal explanations and visual representations like
+                      diagrams, charts, and illustrations. Multiple modalities
+                      create richer mental models and memory pathways.
                     </li>
                     <li>
-                      <strong>Generative Learning:</strong> Prompts for
-                      creating/predicting
+                      <strong>Generative Learning:</strong> Detects prompts that
+                      ask students to create, predict, summarize, or explain in
+                      their own words. Generating content actively builds
+                      understanding rather than passively receiving it.
                     </li>
                     <li>
-                      <strong>Schema Building:</strong> Concept hierarchy and
-                      connections
+                      <strong>Schema Building:</strong> Examines how concepts
+                      are organized into hierarchical structures showing
+                      relationships from foundational to advanced ideas.
+                      Well-organized schemas enable faster retrieval and better
+                      problem-solving.
                     </li>
                     <li>
-                      <strong>Cognitive Load:</strong> Section complexity and
-                      pacing
+                      <strong>Cognitive Load:</strong> Analyzes section length
+                      and complexity to ensure working memory isn't overwhelmed.
+                      Proper pacing with manageable chunks allows mental
+                      resources to focus on learning rather than just surviving
+                      information overload.
                     </li>
                     <li>
-                      <strong>Emotion & Relevance:</strong> Personal connection
-                      elements
+                      <strong>Emotion & Relevance:</strong> Identifies
+                      connections to real-world applications, personal
+                      experiences, and emotional engagement. Relevant material
+                      increases motivation, attention, and memory formation.
                     </li>
                   </ul>
                 </div>
@@ -912,7 +945,8 @@ export const ChapterChecker: React.FC = () => {
         .app-header p {
           margin: 10px 0 0 0;
           font-size: 18px;
-          opacity: 0.9;
+          opacity: 0.85;
+          color: white;
         }
 
         .app-container {

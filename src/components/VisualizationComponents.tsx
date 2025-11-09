@@ -1998,6 +1998,9 @@ export const ChapterAnalysisDashboard: React.FC<{
             </strong>
             <p>Hierarchy Balance</p>
             <p className="stat-note">Target: 60-80%</p>
+            <p className="stat-description">
+              Ratio of core to supporting concepts
+            </p>
           </div>
         </div>
       </div>
@@ -2125,6 +2128,12 @@ export const ChapterAnalysisDashboard: React.FC<{
             color: #64748b !important; /* slate-500 */
             font-size: 11px !important;
             font-style: italic;
+          }
+          .stat-description {
+            margin: 4px 0 0 0 !important;
+            color: #94a3b8 !important; /* slate-400 */
+            font-size: 10px !important;
+            line-height: 1.3;
           }
           .recommendation {
             border-left: 4px solid #ccc;
