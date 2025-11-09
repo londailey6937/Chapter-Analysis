@@ -3,7 +3,7 @@
  * Main component integrating extraction, analysis, and visualization
  */
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { AnalysisEngine } from "./AnalysisEngine"; // retained for types / future direct calls
 import { ChapterAnalysisDashboard } from "./VisualizationComponents";
 import { PdfViewer } from "./PdfViewer";
@@ -26,6 +26,7 @@ export const ChapterChecker: React.FC = () => {
   const [selectedDomain, setSelectedDomain] = useState<Domain>("chemistry");
   const [includeCrossDomain, setIncludeCrossDomain] = useState(false);
   const [customConcepts, setCustomConcepts] = useState<ConceptDefinition[]>([]);
+  const [tocEndPage, setTocEndPage] = useState<number>(10); // Configurable TOC end page
   const [sectionHints, setSectionHints] = useState<
     { title: string; startIndex: number }[] | null
   >(null);
@@ -46,6 +47,17 @@ export const ChapterChecker: React.FC = () => {
   );
   const [currentMentionIndex, setCurrentMentionIndex] = useState<number>(0);
   const [hasAnalyzedOnce, setHasAnalyzedOnce] = useState(false);
+
+  // Debug: Log when analysis updates
+  useEffect(() => {
+    if (analysis) {
+      console.log("[ChapterChecker] Analysis updated:", {
+        hasConceptGraph: !!analysis.conceptGraph,
+        conceptCount: analysis.conceptGraph?.concepts?.length || 0,
+        concepts: analysis.conceptGraph?.concepts,
+      });
+    }
+  }, [analysis]);
 
   /**
    * Handle chapter analysis
@@ -479,6 +491,7 @@ export const ChapterChecker: React.FC = () => {
                     onMentionNavigate={(newIndex) =>
                       setCurrentMentionIndex(newIndex)
                     }
+                    tocEndPage={tocEndPage}
                   />
                 </div>
               </>
@@ -655,6 +668,157 @@ export const ChapterChecker: React.FC = () => {
                   />
                   <span>Include Cross-Domain Concepts</span>
                 </label>
+
+                {/* Custom Concepts Input */}
+                {selectedDomain === "custom" && (
+                  <div
+                    className="custom-concepts-input"
+                    style={{ marginTop: "1rem" }}
+                  >
+                    <label htmlFor="custom-concepts">
+                      <strong>✏️ Enter Custom Concepts:</strong>
+                      <br />
+                      <small style={{ color: "#666" }}>
+                        Enter concepts separated by commas or one per line
+                      </small>
+                    </label>
+                    <textarea
+                      id="custom-concepts"
+                      placeholder="e.g., recursion, algorithm, data structure"
+                      rows={5}
+                      disabled={isAnalyzing}
+                      onChange={(e) => {
+                        const input = e.target.value;
+                        const conceptNames = input
+                          .split(/[,\n]+/)
+                          .map((c) => c.trim())
+                          .filter((c) => c.length > 0);
+
+                        const concepts: ConceptDefinition[] = conceptNames.map(
+                          (name, idx) => ({
+                            name,
+                            category: "Custom",
+                            subcategory: "User-Defined",
+                            importance: "core" as const,
+                          })
+                        );
+
+                        setCustomConcepts(concepts);
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "0.5rem",
+                        borderRadius: "4px",
+                        border: "1px solid #ccc",
+                        fontSize: "0.9rem",
+                        fontFamily: "inherit",
+                      }}
+                    />
+                    <div
+                      style={{
+                        marginTop: "0.5rem",
+                        fontSize: "0.85rem",
+                        color: "#555",
+                      }}
+                    >
+                      {customConcepts.length > 0 && (
+                        <span>
+                          ✓ {customConcepts.length} custom concept(s) defined
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* TOC End Page Setting */}
+                <div className="toc-setting" style={{ marginTop: "1rem" }}>
+                  <label htmlFor="toc-end-page">
+                    <strong>📑 Table of Contents ends at page:</strong>
+                    <br />
+                    <small style={{ color: "#666" }}>
+                      Enter the LAST page number of your TOC (e.g., if TOC ends
+                      at page xvii, enter 17).
+                      <br />
+                      Concept navigation will skip to page {tocEndPage + 1} or
+                      later.
+                    </small>
+                  </label>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "0.5rem",
+                      alignItems: "center",
+                      marginTop: "0.5rem",
+                    }}
+                  >
+                    <input
+                      id="toc-end-page"
+                      type="number"
+                      min="0"
+                      max="200"
+                      value={tocEndPage}
+                      onChange={(e) =>
+                        setTocEndPage(
+                          Math.max(0, parseInt(e.target.value) || 0)
+                        )
+                      }
+                      disabled={isAnalyzing}
+                      style={{
+                        width: "100px",
+                        padding: "0.5rem",
+                        borderRadius: "4px",
+                        border: "1px solid #ccc",
+                        fontSize: "0.9rem",
+                      }}
+                      placeholder="e.g., 17"
+                    />
+                    <span style={{ fontSize: "0.85rem", color: "#666" }}>
+                      Quick:
+                      {[0, 10, 20, 30, 50].map((preset) => (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() => setTocEndPage(preset)}
+                          disabled={isAnalyzing}
+                          style={{
+                            marginLeft: "0.3rem",
+                            padding: "0.2rem 0.5rem",
+                            fontSize: "0.8rem",
+                            background:
+                              tocEndPage === preset ? "#e3f2fd" : "#f5f5f5",
+                            border: "1px solid #ccc",
+                            borderRadius: "3px",
+                            cursor: isAnalyzing ? "not-allowed" : "pointer",
+                          }}
+                        >
+                          {preset === 0 ? "None" : preset}
+                        </button>
+                      ))}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      marginTop: "0.5rem",
+                      fontSize: "0.85rem",
+                      color: "#0066cc",
+                    }}
+                  >
+                    💡 Tip: Count pages manually - most PDFs lack proper
+                    metadata for auto-detection.
+                  </div>
+                  <div
+                    style={{
+                      marginTop: "0.3rem",
+                      fontSize: "0.8rem",
+                      color: "#666",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    Note: Auto-detection rarely works as PDFs don't reliably
+                    store page label metadata (e.g., Roman numerals i, ii, iii).
+                    Manual setting is recommended.
+                  </div>
+                </div>
               </div>
 
               <div className="control-buttons">

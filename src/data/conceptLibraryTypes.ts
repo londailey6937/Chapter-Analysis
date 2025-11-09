@@ -30,6 +30,7 @@ export type Domain =
   | "biology"
   | "computing"
   | "mathematics"
+  | "custom"
   | "cross-domain";
 
 export interface DomainInfo {
@@ -41,23 +42,17 @@ export interface DomainInfo {
 
 export const AVAILABLE_DOMAINS: DomainInfo[] = [
   {
+    id: "biology",
+    label: "Biology",
+    description: "Biology concepts (cells, genes, evolution, ecology, etc.)",
+    icon: "🧬",
+  },
+  {
     id: "chemistry",
     label: "Chemistry",
     description:
       "General chemistry concepts (matter, reactions, bonding, etc.)",
     icon: "⚗️",
-  },
-  {
-    id: "physics",
-    label: "Physics",
-    description: "Physics concepts (force, energy, motion, waves, etc.)",
-    icon: "⚛️",
-  },
-  {
-    id: "biology",
-    label: "Biology",
-    description: "Biology concepts (cells, genes, evolution, ecology, etc.)",
-    icon: "🧬",
   },
   {
     id: "computing",
@@ -67,11 +62,23 @@ export const AVAILABLE_DOMAINS: DomainInfo[] = [
     icon: "💻",
   },
   {
+    id: "custom",
+    label: "Custom Domain",
+    description: "Define your own domain-specific concepts",
+    icon: "✏️",
+  },
+  {
     id: "mathematics",
     label: "Mathematics",
     description:
       "Algebra & Trigonometry concepts (equations, functions, trig identities, etc.)",
     icon: "🔢",
+  },
+  {
+    id: "physics",
+    label: "Physics",
+    description: "Physics concepts (force, energy, motion, waves, etc.)",
+    icon: "⚛️",
   },
   {
     id: "cross-domain",

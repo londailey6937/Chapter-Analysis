@@ -19,6 +19,9 @@ export const ConceptList: React.FC<ConceptListProps> = ({
   highlightedConceptId,
   currentMentionIndex = 0,
 }) => {
+  // Debug logging
+  console.log("[ConceptList] Rendering with concepts:", concepts.length);
+
   // Find the highlighted concept to show navigation
   const highlightedConcept = concepts.find(
     (c) => c.id === highlightedConceptId
@@ -31,6 +34,12 @@ export const ConceptList: React.FC<ConceptListProps> = ({
     supporting: concepts.filter((c) => c.importance === "supporting"),
     detail: concepts.filter((c) => c.importance === "detail"),
   };
+
+  console.log("[ConceptList] Grouped:", {
+    core: groupedConcepts.core.length,
+    supporting: groupedConcepts.supporting.length,
+    detail: groupedConcepts.detail.length,
+  });
 
   const handlePrevious = () => {
     if (highlightedConcept && currentMentionIndex > 0) {

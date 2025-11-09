@@ -24,10 +24,44 @@ interface PdfViewerProps {
   chapterText?: string; // Full chapter text for position mapping
   currentMentionIndex?: number; // Index of the mention to scroll to
   onMentionNavigate?: (newIndex: number) => void; // Callback when user navigates mentions
+  tocEndPage?: number; // Last page of TOC (default: 10) - concepts before this will be skipped
 }
 
 // Simple cache for PDF documents to avoid re-parsing
 const pdfDocumentCache = new Map<string, PDFDocumentProxy>();
+
+// Helper function to detect if page labels contain Roman numerals
+async function detectRomanNumeralPages(pdf: PDFDocumentProxy): Promise<number> {
+  try {
+    const pageLabels = await pdf.getPageLabels();
+    if (!pageLabels || pageLabels.length === 0) {
+      return 0; // No page labels, can't detect
+    }
+
+    // Check each label to find where Roman numerals end
+    const romanNumeralRegex =
+      /^(m{0,3})(cm|cd|d?c{0,3})(xc|xl|l?x{0,3})(ix|iv|v?i{0,3})$/i;
+
+    for (let i = 0; i < pageLabels.length; i++) {
+      const label = pageLabels[i];
+      if (label && typeof label === "string") {
+        // If this label is NOT a Roman numeral (likely Arabic or regular numbering)
+        // Then the previous page was the last Roman numeral page
+        if (!romanNumeralRegex.test(label.trim())) {
+          console.log(
+            `📑 Auto-detected TOC end: Page ${i} (last Roman numeral page)`
+          );
+          return i; // Return 0-based index, which is the last Roman numeral page
+        }
+      }
+    }
+
+    return 0; // No Roman numerals detected
+  } catch (error) {
+    console.warn("Could not detect page labels:", error);
+    return 0;
+  }
+}
 
 export const PdfViewer: React.FC<PdfViewerProps> = ({
   fileBuffer,
@@ -38,6 +72,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
   chapterText,
   currentMentionIndex = 0,
   onMentionNavigate,
+  tocEndPage = 10, // Default: TOC ends at page 10
 }) => {
   const [pdf, setPdf] = useState<PDFDocumentProxy | null>(null);
   const [numPages, setNumPages] = useState(0);
@@ -45,9 +80,13 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
   const [scale, setScale] = useState(1.5);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [autoDetectedTocEnd, setAutoDetectedTocEnd] = useState<number | null>(
+    null
+  );
   const [pendingIndicator, setPendingIndicator] = useState<{
     type: "concept" | "section";
     text: string;
+    conceptName?: string; // Actual concept name for text search
     pageNum: number;
   } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -104,6 +143,21 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
 
         setPdf(loadedPdf);
         setNumPages(loadedPdf.numPages);
+
+        // Auto-detect Roman numeral pages (TOC)
+        const detectedTocEnd = await detectRomanNumeralPages(loadedPdf);
+        if (detectedTocEnd > 0) {
+          setAutoDetectedTocEnd(detectedTocEnd);
+          console.log(
+            `✅ Auto-detected TOC ending at page ${detectedTocEnd} (will skip to page ${
+              detectedTocEnd + 1
+            })`
+          );
+        } else {
+          console.warn(
+            `⚠️ Could not auto-detect page labels. PDF may not have proper page label metadata. Please set TOC end page manually.`
+          );
+        }
 
         // Use pre-extracted text if available, otherwise extract if needed
         if (preExtractedPageTexts && preExtractedPageTexts.length > 0) {
@@ -245,8 +299,8 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
       }
       const pageNum = pageIdx + 1;
 
-      // Skip TOC pages (typically first 10 pages) - if we land on TOC, move to page 11
-      const minContentPage = 11;
+      // Skip TOC pages - if we land on TOC, move to first content page
+      const minContentPage = tocEndPage + 1;
       const adjustedPageNum =
         pageNum < minContentPage ? minContentPage : pageNum;
 
@@ -300,20 +354,60 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
       return;
     }
 
-    // Get the mention at the specified index (default to first mention)
-    const mentionIdx = Math.min(
-      currentMentionIndex,
-      highlightedConcept.mentions.length - 1
+    // Use auto-detected TOC end if available, otherwise use manual setting
+    const effectiveTocEnd =
+      autoDetectedTocEnd !== null ? autoDetectedTocEnd : tocEndPage;
+    const minContentPage = effectiveTocEnd + 1; // First content page after TOC
+
+    console.log(
+      `📑 TOC Filter: Using ${
+        autoDetectedTocEnd !== null ? "auto-detected" : "manual"
+      } value: ${effectiveTocEnd}`
     );
-    const targetMention = highlightedConcept.mentions[mentionIdx];
+
+    // Filter out mentions that fall on TOC pages
+    const contentMentions = highlightedConcept.mentions.filter((mention) => {
+      let pageIdx = 0;
+      for (let i = 0; i < offsets.length; i++) {
+        if (offsets[i] <= mention.position) {
+          pageIdx = i;
+        } else {
+          break;
+        }
+      }
+      const pageNum = pageIdx + 1;
+      return pageNum >= minContentPage;
+    });
+
+    // If all mentions are in TOC, fall back to all mentions
+    const validMentions =
+      contentMentions.length > 0
+        ? contentMentions
+        : highlightedConcept.mentions;
+
+    const tocMentionsFiltered =
+      highlightedConcept.mentions.length - validMentions.length;
+
+    // Get the mention at the specified index
+    const mentionIdx = Math.min(currentMentionIndex, validMentions.length - 1);
+    const targetMention = validMentions[mentionIdx];
     const position = targetMention.position;
 
     console.log("🎯 Scrolling to concept:", {
       name: highlightedConcept.name,
       mentionIndex: mentionIdx + 1,
-      totalMentions: highlightedConcept.mentions.length,
+      totalMentions: validMentions.length,
+      filteredOutTOC: tocMentionsFiltered,
       position,
     });
+
+    if (tocMentionsFiltered > 0) {
+      console.warn(
+        `⚠️ Skipped ${tocMentionsFiltered} mention(s) in TOC (pages 1-${effectiveTocEnd}). First content mention on page ${
+          Math.floor(position / 2000) + 1
+        }`
+      );
+    }
 
     // Find which page contains this position
     let pageIdx = 0;
@@ -327,34 +421,48 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
 
     const pageNum = pageIdx + 1;
 
-    // Skip TOC pages (typically first 10 pages) - if we land on TOC, move to page 11
-    const minContentPage = 11;
-    const adjustedPageNum = pageNum < minContentPage ? minContentPage : pageNum;
-
-    if (adjustedPageNum !== pageNum) {
-      console.log(
-        `⚠️ Skipping TOC for concept: Page ${pageNum} → Page ${adjustedPageNum}`
+    // Warn if we're landing close to the TOC threshold
+    if (pageNum <= effectiveTocEnd + 5 && tocMentionsFiltered > 0) {
+      console.warn(
+        `⚠️ LANDING ON PAGE ${pageNum} - Close to TOC threshold (${effectiveTocEnd}). ${
+          autoDetectedTocEnd !== null
+            ? "Auto-detection may have failed."
+            : "If this is still TOC, increase the TOC setting!"
+        }`
       );
     }
 
     console.log("🎯 Jumping to concept page:", {
       name: highlightedConcept.name,
       mentionIndex: mentionIdx + 1,
-      originalPageNum: pageNum,
-      adjustedPageNum,
+      totalValidMentions: validMentions.length,
+      pageNum,
       pageIdx,
+      effectiveTocEnd,
+      autoDetected: autoDetectedTocEnd !== null,
+      landingInSuspectedTOC: pageNum <= effectiveTocEnd + 5,
     });
 
     // Simply change the current page - no scrolling needed!
-    setCurrentPage(adjustedPageNum);
+    setCurrentPage(pageNum);
 
-    // Set pending indicator to show after page renders
+    // Set pending indicator to show after page renders - include TOC warning if needed
+    const indicatorText =
+      tocMentionsFiltered > 0
+        ? `${
+            highlightedConcept.name
+          } (skipped ${tocMentionsFiltered} TOC mention${
+            tocMentionsFiltered > 1 ? "s" : ""
+          })`
+        : highlightedConcept.name;
+
     setPendingIndicator({
       type: "concept",
-      text: highlightedConcept.name,
-      pageNum: adjustedPageNum,
+      text: indicatorText,
+      conceptName: highlightedConcept.name, // Pass actual concept name for searching
+      pageNum: pageNum,
     });
-  }, [highlightedConcept, currentMentionIndex]);
+  }, [highlightedConcept, currentMentionIndex, tocEndPage, autoDetectedTocEnd]);
 
   // Helper function for simple indicator fallback
   const showSimpleIndicator = (pageEl: HTMLElement, text: string) => {
@@ -406,7 +514,9 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
 
         if (pendingIndicator.type === "concept") {
           // Highlight the actual concept text on the page
-          console.log("🎯 Highlighting concept text:", pendingIndicator.text);
+          const searchText =
+            pendingIndicator.conceptName || pendingIndicator.text;
+          console.log("🎯 Highlighting concept text:", searchText);
 
           // Try to find the concept text in the page's text content
           const pageTexts = pageTextsRef.current;
@@ -414,12 +524,12 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
 
           if (pageTexts && pageTexts[pageIndex]) {
             const pageText = pageTexts[pageIndex].toLowerCase();
-            const conceptText = pendingIndicator.text.toLowerCase();
+            const conceptText = searchText.toLowerCase();
             const conceptIndex = pageText.indexOf(conceptText);
 
             if (conceptIndex !== -1) {
               console.log(
-                `✅ Found concept "${pendingIndicator.text}" at position ${conceptIndex} in page text`
+                `✅ Found concept "${searchText}" at position ${conceptIndex} in page text`
               );
 
               // Get surrounding context (50 chars before and after)
@@ -503,6 +613,21 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
             <span className="mention-counter">
               Mention {currentMentionIndex + 1} of{" "}
               {highlightedConcept.mentions.length}
+              {(autoDetectedTocEnd !== null || tocEndPage > 0) && (
+                <span
+                  style={{
+                    fontSize: "0.85em",
+                    opacity: 0.7,
+                    marginLeft: "0.5rem",
+                  }}
+                >
+                  (
+                  {autoDetectedTocEnd !== null
+                    ? `Auto-detected TOC: skip pages 1-${autoDetectedTocEnd}`
+                    : `TOC filter: skip pages 1-${tocEndPage}`}
+                  )
+                </span>
+              )}
             </span>
           </div>
           <div className="concept-nav-buttons">

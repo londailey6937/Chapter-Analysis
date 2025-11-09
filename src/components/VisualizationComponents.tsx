@@ -2006,14 +2006,24 @@ export const ChapterAnalysisDashboard: React.FC<{
       </div>
 
       {/* Concept List with click-to-highlight */}
-      {concepts && concepts.length > 0 && (
-        <ConceptList
-          concepts={concepts}
-          onConceptClick={onConceptClick}
-          highlightedConceptId={highlightedConceptId}
-          currentMentionIndex={currentMentionIndex}
-        />
-      )}
+      {(() => {
+        console.log("[ChapterAnalysisDashboard] Concepts check:", {
+          conceptsExists: !!concepts,
+          conceptsLength: concepts?.length || 0,
+          willRender: !!(concepts && concepts.length > 0),
+        });
+        return (
+          concepts &&
+          concepts.length > 0 && (
+            <ConceptList
+              concepts={concepts}
+              onConceptClick={onConceptClick}
+              highlightedConceptId={highlightedConceptId}
+              currentMentionIndex={currentMentionIndex}
+            />
+          )
+        );
+      })()}
 
       <style>{`
           .dashboard {
