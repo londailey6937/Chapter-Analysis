@@ -525,6 +525,83 @@ export const ChapterChecker: React.FC = () => {
 
           {/* RIGHT PANEL: Controls & Analysis */}
           <div className="control-panel">
+            {/* How It Works - Always visible, collapsible */}
+            <div className="how-it-works-section">
+              <details open={!analysis}>
+                <summary className="how-it-works-header">
+                  <span>🎓 How the Analyzer Works</span>
+                  <span className="toggle-icon">▼</span>
+                </summary>
+                <div className="how-it-works-content">
+                  <p className="how-it-works-intro">
+                    Chapter Checker evaluates your content against 10
+                    evidence-based learning principles from cognitive science
+                    research:
+                  </p>
+                  <ul className="principles-list">
+                    <li>
+                      <strong>Deep Processing:</strong> Measures the presence of
+                      "why" and "how" questions, worked examples, and prompts
+                      that encourage elaboration beyond memorization. Deeper
+                      processing leads to stronger, more flexible understanding.
+                    </li>
+                    <li>
+                      <strong>Spaced Repetition:</strong> Analyzes how concepts
+                      are revisited across the chapter with increasing time
+                      intervals. Strategic spacing combats the forgetting curve
+                      and strengthens long-term retention more effectively than
+                      massed practice.
+                    </li>
+                    <li>
+                      <strong>Retrieval Practice:</strong> Identifies
+                      opportunities for students to actively recall information
+                      from memory through questions, prompts, and application
+                      exercises. Retrieval strengthens memory pathways better
+                      than passive re-reading.
+                    </li>
+                    <li>
+                      <strong>Interleaving:</strong> Evaluates whether different
+                      topics are mixed together rather than presented in
+                      isolated blocks. Interleaving improves discrimination
+                      between concepts and enhances transfer to new situations.
+                    </li>
+                    <li>
+                      <strong>Dual Coding:</strong> Assesses the balance between
+                      verbal explanations and visual representations like
+                      diagrams, charts, and illustrations. Multiple modalities
+                      create richer mental models and memory pathways.
+                    </li>
+                    <li>
+                      <strong>Generative Learning:</strong> Detects prompts that
+                      ask students to create, predict, summarize, or explain in
+                      their own words. Generating content actively builds
+                      understanding rather than passively receiving it.
+                    </li>
+                    <li>
+                      <strong>Schema Building:</strong> Examines how concepts
+                      are organized into hierarchical structures showing
+                      relationships from foundational to advanced ideas.
+                      Well-organized schemas enable faster retrieval and better
+                      problem-solving.
+                    </li>
+                    <li>
+                      <strong>Cognitive Load:</strong> Analyzes section length
+                      and complexity to ensure working memory isn't overwhelmed.
+                      Proper pacing with manageable chunks allows mental
+                      resources to focus on learning rather than just surviving
+                      information overload.
+                    </li>
+                    <li>
+                      <strong>Emotion & Relevance:</strong> Identifies
+                      connections to real-world applications, personal
+                      experiences, and emotional engagement. Relevant material
+                      increases motivation, attention, and memory formation.
+                    </li>
+                  </ul>
+                </div>
+              </details>
+            </div>
+
             {/* Upload Controls - Always visible */}
             <div
               className={`control-section ${isDragActive ? "drag-active" : ""}`}
@@ -700,7 +777,7 @@ export const ChapterChecker: React.FC = () => {
             </div>
 
             {/* Analysis Results - Shows when available */}
-            {analysis ? (
+            {analysis && (
               <div className="analysis-results">
                 <ChapterAnalysisDashboard
                   analysis={analysis}
@@ -835,84 +912,6 @@ export const ChapterChecker: React.FC = () => {
                       )}
                     </div>
                   </details>
-                </div>
-              </div>
-            ) : (
-              /* Info Section - Shows when no analysis */
-              <div className="info-section">
-                <div className="info-card">
-                  <h3>🎓 How the Analyzer Works</h3>
-                  <p
-                    style={{
-                      fontSize: "14px",
-                      color: "#64748b",
-                      marginBottom: "20px",
-                    }}
-                  >
-                    Chapter Checker evaluates your content against 10
-                    evidence-based learning principles from cognitive science
-                    research:
-                  </p>
-                  <ul>
-                    <li>
-                      <strong>Deep Processing:</strong> Measures the presence of
-                      "why" and "how" questions, worked examples, and prompts
-                      that encourage elaboration beyond memorization. Deeper
-                      processing leads to stronger, more flexible understanding.
-                    </li>
-                    <li>
-                      <strong>Spaced Repetition:</strong> Analyzes how concepts
-                      are revisited across the chapter with increasing time
-                      intervals. Strategic spacing combats the forgetting curve
-                      and strengthens long-term retention more effectively than
-                      massed practice.
-                    </li>
-                    <li>
-                      <strong>Retrieval Practice:</strong> Identifies
-                      opportunities for students to actively recall information
-                      from memory through questions, prompts, and application
-                      exercises. Retrieval strengthens memory pathways better
-                      than passive re-reading.
-                    </li>
-                    <li>
-                      <strong>Interleaving:</strong> Evaluates whether different
-                      topics are mixed together rather than presented in
-                      isolated blocks. Interleaving improves discrimination
-                      between concepts and enhances transfer to new situations.
-                    </li>
-                    <li>
-                      <strong>Dual Coding:</strong> Assesses the balance between
-                      verbal explanations and visual representations like
-                      diagrams, charts, and illustrations. Multiple modalities
-                      create richer mental models and memory pathways.
-                    </li>
-                    <li>
-                      <strong>Generative Learning:</strong> Detects prompts that
-                      ask students to create, predict, summarize, or explain in
-                      their own words. Generating content actively builds
-                      understanding rather than passively receiving it.
-                    </li>
-                    <li>
-                      <strong>Schema Building:</strong> Examines how concepts
-                      are organized into hierarchical structures showing
-                      relationships from foundational to advanced ideas.
-                      Well-organized schemas enable faster retrieval and better
-                      problem-solving.
-                    </li>
-                    <li>
-                      <strong>Cognitive Load:</strong> Analyzes section length
-                      and complexity to ensure working memory isn't overwhelmed.
-                      Proper pacing with manageable chunks allows mental
-                      resources to focus on learning rather than just surviving
-                      information overload.
-                    </li>
-                    <li>
-                      <strong>Emotion & Relevance:</strong> Identifies
-                      connections to real-world applications, personal
-                      experiences, and emotional engagement. Relevant material
-                      increases motivation, attention, and memory formation.
-                    </li>
-                  </ul>
                 </div>
               </div>
             )}
@@ -1077,6 +1076,85 @@ export const ChapterChecker: React.FC = () => {
           gap: 24px;
           min-width: 0;
           overflow-x: hidden;
+        }
+
+        /* How It Works Section - Collapsible */
+        .how-it-works-section {
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+          overflow: hidden;
+        }
+
+        .how-it-works-section details {
+          cursor: pointer;
+        }
+
+        .how-it-works-section details[open] .toggle-icon {
+          transform: rotate(180deg);
+        }
+
+        .how-it-works-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20px 24px;
+          background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+          font-size: 18px;
+          font-weight: 600;
+          color: #1e293b;
+          cursor: pointer;
+          user-select: none;
+          transition: background 0.2s;
+        }
+
+        .how-it-works-header:hover {
+          background: linear-gradient(135deg, #e0e7ff 0%, #d0d9ff 100%);
+        }
+
+        .toggle-icon {
+          transition: transform 0.3s ease;
+          color: #667eea;
+          font-size: 14px;
+        }
+
+        .how-it-works-content {
+          padding: 20px 24px;
+          background: white;
+        }
+
+        .how-it-works-intro {
+          font-size: 14px;
+          color: #64748b;
+          margin-bottom: 16px;
+          line-height: 1.6;
+        }
+
+        .principles-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+
+        .principles-list li {
+          margin: 12px 0;
+          padding-left: 20px;
+          position: relative;
+          font-size: 14px;
+          line-height: 1.6;
+          color: #475569;
+        }
+
+        .principles-list li:before {
+          content: "✓";
+          position: absolute;
+          left: 0;
+          color: #667eea;
+          font-weight: bold;
+        }
+
+        .principles-list strong {
+          color: #1e293b;
         }
 
         .control-section {
