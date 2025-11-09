@@ -1600,6 +1600,16 @@ export const ChapterAnalysisDashboard: React.FC<{
 
       <ChapterOverviewTimeline analysis={safeAnalysis} />
 
+      <div className="principles-section">
+        <h3>Learning Principles Evaluation</h3>
+        <p className="section-subtitle">
+          Click each principle to expand findings and actionable suggestions
+        </p>
+        {principles.map((principle: any) => (
+          <PrincipleFindings key={principle.principle} principle={principle} />
+        ))}
+      </div>
+
       <div className="viz-grid">
         <PrincipleScoresRadar analysis={safeAnalysis} />
         <CognitiveLoadCurve analysis={safeAnalysis} />
@@ -1609,7 +1619,7 @@ export const ChapterAnalysisDashboard: React.FC<{
       </div>
 
       <div className="concepts-section">
-        <h3>Concept Analysis</h3>
+        <h3>Identified Concepts</h3>
         <div className="concept-stats">
           <div className="stat">
             <strong>{conceptAnalysis.totalConceptsIdentified}</strong>
@@ -1630,13 +1640,6 @@ export const ChapterAnalysisDashboard: React.FC<{
             <p>Hierarchy Balance</p>
           </div>
         </div>
-      </div>
-
-      <div className="principles-section">
-        <h3>Learning Principles Evaluation</h3>
-        {principles.map((principle: any) => (
-          <PrincipleFindings key={principle.principle} principle={principle} />
-        ))}
       </div>
 
       <div className="recommendations-section">
@@ -1712,6 +1715,12 @@ export const ChapterAnalysisDashboard: React.FC<{
             color: var(--text-muted);
             font-size: 13px;
             margin: 5px 0 15px 0;
+          }
+          .section-subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin: -5px 0 15px 0;
+            font-style: italic;
           }
           .concept-stats {
             display: grid;

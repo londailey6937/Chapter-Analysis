@@ -1952,11 +1952,12 @@ export class DualCodingEvaluator {
   ): PrincipleEvaluation {
     const visualReferences = this.countVisualReferences(chapter.content);
     const findings: Finding[] = [];
+    const suggestions: Suggestion[] = [];
     const evidence: Evidence[] = [];
 
     evidence.push({
       type: "count",
-      metric: "visual_references",
+      metric: "Visual References",
       value: visualReferences,
       threshold: Math.ceil(chapter.sections.length / 2),
       quality:
@@ -1965,6 +1966,56 @@ export class DualCodingEvaluator {
           : "weak",
     });
 
+    // Generate findings based on visual reference count
+    const minExpected = Math.ceil(chapter.sections.length / 2);
+
+    if (visualReferences === 0) {
+      findings.push({
+        type: "critical",
+        message: "No visual aids detected (diagrams, charts, figures)",
+        severity: 0.9,
+        evidence:
+          "Dual coding (visual + verbal) improves comprehension by 89% vs text-only",
+      });
+    } else if (visualReferences < minExpected) {
+      findings.push({
+        type: "warning",
+        message: `Only ${visualReferences} visual references (expected: ${minExpected} for ${chapter.sections.length} sections)`,
+        severity: 0.6,
+        evidence: "Aim for at least one visual aid per 2 sections",
+      });
+    } else {
+      findings.push({
+        type: "positive",
+        message: `✓ Good visual integration: ${visualReferences} visual references found`,
+        severity: 0,
+        evidence: "Visual aids support dual coding and reduce cognitive load",
+      });
+    }
+
+    // Generate suggestions if needed
+    if (visualReferences < minExpected) {
+      suggestions.push({
+        id: "dual-coding-1",
+        principle: "dualCoding",
+        priority: visualReferences === 0 ? "high" : "medium",
+        title: "Add Visual Representations",
+        description:
+          "Include diagrams, charts, or concept maps to support textual explanations",
+        implementation:
+          "For each major concept: (1) Add labeled diagram showing structure, (2) Use flowcharts for processes, (3) Include graphs for quantitative relationships",
+        expectedImpact:
+          "Dual coding activates both visual and verbal processing channels, improving comprehension and retention by 40-89%",
+        relatedConcepts: [],
+        examples: [
+          "Diagram: Labeled molecular structure for chemical concepts",
+          "Flowchart: Step-by-step problem-solving procedure",
+          "Graph: Visual representation of mathematical relationships",
+          "Concept Map: Shows connections between related ideas",
+        ],
+      });
+    }
+
     let score = 50 + visualReferences * 5;
 
     return {
@@ -1972,7 +2023,7 @@ export class DualCodingEvaluator {
       score: Math.min(score, 100),
       weight: 0.8,
       findings,
-      suggestions: [],
+      suggestions,
       evidence,
     };
   }
@@ -2002,14 +2053,65 @@ export class GenerativeLearningEvaluator {
   ): PrincipleEvaluation {
     const generativePrompts = this.countGenerativePrompts(chapter.content);
     const findings: Finding[] = [];
+    const suggestions: Suggestion[] = [];
     const evidence: Evidence[] = [];
 
     evidence.push({
       type: "count",
-      metric: "generative_prompts",
+      metric: "Generative Prompts",
       value: generativePrompts,
-      quality: generativePrompts > 0 ? "moderate" : "weak",
+      threshold: chapter.sections.length,
+      quality: generativePrompts >= chapter.sections.length ? "strong" : "weak",
     });
+
+    // Generate findings
+    if (generativePrompts === 0) {
+      findings.push({
+        type: "critical",
+        message: "No generative learning prompts detected",
+        severity: 0.85,
+        evidence:
+          "Generative activities (predict, create, construct) improve retention by 50% vs passive reading",
+      });
+    } else if (generativePrompts < chapter.sections.length) {
+      findings.push({
+        type: "warning",
+        message: `Limited generative prompts: ${generativePrompts} found (recommend: ${chapter.sections.length})`,
+        severity: 0.6,
+        evidence: "Aim for at least one generative activity per section",
+      });
+    } else {
+      findings.push({
+        type: "positive",
+        message: `✓ Good use of generative learning: ${generativePrompts} prompts found`,
+        severity: 0,
+        evidence:
+          "Generating output deepens encoding and reveals gaps in understanding",
+      });
+    }
+
+    // Generate suggestions
+    if (generativePrompts < chapter.sections.length) {
+      suggestions.push({
+        id: "generative-1",
+        principle: "generativeLearning",
+        priority: generativePrompts === 0 ? "high" : "medium",
+        title: "Add Generative Learning Activities",
+        description:
+          "Include prompts that require students to produce their own responses, predictions, or solutions",
+        implementation:
+          'Add prompts like: "Predict what happens if...", "Create your own example of...", "Write a summary in your own words", "Design a solution that..."',
+        expectedImpact:
+          "Active generation forces deeper processing and reveals misconceptions early",
+        relatedConcepts: [],
+        examples: [
+          "Before revealing answer: Ask students to predict the outcome",
+          "After explanation: Request students create their own example",
+          "Mid-section: Prompt students to summarize key points in own words",
+          "Problem-solving: Have students design alternative approaches",
+        ],
+      });
+    }
 
     let score = 50 + generativePrompts * 5;
 
@@ -2018,7 +2120,7 @@ export class GenerativeLearningEvaluator {
       score: Math.min(score, 100),
       weight: 0.85,
       findings,
-      suggestions: [],
+      suggestions,
       evidence,
     };
   }
@@ -2049,14 +2151,72 @@ export class MetacognitionEvaluator {
       chapter.content
     );
     const findings: Finding[] = [];
+    const suggestions: Suggestion[] = [];
     const evidence: Evidence[] = [];
 
     evidence.push({
       type: "count",
-      metric: "metacognitive_prompts",
+      metric: "Metacognitive Prompts",
       value: metacognitivePrompts,
-      quality: metacognitivePrompts > 0 ? "moderate" : "weak",
+      threshold: Math.ceil(chapter.sections.length / 2),
+      quality:
+        metacognitivePrompts >= Math.ceil(chapter.sections.length / 2)
+          ? "strong"
+          : "weak",
     });
+
+    // Generate findings
+    const minExpected = Math.ceil(chapter.sections.length / 2);
+
+    if (metacognitivePrompts === 0) {
+      findings.push({
+        type: "critical",
+        message:
+          "No metacognitive prompts detected (self-monitoring, reflection)",
+        severity: 0.8,
+        evidence:
+          "Metacognition helps students monitor their own understanding and identify confusion early",
+      });
+    } else if (metacognitivePrompts < minExpected) {
+      findings.push({
+        type: "warning",
+        message: `Limited metacognitive support: ${metacognitivePrompts} prompts (recommend: ${minExpected})`,
+        severity: 0.6,
+        evidence:
+          "More frequent self-checks help students recognize and address gaps",
+      });
+    } else {
+      findings.push({
+        type: "positive",
+        message: `✓ Good metacognitive scaffolding: ${metacognitivePrompts} prompts found`,
+        severity: 0,
+        evidence:
+          "Regular self-monitoring improves learning efficiency and reduces misconceptions",
+      });
+    }
+
+    // Generate suggestions
+    if (metacognitivePrompts < minExpected) {
+      suggestions.push({
+        id: "metacog-1",
+        principle: "metacognition",
+        priority: metacognitivePrompts === 0 ? "high" : "medium",
+        title: "Add Metacognitive Checkpoints",
+        description:
+          "Include prompts that encourage students to monitor their own understanding",
+        implementation:
+          'Add checkpoints: "Does this make sense?", "Can you explain this in your own words?", "What parts are confusing?", "Check your understanding"',
+        expectedImpact:
+          "Metacognitive prompts help students identify and address confusion before it compounds",
+        relatedConcepts: [],
+        examples: [
+          "After complex section: 'Pause and check—can you explain this to a friend?'",
+          "Before moving on: 'If you're confused, review the worked example above'",
+          "Self-test: 'Cover the solution and try to solve this yourself'",
+          "Reflection: 'What was the most challenging concept in this section?'",
+        ],
+      });
+    }
 
     let score = 50 + metacognitivePrompts * 5;
 
@@ -2065,7 +2225,7 @@ export class MetacognitionEvaluator {
       score: Math.min(score, 100),
       weight: 0.75,
       findings,
-      suggestions: [],
+      suggestions,
       evidence,
     };
   }
@@ -2093,15 +2253,96 @@ export class SchemaBuildingEvaluator {
   ): PrincipleEvaluation {
     const hierarchyBalance = this.analyzeHierarchyBalance(concepts);
     const findings: Finding[] = [];
+    const suggestions: Suggestion[] = [];
     const evidence: Evidence[] = [];
+
+    const total = concepts.concepts.length;
+    const coreCount = concepts.hierarchy.core.length;
+    const supportingCount = concepts.hierarchy.supporting.length;
+    const detailCount = concepts.hierarchy.detail.length;
 
     evidence.push({
       type: "metric",
-      metric: "hierarchy_balance",
+      metric: "Hierarchy Balance",
       value: hierarchyBalance,
       threshold: 0.6,
       quality: hierarchyBalance > 0.6 ? "strong" : "weak",
     });
+
+    evidence.push({
+      type: "count",
+      metric: "Concept Distribution",
+      value: `Core: ${coreCount}, Supporting: ${supportingCount}, Detail: ${detailCount}`,
+      quality: hierarchyBalance > 0.6 ? "strong" : "weak",
+    });
+
+    // Generate findings based on hierarchy balance
+    if (hierarchyBalance < 0.4) {
+      findings.push({
+        type: "critical",
+        message:
+          "Poor concept hierarchy balance—schema organization needs restructuring",
+        severity: 0.8,
+        evidence: `Current: ${coreCount} core, ${supportingCount} supporting, ${detailCount} detail. Optimal: 20% core, 30% supporting, 50% detail`,
+      });
+    } else if (hierarchyBalance < 0.6) {
+      findings.push({
+        type: "warning",
+        message: "Concept hierarchy could be better balanced",
+        severity: 0.5,
+        evidence:
+          "Well-structured hierarchies help students build organized mental models",
+      });
+    } else {
+      findings.push({
+        type: "positive",
+        message: "✓ Well-balanced concept hierarchy",
+        severity: 0,
+        evidence: `Good distribution: ${((coreCount / total) * 100).toFixed(
+          0
+        )}% core, ${((supportingCount / total) * 100).toFixed(
+          0
+        )}% supporting, ${((detailCount / total) * 100).toFixed(0)}% detail`,
+      });
+    }
+
+    // Generate suggestions if needed
+    if (hierarchyBalance < 0.6) {
+      const coreRatio = coreCount / total;
+      const supportingRatio = supportingCount / total;
+
+      let advice = "";
+      if (coreRatio < 0.15) {
+        advice =
+          "Identify more foundational concepts as 'core' (aim for ~20% of concepts)";
+      } else if (coreRatio > 0.25) {
+        advice =
+          "Too many core concepts—demote some to 'supporting' (aim for ~20% core)";
+      } else if (supportingRatio < 0.25) {
+        advice =
+          "Add more supporting concepts to bridge core ideas and details (aim for ~30%)";
+      } else {
+        advice = "Rebalance detail concepts—they should be ~50% of total";
+      }
+
+      suggestions.push({
+        id: "schema-1",
+        principle: "schemaBuilding",
+        priority: hierarchyBalance < 0.4 ? "high" : "medium",
+        title: "Improve Concept Hierarchy Balance",
+        description: advice,
+        implementation:
+          "Review concept classifications: Core = foundational must-knows, Supporting = bridges and applications, Detail = specific examples and extensions",
+        expectedImpact:
+          "Clear hierarchies help students organize knowledge and distinguish essential from supplementary information",
+        relatedConcepts: concepts.hierarchy.core.map((c) => c.id).slice(0, 5),
+        examples: [
+          "Core: Fundamental principles everyone must master",
+          "Supporting: How core concepts connect and apply",
+          "Detail: Specific cases, examples, and extensions",
+        ],
+      });
+    }
 
     let score = hierarchyBalance * 100;
 
@@ -2110,7 +2351,7 @@ export class SchemaBuildingEvaluator {
       score: Math.min(score, 100),
       weight: 0.9,
       findings,
-      suggestions: [],
+      suggestions,
       evidence,
     };
   }
