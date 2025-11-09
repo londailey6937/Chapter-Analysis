@@ -48,17 +48,6 @@ export const ChapterChecker: React.FC = () => {
   const [currentMentionIndex, setCurrentMentionIndex] = useState<number>(0);
   const [hasAnalyzedOnce, setHasAnalyzedOnce] = useState(false);
 
-  // Debug: Log when analysis updates
-  useEffect(() => {
-    if (analysis) {
-      console.log("[ChapterChecker] Analysis updated:", {
-        hasConceptGraph: !!analysis.conceptGraph,
-        conceptCount: analysis.conceptGraph?.concepts?.length || 0,
-        concepts: analysis.conceptGraph?.concepts,
-      });
-    }
-  }, [analysis]);
-
   /**
    * Handle chapter analysis
    */
@@ -147,9 +136,6 @@ export const ChapterChecker: React.FC = () => {
           const progressText = `${capitalizedStep}${
             detail ? ": " + detail : ""
           }`;
-          console.log(
-            `[Progress] Step: ${step}, Detail: ${detail}, Percent will be updated`
-          );
           setProgress(progressText);
 
           // Update progress percentage based on step - 10% intervals for more visibility
@@ -238,9 +224,6 @@ export const ChapterChecker: React.FC = () => {
               setProgressPercent((prev) => Math.min(prev + 1, 95));
               return;
           }
-          console.log(
-            `[Progress] Setting progress percent to ${percent}% for step: ${step}`
-          );
           setProgressPercent(percent);
         } else if (type === "complete") {
           if (analysisTimeoutRef.current) {
@@ -248,6 +231,7 @@ export const ChapterChecker: React.FC = () => {
             analysisTimeoutRef.current = null;
           }
           setIsSlowAnalysis(false);
+          setIsAnalyzing(false);
           setAnalysis(evt.data.result);
           setProgress("");
           setProgressPercent(0);
@@ -259,6 +243,7 @@ export const ChapterChecker: React.FC = () => {
             analysisTimeoutRef.current = null;
           }
           setIsSlowAnalysis(false);
+          setIsAnalyzing(false);
           setError(`Analysis failed: ${evt.data.message}`);
           setProgress("");
           setProgressPercent(0);
@@ -278,12 +263,11 @@ export const ChapterChecker: React.FC = () => {
         analysisTimeoutRef.current = null;
       }
       setIsSlowAnalysis(false);
+      setIsAnalyzing(false);
       setError(
         `Analysis failed: ${err instanceof Error ? err.message : String(err)}`
       );
       setProgress("");
-    } finally {
-      setIsAnalyzing(false);
     }
   };
 
@@ -635,270 +619,330 @@ export const ChapterChecker: React.FC = () => {
               </details>
             </div>
 
-            {/* Upload Controls - Always visible */}
+            {/* Upload Controls - Collapsible after analysis */}
             <div className="control-section">
-              <h2>Upload Your Chapter</h2>
-
-              {/* Domain Selector */}
-              <div className="domain-selector">
-                <label htmlFor="domain-select">
-                  <strong>📚 Select Domain:</strong>
-                </label>
-                <select
-                  id="domain-select"
-                  value={selectedDomain}
-                  onChange={(e) => setSelectedDomain(e.target.value as Domain)}
-                  disabled={isAnalyzing}
-                  className="domain-dropdown"
-                >
-                  {getAvailableDomains()
-                    .filter((d) => d.id !== "cross-domain")
-                    .map((domain) => (
-                      <option key={domain.id} value={domain.id}>
-                        {domain.icon} {domain.label}
-                      </option>
-                    ))}
-                </select>
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={includeCrossDomain}
-                    onChange={(e) => setIncludeCrossDomain(e.target.checked)}
-                    disabled={isAnalyzing}
-                  />
-                  <span>Include Cross-Domain Concepts</span>
-                </label>
-
-                {/* Custom Concepts Input */}
-                {selectedDomain === "custom" && (
-                  <div
-                    className="custom-concepts-input"
-                    style={{ marginTop: "1rem" }}
-                  >
-                    <label htmlFor="custom-concepts">
-                      <strong>✏️ Enter Custom Concepts:</strong>
-                      <br />
-                      <small style={{ color: "#666" }}>
-                        Enter concepts separated by commas or one per line
-                      </small>
+              <details open={!hasAnalyzedOnce}>
+                <summary className="how-it-works-header">
+                  <span>📤 Upload Your Chapter</span>
+                  <span className="toggle-icon">▼</span>
+                </summary>
+                <div className="how-it-works-content">
+                  {/* Domain Selector */}
+                  <div className="domain-selector">
+                    <label htmlFor="domain-select">
+                      <strong>📚 Select Domain:</strong>
                     </label>
-                    <textarea
-                      id="custom-concepts"
-                      placeholder="e.g., recursion, algorithm, data structure"
-                      rows={5}
-                      disabled={isAnalyzing}
-                      onChange={(e) => {
-                        const input = e.target.value;
-                        const conceptNames = input
-                          .split(/[,\n]+/)
-                          .map((c) => c.trim())
-                          .filter((c) => c.length > 0);
-
-                        const concepts: ConceptDefinition[] = conceptNames.map(
-                          (name, idx) => ({
-                            name,
-                            category: "Custom",
-                            subcategory: "User-Defined",
-                            importance: "core" as const,
-                          })
-                        );
-
-                        setCustomConcepts(concepts);
-                      }}
-                      style={{
-                        width: "100%",
-                        padding: "0.5rem",
-                        borderRadius: "4px",
-                        border: "1px solid #ccc",
-                        fontSize: "0.9rem",
-                        fontFamily: "inherit",
-                      }}
-                    />
-                    <div
-                      style={{
-                        marginTop: "0.5rem",
-                        fontSize: "0.85rem",
-                        color: "#555",
-                      }}
-                    >
-                      {customConcepts.length > 0 && (
-                        <span>
-                          ✓ {customConcepts.length} custom concept(s) defined
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* TOC End Page Setting */}
-                <div className="toc-setting" style={{ marginTop: "1rem" }}>
-                  <label htmlFor="toc-end-page">
-                    <strong>📑 Table of Contents ends at page:</strong>
-                    <br />
-                    <small style={{ color: "#666" }}>
-                      Enter the LAST page number of your TOC (e.g., if TOC ends
-                      at page xvii, enter 17).
-                      <br />
-                      Concept navigation will skip to page {tocEndPage + 1} or
-                      later.
-                    </small>
-                  </label>
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "0.5rem",
-                      alignItems: "center",
-                      marginTop: "0.5rem",
-                    }}
-                  >
-                    <input
-                      id="toc-end-page"
-                      type="number"
-                      min="0"
-                      max="200"
-                      value={tocEndPage}
+                    <select
+                      id="domain-select"
+                      value={selectedDomain}
                       onChange={(e) =>
-                        setTocEndPage(
-                          Math.max(0, parseInt(e.target.value) || 0)
-                        )
+                        setSelectedDomain(e.target.value as Domain)
                       }
                       disabled={isAnalyzing}
-                      style={{
-                        width: "100px",
-                        padding: "0.5rem",
-                        borderRadius: "4px",
-                        border: "1px solid #ccc",
-                        fontSize: "0.9rem",
-                      }}
-                      placeholder="e.g., 17"
-                    />
-                    <span style={{ fontSize: "0.85rem", color: "#666" }}>
-                      Quick:
-                      {[0, 10, 20, 30, 50].map((preset) => (
-                        <button
-                          key={preset}
-                          type="button"
-                          onClick={() => setTocEndPage(preset)}
+                      className="domain-dropdown"
+                    >
+                      {getAvailableDomains()
+                        .filter((d) => d.id !== "cross-domain")
+                        .map((domain) => (
+                          <option key={domain.id} value={domain.id}>
+                            {domain.icon} {domain.label}
+                          </option>
+                        ))}
+                    </select>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={includeCrossDomain}
+                        onChange={(e) =>
+                          setIncludeCrossDomain(e.target.checked)
+                        }
+                        disabled={isAnalyzing}
+                      />
+                      <span>Include Cross-Domain Concepts</span>
+                    </label>
+
+                    {/* Custom Concepts Input */}
+                    {selectedDomain === "custom" && (
+                      <div
+                        className="custom-concepts-input"
+                        style={{ marginTop: "1rem" }}
+                      >
+                        <label htmlFor="custom-concepts">
+                          <strong>✏️ Enter Custom Concepts:</strong>
+                          <br />
+                          <small style={{ color: "#666" }}>
+                            Enter concepts separated by commas or one per line
+                          </small>
+                        </label>
+                        <textarea
+                          id="custom-concepts"
+                          placeholder="e.g., recursion, algorithm, data structure"
+                          rows={5}
                           disabled={isAnalyzing}
+                          onChange={(e) => {
+                            const input = e.target.value;
+                            const conceptNames = input
+                              .split(/[,\n]+/)
+                              .map((c) => c.trim())
+                              .filter((c) => c.length > 0);
+
+                            const concepts: ConceptDefinition[] =
+                              conceptNames.map((name, idx) => ({
+                                name,
+                                category: "Custom",
+                                subcategory: "User-Defined",
+                                importance: "core" as const,
+                              }));
+
+                            setCustomConcepts(concepts);
+                          }}
                           style={{
-                            marginLeft: "0.3rem",
-                            padding: "0.2rem 0.5rem",
-                            fontSize: "0.8rem",
-                            background:
-                              tocEndPage === preset ? "#e3f2fd" : "#f5f5f5",
+                            width: "100%",
+                            padding: "0.5rem",
+                            borderRadius: "4px",
                             border: "1px solid #ccc",
-                            borderRadius: "3px",
-                            cursor: isAnalyzing ? "not-allowed" : "pointer",
+                            fontSize: "0.9rem",
+                            fontFamily: "inherit",
+                          }}
+                        />
+                        <div
+                          style={{
+                            marginTop: "0.5rem",
+                            fontSize: "0.85rem",
+                            color: "#555",
                           }}
                         >
-                          {preset === 0 ? "None" : preset}
-                        </button>
-                      ))}
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      marginTop: "0.5rem",
-                      fontSize: "0.85rem",
-                      color: "#0066cc",
-                    }}
-                  >
-                    💡 Tip: Count pages manually - most PDFs lack proper
-                    metadata for auto-detection.
-                  </div>
-                  <div
-                    style={{
-                      marginTop: "0.3rem",
-                      fontSize: "0.8rem",
-                      color: "#666",
-                      fontStyle: "italic",
-                    }}
-                  >
-                    Note: Auto-detection rarely works as PDFs don't reliably
-                    store page label metadata (e.g., Roman numerals i, ii, iii).
-                    Manual setting is recommended.
-                  </div>
-                </div>
-              </div>
+                          {customConcepts.length > 0 && (
+                            <span>
+                              ✓ {customConcepts.length} custom concept(s)
+                              defined
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
-              <div className="control-buttons">
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isAnalyzing}
-                >
-                  📄 Upload File (.md, .pdf)
-                </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".md,.pdf"
-                  onChange={handleFileUpload}
-                  style={{ display: "none" }}
-                />
-                {chapterText && (
+                    {/* TOC End Page Setting */}
+                    <div className="toc-setting" style={{ marginTop: "1rem" }}>
+                      <label htmlFor="toc-end-page">
+                        <strong>📑 Table of Contents ends at page:</strong>
+                        <br />
+                        <small style={{ color: "#666" }}>
+                          Enter the LAST page number of your TOC (e.g., if TOC
+                          ends at page xvii, enter 17).
+                          <br />
+                          Concept navigation will skip to page {tocEndPage +
+                            1}{" "}
+                          or later.
+                        </small>
+                      </label>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "0.5rem",
+                          alignItems: "center",
+                          marginTop: "0.5rem",
+                        }}
+                      >
+                        <input
+                          id="toc-end-page"
+                          type="number"
+                          min="0"
+                          max="200"
+                          value={tocEndPage}
+                          onChange={(e) =>
+                            setTocEndPage(
+                              Math.max(0, parseInt(e.target.value) || 0)
+                            )
+                          }
+                          disabled={isAnalyzing}
+                          style={{
+                            width: "100px",
+                            padding: "0.5rem",
+                            borderRadius: "4px",
+                            border: "1px solid #ccc",
+                            fontSize: "0.9rem",
+                          }}
+                          placeholder="e.g., 17"
+                        />
+                        <span style={{ fontSize: "0.85rem", color: "#666" }}>
+                          Quick:
+                          {[0, 10, 20, 30, 50].map((preset) => (
+                            <button
+                              key={preset}
+                              type="button"
+                              onClick={() => setTocEndPage(preset)}
+                              disabled={isAnalyzing}
+                              style={{
+                                marginLeft: "0.3rem",
+                                padding: "0.2rem 0.5rem",
+                                fontSize: "0.8rem",
+                                background:
+                                  tocEndPage === preset ? "#e3f2fd" : "#f5f5f5",
+                                border: "1px solid #ccc",
+                                borderRadius: "3px",
+                                cursor: isAnalyzing ? "not-allowed" : "pointer",
+                              }}
+                            >
+                              {preset === 0 ? "None" : preset}
+                            </button>
+                          ))}
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          marginTop: "0.5rem",
+                          fontSize: "0.85rem",
+                          color: "#0066cc",
+                        }}
+                      >
+                        💡 Tip: Count pages manually - most PDFs lack proper
+                        metadata for auto-detection.
+                      </div>
+                      <div
+                        style={{
+                          marginTop: "0.3rem",
+                          fontSize: "0.8rem",
+                          color: "#666",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        Note: Auto-detection rarely works as PDFs don't reliably
+                        store page label metadata (e.g., Roman numerals i, ii,
+                        iii). Manual setting is recommended.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="control-buttons">
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isAnalyzing}
+                    >
+                      📄 Upload File (.md, .pdf)
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".md,.pdf"
+                      onChange={handleFileUpload}
+                      style={{ display: "none" }}
+                    />
+                    {chapterText && (
+                      <button
+                        className="btn btn-secondary"
+                        onClick={handleClear}
+                        disabled={isAnalyzing}
+                      >
+                        🗑️ Clear
+                      </button>
+                    )}
+                    {analysis && (
+                      <button
+                        className="btn btn-secondary"
+                        onClick={handleExport}
+                      >
+                        📥 Export JSON
+                      </button>
+                    )}
+                  </div>
+
+                  {error && <div className="error-message">{error}</div>}
+
+                  {progress && !error && (
+                    <div className="progress-indicator">
+                      <div className="progress-bar">
+                        <div
+                          className="progress-fill"
+                          style={{
+                            width:
+                              progressPercent > 0
+                                ? `${progressPercent}%`
+                                : "30%",
+                          }}
+                        ></div>
+                      </div>
+                      <div className="progress-text">{progress}</div>
+                      {isSlowPdf && (
+                        <div className="slow-pdf-warning">
+                          ⚠️ This PDF is taking longer than expected. This may
+                          be due to complex fonts or encoding. The process will
+                          continue, but it may take several minutes.
+                        </div>
+                      )}
+                      {isSlowAnalysis && (
+                        <div className="slow-analysis-warning">
+                          ⚠️ This analysis is taking longer than expected. This
+                          may be due to chapter length or complexity. The
+                          process will continue, but it may take several
+                          minutes.
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   <button
-                    className="btn btn-secondary"
-                    onClick={handleClear}
-                    disabled={isAnalyzing}
+                    className={`btn btn-primary btn-large ${
+                      chapterText.trim() &&
+                      !isAnalyzing &&
+                      !analysis &&
+                      !hasAnalyzedOnce
+                        ? "attention-pulse"
+                        : ""
+                    }`}
+                    onClick={handleAnalyzeChapter}
+                    disabled={isAnalyzing || !chapterText.trim()}
                   >
-                    🗑️ Clear
+                    {isAnalyzing ? "Processing..." : "🔍 Analyze Chapter"}
                   </button>
-                )}
-                {analysis && (
-                  <button className="btn btn-secondary" onClick={handleExport}>
-                    📥 Export JSON
-                  </button>
-                )}
-              </div>
 
-              {error && <div className="error-message">{error}</div>}
+                  {isAnalyzing && <div className="loading-spinner" />}
+                </div>
+              </details>
 
-              {progress && !error && (
-                <div className="progress-indicator">
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{
-                        width:
-                          progressPercent > 0 ? `${progressPercent}%` : "30%",
-                      }}
-                    ></div>
+              {/* Loading indicator - shows during analysis */}
+              {isAnalyzing && (
+                <div
+                  className="analysis-loading-indicator"
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "32px",
+                    margin: "24px 0",
+                    background:
+                      "linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)",
+                    border: "2px solid #0ea5e9",
+                    borderRadius: "12px",
+                    boxShadow: "0 4px 12px rgba(14, 165, 233, 0.15)",
+                  }}
+                >
+                  <div
+                    className="loading-spinner-large"
+                    style={{
+                      width: "48px",
+                      height: "48px",
+                      border: "4px solid rgba(14, 165, 233, 0.2)",
+                      borderTopColor: "#0ea5e9",
+                      borderRadius: "50%",
+                      animation: "spin 1s linear infinite",
+                      marginBottom: "16px",
+                    }}
+                  ></div>
+                  <div
+                    className="loading-text"
+                    style={{
+                      fontSize: "16px",
+                      fontWeight: "500",
+                      color: "#1e40af",
+                    }}
+                  >
+                    Analyzing chapter...
                   </div>
-                  <div className="progress-text">{progress}</div>
-                  {isSlowPdf && (
-                    <div className="slow-pdf-warning">
-                      ⚠️ This PDF is taking longer than expected. This may be
-                      due to complex fonts or encoding. The process will
-                      continue, but it may take several minutes.
-                    </div>
-                  )}
-                  {isSlowAnalysis && (
-                    <div className="slow-analysis-warning">
-                      ⚠️ This analysis is taking longer than expected. This may
-                      be due to chapter length or complexity. The process will
-                      continue, but it may take several minutes.
-                    </div>
-                  )}
                 </div>
               )}
-
-              <button
-                className={`btn btn-primary btn-large ${
-                  chapterText.trim() &&
-                  !isAnalyzing &&
-                  !analysis &&
-                  !hasAnalyzedOnce
-                    ? "attention-pulse"
-                    : ""
-                }`}
-                onClick={handleAnalyzeChapter}
-                disabled={isAnalyzing || !chapterText.trim()}
-              >
-                {isAnalyzing ? "Processing..." : "🔍 Analyze Chapter"}
-              </button>
-
-              {isAnalyzing && <div className="loading-spinner" />}
             </div>
 
             {/* Analysis Results - Shows when available */}
@@ -908,12 +952,6 @@ export const ChapterChecker: React.FC = () => {
                   analysis={analysis}
                   concepts={analysis.conceptGraph?.concepts || []}
                   onConceptClick={(concept, mentionIndex) => {
-                    console.log(
-                      "[ChapterChecker] Concept clicked:",
-                      concept.name,
-                      "mention",
-                      mentionIndex
-                    );
                     setHighlightedConcept(concept);
                     setCurrentMentionIndex(mentionIndex);
                   }}
@@ -1782,6 +1820,46 @@ export const ChapterChecker: React.FC = () => {
 
           .btn {
             width: 100%;
+          }
+        }
+
+        /* Loading indicator below collapsed section */
+        .analysis-loading-indicator {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 32px;
+          margin: 24px 0;
+          background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+          border: 2px solid var(--brand-accent);
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+        }
+
+        .loading-spinner-large {
+          width: 48px;
+          height: 48px;
+          border: 4px solid rgba(14, 165, 233, 0.2);
+          border-top-color: #0ea5e9;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin-bottom: 16px;
+        }
+
+        .loading-text {
+          font-size: 16px;
+          font-weight: 500;
+          color: var(--brand-navy-700);
+          animation: pulse-opacity 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-opacity {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.5;
           }
         }
       `}</style>

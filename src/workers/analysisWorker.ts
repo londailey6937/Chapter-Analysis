@@ -20,9 +20,6 @@ self.onmessage = async (evt: MessageEvent<IncomingMessage>) => {
 
   // Progress reporting function
   const reportProgress = (step: string, detail?: string) => {
-    console.log(
-      `[Worker] Reporting progress - Step: ${step}, Detail: ${detail}`
-    );
     (self as any).postMessage({ type: "progress", step, detail });
   };
 
