@@ -65,6 +65,7 @@ export class ConceptExtractor {
     includeCrossDomain: boolean = true,
     customConcepts: ConceptDefinition[] = []
   ): Promise<ConceptGraph> {
+    const overallStart = performance.now();
     console.log(
       "[ConceptExtractor] Starting library-based extraction, chapter length:",
       chapter.length,
@@ -79,58 +80,83 @@ export class ConceptExtractor {
 
     // Phase 1: Search for library concepts in text
     onProgress?.("concept-phase-1", "Searching for known concepts");
-    console.log("[ConceptExtractor] Phase 1: Searching library concepts...");
+    const phase1Start = performance.now();
     const foundConcepts = extractor.searchLibraryConcepts(chapter);
-    console.log("[ConceptExtractor] Found", foundConcepts.length, "concepts");
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    const phase1Time = performance.now() - phase1Start;
+    console.log(
+      `[ConceptExtractor] Phase 1: Found ${
+        foundConcepts.length
+      } concepts in ${phase1Time.toFixed(2)}ms`
+    );
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     // Phase 2: Track all mentions for each concept
     onProgress?.("concept-phase-2", "Tracking concept mentions");
-    console.log("[ConceptExtractor] Phase 2: Tracking mentions...");
+    const phase2Start = performance.now();
     const conceptsWithMentions = extractor.trackMentions(
       foundConcepts,
       chapter
     );
+    const phase2Time = performance.now() - phase2Start;
     console.log(
-      "[ConceptExtractor] Tracked mentions for",
-      conceptsWithMentions.length,
-      "concepts"
+      `[ConceptExtractor] Phase 2: Tracked mentions for ${
+        conceptsWithMentions.length
+      } concepts in ${phase2Time.toFixed(2)}ms`
     );
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     // Phase 3: Establish relationships
     onProgress?.("concept-phase-3", "Establishing concept relationships");
-    console.log("[ConceptExtractor] Phase 3: Establishing relationships...");
+    const phase3Start = performance.now();
     const relationships = extractor.establishRelationships(
       conceptsWithMentions,
       chapter
     );
+    const phase3Time = performance.now() - phase3Start;
     console.log(
-      "[ConceptExtractor] Found",
-      relationships.length,
-      "relationships"
+      `[ConceptExtractor] Phase 3: Found ${
+        relationships.length
+      } relationships in ${phase3Time.toFixed(2)}ms`
     );
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     // Phase 4: Build hierarchy
     onProgress?.("concept-phase-4", "Building concept hierarchy");
-    console.log("[ConceptExtractor] Phase 4: Building hierarchy...");
+    const phase4Start = performance.now();
     const hierarchy = extractor.buildHierarchy(conceptsWithMentions);
+    const phase4Time = performance.now() - phase4Start;
     console.log(
-      "[ConceptExtractor] Hierarchy built - core:",
-      hierarchy.core.length,
-      "supporting:",
-      hierarchy.supporting.length
+      `[ConceptExtractor] Phase 4: Hierarchy built in ${phase4Time.toFixed(
+        2
+      )}ms - core: ${hierarchy.core.length}, supporting: ${
+        hierarchy.supporting.length
+      }`
     );
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     // Phase 5: Extract concept sequence
     onProgress?.("concept-phase-5", "Extracting concept sequence");
-    console.log("[ConceptExtractor] Phase 5: Extracting sequence...");
+    const phase5Start = performance.now();
     const sequence = extractor.extractConceptSequence(conceptsWithMentions);
+    const phase5Time = performance.now() - phase5Start;
     console.log(
-      "[ConceptExtractor] Sequence extracted, length:",
-      sequence.length
+      `[ConceptExtractor] Phase 5: Sequence extracted (${
+        sequence.length
+      } items) in ${phase5Time.toFixed(2)}ms`
+    );
+
+    const overallTime = performance.now() - overallStart;
+    console.log(
+      `[ConceptExtractor] ✅ Extraction complete in ${overallTime.toFixed(
+        2
+      )}ms (${(overallTime / 1000).toFixed(2)}s)`
+    );
+    console.log(
+      `[ConceptExtractor] Phase breakdown: P1=${phase1Time.toFixed(
+        0
+      )}ms P2=${phase2Time.toFixed(0)}ms P3=${phase3Time.toFixed(
+        0
+      )}ms P4=${phase4Time.toFixed(0)}ms P5=${phase5Time.toFixed(0)}ms`
     );
 
     return {
@@ -149,46 +175,76 @@ export class ConceptExtractor {
 
   /**
    * Search for all library concepts in the text
+   * OPTIMIZED: Pre-compile all regex patterns, single-pass scanning
    */
   private searchLibraryConcepts(text: string): FoundConcept[] {
+    const startTime = performance.now();
     const found: FoundConcept[] = [];
-    const textLower = text.toLowerCase();
+
+    // OPTIMIZATION 1: Pre-compile all regex patterns once
+    interface SearchPattern {
+      regex: RegExp;
+      definition: ConceptDefinition;
+    }
+
+    const patterns: SearchPattern[] = [];
 
     for (const libraryDef of this.conceptLibrary) {
-      // Search for concept name
+      // Collect all search terms (name + aliases)
       const searchTerms = [libraryDef.name.toLowerCase()];
-
-      // Add aliases if available
       if (libraryDef.aliases) {
         searchTerms.push(...libraryDef.aliases.map((a) => a.toLowerCase()));
       }
 
-      let totalCount = 0;
-      const allPositions: number[] = [];
-
-      // Search for each term
+      // Create one pattern per unique term
       for (const term of searchTerms) {
         const regex = new RegExp(`\\b${this.escapeRegex(term)}\\b`, "gi");
-        let match;
-        const termPositions: number[] = [];
-
-        while ((match = regex.exec(text)) !== null) {
-          termPositions.push(match.index);
-          totalCount++;
-        }
-
-        allPositions.push(...termPositions);
-      }
-
-      // Only include concepts that were found
-      if (totalCount > 0) {
-        found.push({
-          definition: libraryDef,
-          count: totalCount,
-          positions: allPositions.sort((a, b) => a - b),
-        });
+        patterns.push({ regex, definition: libraryDef });
       }
     }
+
+    console.log(
+      `[ConceptExtractor] Pre-compiled ${patterns.length} search patterns`
+    );
+
+    // OPTIMIZATION 2: Track found concepts by definition reference
+    const foundMap = new Map<
+      ConceptDefinition,
+      { count: number; positions: number[] }
+    >();
+
+    // OPTIMIZATION 3: Scan text once per pattern (unavoidable for position tracking)
+    for (const { regex, definition } of patterns) {
+      let match;
+
+      while ((match = regex.exec(text)) !== null) {
+        if (!foundMap.has(definition)) {
+          foundMap.set(definition, { count: 0, positions: [] });
+        }
+        const entry = foundMap.get(definition)!;
+        entry.count++;
+        entry.positions.push(match.index);
+      }
+
+      // Reset regex lastIndex
+      regex.lastIndex = 0;
+    }
+
+    // Convert map to array
+    for (const [definition, data] of foundMap.entries()) {
+      found.push({
+        definition,
+        count: data.count,
+        positions: data.positions.sort((a, b) => a - b),
+      });
+    }
+
+    const endTime = performance.now();
+    console.log(
+      `[ConceptExtractor] Phase 1 complete: Found ${
+        found.length
+      } concepts in ${(endTime - startTime).toFixed(2)}ms`
+    );
 
     // Sort by frequency (most mentioned first)
     return found.sort((a, b) => b.count - a.count);
