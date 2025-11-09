@@ -97,7 +97,7 @@ export class AnalysisEngine {
       );
 
       // Allow UI to update before heavy computation
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       console.log("[AnalysisEngine] Starting principle evaluations...");
       // Evaluate all learning principles (full evaluations used by UI)
@@ -108,10 +108,10 @@ export class AnalysisEngine {
       );
       console.log("[AnalysisEngine] Principle evaluations complete");
 
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       onProgress?.("principles-complete", "Principle evaluation complete");
 
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       onProgress?.(
         "building-visualizations",
         "Creating analysis visualizations"
@@ -126,14 +126,14 @@ export class AnalysisEngine {
           weight: ev.weight ?? 1,
         }));
 
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       onProgress?.(
         "analyzing-concepts",
         "Analyzing concept patterns and relationships"
       );
 
       // Allow UI to update
-      await new Promise((resolve) => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Build concept analysis (basic defaults from graph/metrics)
       const reviewPatterns: ReviewPattern[] = conceptGraph.concepts.map(
@@ -333,6 +333,8 @@ export class AnalysisEngine {
     conceptGraph: ConceptGraph,
     onProgress?: (step: string, detail?: string) => void
   ): Promise<PrincipleEvaluation[]> {
+    const overallStart = performance.now();
+
     const evaluators = [
       { name: "Deep Processing", evaluator: DeepProcessingEvaluator },
       { name: "Spaced Repetition", evaluator: SpacedRepetitionEvaluator },
@@ -347,6 +349,7 @@ export class AnalysisEngine {
     ];
 
     const results: PrincipleEvaluation[] = [];
+    const timings: { name: string; time: number }[] = [];
 
     for (let i = 0; i < evaluators.length; i++) {
       const { name, evaluator } = evaluators[i];
@@ -355,12 +358,27 @@ export class AnalysisEngine {
         `Evaluating ${name} (${i + 1}/${evaluators.length})`
       );
 
+      const evalStart = performance.now();
       const result = evaluator.evaluate(chapter, conceptGraph);
+      const evalTime = performance.now() - evalStart;
+
       results.push(result);
+      timings.push({ name, time: evalTime });
 
       // Yield control between evaluators to allow UI updates
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 50));
     }
+
+    const overallTime = performance.now() - overallStart;
+    console.log(
+      `[AnalysisEngine] ✅ All evaluators complete in ${overallTime.toFixed(
+        2
+      )}ms (${(overallTime / 1000).toFixed(2)}s)`
+    );
+    console.log(
+      `[AnalysisEngine] Evaluator timings:`,
+      timings.map((t) => `${t.name}=${t.time.toFixed(0)}ms`).join(", ")
+    );
 
     return results;
   }
