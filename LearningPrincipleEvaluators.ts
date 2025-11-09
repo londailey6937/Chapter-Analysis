@@ -29,7 +29,7 @@ export class DeepProcessingEvaluator {
     const bloomsAnalysis = this.classifyQuestionsByBloomsLevel(chapter.content);
     evidence.push({
       type: "metric",
-      metric: "blooms_higher_order",
+      metric: "Higher-Order Thinking %",
       value: bloomsAnalysis.higherOrderPercentage,
       threshold: 40,
       quality:
@@ -39,6 +39,24 @@ export class DeepProcessingEvaluator {
           ? "moderate"
           : "weak",
     });
+
+    // Add detailed Bloom's breakdown to evidence
+    const totalBloomsQuestions =
+      bloomsAnalysis.remember +
+      bloomsAnalysis.understand +
+      bloomsAnalysis.apply +
+      bloomsAnalysis.analyze +
+      bloomsAnalysis.evaluate +
+      bloomsAnalysis.create;
+
+    if (totalBloomsQuestions > 0) {
+      evidence.push({
+        type: "count",
+        metric: "Bloom's Breakdown",
+        value: `Remember: ${bloomsAnalysis.remember}, Understand: ${bloomsAnalysis.understand}, Apply: ${bloomsAnalysis.apply}, Analyze: ${bloomsAnalysis.analyze}, Evaluate: ${bloomsAnalysis.evaluate}, Create: ${bloomsAnalysis.create}`,
+        quality: bloomsAnalysis.higherOrderPercentage >= 40 ? "strong" : "weak",
+      });
+    }
 
     if (bloomsAnalysis.higherOrderPercentage < 25) {
       findings.push({
