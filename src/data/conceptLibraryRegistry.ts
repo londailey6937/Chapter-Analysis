@@ -11,7 +11,6 @@ import {
 } from "./conceptLibraryTypes";
 import { CHEMISTRY_CONCEPTS } from "./chemistryConceptLibrary";
 import { CROSS_DOMAIN_CONCEPTS } from "./crossDomainConcepts";
-import { LITERATURE_CONCEPTS } from "./literatureConcepts";
 import { ALGEBRA_TRIG_CONCEPTS } from "./algebraTrigConceptLibrary";
 
 // Re-export types for convenience
@@ -26,7 +25,6 @@ export type {
  */
 export const CONCEPT_LIBRARIES: Record<Domain, ConceptLibrary> = {
   chemistry: CHEMISTRY_CONCEPTS,
-  literature: LITERATURE_CONCEPTS,
   "cross-domain": CROSS_DOMAIN_CONCEPTS,
 
   // Placeholder libraries for other domains (to be expanded)
@@ -112,11 +110,6 @@ export function getAvailableDomains() {
  * Check if a domain has a comprehensive library (vs placeholder)
  */
 export function hasComprehensiveLibrary(domain: Domain): boolean {
-  const comprehensive: Domain[] = [
-    "chemistry",
-    "literature",
-    "mathematics",
-    "cross-domain",
-  ];
+  const comprehensive: Domain[] = ["chemistry", "mathematics", "cross-domain"];
   return comprehensive.includes(domain);
 }

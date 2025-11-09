@@ -28,7 +28,6 @@ export type Domain =
   | "chemistry"
   | "physics"
   | "biology"
-  | "literature"
   | "computing"
   | "mathematics"
   | "cross-domain";
@@ -59,12 +58,6 @@ export const AVAILABLE_DOMAINS: DomainInfo[] = [
     label: "Biology",
     description: "Biology concepts (cells, genes, evolution, ecology, etc.)",
     icon: "🧬",
-  },
-  {
-    id: "literature",
-    label: "Literature",
-    description: "Literary concepts (narrator, character, plot, theme, etc.)",
-    icon: "📚",
   },
   {
     id: "computing",
