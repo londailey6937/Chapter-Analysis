@@ -24,7 +24,7 @@ import type { ConceptDefinition } from "@/data/conceptLibraryRegistry";
 export const ChapterChecker: React.FC = () => {
   const [chapterText, setChapterText] = useState("");
   const [selectedDomain, setSelectedDomain] = useState<Domain>("chemistry");
-  const [includeCrossDomain, setIncludeCrossDomain] = useState(true);
+  const [includeCrossDomain, setIncludeCrossDomain] = useState(false);
   const [customConcepts, setCustomConcepts] = useState<ConceptDefinition[]>([]);
   const [sectionHints, setSectionHints] = useState<
     { title: string; startIndex: number }[] | null
@@ -37,7 +37,6 @@ export const ChapterChecker: React.FC = () => {
   const [progress, setProgress] = useState<string>("");
   const [progressPercent, setProgressPercent] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isDragActive, setIsDragActive] = useState(false);
   const [isSlowPdf, setIsSlowPdf] = useState(false);
   const [isSlowAnalysis, setIsSlowAnalysis] = useState(false);
   const fileProcessingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -455,31 +454,6 @@ export const ChapterChecker: React.FC = () => {
     }
   };
 
-  /** Drag & Drop handlers */
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!isDragActive) setIsDragActive(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragActive(false);
-  };
-
-  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragActive(false);
-    const files = Array.from(e.dataTransfer?.files || []);
-    if (!files.length) return;
-    for (const file of files) {
-      if (!/(\.txt|\.md|\.pdf)$/i.test(file.name)) continue;
-      await readFile(file);
-    }
-  };
-
   return (
     <div className="chapter-checker">
       <header className="app-header">
@@ -494,14 +468,19 @@ export const ChapterChecker: React.FC = () => {
             {pdfBuffer ? (
               <>
                 <h3>📄 Chapter PDF</h3>
-                <PdfViewer
-                  fileBuffer={pdfBuffer}
-                  skipTextExtraction={true}
-                  preExtractedPageTexts={pdfPageTexts || undefined}
-                  highlightedConcept={highlightedConcept}
-                  chapterText={chapterText}
-                  currentMentionIndex={currentMentionIndex}
-                />
+                <div className="pdf-viewer-container">
+                  <PdfViewer
+                    fileBuffer={pdfBuffer}
+                    skipTextExtraction={true}
+                    preExtractedPageTexts={pdfPageTexts || undefined}
+                    highlightedConcept={highlightedConcept}
+                    chapterText={chapterText}
+                    currentMentionIndex={currentMentionIndex}
+                    onMentionNavigate={(newIndex) =>
+                      setCurrentMentionIndex(newIndex)
+                    }
+                  />
+                </div>
               </>
             ) : (
               <div className="pdf-placeholder">
@@ -527,7 +506,7 @@ export const ChapterChecker: React.FC = () => {
           <div className="control-panel">
             {/* How It Works - Always visible, collapsible */}
             <div className="how-it-works-section">
-              <details open={!analysis}>
+              <details open={false}>
                 <summary className="how-it-works-header">
                   <span>🎓 How the Analyzer Works</span>
                   <span className="toggle-icon">▼</span>
@@ -602,13 +581,49 @@ export const ChapterChecker: React.FC = () => {
               </details>
             </div>
 
+            {/* User's Guide - Collapsible */}
+            <div className="how-it-works-section">
+              <details open={false}>
+                <summary className="how-it-works-header">
+                  <span>📖 User's Guide</span>
+                  <span className="toggle-icon">▼</span>
+                </summary>
+                <div className="how-it-works-content">
+                  <p className="how-it-works-intro">
+                    Follow these steps to analyze your chapter:
+                  </p>
+                  <ul className="principle-list">
+                    <li>
+                      <strong>Select Domain:</strong> Choose the subject area
+                      that best matches your content (Chemistry, Algebra &
+                      Trigonometry, or Literature).
+                    </li>
+                    <li>
+                      <strong>Upload File:</strong> Click the "Upload File"
+                      button and select a .md (Markdown) or .pdf file from your
+                      computer.
+                    </li>
+                    <li>
+                      <strong>Review Analysis:</strong> Once processed, the
+                      analyzer will display scores for each learning principle
+                      along with specific findings and recommendations.
+                    </li>
+                    <li>
+                      <strong>Explore Details:</strong> Click on individual
+                      principle cards to see detailed evidence, suggestions for
+                      improvement, and specific text excerpts.
+                    </li>
+                    <li>
+                      <strong>Export Results:</strong> Save your analysis as
+                      JSON for future reference or sharing with colleagues.
+                    </li>
+                  </ul>
+                </div>
+              </details>
+            </div>
+
             {/* Upload Controls - Always visible */}
-            <div
-              className={`control-section ${isDragActive ? "drag-active" : ""}`}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-            >
+            <div className="control-section">
               <h2>Upload Your Chapter</h2>
 
               {/* Domain Selector */}
@@ -648,12 +663,12 @@ export const ChapterChecker: React.FC = () => {
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isAnalyzing}
                 >
-                  📄 Upload File (.txt, .md, .pdf)
+                  📄 Upload File (.md, .pdf)
                 </button>
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".txt,.md,.pdf"
+                  accept=".md,.pdf"
                   onChange={handleFileUpload}
                   style={{ display: "none" }}
                 />
@@ -671,60 +686,6 @@ export const ChapterChecker: React.FC = () => {
                     📥 Export JSON
                   </button>
                 )}
-              </div>
-
-              {/* Text Editor (only when no PDF) */}
-              {!pdfBuffer && (
-                <>
-                  <textarea
-                    value={chapterText}
-                    onChange={(e) => setChapterText(e.target.value)}
-                    placeholder="Paste your chapter text here... (minimum 200 words)"
-                    className="chapter-textarea"
-                    disabled={isAnalyzing}
-                    onPaste={async (e) => {
-                      try {
-                        const items = e.clipboardData?.items;
-                        if (!items) return;
-                        for (let i = 0; i < items.length; i++) {
-                          const item = items[i];
-                          if (
-                            item.kind === "file" &&
-                            item.type === "application/pdf"
-                          ) {
-                            e.preventDefault();
-                            const file = item.getAsFile();
-                            if (!file) return;
-                            const originalBuffer = await file.arrayBuffer();
-                            const viewerBuffer = originalBuffer.slice(0);
-                            setPdfBuffer(viewerBuffer);
-                            const text = await extractTextFromPdfArrayBuffer(
-                              originalBuffer
-                            );
-                            setChapterText((prev) =>
-                              prev ? prev + "\n\n" + text : text
-                            );
-                            return;
-                          }
-                        }
-                      } catch (err) {
-                        setError(
-                          `Failed to paste PDF: ${
-                            err instanceof Error ? err.message : String(err)
-                          }`
-                        );
-                      }
-                    }}
-                  />
-                  <div className="drop-zone">
-                    <strong>Drag & Drop</strong> a .txt, .md, or .pdf file here
-                    <div className="accepted-note">Accepted: .txt .md .pdf</div>
-                  </div>
-                </>
-              )}
-
-              <div className="word-count">
-                <span>{chapterText.trim().split(/\s+/).length} words</span>
               </div>
 
               {error && <div className="error-message">{error}</div>}
@@ -958,7 +919,7 @@ export const ChapterChecker: React.FC = () => {
           display: grid;
           grid-template-columns: 900px 1fr;
           gap: 24px;
-          align-items: flex-start;
+          align-items: stretch;
         }
 
         /* LEFT PANEL: PDF Viewer */
@@ -967,19 +928,26 @@ export const ChapterChecker: React.FC = () => {
           border-radius: 12px;
           padding: 20px;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-          position: sticky;
-          top: 20px;
-          max-height: calc(100vh - 60px);
-          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
         }
 
         .pdf-panel h3 {
           margin: 0 0 16px 0;
           font-size: 20px;
           color: #1e293b;
+          flex-shrink: 0;
+        }
+
+        .pdf-viewer-container {
+          flex: 1;
+          overflow-y: auto;
+          min-height: 0;
         }
 
         .pdf-placeholder {
+          flex: 1;
           min-height: 500px;
           display: flex;
           align-items: center;
@@ -1163,6 +1131,10 @@ export const ChapterChecker: React.FC = () => {
           padding: 24px;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
           min-width: 0;
+          position: sticky;
+          top: 20px;
+          max-height: calc(100vh - 60px);
+          overflow-y: auto;
         }
 
         .control-section h2 {
@@ -1412,68 +1384,10 @@ export const ChapterChecker: React.FC = () => {
           }
         }
 
-        .control-section.drag-active {
-          outline: 3px dashed var(--brand-navy-600);
-          outline-offset: 2px;
-          background: linear-gradient(180deg, #ffffff 0%, #f0f4ff 100%);
-        }
-
-        .drop-zone {
-          margin-top: 12px;
-          padding: 14px 16px;
-          border: 2px dashed #cbd5e1;
-          border-radius: 10px;
-          font-size: 14px;
-          text-align: center;
-          color: #334155;
-          background: #f8fafc;
-          transition: background 0.25s, border-color 0.25s;
-          user-select: none;
-        }
-
-        .drag-active .drop-zone {
-          border-color: var(--brand-navy-600);
-          background: #eef2ff;
-        }
-
-        .drop-zone strong {
-          display: block;
-          font-size: 13px;
-          letter-spacing: 0.5px;
-          margin-bottom: 4px;
-          color: #1e3a8a;
-        }
-
-        .accepted-note {
-          margin-top: 6px;
-          font-size: 11px;
-          color: #64748b;
-        }        .control-buttons {
+        .control-buttons {
           display: flex;
           gap: 10px;
           margin-bottom: 15px;
-        }
-
-        .chapter-textarea {
-          width: 100%;
-          height: 300px;
-          padding: 15px;
-          border: 2px solid #e0e0e0;
-          border-radius: 8px;
-          font-family: 'Courier New', monospace;
-          font-size: 14px;
-          resize: vertical;
-          transition: border-color 0.3s;
-        }
-
-        .chapter-textarea:focus {
-          outline: none;
-          border-color: var(--brand-navy-600);
-        }
-
-        .chapter-textarea:disabled {
-          background: #f5f5f5;
-          color: #999;
         }
 
         .word-count {
@@ -1692,10 +1606,6 @@ export const ChapterChecker: React.FC = () => {
         @media (max-width: 768px) {
           .app-header h1 {
             font-size: 32px;
-          }
-
-          .chapter-textarea {
-            height: 200px;
           }
 
           .info-section {

@@ -23,6 +23,7 @@ interface PdfViewerProps {
   highlightedConcept?: Concept | null; // Concept to highlight in the PDF
   chapterText?: string; // Full chapter text for position mapping
   currentMentionIndex?: number; // Index of the mention to scroll to
+  onMentionNavigate?: (newIndex: number) => void; // Callback when user navigates mentions
 }
 
 // Simple cache for PDF documents to avoid re-parsing
@@ -36,12 +37,19 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
   highlightedConcept,
   chapterText,
   currentMentionIndex = 0,
+  onMentionNavigate,
 }) => {
   const [pdf, setPdf] = useState<PDFDocumentProxy | null>(null);
   const [numPages, setNumPages] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [scale, setScale] = useState(1.5);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [pendingIndicator, setPendingIndicator] = useState<{
+    type: "concept" | "section";
+    text: string;
+    pageNum: number;
+  } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const pageOffsetsRef = useRef<number[] | null>(null);
   const pageTextsRef = useRef<string[] | null>(null);
@@ -197,16 +205,19 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
       }
 
       let pageIdx = 0;
-      // Strategy 1: position mapping if provided
+      let strategyUsed = "none";
+
+      // Strategy 1: position mapping if provided (HIGHEST PRIORITY)
       if (typeof pos === "number") {
         for (let i = 0; i < offsets.length; i++) {
           if (offsets[i] <= pos) pageIdx = i;
           else break;
         }
+        strategyUsed = "position";
         console.log("📍 Position strategy:", { pos, pageIdx });
       }
-      // Strategy 2: heading search within pages (case-insensitive)
-      if (heading && pageTexts && pageTexts.length) {
+      // Strategy 2: heading search within pages (ONLY if no position provided)
+      else if (heading && pageTexts && pageTexts.length) {
         const h = heading
           .toLowerCase()
           .replace(/[^a-z0-9\s]/gi, "")
@@ -214,11 +225,12 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
         const found = pageTexts.findIndex((t) => t.toLowerCase().includes(h));
         if (found >= 0) {
           pageIdx = found;
+          strategyUsed = "heading";
           console.log("🔍 Heading strategy:", { heading, found, pageIdx });
         }
       }
       // Strategy 3: proportional fallback by section index
-      if (typeof sectionIndex === "number" && (!pageIdx || pageIdx === 0)) {
+      if (typeof sectionIndex === "number" && strategyUsed === "none") {
         // use proportional estimate if position/heading not decisive
         const est = Math.round(
           (sectionIndex / Math.max(1, offsets.length - 1)) *
@@ -232,49 +244,34 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
         });
       }
       const pageNum = pageIdx + 1;
-      const container = containerRef.current;
-      if (!container) {
-        console.warn("⚠️ No container ref");
-        return;
+
+      // Skip TOC pages (typically first 10 pages) - if we land on TOC, move to page 11
+      const minContentPage = 11;
+      const adjustedPageNum =
+        pageNum < minContentPage ? minContentPage : pageNum;
+
+      if (adjustedPageNum !== pageNum) {
+        console.log(
+          `⚠️ Skipping TOC: Page ${pageNum} → Page ${adjustedPageNum}`
+        );
       }
 
-      // Find the target page element
-      const pageEl = container.querySelector(
-        `[data-pdf-page="${pageNum}"]`
-      ) as HTMLElement | null;
+      console.log("🎯 Jumping to page:", {
+        originalPageNum: pageNum,
+        adjustedPageNum,
+        pageIdx,
+        strategyUsed,
+      });
 
-      if (pageEl) {
-        // Find the scrollable parent - prioritize .pdf-panel which is the sticky scrollable container
-        const pdfPanel = container.closest(".pdf-panel") as HTMLElement | null;
-        const scrollContainer = pdfPanel || container;
+      // Simply change the current page - no scrolling needed!
+      setCurrentPage(adjustedPageNum);
 
-        console.log("📜 Scroll info:", {
-          pageNum,
-          scrollContainer: scrollContainer.className,
-          hasScrollTop: "scrollTop" in scrollContainer,
-          currentScrollTop: scrollContainer.scrollTop,
-          scrollHeight: scrollContainer.scrollHeight,
-          clientHeight: scrollContainer.clientHeight,
-        });
-
-        const containerRect = scrollContainer.getBoundingClientRect();
-        const pageRect = pageEl.getBoundingClientRect();
-        const scrollTop =
-          scrollContainer.scrollTop + (pageRect.top - containerRect.top) - 50;
-
-        console.log("✨ Scrolling to:", { scrollTop, behavior: "smooth" });
-
-        scrollContainer.scrollTo({
-          top: scrollTop,
-          behavior: "smooth",
-        });
-
-        // flash highlight - increased duration for better visibility
-        pageEl.classList.add("flash-highlight");
-        setTimeout(() => pageEl.classList.remove("flash-highlight"), 3000); // Increased from 1500 to 3000ms
-      } else {
-        console.warn("⚠️ Page element not found:", pageNum);
-      }
+      // Set pending indicator to show after page renders
+      setPendingIndicator({
+        type: "section",
+        text: heading || `Page ${adjustedPageNum}`,
+        pageNum: adjustedPageNum,
+      });
     };
     window.addEventListener("jump-to-position", handler as EventListener);
     return () => {
@@ -284,7 +281,16 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
 
   // Scroll to highlighted concept when it changes
   useEffect(() => {
+    console.log("🔔 Concept highlight useEffect triggered:", {
+      hasHighlightedConcept: !!highlightedConcept,
+      conceptName: highlightedConcept?.name,
+      hasMentions: highlightedConcept?.mentions.length || 0,
+      currentMentionIndex,
+      hasOffsets: !!pageOffsetsRef.current,
+    });
+
     if (!highlightedConcept || !highlightedConcept.mentions.length) {
+      console.log("⚠️ No highlighted concept or no mentions, exiting");
       return;
     }
 
@@ -320,76 +326,245 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
     }
 
     const pageNum = pageIdx + 1;
-    const container = containerRef.current;
-    if (!container) {
-      console.warn("⚠️ No container ref for concept scroll");
-      return;
+
+    // Skip TOC pages (typically first 10 pages) - if we land on TOC, move to page 11
+    const minContentPage = 11;
+    const adjustedPageNum = pageNum < minContentPage ? minContentPage : pageNum;
+
+    if (adjustedPageNum !== pageNum) {
+      console.log(
+        `⚠️ Skipping TOC for concept: Page ${pageNum} → Page ${adjustedPageNum}`
+      );
     }
 
-    // Find the target page element
-    const pageEl = container.querySelector(
-      `[data-pdf-page="${pageNum}"]`
-    ) as HTMLElement | null;
+    console.log("🎯 Jumping to concept page:", {
+      name: highlightedConcept.name,
+      mentionIndex: mentionIdx + 1,
+      originalPageNum: pageNum,
+      adjustedPageNum,
+      pageIdx,
+    });
 
-    if (pageEl) {
-      // Find the scrollable parent
-      const pdfPanel = container.closest(".pdf-panel") as HTMLElement | null;
-      const scrollContainer = pdfPanel || container;
+    // Simply change the current page - no scrolling needed!
+    setCurrentPage(adjustedPageNum);
 
-      console.log("📜 Scrolling to concept page:", {
-        conceptName: highlightedConcept.name,
-        mentionIndex: mentionIdx + 1,
-        pageNum,
-        pageIdx,
-      });
+    // Set pending indicator to show after page renders
+    setPendingIndicator({
+      type: "concept",
+      text: highlightedConcept.name,
+      pageNum: adjustedPageNum,
+    });
+  }, [highlightedConcept, currentMentionIndex]);
 
-      const containerRect = scrollContainer.getBoundingClientRect();
-      const pageRect = pageEl.getBoundingClientRect();
-      const scrollTop =
-        scrollContainer.scrollTop + (pageRect.top - containerRect.top) - 100;
+  // Helper function for simple indicator fallback
+  const showSimpleIndicator = (pageEl: HTMLElement, text: string) => {
+    const indicator = document.createElement("div");
+    indicator.className = "concept-simple-indicator";
+    indicator.innerHTML = `
+      <div class="simple-indicator-content">
+        <span class="simple-indicator-icon">📍</span>
+        <span class="simple-indicator-text">${text}</span>
+      </div>
+    `;
+    pageEl.appendChild(indicator);
 
-      scrollContainer.scrollTo({
-        top: Math.max(0, scrollTop),
-        behavior: "smooth",
-      });
+    setTimeout(() => {
+      indicator.classList.add("fade-out");
+      setTimeout(() => indicator.remove(), 500);
+    }, 4000);
+  };
 
-      // Create a concept indicator overlay instead of highlighting the whole page
-      const existingIndicator = pageEl.querySelector(".concept-indicator");
-      if (existingIndicator) {
-        existingIndicator.remove();
+  // Show indicator after page change
+  useEffect(() => {
+    if (!pendingIndicator) return;
+
+    console.log("🎨 Adding indicator:", pendingIndicator);
+
+    // Wait for page to render
+    const timer = setTimeout(() => {
+      const container = containerRef.current;
+      if (!container) {
+        console.warn("⚠️ No container for indicator");
+        return;
       }
 
-      const indicator = document.createElement("div");
-      indicator.className = "concept-indicator";
-      indicator.innerHTML = `
-        <div class="concept-indicator-content">
-          <div class="concept-indicator-label">📍 ${highlightedConcept.name}</div>
-          <div class="concept-indicator-pulse"></div>
-        </div>
-      `;
-      pageEl.appendChild(indicator);
+      const pageEl = container.querySelector(
+        `[data-pdf-page="${pendingIndicator.pageNum}"]`
+      ) as HTMLElement | null;
 
-      // Remove indicator after animation completes
-      setTimeout(() => {
-        indicator.classList.add("fade-out");
-        setTimeout(() => indicator.remove(), 500);
-      }, 3500);
-    } else {
-      console.warn("⚠️ Page element not found for concept:", pageNum);
-    }
-  }, [highlightedConcept, currentMentionIndex]);
+      if (pageEl) {
+        console.log("✅ Found page element, adding indicator");
+
+        // Scroll the PDF viewer into view
+        container.scrollIntoView({ behavior: "smooth", block: "start" });
+
+        // Remove any existing indicators
+        const existingIndicators = pageEl.querySelectorAll(
+          ".concept-indicator, .page-jump-indicator"
+        );
+        existingIndicators.forEach((ind) => ind.remove());
+
+        if (pendingIndicator.type === "concept") {
+          // Highlight the actual concept text on the page
+          console.log("🎯 Highlighting concept text:", pendingIndicator.text);
+
+          // Try to find the concept text in the page's text content
+          const pageTexts = pageTextsRef.current;
+          const pageIndex = pendingIndicator.pageNum - 1;
+
+          if (pageTexts && pageTexts[pageIndex]) {
+            const pageText = pageTexts[pageIndex].toLowerCase();
+            const conceptText = pendingIndicator.text.toLowerCase();
+            const conceptIndex = pageText.indexOf(conceptText);
+
+            if (conceptIndex !== -1) {
+              console.log(
+                `✅ Found concept "${pendingIndicator.text}" at position ${conceptIndex} in page text`
+              );
+
+              // Get surrounding context (50 chars before and after)
+              const contextStart = Math.max(0, conceptIndex - 50);
+              const contextEnd = Math.min(
+                pageText.length,
+                conceptIndex + conceptText.length + 50
+              );
+              const context = pageTexts[pageIndex].substring(
+                contextStart,
+                contextEnd
+              );
+
+              // Create a text highlight with context
+              const highlightOverlay = document.createElement("div");
+              highlightOverlay.className = "concept-text-highlight-box";
+              highlightOverlay.innerHTML = `
+                <div class="highlight-header">
+                  <span class="highlight-icon">🎯</span>
+                  <span class="highlight-concept-name">${
+                    pendingIndicator.text
+                  }</span>
+                </div>
+                <div class="highlight-context">
+                  <span class="context-text">${context.replace(
+                    new RegExp(`(${pendingIndicator.text})`, "gi"),
+                    '<mark class="concept-mark">$1</mark>'
+                  )}</span>
+                </div>
+              `;
+
+              pageEl.style.position = "relative";
+              pageEl.appendChild(highlightOverlay);
+
+              // Animate and remove after delay
+              setTimeout(() => {
+                highlightOverlay.classList.add("fade-out");
+                setTimeout(() => highlightOverlay.remove(), 500);
+              }, 6000);
+            } else {
+              console.warn(
+                `⚠️ Concept "${pendingIndicator.text}" not found in page text`
+              );
+              // Fallback: show simple indicator
+              showSimpleIndicator(pageEl, pendingIndicator.text);
+            }
+          } else {
+            console.warn("⚠️ No page text available for highlighting");
+            // Fallback: show simple indicator
+            showSimpleIndicator(pageEl, pendingIndicator.text);
+          }
+        } else {
+          // Section indicator
+          const indicator = document.createElement("div");
+          indicator.className = "page-jump-indicator";
+          indicator.textContent = `📍 ${pendingIndicator.text}`;
+          pageEl.appendChild(indicator);
+          setTimeout(() => indicator.remove(), 3500);
+        }
+
+        // Clear the pending indicator
+        setPendingIndicator(null);
+      } else {
+        console.warn(
+          "⚠️ Page element not found for indicator:",
+          pendingIndicator.pageNum
+        );
+      }
+    }, 300); // Give time for page to render
+
+    return () => clearTimeout(timer);
+  }, [pendingIndicator, currentPage]);
 
   return (
     <div className="pdf-viewer" ref={containerRef}>
+      {/* Concept Navigation - Sticky bar when concept is selected */}
+      {highlightedConcept && highlightedConcept.mentions.length > 1 && (
+        <div className="concept-navigation-bar">
+          <div className="concept-nav-info">
+            <span className="concept-name">📍 {highlightedConcept.name}</span>
+            <span className="mention-counter">
+              Mention {currentMentionIndex + 1} of{" "}
+              {highlightedConcept.mentions.length}
+            </span>
+          </div>
+          <div className="concept-nav-buttons">
+            <button
+              onClick={() =>
+                onMentionNavigate?.(Math.max(0, currentMentionIndex - 1))
+              }
+              disabled={currentMentionIndex === 0}
+              title="Previous mention"
+            >
+              ← Prev
+            </button>
+            <button
+              onClick={() =>
+                onMentionNavigate?.(
+                  Math.min(
+                    highlightedConcept.mentions.length - 1,
+                    currentMentionIndex + 1
+                  )
+                )
+              }
+              disabled={
+                currentMentionIndex >= highlightedConcept.mentions.length - 1
+              }
+              title="Next mention"
+            >
+              Next →
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="pdf-controls">
         <button onClick={() => setScale((s) => Math.max(0.5, s - 0.25))}>
           Zoom Out
         </button>
-        <span style={{ margin: "0 10px" }}>
-          {Math.round(scale * 100)}% | {numPages} pages
-        </span>
+        <span style={{ margin: "0 10px" }}>{Math.round(scale * 100)}%</span>
         <button onClick={() => setScale((s) => Math.min(3, s + 0.25))}>
           Zoom In
+        </button>
+
+        <span
+          style={{
+            margin: "0 20px",
+            borderLeft: "1px solid #ccc",
+            paddingLeft: "20px",
+          }}
+        >
+          Page {currentPage} of {numPages}
+        </span>
+
+        <button
+          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+          disabled={currentPage <= 1}
+        >
+          Previous
+        </button>
+        <button
+          onClick={() => setCurrentPage((p) => Math.min(numPages, p + 1))}
+          disabled={currentPage >= numPages}
+        >
+          Next
         </button>
       </div>
 
@@ -403,10 +578,7 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
       )}
 
       <div className="pdf-pages" id="pdf-pages">
-        {pdf &&
-          Array.from({ length: numPages }, (_, i) => (
-            <LazyPdfPage key={i} pdf={pdf} pageNum={i + 1} scale={scale} />
-          ))}
+        {pdf && <SinglePdfPage pdf={pdf} pageNum={currentPage} scale={scale} />}
       </div>
 
       <style>{`
@@ -415,6 +587,54 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
           background: #f5f5f5;
           border-radius: 8px;
           overflow: hidden;
+        }
+        .concept-navigation-bar {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 12px 20px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .concept-nav-info {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+        .concept-name {
+          font-weight: 600;
+          font-size: 16px;
+        }
+        .mention-counter {
+          font-size: 13px;
+          opacity: 0.9;
+        }
+        .concept-nav-buttons {
+          display: flex;
+          gap: 8px;
+        }
+        .concept-nav-buttons button {
+          padding: 8px 16px;
+          border: 2px solid white;
+          background: rgba(255,255,255,0.2);
+          color: white;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          transition: all 0.2s;
+        }
+        .concept-nav-buttons button:hover:not(:disabled) {
+          background: rgba(255,255,255,0.3);
+          transform: translateY(-1px);
+        }
+        .concept-nav-buttons button:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
         }
         .pdf-controls {
           padding: 12px;
@@ -433,8 +653,12 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
           cursor: pointer;
           font-size: 14px;
         }
-        .pdf-controls button:hover {
+        .pdf-controls button:hover:not(:disabled) {
           background: #f0f0f0;
+        }
+        .pdf-controls button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
         .pdf-loading {
           display: flex;
@@ -467,14 +691,94 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
         }
         .flash-highlight {
           animation: flashHighlight 2s ease-in-out;
-          outline: 4px solid #0ea5e9 !important;
-          outline-offset: 4px;
-          box-shadow: 0 0 20px rgba(14, 165, 233, 0.6),
-                      0 0 40px rgba(14, 165, 233, 0.4),
-                      inset 0 0 20px rgba(14, 165, 233, 0.2) !important;
+          outline: 6px solid #0ea5e9 !important;
+          outline-offset: 8px;
+          box-shadow: 0 0 30px rgba(14, 165, 233, 0.8),
+                      0 0 60px rgba(14, 165, 233, 0.6),
+                      inset 0 0 30px rgba(14, 165, 233, 0.3) !important;
           border-radius: 8px;
           position: relative;
           z-index: 10;
+        }
+
+        .page-jump-indicator {
+          position: absolute;
+          top: -40px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+          color: white;
+          padding: 12px 24px;
+          border-radius: 24px;
+          font-weight: bold;
+          font-size: 16px;
+          box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+          animation: bounceIn 0.5s ease-out;
+          z-index: 1001;
+        }
+
+        @keyframes bounceIn {
+          0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
+          50% { transform: translateX(-50%) scale(1.1); }
+          100% { transform: translateX(-50%) scale(1); opacity: 1; }
+        }
+
+        .jump-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(14, 165, 233, 0.95);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10000;
+          animation: overlayFadeIn 0.2s ease-out;
+        }
+
+        .jump-overlay.fade-out {
+          animation: overlayFadeOut 0.3s ease-out;
+          opacity: 0;
+        }
+
+        .jump-overlay-content {
+          text-align: center;
+          color: white;
+        }
+
+        .jump-overlay-icon {
+          font-size: 80px;
+          margin-bottom: 20px;
+          animation: iconPulse 0.6s ease-in-out;
+        }
+
+        .jump-overlay-text {
+          font-size: 24px;
+          font-weight: 500;
+          line-height: 1.4;
+        }
+
+        .jump-overlay-text strong {
+          display: block;
+          font-size: 32px;
+          margin-top: 10px;
+          font-weight: 700;
+        }
+
+        @keyframes overlayFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes overlayFadeOut {
+          from { opacity: 1; }
+          to { opacity: 0; }
+        }
+
+        @keyframes iconPulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.2); }
         }
 
         /* Concept indicator overlay - appears in center of page with concept name */
@@ -576,6 +880,268 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
           }
         }
 
+        /* Text highlight box for concepts with context */
+        .concept-text-highlight-box {
+          position: absolute;
+          top: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          max-width: 90%;
+          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+          border: 3px solid #d97706;
+          border-radius: 12px;
+          padding: 16px 20px;
+          box-shadow:
+            0 8px 32px rgba(0, 0, 0, 0.3),
+            0 0 60px rgba(251, 191, 36, 0.5),
+            inset 0 2px 0 rgba(255, 255, 255, 0.3);
+          z-index: 1000;
+          animation: highlightBoxSlideIn 0.4s ease-out;
+          pointer-events: none;
+        }
+
+        .concept-text-highlight-box.fade-out {
+          animation: highlightBoxFadeOut 0.5s ease-out forwards;
+        }
+
+        .highlight-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 12px;
+          padding-bottom: 8px;
+          border-bottom: 2px solid rgba(120, 53, 15, 0.3);
+        }
+
+        .highlight-icon {
+          font-size: 20px;
+        }
+
+        .highlight-concept-name {
+          font-size: 16px;
+          font-weight: 700;
+          color: #78350f;
+          text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+        .highlight-context {
+          background: rgba(255, 255, 255, 0.9);
+          padding: 12px;
+          border-radius: 6px;
+          font-size: 14px;
+          line-height: 1.6;
+          color: #1f2937;
+          max-height: 200px;
+          overflow-y: auto;
+          border: 1px solid rgba(120, 53, 15, 0.2);
+        }
+
+        .context-text {
+          display: block;
+          word-wrap: break-word;
+        }
+
+        .concept-mark {
+          background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+          color: #78350f;
+          padding: 2px 6px;
+          border-radius: 4px;
+          font-weight: 700;
+          border: 2px solid #f59e0b;
+          box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+          animation: conceptMarkPulse 1.5s ease-in-out infinite;
+        }
+
+        .concept-simple-indicator {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+          color: white;
+          padding: 16px 32px;
+          border-radius: 12px;
+          font-weight: 600;
+          font-size: 18px;
+          box-shadow: 0 4px 20px rgba(14, 165, 233, 0.4);
+          animation: simpleIndicatorBounce 0.6s ease-out;
+          z-index: 1000;
+          pointer-events: none;
+        }
+
+        .concept-simple-indicator.fade-out {
+          animation: indicatorFadeOut 0.5s ease-out forwards;
+        }
+
+        .simple-indicator-content {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .simple-indicator-icon {
+          font-size: 24px;
+        }
+
+        .simple-indicator-text {
+          font-size: 18px;
+        }
+
+        @keyframes highlightBoxSlideIn {
+          from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+          }
+        }
+
+        @keyframes highlightBoxFadeOut {
+          from {
+            opacity: 1;
+          }
+          to {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-10px);
+          }
+        }
+
+        @keyframes conceptMarkPulse {
+          0%, 100% {
+            box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+          }
+          50% {
+            box-shadow: 0 2px 16px rgba(251, 191, 36, 0.8);
+          }
+        }
+
+        @keyframes simpleIndicatorBounce {
+          0% {
+            transform: translate(-50%, -50%) scale(0.8);
+            opacity: 0;
+          }
+          50% {
+            transform: translate(-50%, -50%) scale(1.05);
+          }
+          100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+          }
+        }
+
+        /* Text highlight overlay for concepts */
+        .concept-text-highlight {
+          background: radial-gradient(
+            circle at center,
+            rgba(255, 215, 0, 0.3) 0%,
+            rgba(255, 215, 0, 0.15) 40%,
+            rgba(255, 215, 0, 0) 70%
+          );
+          animation: highlightPulse 2s ease-in-out infinite;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 3px solid rgba(255, 215, 0, 0.6);
+          box-shadow:
+            0 0 30px rgba(255, 215, 0, 0.5),
+            inset 0 0 50px rgba(255, 215, 0, 0.2);
+        }
+
+        .concept-text-highlight.fade-out {
+          animation: highlightFadeOut 0.5s ease-out forwards;
+        }
+
+        .highlight-pulse {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 200px;
+          height: 200px;
+          border-radius: 50%;
+          background: radial-gradient(
+            circle,
+            rgba(255, 215, 0, 0.4) 0%,
+            rgba(255, 215, 0, 0) 70%
+          );
+          animation: pulseExpand 2s ease-out infinite;
+        }
+
+        .highlight-label {
+          position: relative;
+          background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+          color: #78350f;
+          padding: 12px 24px;
+          border-radius: 12px;
+          font-weight: 700;
+          font-size: 18px;
+          box-shadow:
+            0 4px 20px rgba(251, 191, 36, 0.5),
+            0 0 60px rgba(251, 191, 36, 0.3);
+          text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+          border: 2px solid rgba(120, 53, 15, 0.2);
+          animation: labelBounce 0.6s ease-out;
+        }
+
+        @keyframes highlightPulse {
+          0%, 100% {
+            background: radial-gradient(
+              circle at center,
+              rgba(255, 215, 0, 0.3) 0%,
+              rgba(255, 215, 0, 0.15) 40%,
+              rgba(255, 215, 0, 0) 70%
+            );
+          }
+          50% {
+            background: radial-gradient(
+              circle at center,
+              rgba(255, 215, 0, 0.5) 0%,
+              rgba(255, 215, 0, 0.25) 40%,
+              rgba(255, 215, 0, 0) 70%
+            );
+          }
+        }
+
+        @keyframes highlightFadeOut {
+          from {
+            opacity: 1;
+          }
+          to {
+            opacity: 0;
+          }
+        }
+
+        @keyframes pulseExpand {
+          0% {
+            transform: translate(-50%, -50%) scale(0.5);
+            opacity: 0.8;
+          }
+          50% {
+            transform: translate(-50%, -50%) scale(2);
+            opacity: 0.4;
+          }
+          100% {
+            transform: translate(-50%, -50%) scale(3.5);
+            opacity: 0;
+          }
+        }
+
+        @keyframes labelBounce {
+          0% {
+            transform: scale(0.8) translateY(20px);
+            opacity: 0;
+          }
+          50% {
+            transform: scale(1.1) translateY(-5px);
+          }
+          100% {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+          }
+        }
+
         @keyframes flashHighlight {
           0%, 100% {
             outline-color: transparent;
@@ -607,6 +1173,16 @@ export const PdfViewer: React.FC<PdfViewerProps> = ({
     </div>
   );
 };
+
+// Single page component - always renders immediately (no lazy loading)
+const SinglePdfPage: React.FC<PdfPageProps> = ({ pdf, pageNum, scale }) => {
+  return (
+    <div className="pdf-page-container" data-pdf-page={pageNum}>
+      <PdfPage pdf={pdf} pageNum={pageNum} scale={scale} />
+    </div>
+  );
+};
+
 // Lazy page that only renders canvas when visible - optimized for performance
 const LazyPdfPage: React.FC<PdfPageProps> = ({ pdf, pageNum, scale }) => {
   const [shouldRender, setShouldRender] = useState(false);

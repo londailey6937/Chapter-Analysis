@@ -86,37 +86,6 @@ export const ConceptList: React.FC<ConceptListProps> = ({
             Overview of concepts covered - Click a concept to highlight it in
             the PDF
           </p>
-
-          {/* Navigation controls when a concept is selected */}
-          {highlightedConcept && totalMentions > 1 && (
-            <div className="mt-3 flex items-center justify-between bg-blue-50 rounded-lg p-3">
-              <div className="text-sm font-medium text-gray-700">
-                <span className="font-bold text-blue-600">
-                  {highlightedConcept.name}
-                </span>
-                {" - "}
-                Mention {currentMentionIndex + 1} of {totalMentions}
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={handlePrevious}
-                  disabled={currentMentionIndex === 0}
-                  className="nav-button"
-                  title="Previous mention"
-                >
-                  ← Prev
-                </button>
-                <button
-                  onClick={handleNext}
-                  disabled={currentMentionIndex >= totalMentions - 1}
-                  className="nav-button"
-                  title="Next mention"
-                >
-                  Next →
-                </button>
-              </div>
-            </div>
-          )}
         </div>
         <div className="card-body">
           {renderConceptGroup(
