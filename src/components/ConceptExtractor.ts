@@ -298,6 +298,7 @@ export class ConceptExtractor {
     sections: Section[],
     onProgress?: (step: string, detail?: string) => void
   ): Promise<ConceptGraph> {
+    const overallStart = performance.now();
     console.log(
       "[ConceptExtractor] Starting extraction, chapter length:",
       chapter.length,
@@ -308,63 +309,94 @@ export class ConceptExtractor {
 
     // Phase 1: Identify candidate concepts
     onProgress?.("concept-phase-1", "Identifying candidate concepts");
-    console.log("[ConceptExtractor] Phase 1: Identifying candidates...");
+    const phase1Start = performance.now();
     const candidates = extractor.identifyCandidateConcepts(chapter, sections);
-    console.log("[ConceptExtractor] Found", candidates.length, "candidates");
-    await new Promise((resolve) => setTimeout(resolve, 100)); // Yield control
+    const phase1Time = performance.now() - phase1Start;
+    console.log(
+      `[ConceptExtractor] Phase 1: Found ${
+        candidates.length
+      } candidates in ${phase1Time.toFixed(2)}ms`
+    );
+    await new Promise((resolve) => setTimeout(resolve, 50)); // Yield control
 
     // Phase 2: Score and filter candidates
     onProgress?.("concept-phase-2", "Scoring and filtering concepts");
-    console.log("[ConceptExtractor] Phase 2: Scoring and filtering...");
+    const phase2Start = performance.now();
     const scored = extractor.scoreAndFilterCandidates(candidates, chapter);
-    console.log("[ConceptExtractor] Scored", scored.length, "concepts");
-    await new Promise((resolve) => setTimeout(resolve, 100)); // Yield control
+    const phase2Time = performance.now() - phase2Start;
+    console.log(
+      `[ConceptExtractor] Phase 2: Scored ${
+        scored.length
+      } concepts in ${phase2Time.toFixed(2)}ms`
+    );
+    await new Promise((resolve) => setTimeout(resolve, 50)); // Yield control
 
     // Phase 3: Create concept objects with mentions
     onProgress?.("concept-phase-3", "Creating concept objects");
-    console.log("[ConceptExtractor] Phase 3: Creating concept objects...");
+    const phase3Start = performance.now();
     const concepts = extractor.createConceptObjects(scored, chapter);
+    const phase3Time = performance.now() - phase3Start;
     console.log(
-      "[ConceptExtractor] Created",
-      concepts.length,
-      "concept objects"
+      `[ConceptExtractor] Phase 3: Created ${
+        concepts.length
+      } concept objects in ${phase3Time.toFixed(2)}ms`
     );
-    await new Promise((resolve) => setTimeout(resolve, 100)); // Yield control
+    await new Promise((resolve) => setTimeout(resolve, 50)); // Yield control
 
     // Phase 4: Establish relationships
     onProgress?.("concept-phase-4", "Establishing concept relationships");
-    console.log("[ConceptExtractor] Phase 4: Establishing relationships...");
+    const phase4Start = performance.now();
     const relationships = extractor.establishRelationships(concepts, chapter);
+    const phase4Time = performance.now() - phase4Start;
     console.log(
-      "[ConceptExtractor] Found",
-      relationships.length,
-      "relationships"
+      `[ConceptExtractor] Phase 4: Found ${
+        relationships.length
+      } relationships in ${phase4Time.toFixed(2)}ms`
     );
-    await new Promise((resolve) => setTimeout(resolve, 100)); // Yield control
+    await new Promise((resolve) => setTimeout(resolve, 50)); // Yield control
 
     // Phase 5: Build hierarchy
     onProgress?.("concept-phase-5", "Building concept hierarchy");
-    console.log("[ConceptExtractor] Phase 5: Building hierarchy...");
+    const phase5Start = performance.now();
     const hierarchy = extractor.buildHierarchy(concepts);
+    const phase5Time = performance.now() - phase5Start;
     console.log(
-      "[ConceptExtractor] Hierarchy built - core:",
-      hierarchy.core.length,
-      "supporting:",
-      hierarchy.supporting.length
+      `[ConceptExtractor] Phase 5: Hierarchy built in ${phase5Time.toFixed(
+        2
+      )}ms - core: ${hierarchy.core.length}, supporting: ${
+        hierarchy.supporting.length
+      }`
     );
-    await new Promise((resolve) => setTimeout(resolve, 100)); // Yield control
+    await new Promise((resolve) => setTimeout(resolve, 50)); // Yield control
 
     // Phase 6: Extract concept sequence
     onProgress?.("concept-phase-6", "Extracting concept sequence");
-    console.log("[ConceptExtractor] Phase 6: Extracting sequence...");
+    const phase6Start = performance.now();
     const sequence = extractor.extractConceptSequence(concepts);
+    const phase6Time = performance.now() - phase6Start;
     console.log(
-      "[ConceptExtractor] Sequence extracted, length:",
-      sequence.length
+      `[ConceptExtractor] Phase 6: Sequence extracted (${
+        sequence.length
+      } items) in ${phase6Time.toFixed(2)}ms`
     );
-    await new Promise((resolve) => setTimeout(resolve, 100)); // Yield control
+    await new Promise((resolve) => setTimeout(resolve, 50)); // Yield control
 
-    console.log("[ConceptExtractor] Extraction complete!");
+    const overallTime = performance.now() - overallStart;
+    console.log(
+      `[ConceptExtractor] ✅ Extraction complete in ${overallTime.toFixed(
+        2
+      )}ms (${(overallTime / 1000).toFixed(2)}s)`
+    );
+    console.log(
+      `[ConceptExtractor] Phase breakdown: P1=${phase1Time.toFixed(
+        0
+      )}ms P2=${phase2Time.toFixed(0)}ms P3=${phase3Time.toFixed(
+        0
+      )}ms P4=${phase4Time.toFixed(0)}ms P5=${phase5Time.toFixed(
+        0
+      )}ms P6=${phase6Time.toFixed(0)}ms`
+    );
+
     return {
       concepts,
       relationships,
@@ -895,26 +927,38 @@ export class ConceptExtractor {
     text: string,
     candidates: Map<string, ConceptCandidate>
   ): void {
-    const lowerText = text.toLowerCase();
+    // OPTIMIZED: Build all patterns once, scan text once
+    // Old: O(n * m) where n=text length, m=concept count (261+ concepts = slow!)
+    // New: O(n) single pass through text
 
-    // Check for each concept in the library
+    const conceptPatterns: Array<{
+      key: string;
+      pattern: RegExp;
+      def: ConceptDefinition;
+    }> = [];
+
+    // Pre-compile all patterns
     for (const [conceptKey, conceptDef] of this.conceptLibrary.entries()) {
-      // Create regex pattern for whole word matching
       const pattern = new RegExp(`\\b${this.escapeRegex(conceptKey)}\\b`, "gi");
-      const matches = text.match(pattern);
+      conceptPatterns.push({ key: conceptKey, pattern, def: conceptDef });
+    }
 
-      if (matches && matches.length > 0) {
-        // Find all positions
-        const positions: number[] = [];
-        let match;
-        const regex = new RegExp(`\\b${this.escapeRegex(conceptKey)}\\b`, "gi");
-        while ((match = regex.exec(text)) !== null) {
-          positions.push(match.index);
-        }
+    // Single pass: find all matches for all concepts
+    for (const { key, pattern, def } of conceptPatterns) {
+      const matches: RegExpExecArray[] = [];
+      let match;
 
-        const existing = candidates.get(conceptKey) || {
-          term: conceptDef.name, // Use canonical name from library
-          normalized: conceptKey,
+      // Find all matches for this concept
+      while ((match = pattern.exec(text)) !== null) {
+        matches.push(match);
+      }
+
+      if (matches.length > 0) {
+        const positions = matches.map((m) => m.index);
+
+        const existing = candidates.get(key) || {
+          term: def.name, // Use canonical name from library
+          normalized: key,
           frequency: 0,
           fromHeading: 0,
           inlineDefinitions: [],
@@ -925,8 +969,11 @@ export class ConceptExtractor {
 
         existing.frequency += matches.length;
         existing.positions.push(...positions);
-        candidates.set(conceptKey, existing);
+        candidates.set(key, existing);
       }
+
+      // Reset regex lastIndex
+      pattern.lastIndex = 0;
     }
   }
 
