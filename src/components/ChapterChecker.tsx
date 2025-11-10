@@ -1004,9 +1004,66 @@ export const ChapterChecker: React.FC = () => {
                       fontSize: "16px",
                       fontWeight: "500",
                       color: "#1e40af",
+                      marginBottom: "16px",
                     }}
                   >
-                    Analyzing chapter...
+                    {progress || "Analyzing chapter..."}
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div
+                    style={{
+                      width: "100%",
+                      maxWidth: "400px",
+                      marginTop: "8px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: "14px",
+                          fontWeight: "600",
+                          color: "#0369a1",
+                        }}
+                      >
+                        Progress
+                      </span>
+                      <span
+                        style={{
+                          fontSize: "14px",
+                          fontWeight: "600",
+                          color: "#0369a1",
+                        }}
+                      >
+                        {progressPercent}%
+                      </span>
+                    </div>
+                    <div
+                      style={{
+                        width: "100%",
+                        height: "8px",
+                        backgroundColor: "rgba(14, 165, 233, 0.2)",
+                        borderRadius: "4px",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${progressPercent}%`,
+                          height: "100%",
+                          backgroundColor: "#0ea5e9",
+                          transition: "width 0.3s ease-out",
+                          borderRadius: "4px",
+                        }}
+                      ></div>
+                    </div>
                   </div>
                 </div>
               )}
