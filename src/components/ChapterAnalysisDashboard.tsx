@@ -2,6 +2,7 @@ import { ChapterAnalysis } from "@/types";
 import OverallScoreCard from "./OverallScoreCard";
 import PrincipleScoresGrid from "./PrincipleScoresGrid";
 import ConceptAnalysisSection from "./ConceptAnalysisSection";
+import ConceptRelationshipsSection from "./ConceptRelationshipsSection";
 import RecommendationsSection from "./RecommendationsSection";
 
 /**
@@ -73,6 +74,15 @@ function ChapterAnalysisDashboard({
         density={conceptAnalysis.conceptDensity}
         balance={conceptAnalysis.hierarchyBalance}
       />
+
+      {/* Concept Relationships Section */}
+      {analysis.conceptGraph?.concepts &&
+        analysis.conceptGraph?.relationships && (
+          <ConceptRelationshipsSection
+            concepts={analysis.conceptGraph.concepts}
+            relationships={analysis.conceptGraph.relationships}
+          />
+        )}
 
       {/* Structure Analysis */}
       <div className="card">
