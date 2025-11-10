@@ -40,13 +40,13 @@ function PrincipleScoreCard({
    * Converts camelCase to Title Case with proper capitalization
    */
   const formatPrincipleName = (name: string): string => {
-    // Add space before capital letters and capitalize first letter
+    // Add space before capital letters, capitalize all words
     return name
-      .replace(/([A-Z])/g, " $1")
+      .replace(/([A-Z])/g, " $1") // Add space before caps
+      .trim() // Remove leading space
       .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ")
-      .trim();
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
   };
 
   const { score, findings, suggestions } = principle;
