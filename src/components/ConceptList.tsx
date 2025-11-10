@@ -25,11 +25,17 @@ export const ConceptList: React.FC<ConceptListProps> = ({
   );
   const totalMentions = highlightedConcept?.mentions.length || 0;
 
-  // Group concepts by importance
+  // Group concepts by importance and sort alphabetically within each group
   const groupedConcepts = {
-    core: concepts.filter((c) => c.importance === "core"),
-    supporting: concepts.filter((c) => c.importance === "supporting"),
-    detail: concepts.filter((c) => c.importance === "detail"),
+    core: concepts
+      .filter((c) => c.importance === "core")
+      .sort((a, b) => a.name.localeCompare(b.name)),
+    supporting: concepts
+      .filter((c) => c.importance === "supporting")
+      .sort((a, b) => a.name.localeCompare(b.name)),
+    detail: concepts
+      .filter((c) => c.importance === "detail")
+      .sort((a, b) => a.name.localeCompare(b.name)),
   };
 
   const handlePrevious = () => {
