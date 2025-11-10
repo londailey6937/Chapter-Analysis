@@ -7,16 +7,19 @@
 ## ⚡ Quick Start (3 Steps)
 
 ### 1️⃣ Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 2️⃣ Start Development Server
+
 ```bash
 npm run dev
 ```
 
 ### 3️⃣ Open Your Browser
+
 - Automatically opens at `http://localhost:3000`
 - Paste a chapter or upload a .txt/.md file
 - Click "Analyze Chapter" to see results
@@ -82,16 +85,37 @@ chapter-checker/
 
 ---
 
-## 📖 Documentation Quick Links
+## 📖 Chapter Analysis Tool - Documentation
 
-| Document | Purpose | Read Time |
-|----------|---------|-----------|
-| **VITE_SETUP.md** | Complete setup & architecture guide | 15 min |
-| **PROJECT_MANIFEST.md** | Detailed file reference | 20 min |
-| **QUICK_START.md** | Code examples & recipes | 10 min |
-| **README.md** | Full documentation | 20 min |
+Welcome! This directory contains all documentation for the Chapter Analysis Tool.
+
+## 🚀 Quick Start
+
+New to the tool? Start here:
+
+1. **[Quick Start Guide](./QUICK_START.md)** - Get analyzing in 5 minutes
+2. **[System Overview](./SYSTEM_OVERVIEW.md)** - Understand what the tool does
+3. **[Analysis Results Guide](./ANALYSIS_RESULTS_GUIDE.md)** - Comprehensive guide to interpreting results
+
+## 📚 Complete Documentation
+
+### For Users
+
+- **[Quick Start Guide](./QUICK_START.md)** - Step-by-step usage instructions
+- **[System Overview](./SYSTEM_OVERVIEW.md)** - Learning principles explained
+- **[Analysis Results Guide](./ANALYSIS_RESULTS_GUIDE.md)** - In-depth explanation of every metric and section
+- **[Domain-Specific Features](./DOMAIN_SPECIFIC_GUIDE.md)** - Chemistry patterns and future domains
+
+### For Developers
+
+- **[Technical Architecture](./TECHNICAL_ARCHITECTURE.md)** - System design, pipeline, and API reference
+- **[Domain-Specific Guide](./DOMAIN_SPECIFIC_GUIDE.md)** - How to add new academic domains
+- **[Project Manifest](./PROJECT_MANIFEST.md)** - Project structure and goals
+- **[File Index](./FILE_INDEX.md)** - Detailed file-by-file documentation
+- **[Vite Setup](./VITE_SETUP.md)** - Development environment setup
 
 **Recommended Reading Order:**
+
 1. This file (you're reading it!) - 5 min
 2. VITE_SETUP.md - 15 min
 3. Start coding! - 10 min
@@ -101,6 +125,7 @@ chapter-checker/
 ## 🎯 What You Have
 
 ### ✅ Complete Features
+
 - ✓ React 18.2 with TypeScript
 - ✓ Vite build tool
 - ✓ Tailwind CSS 3.3 with Inter font
@@ -113,6 +138,7 @@ chapter-checker/
 - ✓ JSON export
 
 ### ✅ Code Quality
+
 - ✓ Destructuring everywhere
 - ✓ React-style comments
 - ✓ Props interfaces for all components
@@ -123,6 +149,7 @@ chapter-checker/
 - ✓ Tailwind @layer directives
 
 ### ✅ Developer Experience
+
 - ✓ Hot Module Replacement (HMR)
 - ✓ Fast dev server startup
 - ✓ TypeScript strict mode
@@ -135,6 +162,7 @@ chapter-checker/
 ## 🚀 Commands
 
 ### Development
+
 ```bash
 npm run dev              # Start dev server (http://localhost:3000)
 npm run type-check      # Check TypeScript types
@@ -142,6 +170,7 @@ npm run lint            # Lint code
 ```
 
 ### Production
+
 ```bash
 npm run build            # Build optimized bundle
 npm run preview          # Preview production build
@@ -177,24 +206,25 @@ App (root, manages state)
 ### Props Flow Pattern
 
 **Parent → Child (one direction):**
+
 ```tsx
 // Parent passes data
-<TextAreaInput 
-  value={text}              // ← from parent state
+<TextAreaInput
+  value={text} // ← from parent state
   onChange={setChapterText} // ← parent callback
-  disabled={isLoading}      // ← parent state
-/>
+  disabled={isLoading} // ← parent state
+/>;
 
 // Child receives props
-function TextAreaInput({ 
-  value,      // ← from parent
-  onChange,   // ← from parent
-  disabled 
+function TextAreaInput({
+  value, // ← from parent
+  onChange, // ← from parent
+  disabled,
 }: TextAreaInputProps) {
   return (
     <textarea
       value={value}
-      onChange={(e) => onChange(e.target.value)}  // ← call parent callback
+      onChange={(e) => onChange(e.target.value)} // ← call parent callback
       disabled={disabled}
     />
   );
@@ -206,22 +236,26 @@ function TextAreaInput({
 ## 🎨 Styling Details
 
 ### Font Setup
+
 - **Font:** Inter from Google Fonts
 - **Loaded in:** index.html
 - **Configured in:** tailwind.config.ts
 - **Applied:** Global via `font-sans`
 
 ### Tailwind Custom Classes
+
 ```css
 /* In src/styles/globals.css */
 .btn-primary       /* Primary button */
+/* Primary button */
 .btn-secondary     /* Secondary button */
 .card              /* Card component */
 .input-base        /* Input field */
-.badge-primary     /* Primary badge */
+.badge-primary; /* Primary badge */
 ```
 
 ### Color Palette
+
 - **Primary:** Gradient indigo/purple
 - **Secondary:** Blue tones
 - **Grayscale:** Full gray palette
@@ -249,10 +283,7 @@ interface NewComponentProps {
  */
 
 // 3. Destructure props
-function NewComponent({ 
-  title, 
-  onAction 
-}: NewComponentProps): JSX.Element {
+function NewComponent({ title, onAction }: NewComponentProps): JSX.Element {
   return (
     <div className="card">
       <h3 className="font-bold">{title}</h3>
@@ -272,15 +303,10 @@ export default NewComponent;
 ### Using in Parent
 
 ```tsx
-import NewComponent from '@components/Feature/NewComponent';
+import NewComponent from "@components/Feature/NewComponent";
 
 function Parent(): JSX.Element {
-  return (
-    <NewComponent 
-      title="Hello"
-      onAction={() => console.log('clicked')}
-    />
-  );
+  return <NewComponent title="Hello" onAction={() => console.log("clicked")} />;
 }
 ```
 
@@ -289,22 +315,26 @@ function Parent(): JSX.Element {
 ## 🔧 Project Structure Benefits
 
 ### Path Aliases
+
 No more `../../../../` in imports!
+
 ```tsx
 // Instead of:
-import types from '../../../../types';
+import types from "../../../../types";
 
 // Write:
-import { ChapterAnalysis } from '@types/index';
+import { ChapterAnalysis } from "@types/index";
 ```
 
 ### Organized by Feature
+
 - All input-related: `src/components/Input/`
 - All dashboard: `src/components/Dashboard/`
 - All types: `src/types/`
 - All utilities: `src/utils/`
 
 ### Type Safety Everywhere
+
 - All props typed
 - All functions typed
 - All exports typed
@@ -332,11 +362,13 @@ Your app analyzes chapters using:
 ## 📦 Dependencies
 
 **Production:**
+
 - react@18.2.0
 - react-dom@18.2.0
 - recharts@2.10.3
 
 **Development:**
+
 - typescript@5.3.3
 - vite@5.0.8
 - tailwindcss@3.3.6
@@ -348,12 +380,14 @@ Your app analyzes chapters using:
 ## 🚀 Deployment Options
 
 ### Build
+
 ```bash
 npm run build
 # Creates optimized dist/ folder
 ```
 
 ### Deploy To:
+
 - **Vercel:** `vercel deploy`
 - **Netlify:** Drag dist/ folder
 - **GitHub Pages:** Configure Actions
@@ -384,6 +418,7 @@ A: It's already loaded! Google Fonts in index.html, configured in tailwind.confi
 ## ✅ Checklist
 
 Before committing:
+
 - [ ] Run `npm run type-check` - no errors?
 - [ ] Run `npm run build` - builds successfully?
 - [ ] Components are in correct folders?
@@ -396,12 +431,14 @@ Before committing:
 ## 📞 Support
 
 **Need help?**
+
 1. Check VITE_SETUP.md for architecture details
 2. Check PROJECT_MANIFEST.md for file reference
-3. Look at component comments (/* ... */)
+3. Look at component comments (/_ ... _/)
 4. Check types in `src/types/index.ts`
 
 **Getting Started Steps:**
+
 1. ✅ Run `npm install`
 2. ✅ Run `npm run dev`
 3. ✅ Browser opens to localhost:3000
@@ -434,11 +471,12 @@ npm run dev
 
 **Happy coding! 🚀**
 
-*For detailed information, see the other documentation files.*
+_For detailed information, see the other documentation files._
 
 ---
 
 **Project Stats:**
+
 - 26 files (code + config)
 - 3,000+ lines of code
 - 18 React components
@@ -447,9 +485,9 @@ npm run dev
 - Production-ready
 
 **Built with:**
+
 - React 18.2
 - Vite 5.0
 - Tailwind CSS 3.3
 - TypeScript 5.3
 - Inter Font
-
