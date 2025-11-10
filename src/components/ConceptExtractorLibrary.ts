@@ -416,13 +416,30 @@ export class ConceptExtractor {
                 contrastIndicators++;
               }
 
-              // Detect example patterns
+              // Detect example patterns (stricter: check if source is actually mentioned as example)
+              // Pattern: "X such as Y" or "Y is an example of X"
+              const examplePatterns = [
+                new RegExp(
+                  `${concept1.name}\\s+such as\\s+${concept2.name}`,
+                  "i"
+                ),
+                new RegExp(`${concept1.name}\\s+like\\s+${concept2.name}`, "i"),
+                new RegExp(
+                  `${concept1.name}\\s+\\(e\\.g\\.?,?\\s+${concept2.name}`,
+                  "i"
+                ),
+                new RegExp(
+                  `${concept2.name}\\s+is an example of\\s+${concept1.name}`,
+                  "i"
+                ),
+                new RegExp(
+                  `${concept2.name}\\s+exemplifies?\\s+${concept1.name}`,
+                  "i"
+                ),
+              ];
+
               if (
-                contextText.includes("for example") ||
-                contextText.includes("such as") ||
-                contextText.includes("for instance") ||
-                contextText.includes("e.g.") ||
-                contextText.includes("like")
+                examplePatterns.some((pattern) => pattern.test(contextText))
               ) {
                 exampleIndicators++;
               }
@@ -455,11 +472,12 @@ export class ConceptExtractor {
               type: relType,
               strength,
             });
-          } else if (exampleIndicators >= 1) {
+          } else if (exampleIndicators >= 2) {
+            // Increased threshold from 1 to 2 to reduce false positives
             relType = "example";
             relationships.push({
-              source: concept1.id,
-              target: concept2.id,
+              source: concept2.id, // Flip: concept2 is example of concept1
+              target: concept1.id,
               type: relType,
               strength,
             });
