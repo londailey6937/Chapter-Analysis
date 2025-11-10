@@ -13,22 +13,29 @@ import type {
   PatternAnalysis,
   Chapter,
 } from "../../types";
+import { ChemistryPatterns } from "./ChemistryPatterns";
 
 export class PatternRecognizer {
   /**
    * Analyze chapter text for learning patterns
    */
-  static analyzePatterns(chapter: Chapter): PatternAnalysis {
+  static analyzePatterns(chapter: Chapter, domain?: string): PatternAnalysis {
     const text = chapter.content;
     const patterns: PatternMatch[] = [];
 
-    // Detect each pattern type
+    // Detect general patterns
     patterns.push(...this.detectWorkedExamples(text));
     patterns.push(...this.detectPracticeProblems(text));
     patterns.push(...this.detectDefinitionExamples(text));
     patterns.push(...this.detectFormulas(text));
     patterns.push(...this.detectProcedures(text));
     patterns.push(...this.detectComparisons(text));
+
+    // Add domain-specific patterns
+    if (domain === "chemistry") {
+      patterns.push(...ChemistryPatterns.detectAll(text));
+    }
+    // Future: Add other domains (finance, biology, CS, etc.)
 
     // Sort by position
     patterns.sort((a, b) => a.startPosition - b.startPosition);

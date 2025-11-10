@@ -167,6 +167,11 @@ export interface PatternMatch {
     hasAnswer?: boolean; // For practice problems
     variableCount?: number; // For formulas
     comparisonItems?: string[]; // For comparisons
+    // Chemistry-specific metadata
+    isBalanced?: boolean; // For chemical equations
+    problemType?: string; // e.g., "stoichiometry", "nomenclature", "lewis-structure"
+    procedureType?: string; // e.g., "laboratory", "mechanism"
+    isWorkedExample?: boolean; // If equation is part of worked example
   };
 }
 

@@ -95,7 +95,11 @@ export class AnalysisEngine {
       onProgress?.("detecting-patterns", "Detecting learning patterns");
 
       // Detect learning patterns (worked examples, practice problems, etc.)
-      const patternAnalysis = PatternRecognizer.analyzePatterns(chapter);
+      // Pass domain for domain-specific pattern detection
+      const patternAnalysis = PatternRecognizer.analyzePatterns(
+        chapter,
+        domain
+      );
       console.log(
         "[AnalysisEngine] Pattern detection complete, found",
         patternAnalysis.totalPatterns,
