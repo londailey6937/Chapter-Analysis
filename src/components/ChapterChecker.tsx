@@ -631,28 +631,22 @@ export const ChapterChecker: React.FC = () => {
             <img
               src="/TomeIQ.png"
               alt="TomeIQ Logo"
-              style={{ height: "70px", width: "auto" }}
+              style={{ height: "60px", width: "auto" }}
             />
-            <h1
-              style={{
-                margin: 0,
-                fontFamily: "'Brush Script MT', cursive, serif",
-                fontSize: "2.25rem",
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.25rem",
-              }}
-            >
-              <span>TomeIQ</span>
-              <span
+            <div>
+              <h1
                 style={{
-                  fontSize: "0.875rem",
-                  fontFamily: "system-ui, sans-serif",
+                  margin: 0,
+                  fontFamily: "'Brush Script MT', cursive, serif",
+                  fontSize: "2rem",
                 }}
               >
+                TomeIQ
+              </h1>
+              <p style={{ margin: 0, fontSize: "0.875rem" }}>
                 AI-Powered Textbook Analysis
-              </span>
-            </h1>
+              </p>
+            </div>
           </div>
         </div>
       </header>
