@@ -2009,37 +2009,14 @@ export const ChapterAnalysisDashboard: React.FC<{
       </div>
 
       {/* Concept Relationships Section */}
-      {(() => {
-        const hasConceptGraph = !!analysis.conceptGraph;
-        const hasConcepts = !!analysis.conceptGraph?.concepts;
-        const hasRelationships = !!analysis.conceptGraph?.relationships;
-        const conceptCount = analysis.conceptGraph?.concepts?.length || 0;
-        const relationshipCount =
-          analysis.conceptGraph?.relationships?.length || 0;
-
-        console.log("ConceptRelationshipsSection check:", {
-          hasConceptGraph,
-          hasConcepts,
-          hasRelationships,
-          conceptCount,
-          relationshipCount,
-        });
-
-        if (
-          hasConceptGraph &&
-          hasConcepts &&
-          hasRelationships &&
-          relationshipCount > 0
-        ) {
-          return (
-            <ConceptRelationshipsSection
-              concepts={analysis.conceptGraph.concepts}
-              relationships={analysis.conceptGraph.relationships}
-            />
-          );
-        }
-        return null;
-      })()}
+      {analysis.conceptGraph?.concepts &&
+        analysis.conceptGraph?.relationships &&
+        analysis.conceptGraph.relationships.length > 0 && (
+          <ConceptRelationshipsSection
+            concepts={analysis.conceptGraph.concepts}
+            relationships={analysis.conceptGraph.relationships}
+          />
+        )}
 
       {/* Concept List with click-to-highlight */}
       {concepts && concepts.length > 0 && (
