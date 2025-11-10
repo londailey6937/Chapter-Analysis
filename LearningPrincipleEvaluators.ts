@@ -793,10 +793,41 @@ export class DeepProcessingEvaluator {
 export class SpacedRepetitionEvaluator {
   static evaluate(
     chapter: Chapter,
-    concepts: ConceptGraph
+    concepts: ConceptGraph,
+    patternAnalysis?: any
   ): PrincipleEvaluation {
     const findings: Finding[] = [];
     const evidence: Evidence[] = [];
+
+    // Pattern-based enhancement: Practice problems enable spaced retrieval
+    if (patternAnalysis) {
+      const practiceProblems = patternAnalysis.patterns.filter(
+        (p: any) => p.type === "practiceProblem"
+      );
+      if (practiceProblems.length > 5) {
+        findings.push({
+          type: "positive",
+          message: `✓ ${practiceProblems.length} practice problems distributed throughout chapter support spaced retrieval`,
+          severity: 0,
+          evidence:
+            "Regular problem sets encourage revisiting concepts at intervals",
+        });
+      }
+
+      // Chemistry-specific: Lab procedures spaced across chapter
+      const labProcedures = patternAnalysis.patterns.filter(
+        (p: any) => p.metadata?.procedureType === "laboratory"
+      );
+      if (labProcedures.length >= 2) {
+        findings.push({
+          type: "positive",
+          message: `✓ Chemistry: ${labProcedures.length} lab procedures provide hands-on spaced practice`,
+          severity: 0,
+          evidence:
+            "Laboratory activities spaced throughout chapter reinforce concepts over time",
+        });
+      }
+    }
 
     // NEW: Optimal Spacing Interval Analysis
     const spacingIntervals = this.calculateOptimalSpacingIntervals(
@@ -1907,7 +1938,8 @@ export class RetrievalPracticeEvaluator {
 export class InterleavingEvaluator {
   static evaluate(
     chapter: Chapter,
-    concepts: ConceptGraph
+    concepts: ConceptGraph,
+    patternAnalysis?: any
   ): PrincipleEvaluation {
     const sequence = concepts.sequence;
     const blockingSegments = this.identifyBlockingSegments(sequence);
@@ -1920,6 +1952,35 @@ export class InterleavingEvaluator {
 
     const findings: Finding[] = [];
     const evidence: Evidence[] = [];
+
+    // Pattern-based enhancement: Comparisons indicate interleaved concepts
+    if (patternAnalysis) {
+      const comparisons = patternAnalysis.patterns.filter(
+        (p: any) => p.type === "comparison"
+      );
+      if (comparisons.length > 3) {
+        findings.push({
+          type: "positive",
+          message: `✓ ${comparisons.length} comparison sections explicitly interleave related concepts`,
+          severity: 0,
+          evidence: "Comparisons force discrimination between similar ideas",
+        });
+      }
+
+      // Chemistry-specific: Reaction mechanism comparison
+      const mechanisms = patternAnalysis.patterns.filter(
+        (p: any) => p.metadata?.procedureType === "mechanism"
+      );
+      if (mechanisms.length >= 2) {
+        findings.push({
+          type: "positive",
+          message: `✓ Chemistry: ${mechanisms.length} reaction mechanisms enable comparison of different pathways`,
+          severity: 0,
+          evidence:
+            "Multiple mechanisms interleave mechanistic thinking across reactions",
+        });
+      }
+    }
 
     // NEW: Interleaving Density by Section
     const interleavingDensity = this.calculateInterleavingDensity(
@@ -2424,7 +2485,8 @@ export class GenerativeLearningEvaluator {
 export class MetacognitionEvaluator {
   static evaluate(
     chapter: Chapter,
-    _concepts: ConceptGraph
+    _concepts: ConceptGraph,
+    patternAnalysis?: any
   ): PrincipleEvaluation {
     const metacognitivePrompts = this.countMetacognitiveElements(
       chapter.content
@@ -2432,6 +2494,37 @@ export class MetacognitionEvaluator {
     const findings: Finding[] = [];
     const suggestions: Suggestion[] = [];
     const evidence: Evidence[] = [];
+
+    // Pattern-based enhancement: Practice problems without answers encourage self-monitoring
+    if (patternAnalysis) {
+      const problemsWithoutAnswers = patternAnalysis.patterns.filter(
+        (p: any) =>
+          p.type === "practiceProblem" && p.metadata?.hasAnswer === false
+      );
+      if (problemsWithoutAnswers.length > 5) {
+        findings.push({
+          type: "positive",
+          message: `✓ ${problemsWithoutAnswers.length} problems without immediate answers promote self-assessment`,
+          severity: 0,
+          evidence:
+            "Students must evaluate their own understanding before checking solutions",
+        });
+      }
+
+      // Chemistry-specific: Lab safety requires metacognitive awareness
+      const labProcedures = patternAnalysis.patterns.filter(
+        (p: any) => p.metadata?.procedureType === "laboratory"
+      );
+      if (labProcedures.length > 0) {
+        findings.push({
+          type: "positive",
+          message: `✓ Chemistry: ${labProcedures.length} lab procedures require safety monitoring and self-evaluation`,
+          severity: 0,
+          evidence:
+            "Laboratory work demands continuous metacognitive awareness of technique and hazards",
+        });
+      }
+    }
 
     evidence.push({
       type: "count",
@@ -2528,12 +2621,43 @@ export class MetacognitionEvaluator {
 export class SchemaBuildingEvaluator {
   static evaluate(
     _chapter: Chapter,
-    concepts: ConceptGraph
+    concepts: ConceptGraph,
+    patternAnalysis?: any
   ): PrincipleEvaluation {
     const hierarchyBalance = this.analyzeHierarchyBalance(concepts);
     const findings: Finding[] = [];
     const suggestions: Suggestion[] = [];
     const evidence: Evidence[] = [];
+
+    // Pattern-based enhancement: Definition-example pairs build schemas
+    if (patternAnalysis) {
+      const definitionExamples = patternAnalysis.patterns.filter(
+        (p: any) => p.type === "definitionExample"
+      );
+      if (definitionExamples.length > concepts.concepts.length * 0.3) {
+        findings.push({
+          type: "positive",
+          message: `✓ ${definitionExamples.length} definition-example pairs scaffold schema construction`,
+          severity: 0,
+          evidence:
+            "Concrete examples linked to definitions help build organized mental models",
+        });
+      }
+
+      // Chemistry-specific: Nomenclature builds taxonomic schemas
+      const nomenclaturePractice = patternAnalysis.patterns.filter(
+        (p: any) => p.metadata?.problemType === "nomenclature"
+      );
+      if (nomenclaturePractice.length > 5) {
+        findings.push({
+          type: "positive",
+          message: `✓ Chemistry: ${nomenclaturePractice.length} nomenclature exercises build systematic naming schemas`,
+          severity: 0,
+          evidence:
+            "IUPAC naming practice develops hierarchical understanding of compound classification",
+        });
+      }
+    }
 
     const total = concepts.concepts.length;
     const coreCount = concepts.hierarchy.core.length;
@@ -2652,12 +2776,62 @@ export class SchemaBuildingEvaluator {
 export class CognitiveLoadEvaluator {
   static evaluate(
     chapter: Chapter,
-    _concepts: ConceptGraph
+    _concepts: ConceptGraph,
+    patternAnalysis?: any
   ): PrincipleEvaluation {
     const segmentAnalysis = this.analyzeSectionSegmentation(chapter);
     const findings: Finding[] = [];
     const evidence: Evidence[] = [];
     const suggestions: Suggestion[] = [];
+
+    // Pattern-based enhancement: Worked examples reduce cognitive load
+    if (patternAnalysis) {
+      const workedExamples = patternAnalysis.patterns.filter(
+        (p: any) => p.type === "workedExample"
+      );
+      const practiceProblems = patternAnalysis.patterns.filter(
+        (p: any) => p.type === "practiceProblem"
+      );
+
+      const ratio =
+        practiceProblems.length > 0
+          ? workedExamples.length / practiceProblems.length
+          : 0;
+
+      if (ratio >= 0.5) {
+        findings.push({
+          type: "positive",
+          message: `✓ Good worked-to-practice ratio (${workedExamples.length}:${practiceProblems.length}) reduces cognitive load`,
+          severity: 0,
+          evidence:
+            "Sufficient worked examples before practice reduces extraneous cognitive load",
+        });
+      } else if (ratio < 0.3 && practiceProblems.length > 5) {
+        findings.push({
+          type: "warning",
+          message: `Too few worked examples (${workedExamples.length}) for ${practiceProblems.length} practice problems may overload beginners`,
+          severity: 0.5,
+          evidence:
+            "Novice learners need more worked examples to reduce problem-solving cognitive load",
+        });
+      }
+
+      // Chemistry-specific: Complex mechanisms increase intrinsic load
+      const mechanisms = patternAnalysis.patterns.filter(
+        (p: any) =>
+          p.metadata?.procedureType === "mechanism" &&
+          p.metadata?.difficulty === "hard"
+      );
+      if (mechanisms.length > 3) {
+        findings.push({
+          type: "warning",
+          message: `Chemistry: ${mechanisms.length} complex reaction mechanisms may cause cognitive overload`,
+          severity: 0.5,
+          evidence:
+            "Multi-step mechanisms have high intrinsic complexity—ensure adequate scaffolding",
+        });
+      }
+    }
 
     evidence.push({
       type: "metric",
@@ -2791,12 +2965,62 @@ export class CognitiveLoadEvaluator {
 export class EmotionAndRelevanceEvaluator {
   static evaluate(
     chapter: Chapter,
-    _concepts: ConceptGraph
+    _concepts: ConceptGraph,
+    patternAnalysis?: any
   ): PrincipleEvaluation {
     const emotionalElements = this.countEmotionalElements(chapter.content);
     const relevanceElements = this.countRelevanceStatements(chapter.content);
     const findings: Finding[] = [];
     const evidence: Evidence[] = [];
+
+    // Pattern-based enhancement: Real-world examples increase relevance
+    if (patternAnalysis) {
+      const workedExamples = patternAnalysis.patterns.filter(
+        (p: any) => p.type === "workedExample"
+      );
+      const definitionExamples = patternAnalysis.patterns.filter(
+        (p: any) => p.type === "definitionExample"
+      );
+
+      const totalExamples = workedExamples.length + definitionExamples.length;
+      if (totalExamples > 10) {
+        findings.push({
+          type: "positive",
+          message: `✓ ${totalExamples} concrete examples increase emotional engagement and relevance`,
+          severity: 0,
+          evidence:
+            "Real examples make abstract concepts tangible and personally meaningful",
+        });
+      }
+
+      // Chemistry-specific: Lab procedures create hands-on relevance
+      const labProcedures = patternAnalysis.patterns.filter(
+        (p: any) => p.metadata?.procedureType === "laboratory"
+      );
+      if (labProcedures.length > 0) {
+        findings.push({
+          type: "positive",
+          message: `✓ Chemistry: ${labProcedures.length} laboratory procedures connect theory to hands-on experience`,
+          severity: 0,
+          evidence:
+            "Lab work creates emotional investment through direct sensory engagement",
+        });
+      }
+
+      // Chemistry-specific: Real chemical equations show practical relevance
+      const chemicalEquations = patternAnalysis.patterns.filter(
+        (p: any) => p.title === "Chemical Equation"
+      );
+      if (chemicalEquations.length > 15) {
+        findings.push({
+          type: "positive",
+          message: `✓ Chemistry: ${chemicalEquations.length} reactions demonstrate real-world chemical processes`,
+          severity: 0,
+          evidence:
+            "Seeing actual reactions makes chemistry tangible and relevant to daily life",
+        });
+      }
+    }
 
     evidence.push({
       type: "count",
