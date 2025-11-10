@@ -378,11 +378,155 @@ export function NavigationMenu({
           />
         </div>
 
-        {/* Coming Soon */}
+        {/* Company & Support Section */}
+        <div style={{ padding: "1.5rem", borderTop: "1px solid #e5e7eb" }}>
+          <h3
+            style={{
+              margin: "0 0 1rem 0",
+              fontSize: "0.875rem",
+              fontWeight: "600",
+              color: "#6b7280",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+            }}
+          >
+            Company & Support
+          </h3>
+
+          {/* About */}
+          <MenuLink
+            icon="ℹ️"
+            title="About"
+            desc="Learn about our mission and team"
+            onClick={() => {
+              alert(
+                "About: Chapter Checker is an AI-powered tool that helps educators create better learning materials using evidence-based cognitive science principles."
+              );
+            }}
+          />
+
+          {/* Pricing */}
+          <MenuLink
+            icon="💳"
+            title="Pricing"
+            desc="Plans for individuals and teams"
+            badge="FREE"
+            onClick={() => {
+              alert(
+                "Pricing:\n\n🎓 Free Plan:\n- Unlimited chapter analysis\n- All 10 learning principles\n- Export results as JSON\n- Community support\n\n🚀 Pro Plan (Coming Soon):\n- Priority processing\n- PDF report exports\n- Custom branding\n- API access\n- Priority support"
+              );
+            }}
+          />
+
+          {/* Support */}
+          <MenuLink
+            icon="💬"
+            title="Support"
+            desc="Get help with your analysis"
+            onClick={() => {
+              alert(
+                "Support:\n\nNeed help? We're here for you!\n\n📧 Email: support@chapterchecker.com\n💬 Live Chat: Available Mon-Fri 9am-5pm EST\n📚 Documentation: View Analysis Guide from Quick Actions\n🐛 Report Bug: github.com/londailey6937/Chapter-Analysis/issues"
+              );
+            }}
+          />
+
+          {/* Contact */}
+          <MenuLink
+            icon="📧"
+            title="Contact"
+            desc="Reach out to our team"
+            onClick={() => {
+              alert(
+                "Contact Us:\n\n📧 General: hello@chapterchecker.com\n💼 Partnerships: partners@chapterchecker.com\n🎓 Education: education@chapterchecker.com\n📰 Press: press@chapterchecker.com\n\n📍 Location: San Francisco, CA"
+              );
+            }}
+          />
+
+          {/* Resources */}
+          <MenuLink
+            icon="📚"
+            title="Resources"
+            desc="Guides, tutorials, and research"
+            onClick={() => {
+              alert(
+                "Resources:\n\n📖 User Guide: Built into the app\n🎥 Video Tutorials: Coming soon\n📊 Case Studies: See how educators use Chapter Checker\n🔬 Research: Based on peer-reviewed cognitive science\n📝 Blog: Tips for better educational content\n🎓 Webinars: Monthly learning science workshops"
+              );
+            }}
+          />
+
+          {/* Feedback */}
+          <MenuLink
+            icon="💡"
+            title="Feedback"
+            desc="Share your ideas and suggestions"
+            onClick={() => {
+              alert(
+                "We'd love to hear from you!\n\n💡 Feature Requests: What would make Chapter Checker better?\n🐛 Bug Reports: Found an issue? Let us know\n⭐ Testimonials: Share your success story\n\n📧 Send feedback to: feedback@chapterchecker.com"
+              );
+            }}
+          />
+        </div>
+
+        {/* Legal Section */}
         <div
           style={{
             padding: "1.5rem",
             backgroundColor: "#f9fafb",
+            borderTop: "1px solid #e5e7eb",
+          }}
+        >
+          <h3
+            style={{
+              margin: "0 0 1rem 0",
+              fontSize: "0.875rem",
+              fontWeight: "600",
+              color: "#6b7280",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+            }}
+          >
+            Legal
+          </h3>
+
+          <MenuLink
+            icon="📜"
+            title="Terms of Service"
+            desc="Usage terms and conditions"
+            onClick={() => {
+              alert(
+                "Terms of Service:\n\n• Free to use for educational purposes\n• Analyze unlimited chapters\n• Export and share your results\n• No warranty on analysis accuracy\n• Use responsibly and ethically\n\nFull terms available at:\nchapterchecker.com/terms"
+              );
+            }}
+          />
+
+          <MenuLink
+            icon="🔒"
+            title="Privacy Policy"
+            desc="How we protect your data"
+            onClick={() => {
+              alert(
+                "Privacy Policy:\n\n✅ Your data stays local - processed in your browser\n✅ No server uploads of chapter content\n✅ We don't sell your data\n✅ Minimal analytics for improvements\n✅ GDPR & CCPA compliant\n\nFull policy at:\nchapterchecker.com/privacy"
+              );
+            }}
+          />
+
+          <MenuLink
+            icon="🍪"
+            title="Cookie Policy"
+            desc="How we use cookies"
+            onClick={() => {
+              alert(
+                "Cookie Policy:\n\n🍪 Essential cookies only\n📊 Optional analytics (with consent)\n🎯 No advertising cookies\n✅ Full control over your preferences\n\nManage cookies at:\nchapterchecker.com/cookies"
+              );
+            }}
+          />
+        </div>
+
+        {/* Coming Soon */}
+        <div
+          style={{
+            padding: "1.5rem",
+            backgroundColor: "#fef3c7",
             borderTop: "1px solid #e5e7eb",
           }}
         >
@@ -657,5 +801,95 @@ function ComingSoonItem({ icon, title, desc }: ComingSoonItemProps) {
         SOON
       </span>
     </div>
+  );
+}
+
+// Menu Link Component
+interface MenuLinkProps {
+  icon: string;
+  title: string;
+  desc: string;
+  badge?: string;
+  onClick: () => void;
+}
+
+function MenuLink({ icon, title, desc, badge, onClick }: MenuLinkProps) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        width: "100%",
+        padding: "0.75rem 1rem",
+        marginBottom: "0.5rem",
+        backgroundColor: "white",
+        borderRadius: "6px",
+        border: "1px solid #e5e7eb",
+        display: "flex",
+        alignItems: "center",
+        gap: "0.75rem",
+        cursor: "pointer",
+        textAlign: "left",
+        transition: "all 0.2s",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = "#f9fafb";
+        e.currentTarget.style.borderColor = "#667eea";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = "white";
+        e.currentTarget.style.borderColor = "#e5e7eb";
+      }}
+    >
+      <span style={{ fontSize: "1.25rem" }}>{icon}</span>
+      <div style={{ flex: 1 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem",
+            marginBottom: "0.25rem",
+          }}
+        >
+          <span
+            style={{
+              fontWeight: "600",
+              fontSize: "0.875rem",
+              color: "#1f2937",
+            }}
+          >
+            {title}
+          </span>
+          {badge && (
+            <span
+              style={{
+                padding: "0.125rem 0.5rem",
+                backgroundColor: "#10b981",
+                color: "white",
+                fontSize: "0.625rem",
+                fontWeight: "700",
+                borderRadius: "9999px",
+                textTransform: "uppercase",
+              }}
+            >
+              {badge}
+            </span>
+          )}
+        </div>
+        <div style={{ fontSize: "0.75rem", color: "#6b7280" }}>{desc}</div>
+      </div>
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={{ color: "#9ca3af" }}
+      >
+        <path d="M6 12l4-4-4-4" />
+      </svg>
+    </button>
   );
 }
