@@ -72,6 +72,35 @@ export class DeepProcessingEvaluator {
             "Concrete examples help students connect abstract concepts to real applications",
         });
       }
+
+      // Chemistry-specific: Chemical equations as worked examples
+      const chemicalEquations = patternAnalysis.patterns.filter(
+        (p: any) =>
+          p.title === "Chemical Equation" && p.metadata?.isWorkedExample
+      );
+      if (chemicalEquations.length > 0) {
+        findings.push({
+          type: "positive",
+          message: `✓ Chemistry: ${chemicalEquations.length} balanced equations demonstrate reaction stoichiometry`,
+          severity: 0,
+          evidence:
+            "Worked chemical equations show molecular-level transformations and quantitative relationships",
+        });
+      }
+
+      // Chemistry-specific: Reaction mechanisms show deep understanding
+      const mechanisms = patternAnalysis.patterns.filter(
+        (p: any) => p.metadata?.procedureType === "mechanism"
+      );
+      if (mechanisms.length > 0) {
+        findings.push({
+          type: "positive",
+          message: `✓ Chemistry: ${mechanisms.length} reaction mechanisms explain step-by-step molecular changes`,
+          severity: 0,
+          evidence:
+            "Reaction mechanisms promote deep processing by revealing electron movement and bond formation",
+        });
+      }
     }
 
     // NEW: Bloom's Taxonomy Classification
@@ -1343,6 +1372,48 @@ export class RetrievalPracticeEvaluator {
           });
         }
       }
+
+      // Chemistry-specific: Stoichiometry problems are core retrieval practice
+      const stoichProblems = patternAnalysis.patterns.filter(
+        (p: any) => p.metadata?.problemType === "stoichiometry"
+      );
+      if (stoichProblems.length > 0) {
+        findings.push({
+          type: "positive",
+          message: `✓ Chemistry: ${stoichProblems.length} stoichiometry problems practice mole calculations`,
+          severity: 0,
+          evidence:
+            "Stoichiometry is a core chemistry skill requiring frequent practice to master",
+        });
+      }
+
+      // Chemistry-specific: Nomenclature practice
+      const nomenclatureProblems = patternAnalysis.patterns.filter(
+        (p: any) => p.metadata?.problemType === "nomenclature"
+      );
+      if (nomenclatureProblems.length > 0) {
+        findings.push({
+          type: "positive",
+          message: `✓ Chemistry: ${nomenclatureProblems.length} nomenclature exercises strengthen naming conventions`,
+          severity: 0,
+          evidence:
+            "Chemical nomenclature requires repetitive retrieval to build automatic recall",
+        });
+      }
+
+      // Chemistry-specific: Lewis structure problems
+      const lewisProblems = patternAnalysis.patterns.filter(
+        (p: any) => p.metadata?.problemType === "lewis-structure"
+      );
+      if (lewisProblems.length > 0) {
+        findings.push({
+          type: "positive",
+          message: `✓ Chemistry: ${lewisProblems.length} Lewis structure problems practice electron distribution`,
+          severity: 0,
+          evidence:
+            "Drawing Lewis structures strengthens understanding of bonding and molecular geometry",
+        });
+      }
     }
 
     // NEW: Classify Retrieval Types (Recognition vs Recall)
@@ -2069,7 +2140,8 @@ export class InterleavingEvaluator {
 export class DualCodingEvaluator {
   static evaluate(
     chapter: Chapter,
-    _concepts: ConceptGraph
+    _concepts: ConceptGraph,
+    patternAnalysis?: any
   ): PrincipleEvaluation {
     const visualReferences = this.countVisualReferences(chapter.content);
     const findings: Finding[] = [];
@@ -2086,6 +2158,45 @@ export class DualCodingEvaluator {
           ? "strong"
           : "weak",
     });
+
+    // Chemistry-specific: Lewis structures are visual representations
+    if (patternAnalysis) {
+      const lewisStructures = patternAnalysis.patterns.filter(
+        (p: any) => p.metadata?.problemType === "lewis-structure"
+      ).length;
+
+      if (lewisStructures > 0) {
+        evidence.push({
+          type: "count",
+          metric: "Lewis Structures (Visual)",
+          value: lewisStructures,
+          quality: "strong",
+        });
+
+        findings.push({
+          type: "positive",
+          message: `✓ Chemistry: ${lewisStructures} Lewis structures provide visual bonding representations`,
+          severity: 0,
+          evidence:
+            "Lewis structures dual-code bonding concepts with electron dot diagrams",
+        });
+      }
+
+      // Chemistry-specific: Chemical equations are visual representations
+      const equations = patternAnalysis.patterns.filter(
+        (p: any) => p.title === "Chemical Equation"
+      ).length;
+
+      if (equations > 0) {
+        findings.push({
+          type: "positive",
+          message: `✓ Chemistry: ${equations} chemical equations visualize molecular transformations`,
+          severity: 0,
+          evidence:
+            "Chemical equations dual-code reactions with symbolic notation and stoichiometric relationships",
+        });
+      }
+    }
 
     // Generate findings based on visual reference count
     const minExpected = Math.ceil(chapter.sections.length / 2);
