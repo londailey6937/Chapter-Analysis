@@ -116,6 +116,7 @@ export class AnalysisEngine {
       const principleEvaluations = await this.runEvaluators(
         chapter,
         conceptGraph,
+        patternAnalysis,
         onProgress
       );
       console.log("[AnalysisEngine] Principle evaluations complete");
@@ -344,6 +345,7 @@ export class AnalysisEngine {
   private static async runEvaluators(
     chapter: Chapter,
     conceptGraph: ConceptGraph,
+    patternAnalysis: any,
     onProgress?: (step: string, detail?: string) => void
   ): Promise<PrincipleEvaluation[]> {
     const overallStart = performance.now();
@@ -372,7 +374,7 @@ export class AnalysisEngine {
       );
 
       const evalStart = performance.now();
-      const result = evaluator.evaluate(chapter, conceptGraph);
+      const result = evaluator.evaluate(chapter, conceptGraph, patternAnalysis);
       const evalTime = performance.now() - evalStart;
 
       results.push(result);

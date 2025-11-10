@@ -20,10 +20,59 @@ import {
 export class DeepProcessingEvaluator {
   static evaluate(
     chapter: Chapter,
-    concepts: ConceptGraph
+    concepts: ConceptGraph,
+    patternAnalysis?: any
   ): PrincipleEvaluation {
     const findings: Finding[] = [];
     const evidence: Evidence[] = [];
+
+    // Pattern-based enhancement: Worked examples indicate deeper processing
+    if (patternAnalysis) {
+      const workedExamples = patternAnalysis.patternCounts.workedExample || 0;
+      const definitionExamples =
+        patternAnalysis.patternCounts.definitionExample || 0;
+
+      evidence.push({
+        type: "count",
+        metric: "Worked Examples",
+        value: workedExamples,
+        threshold: Math.ceil(chapter.sections.length * 0.5),
+        quality:
+          workedExamples >= chapter.sections.length * 0.5
+            ? "strong"
+            : workedExamples > 0
+            ? "moderate"
+            : "weak",
+      });
+
+      if (workedExamples >= chapter.sections.length * 0.5) {
+        findings.push({
+          type: "positive",
+          message: `✓ Excellent: ${workedExamples} worked examples demonstrate step-by-step reasoning`,
+          severity: 0,
+          evidence: `Worked examples promote deeper processing by showing solution strategies`,
+        });
+      } else if (workedExamples === 0) {
+        findings.push({
+          type: "warning",
+          message:
+            "No worked examples found to demonstrate problem-solving strategies",
+          severity: 0.6,
+          evidence:
+            "Worked examples help students understand reasoning processes",
+        });
+      }
+
+      if (definitionExamples > 0) {
+        findings.push({
+          type: "positive",
+          message: `✓ ${definitionExamples} definition-example pairs support conceptual understanding`,
+          severity: 0,
+          evidence:
+            "Concrete examples help students connect abstract concepts to real applications",
+        });
+      }
+    }
 
     // NEW: Bloom's Taxonomy Classification
     const bloomsAnalysis = this.classifyQuestionsByBloomsLevel(chapter.content);
@@ -1230,10 +1279,71 @@ export class SpacedRepetitionEvaluator {
 export class RetrievalPracticeEvaluator {
   static evaluate(
     chapter: Chapter,
-    concepts: ConceptGraph
+    concepts: ConceptGraph,
+    patternAnalysis?: any
   ): PrincipleEvaluation {
     const findings: Finding[] = [];
     const evidence: Evidence[] = [];
+
+    // Pattern-based enhancement: Practice problems are key retrieval opportunities
+    if (patternAnalysis) {
+      const practiceProblems =
+        patternAnalysis.patternCounts.practiceProblem || 0;
+      const workedExamples = patternAnalysis.patternCounts.workedExample || 0;
+
+      evidence.push({
+        type: "count",
+        metric: "Practice Problems",
+        value: practiceProblems,
+        threshold: Math.ceil(chapter.sections.length * 2),
+        quality:
+          practiceProblems >= chapter.sections.length * 2
+            ? "strong"
+            : practiceProblems >= chapter.sections.length
+            ? "moderate"
+            : "weak",
+      });
+
+      if (practiceProblems >= chapter.sections.length * 2) {
+        findings.push({
+          type: "positive",
+          message: `✓ Excellent: ${practiceProblems} practice problems provide rich retrieval opportunities`,
+          severity: 0,
+          evidence: `Frequent retrieval practice strengthens memory and reveals knowledge gaps`,
+        });
+      } else if (practiceProblems < chapter.sections.length) {
+        findings.push({
+          type: "warning",
+          message: `Limited practice problems (${practiceProblems}) for active retrieval`,
+          severity: 0.65,
+          evidence: `Aim for 2-3 practice problems per section. Currently: ${(
+            practiceProblems / chapter.sections.length
+          ).toFixed(1)} per section`,
+        });
+      }
+
+      // Check balance between worked examples and practice
+      if (workedExamples > 0 && practiceProblems > 0) {
+        const ratio = practiceProblems / workedExamples;
+        if (ratio >= 1.5) {
+          findings.push({
+            type: "positive",
+            message: `✓ Good example-to-practice ratio: ${workedExamples} examples → ${practiceProblems} practice problems`,
+            severity: 0,
+            evidence:
+              "Students learn from examples then apply through practice",
+          });
+        } else if (ratio < 0.5) {
+          findings.push({
+            type: "warning",
+            message: `Too many examples (${workedExamples}) relative to practice (${practiceProblems})`,
+            severity: 0.5,
+            evidence:
+              "Balance demonstrations with opportunities for independent retrieval",
+          });
+        }
+      }
+    }
 
     // NEW: Classify Retrieval Types (Recognition vs Recall)
     const retrievalTypes = this.classifyRetrievalTypes(chapter.content);
@@ -2060,12 +2170,59 @@ export class DualCodingEvaluator {
 export class GenerativeLearningEvaluator {
   static evaluate(
     chapter: Chapter,
-    _concepts: ConceptGraph
+    _concepts: ConceptGraph,
+    patternAnalysis?: any
   ): PrincipleEvaluation {
     const generativePrompts = this.countGenerativePrompts(chapter.content);
     const findings: Finding[] = [];
     const suggestions: Suggestion[] = [];
     const evidence: Evidence[] = [];
+
+    // Pattern-based enhancement: Practice problems without answers promote generation
+    if (patternAnalysis) {
+      const practiceProblems =
+        patternAnalysis.patternCounts.practiceProblem || 0;
+      const procedures = patternAnalysis.patternCounts.procedure || 0;
+
+      // Practice problems without provided answers require generation
+      const practicePatterns = patternAnalysis.patterns.filter(
+        (p: any) => p.type === "practiceProblem"
+      );
+      const problemsWithoutAnswers = practicePatterns.filter(
+        (p: any) => !p.metadata?.hasAnswer
+      ).length;
+
+      if (problemsWithoutAnswers > 0) {
+        evidence.push({
+          type: "count",
+          metric: "Generative Practice Problems",
+          value: problemsWithoutAnswers,
+          threshold: chapter.sections.length,
+          quality:
+            problemsWithoutAnswers >= chapter.sections.length
+              ? "strong"
+              : "moderate",
+        });
+
+        findings.push({
+          type: "positive",
+          message: `✓ ${problemsWithoutAnswers} practice problems require students to generate solutions independently`,
+          severity: 0,
+          evidence:
+            "Self-generation strengthens encoding and reveals understanding gaps",
+        });
+      }
+
+      // Procedures provide scaffolding for generation
+      if (procedures > 0) {
+        findings.push({
+          type: "positive",
+          message: `✓ ${procedures} procedures guide students in generating systematic solutions`,
+          severity: 0,
+          evidence: "Step-by-step procedures scaffold complex generative tasks",
+        });
+      }
+    }
 
     evidence.push({
       type: "count",
