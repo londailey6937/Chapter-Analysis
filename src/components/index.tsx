@@ -296,3 +296,4 @@ function ChapterInput({
 
 export default ChapterInput;
 export { HelpModal } from "./HelpModal";
+export { NavigationMenu } from "./NavigationMenu";

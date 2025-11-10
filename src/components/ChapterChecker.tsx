@@ -9,6 +9,7 @@ import { ChapterAnalysisDashboard } from "./VisualizationComponents";
 import { PdfViewer } from "./PdfViewer";
 import { ConceptList } from "./ConceptList";
 import { HelpModal } from "./HelpModal";
+import { NavigationMenu } from "./NavigationMenu";
 import { Chapter, ChapterAnalysis, Concept } from "@/types";
 import {
   extractTextFromPdf,
@@ -50,6 +51,7 @@ export const ChapterChecker: React.FC = () => {
   const [currentMentionIndex, setCurrentMentionIndex] = useState<number>(0);
   const [hasAnalyzedOnce, setHasAnalyzedOnce] = useState(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  const [isNavigationOpen, setIsNavigationOpen] = useState(false);
 
   // Detect Mac for keyboard shortcut hints
   const isMac =
@@ -579,8 +581,59 @@ export const ChapterChecker: React.FC = () => {
   return (
     <div className="chapter-checker">
       <header className="app-header">
-        <h1>🧠 Chapter Checker</h1>
-        <p>Analyze your chapters using evidence-based learning science</p>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          {/* Menu Button */}
+          <button
+            onClick={() => setIsNavigationOpen(true)}
+            style={{
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              border: "none",
+              color: "white",
+              padding: "0.75rem",
+              borderRadius: "8px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "transform 0.2s, box-shadow 0.2s",
+              boxShadow: "0 2px 8px rgba(102, 126, 234, 0.3)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "scale(1.05)";
+              e.currentTarget.style.boxShadow =
+                "0 4px 12px rgba(102, 126, 234, 0.4)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "scale(1)";
+              e.currentTarget.style.boxShadow =
+                "0 2px 8px rgba(102, 126, 234, 0.3)";
+            }}
+            title="Open Menu"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+
+          {/* Title */}
+          <div>
+            <h1 style={{ margin: 0 }}>🧠 Chapter Checker</h1>
+            <p style={{ margin: 0 }}>
+              Analyze your chapters using evidence-based learning science
+            </p>
+          </div>
+        </div>
       </header>
 
       <div className="app-container">
@@ -2216,6 +2269,13 @@ export const ChapterChecker: React.FC = () => {
           }
         }
       `}</style>
+
+      {/* Navigation Menu */}
+      <NavigationMenu
+        isOpen={isNavigationOpen}
+        onClose={() => setIsNavigationOpen(false)}
+        onOpenHelp={() => setIsHelpModalOpen(true)}
+      />
 
       {/* Help Modal */}
       <HelpModal
