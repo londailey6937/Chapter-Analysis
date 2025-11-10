@@ -104,12 +104,26 @@ export const CHEMISTRY_CONCEPTS: ConceptLibrary = {
       subcategory: "Metalloids",
       importance: "core",
     },
-    { name: "atom", category: "Atomic Structure", subcategory: "The Atom" },
+    {
+      name: "atom",
+      category: "Atomic Structure",
+      subcategory: "The Atom",
+      importance: "core",
+      misconceptions: [
+        "Atoms are the smallest particles (electrons, protons, and neutrons are smaller)",
+        "Electrons orbit like planets (quantum model shows electron clouds/orbitals)",
+        "Atoms are mostly solid matter (atoms are mostly empty space)",
+      ],
+    },
     {
       name: "atomic number",
       category: "Atomic Structure",
       subcategory: "The Atom",
       importance: "core",
+      misconceptions: [
+        "Atomic number equals atomic mass (atomic number is protons only, mass includes neutrons)",
+        "Elements are ordered by mass in periodic table (ordered by atomic number)",
+      ],
     },
     {
       name: "atomic radius",
@@ -1945,6 +1959,6 @@ export const CHEMISTRY_CONCEPTS: ConceptLibrary = {
       category: "Elements",
       subcategory: "Transition Metals",
       importance: "core",
-    }
+    },
   ],
 };

@@ -13,6 +13,7 @@ export interface ConceptDefinition {
   relatedConcepts?: string[]; // Concepts that frequently co-occur
   importance?: "core" | "supporting" | "detail"; // Expected importance level
   description?: string; // Optional explanation for the concept
+  misconceptions?: string[]; // Common misconceptions about this concept
 }
 
 export interface ConceptLibrary {

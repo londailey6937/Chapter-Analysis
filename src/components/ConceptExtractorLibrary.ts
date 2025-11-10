@@ -120,6 +120,9 @@ export class ConceptExtractor {
     );
     await new Promise((resolve) => setTimeout(resolve, 50));
 
+    // Phase 3.5: Populate prerequisites from relationships
+    extractor.populatePrerequisites(conceptsWithMentions, relationships);
+
     // Phase 4: Build hierarchy
     onProgress?.("concept-phase-4", "Building concept hierarchy");
     const phase4Start = performance.now();
@@ -352,7 +355,8 @@ export class ConceptExtractor {
   }
 
   /**
-   * Establish relationships between concepts based on proximity
+   * Establish relationships between concepts based on proximity, context, and order
+   * Enhanced to detect: co-occurrence, prerequisites, contrasts, and examples
    */
   private establishRelationships(
     concepts: Concept[],
@@ -360,36 +364,146 @@ export class ConceptExtractor {
   ): ConceptRelationship[] {
     const relationships: ConceptRelationship[] = [];
     const proximityThreshold = 500; // characters
+    const textLower = text.toLowerCase();
 
-    // For each pair of concepts, check if they appear close together
+    // For each pair of concepts, check relationships
     for (let i = 0; i < concepts.length; i++) {
       for (let j = i + 1; j < concepts.length; j++) {
         const concept1 = concepts[i];
         const concept2 = concepts[j];
 
         let cooccurrences = 0;
+        let prerequisiteIndicators = 0;
+        let contrastIndicators = 0;
+        let exampleIndicators = 0;
 
-        // Check proximity of mentions
+        // Check proximity and context of mentions
         for (const m1 of concept1.mentions) {
           for (const m2 of concept2.mentions) {
-            if (Math.abs(m1.position - m2.position) < proximityThreshold) {
+            const distance = Math.abs(m1.position - m2.position);
+
+            if (distance < proximityThreshold) {
               cooccurrences++;
+
+              // Extract context around both mentions to detect relationship type
+              const start = Math.min(m1.position, m2.position) - 100;
+              const end = Math.max(m1.position, m2.position) + 100;
+              const contextText = textLower.slice(Math.max(0, start), end);
+
+              // Detect prerequisite patterns (concept1 before concept2)
+              if (m1.position < m2.position) {
+                if (
+                  contextText.includes("before") ||
+                  contextText.includes("first") ||
+                  contextText.includes("foundation") ||
+                  contextText.includes("builds on") ||
+                  contextText.includes("requires") ||
+                  contextText.includes("prerequisite")
+                ) {
+                  prerequisiteIndicators++;
+                }
+              }
+
+              // Detect contrast patterns
+              if (
+                contextText.includes("unlike") ||
+                contextText.includes("whereas") ||
+                contextText.includes("in contrast") ||
+                contextText.includes("however") ||
+                contextText.includes("but") ||
+                contextText.includes("different from")
+              ) {
+                contrastIndicators++;
+              }
+
+              // Detect example patterns
+              if (
+                contextText.includes("for example") ||
+                contextText.includes("such as") ||
+                contextText.includes("for instance") ||
+                contextText.includes("e.g.") ||
+                contextText.includes("like")
+              ) {
+                exampleIndicators++;
+              }
             }
           }
         }
 
+        // Create relationships based on strongest detected pattern
         if (cooccurrences > 0) {
-          relationships.push({
-            source: concept1.id,
-            target: concept2.id,
-            type: "related",
-            strength: Math.min(cooccurrences / 5, 1), // Normalize to 0-1
-          });
+          // Determine relationship type based on indicators
+          let relType: "prerequisite" | "related" | "contrasts" | "example" =
+            "related";
+          let strength = Math.min(cooccurrences / 5, 1);
+
+          if (prerequisiteIndicators >= 2) {
+            relType = "prerequisite";
+            strength = Math.min(prerequisiteIndicators / 3, 1);
+            relationships.push({
+              source: concept1.id,
+              target: concept2.id,
+              type: relType,
+              strength,
+            });
+          } else if (contrastIndicators >= 2) {
+            relType = "contrasts";
+            strength = Math.min(contrastIndicators / 3, 1);
+            relationships.push({
+              source: concept1.id,
+              target: concept2.id,
+              type: relType,
+              strength,
+            });
+          } else if (exampleIndicators >= 1) {
+            relType = "example";
+            relationships.push({
+              source: concept1.id,
+              target: concept2.id,
+              type: relType,
+              strength,
+            });
+          } else {
+            // Default to related
+            relationships.push({
+              source: concept1.id,
+              target: concept2.id,
+              type: "related",
+              strength,
+            });
+          }
         }
       }
     }
 
     return relationships;
+  }
+
+  /**
+   * Populate concept prerequisites based on prerequisite relationships
+   */
+  private populatePrerequisites(
+    concepts: Concept[],
+    relationships: ConceptRelationship[]
+  ): void {
+    // Build a map for quick concept lookup
+    const conceptMap = new Map<string, Concept>();
+    for (const concept of concepts) {
+      conceptMap.set(concept.id, concept);
+    }
+
+    // For each prerequisite relationship, add to target concept's prerequisites
+    for (const rel of relationships) {
+      if (rel.type === "prerequisite") {
+        const targetConcept = conceptMap.get(rel.target);
+        if (
+          targetConcept &&
+          !targetConcept.prerequisites.includes(rel.source)
+        ) {
+          targetConcept.prerequisites.push(rel.source);
+        }
+      }
+    }
   }
 
   /**
