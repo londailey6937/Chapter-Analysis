@@ -739,6 +739,86 @@ export const ChapterChecker: React.FC = () => {
                       JSON for future reference or sharing with colleagues.
                     </li>
                   </ul>
+
+                  {/* Comprehensive Documentation Link */}
+                  <div
+                    style={{
+                      marginTop: "1.5rem",
+                      padding: "1rem",
+                      background:
+                        "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      borderRadius: "8px",
+                      textAlign: "center",
+                    }}
+                  >
+                    <a
+                      href="https://github.com/londailey6937/Chapter-Analysis/tree/main/docs"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                        color: "white",
+                        textDecoration: "none",
+                        fontSize: "1.1rem",
+                        fontWeight: 600,
+                        padding: "0.75rem 1.5rem",
+                        background: "rgba(255, 255, 255, 0.2)",
+                        borderRadius: "6px",
+                        transition: "all 0.2s",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background =
+                          "rgba(255, 255, 255, 0.3)";
+                        e.currentTarget.style.transform = "translateY(-2px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background =
+                          "rgba(255, 255, 255, 0.2)";
+                        e.currentTarget.style.transform = "translateY(0)";
+                      }}
+                    >
+                      <svg
+                        style={{ width: "24px", height: "24px" }}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                        />
+                      </svg>
+                      <span>View Comprehensive Documentation</span>
+                      <svg
+                        style={{ width: "16px", height: "16px" }}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
+                      </svg>
+                    </a>
+                    <p
+                      style={{
+                        marginTop: "0.75rem",
+                        marginBottom: 0,
+                        fontSize: "0.9rem",
+                        color: "rgba(255, 255, 255, 0.9)",
+                      }}
+                    >
+                      Complete guides on analysis results, learning principles,
+                      domain-specific features, and technical architecture
+                    </p>
+                  </div>
                 </div>
               </details>
             </div>
