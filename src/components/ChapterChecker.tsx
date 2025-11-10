@@ -48,6 +48,57 @@ export const ChapterChecker: React.FC = () => {
   const [currentMentionIndex, setCurrentMentionIndex] = useState<number>(0);
   const [hasAnalyzedOnce, setHasAnalyzedOnce] = useState(false);
 
+  // Detect Mac for keyboard shortcut hints
+  const isMac =
+    typeof navigator !== "undefined" &&
+    navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+  const modKey = isMac ? "⌘" : "Ctrl";
+
+  /**
+   * Keyboard shortcuts
+   * - Cmd/Ctrl + U: Upload file
+   * - Cmd/Ctrl + Enter: Analyze chapter
+   * - Escape: Close expanded sections (future: close modals)
+   */
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Detect Mac (Cmd) vs PC (Ctrl)
+      const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+      const modifierKey = isMac ? e.metaKey : e.ctrlKey;
+
+      // Cmd/Ctrl + U: Upload file
+      if (modifierKey && e.key === "u") {
+        e.preventDefault();
+        fileInputRef.current?.click();
+        return;
+      }
+
+      // Cmd/Ctrl + Enter: Analyze chapter
+      if (modifierKey && e.key === "Enter") {
+        e.preventDefault();
+        if (chapterText.trim() && !isAnalyzing) {
+          handleAnalyzeChapter();
+        }
+        return;
+      }
+
+      // Escape: Close expanded details sections
+      if (e.key === "Escape") {
+        // Find all open details elements and close them
+        const openDetails = document.querySelectorAll("details[open]");
+        if (openDetails.length > 0) {
+          e.preventDefault();
+          openDetails.forEach((detail) => {
+            (detail as HTMLDetailsElement).open = false;
+          });
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [chapterText, isAnalyzing]); // Re-bind when these change
+
   /**
    * Handle chapter analysis
    */
@@ -819,8 +870,12 @@ export const ChapterChecker: React.FC = () => {
                       className="btn btn-secondary"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isAnalyzing}
+                      title={`Upload file (${modKey}+U)`}
                     >
-                      📄 Upload File (.md, .pdf)
+                      📄 Upload File{" "}
+                      <span style={{ opacity: 0.6, fontSize: "0.85em" }}>
+                        ({modKey}+U)
+                      </span>
                     </button>
                     <input
                       ref={fileInputRef}
@@ -893,8 +948,20 @@ export const ChapterChecker: React.FC = () => {
                     }`}
                     onClick={handleAnalyzeChapter}
                     disabled={isAnalyzing || !chapterText.trim()}
+                    title={`Analyze chapter (${modKey}+Enter)`}
                   >
-                    {isAnalyzing ? "Processing..." : "🔍 Analyze Chapter"}
+                    {isAnalyzing ? "Processing..." : `🔍 Analyze Chapter`}
+                    {!isAnalyzing && (
+                      <span
+                        style={{
+                          opacity: 0.7,
+                          fontSize: "0.85em",
+                          marginLeft: "8px",
+                        }}
+                      >
+                        ({modKey}+⏎)
+                      </span>
+                    )}
                   </button>
 
                   {isAnalyzing && <div className="loading-spinner" />}
