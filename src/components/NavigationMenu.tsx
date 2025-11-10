@@ -74,19 +74,28 @@ export function NavigationMenu({
             justifyContent: "space-between",
           }}
         >
-          <div>
-            <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: "bold" }}>
-              🧠 TomeIQ
-            </h2>
-            <p
-              style={{
-                margin: "0.25rem 0 0 0",
-                fontSize: "0.875rem",
-                opacity: 0.9,
-              }}
-            >
-              AI-Powered Textbook Analysis
-            </p>
+          <div
+            style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}
+          >
+            <img
+              src="/TomeIQ.png"
+              alt="TomeIQ Logo"
+              style={{ height: "36px", width: "auto" }}
+            />
+            <div>
+              <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: "bold" }}>
+                TomeIQ
+              </h2>
+              <p
+                style={{
+                  margin: "0.25rem 0 0 0",
+                  fontSize: "0.875rem",
+                  opacity: 0.9,
+                }}
+              >
+                AI-Powered Textbook Analysis
+              </p>
+            </div>
           </div>
           <button
             onClick={onClose}

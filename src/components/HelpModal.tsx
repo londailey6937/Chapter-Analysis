@@ -73,9 +73,18 @@ export function HelpModal({
             borderTopRightRadius: "12px",
           }}
         >
-          <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: "bold" }}>
-            📚 TomeIQ Analysis Guide
-          </h2>
+          <div
+            style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}
+          >
+            <img
+              src="/TomeIQ.png"
+              alt="TomeIQ Logo"
+              style={{ height: "32px", width: "auto" }}
+            />
+            <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: "bold" }}>
+              TomeIQ Analysis Guide
+            </h2>
+          </div>
           <button
             onClick={onClose}
             style={{
