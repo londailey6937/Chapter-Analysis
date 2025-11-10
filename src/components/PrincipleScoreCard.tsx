@@ -53,6 +53,19 @@ function PrincipleScoreCard({
   const scoreColor = getScoreColor(score);
   const displayName = formatPrincipleName(principle.principle);
 
+  // Debug: Log the formatted name (remove after verification)
+  if (
+    typeof window !== "undefined" &&
+    principle.principle === "deepProcessing"
+  ) {
+    console.log(
+      "Formatted principle name:",
+      principle.principle,
+      "→",
+      displayName
+    );
+  }
+
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-soft transition-shadow">
       {/* Card Header - Always Visible */}
