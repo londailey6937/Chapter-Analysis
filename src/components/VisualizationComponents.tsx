@@ -25,6 +25,7 @@ import {
   PrincipleEvaluation,
 } from "@/types";
 import { ConceptList } from "./ConceptList";
+import ConceptRelationshipsSection from "./ConceptRelationshipsSection";
 
 // Friendly display names for principle enum codes to avoid raw concatenation (e.g., "dualCoding") in UI copy
 const PRINCIPLE_NAME_MAP: Record<string, string> = {
@@ -2006,6 +2007,39 @@ export const ChapterAnalysisDashboard: React.FC<{
           </div>
         </div>
       </div>
+
+      {/* Concept Relationships Section */}
+      {(() => {
+        const hasConceptGraph = !!analysis.conceptGraph;
+        const hasConcepts = !!analysis.conceptGraph?.concepts;
+        const hasRelationships = !!analysis.conceptGraph?.relationships;
+        const conceptCount = analysis.conceptGraph?.concepts?.length || 0;
+        const relationshipCount =
+          analysis.conceptGraph?.relationships?.length || 0;
+
+        console.log("ConceptRelationshipsSection check:", {
+          hasConceptGraph,
+          hasConcepts,
+          hasRelationships,
+          conceptCount,
+          relationshipCount,
+        });
+
+        if (
+          hasConceptGraph &&
+          hasConcepts &&
+          hasRelationships &&
+          relationshipCount > 0
+        ) {
+          return (
+            <ConceptRelationshipsSection
+              concepts={analysis.conceptGraph.concepts}
+              relationships={analysis.conceptGraph.relationships}
+            />
+          );
+        }
+        return null;
+      })()}
 
       {/* Concept List with click-to-highlight */}
       {concepts && concepts.length > 0 && (
