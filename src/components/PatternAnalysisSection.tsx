@@ -281,6 +281,7 @@ const PatternAnalysisSection: React.FC<PatternAnalysisSectionProps> = ({
                         marginTop: "8px",
                         fontSize: "12px",
                         color: "#64748b",
+                        flexWrap: "wrap",
                       }}
                     >
                       <span>
@@ -297,6 +298,42 @@ const PatternAnalysisSection: React.FC<PatternAnalysisSectionProps> = ({
                           {pattern.metadata.hasAnswer
                             ? "✅ Answer provided"
                             : "❌ No answer"}
+                        </span>
+                      )}
+                      {/* Chemistry-specific metadata */}
+                      {pattern.metadata?.problemType && (
+                        <span
+                          style={{
+                            backgroundColor: "#dbeafe",
+                            padding: "2px 8px",
+                            borderRadius: "4px",
+                            color: "#1e40af",
+                            fontWeight: 600,
+                          }}
+                        >
+                          🧪 {pattern.metadata.problemType}
+                        </span>
+                      )}
+                      {pattern.metadata?.isBalanced !== undefined && (
+                        <span>
+                          {pattern.metadata.isBalanced
+                            ? "⚖️ Balanced"
+                            : "⚠️ Unbalanced"}
+                        </span>
+                      )}
+                      {pattern.metadata?.procedureType && (
+                        <span
+                          style={{
+                            backgroundColor: "#dcfce7",
+                            padding: "2px 8px",
+                            borderRadius: "4px",
+                            color: "#166534",
+                            fontWeight: 600,
+                          }}
+                        >
+                          {pattern.metadata.procedureType === "laboratory"
+                            ? "🔬 Lab"
+                            : "⚗️ Mechanism"}
                         </span>
                       )}
                     </div>
