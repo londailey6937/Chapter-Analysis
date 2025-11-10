@@ -140,6 +140,12 @@ function ChapterInput({
             weakestPrinciples: [],
           },
         },
+        conceptGraph: {
+          concepts: [],
+          relationships: [],
+          hierarchy: { core: [], supporting: [], detail: [] },
+          sequence: [],
+        },
       };
 
       setProgress("");
