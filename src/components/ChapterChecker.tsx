@@ -628,10 +628,8 @@ export const ChapterChecker: React.FC = () => {
 
           {/* Title */}
           <div>
-            <h1 style={{ margin: 0 }}>🧠 Chapter Checker</h1>
-            <p style={{ margin: 0 }}>
-              Analyze your chapters using evidence-based learning science
-            </p>
+            <h1 style={{ margin: 0 }}>🧠 TomeIQ</h1>
+            <p style={{ margin: 0 }}>AI-Powered Textbook Analysis</p>
           </div>
         </div>
       </header>

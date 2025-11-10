@@ -74,7 +74,7 @@ export function HelpModal({
           }}
         >
           <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: "bold" }}>
-            📚 Analysis Results Guide
+            📚 TomeIQ Analysis Guide
           </h2>
           <button
             onClick={onClose}

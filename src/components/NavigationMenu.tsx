@@ -76,7 +76,7 @@ export function NavigationMenu({
         >
           <div>
             <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: "bold" }}>
-              🧠 Chapter Checker
+              🧠 TomeIQ
             </h2>
             <p
               style={{
@@ -85,7 +85,7 @@ export function NavigationMenu({
                 opacity: 0.9,
               }}
             >
-              AI-Powered Learning Science Analysis
+              AI-Powered Textbook Analysis
             </p>
           </div>
           <button
