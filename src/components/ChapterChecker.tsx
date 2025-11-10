@@ -38,6 +38,7 @@ export const ChapterChecker: React.FC = () => {
   const [progress, setProgress] = useState<string>("");
   const [progressPercent, setProgressPercent] = useState<number>(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const loadAnalysisInputRef = useRef<HTMLInputElement>(null);
   const [isSlowPdf, setIsSlowPdf] = useState(false);
   const [isSlowAnalysis, setIsSlowAnalysis] = useState(false);
   const fileProcessingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -335,6 +336,62 @@ export const ChapterChecker: React.FC = () => {
         `Analysis failed: ${err instanceof Error ? err.message : String(err)}`
       );
       setProgress("");
+    }
+  };
+
+  /**
+   * Save analysis results to JSON file
+   */
+  const handleSaveAnalysis = () => {
+    if (!analysis) return;
+
+    const dataToSave = {
+      analysis,
+      chapterText,
+      timestamp: new Date().toISOString(),
+      domain: selectedDomain,
+    };
+
+    const blob = new Blob([JSON.stringify(dataToSave, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `chapter-analysis-${Date.now()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  /**
+   * Load analysis results from JSON file
+   */
+  const handleLoadAnalysis = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+
+      if (data.analysis && data.chapterText) {
+        setAnalysis(data.analysis);
+        setChapterText(data.chapterText);
+        if (data.domain) {
+          setSelectedDomain(data.domain);
+        }
+        setError(null);
+      } else {
+        setError("Invalid analysis file format");
+      }
+    } catch (err) {
+      setError(
+        `Failed to load analysis: ${
+          err instanceof Error ? err.message : String(err)
+        }`
+      );
     }
   };
 
@@ -1113,6 +1170,67 @@ export const ChapterChecker: React.FC = () => {
             {/* Analysis Results - Shows when available */}
             {analysis && (
               <div className="analysis-results">
+                {/* Save/Load Analysis Buttons */}
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "12px",
+                    marginBottom: "20px",
+                    padding: "16px",
+                    backgroundColor: "#f8fafc",
+                    borderRadius: "8px",
+                    border: "1px solid #e2e8f0",
+                  }}
+                >
+                  <button
+                    onClick={handleSaveAnalysis}
+                    className="btn btn-primary"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "8px 16px",
+                      backgroundColor: "#0ea5e9",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "6px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      cursor: "pointer",
+                    }}
+                    title="Save analysis results to JSON file"
+                  >
+                    💾 Save Analysis
+                  </button>
+                  <button
+                    onClick={() => loadAnalysisInputRef.current?.click()}
+                    className="btn btn-secondary"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "8px 16px",
+                      backgroundColor: "#64748b",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "6px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      cursor: "pointer",
+                    }}
+                    title="Load previously saved analysis"
+                  >
+                    📂 Load Analysis
+                  </button>
+                  <input
+                    ref={loadAnalysisInputRef}
+                    type="file"
+                    accept=".json"
+                    onChange={handleLoadAnalysis}
+                    style={{ display: "none" }}
+                  />
+                </div>
+
                 <ChapterAnalysisDashboard
                   analysis={analysis}
                   concepts={analysis.conceptGraph?.concepts || []}
