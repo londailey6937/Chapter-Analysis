@@ -15,10 +15,3 @@ export interface ConceptPattern {
   averageSpacing: number;
   isWellSpaced: boolean;
 }
-
-export interface ReviewPattern {
-  conceptId: string;
-  reviewPoints: number[];
-  idealSpacing: number[];
-  score: number;
-}

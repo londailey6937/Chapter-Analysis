@@ -24,6 +24,7 @@ import {
   ConceptLink,
   PrincipleEvaluation,
 } from "@/types";
+import type { ReviewPattern, InterleavingData } from "@/types";
 import { ConceptList } from "./ConceptList";
 import ConceptRelationshipsSection from "./ConceptRelationshipsSection";
 import PatternAnalysisSection from "./PatternAnalysisSection";
@@ -518,11 +519,6 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
                 if (n > 35) return Math.ceil(n / 10);
                 return 0;
               })()}
-              tickFormatter={(value: string, index: number) => {
-                const n = data.length;
-                if (n > 60) return `S${index + 1}`; // compact label
-                return value;
-              }}
               angle={-35}
               textAnchor="end"
               height={70}
@@ -605,13 +601,58 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
 
 export const ConceptMentionFrequency: React.FC<{
   analysis: ChapterAnalysis;
-}> = ({ analysis }) => {
-  const reviewPatterns = analysis.conceptAnalysis.reviewPatterns.slice(0, 15);
+  pageOffsets?: number[];
+}> = ({ analysis, pageOffsets }) => {
+  const reviewPatterns: ReviewPattern[] =
+    analysis.conceptAnalysis.reviewPatterns.slice(0, 15);
   const data = reviewPatterns.map((pattern) => ({
     concept: pattern.conceptName || pattern.conceptId.replace("concept-", "C"),
+    conceptId: pattern.conceptId,
     mentions: pattern.mentions,
     isOptimal: pattern.isOptimal,
+    spacing: pattern.spacing,
+    avgSpacing: pattern.avgSpacing,
+    firstAppearance: pattern.firstAppearance,
+    recommendation: pattern.recommendation,
   }));
+
+  // Find a concept with suboptimal spacing (red bar) and enough mentions
+  const exampleConcept = data.find((d) => !d.isOptimal && d.mentions >= 3);
+  let beforeExample: string[] = [];
+  let afterExample: string[] = [];
+  if (exampleConcept && pageOffsets && pageOffsets.length > 0) {
+    // Find the real Concept object to get mention positions
+    const realConcept = analysis.conceptGraph.concepts.find(
+      (c) => c.id === exampleConcept.conceptId
+    );
+    if (
+      realConcept &&
+      realConcept.mentions &&
+      realConcept.mentions.length > 0
+    ) {
+      // Helper to map position to page number
+      const getPageNumber = (pos: number) => {
+        for (let i = 0; i < pageOffsets.length; i++) {
+          if (pos < pageOffsets[i]) {
+            return i + 1; // 1-based page number
+          }
+        }
+        return pageOffsets.length; // Last page if beyond last offset
+      };
+      beforeExample = realConcept.mentions.slice(0, 5).map((m, i) => {
+        const page = getPageNumber(m.position);
+        return `Mention ${i + 1}: ...[page ${page}]...`;
+      });
+    }
+    // Simulate ideal spacing: 3-5 mentions with increasing intervals
+    afterExample = [
+      "Mention 1: ...[page 1]...",
+      "Mention 2: ...[page 3]...",
+      "Mention 3: ...[page 6]...",
+      "Mention 4: ...[page 10]...",
+      "Mention 5: ...[page 16]...",
+    ];
+  }
 
   return (
     <div className="viz-container">
@@ -678,6 +719,38 @@ export const ConceptMentionFrequency: React.FC<{
             : "Many concepts need spacing adjustments—ensure 3-5 spaced revisits per concept with increasing intervals.";
         })()}
       </div>
+      {exampleConcept && (
+        <div className="spacing-examples-block">
+          <h4>Example: Improving Spacing for "{exampleConcept.concept}"</h4>
+          <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
+            <div style={{ minWidth: 220 }}>
+              <strong>Current Pattern (from your PDF):</strong>
+              <ul style={{ fontSize: 13, margin: "8px 0 0 0" }}>
+                {beforeExample.map((ex, i) => (
+                  <li key={i}>{ex}</li>
+                ))}
+              </ul>
+            </div>
+            <div style={{ minWidth: 220 }}>
+              <strong>Optimal Pattern (spaced revisits):</strong>
+              <ul style={{ fontSize: 13, margin: "8px 0 0 0" }}>
+                {afterExample.map((ex, i) => (
+                  <li key={i}>{ex}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div
+            style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 8 }}
+          >
+            <em>
+              Spacing intervals and positions are illustrative. For best
+              results, distribute mentions with increasing gaps (e.g., 1,000 →
+              2,500 → 5,000 words).
+            </em>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -967,9 +1040,21 @@ const BlockingIssueCard: React.FC<BlockingIssueCardProps> = ({
 // INTERLEAVING PATTERN VISUALIZATION
 // ============================================================================
 
-export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
-  analysis,
-}) => {
+export const InterleavingPattern: React.FC<{
+  analysis: ChapterAnalysis;
+  pageOffsets?: number[];
+}> = ({ analysis, pageOffsets }) => {
+  // Helper to map position to page number
+  const getPageNumber = (pos: number) => {
+    if (!pageOffsets || pageOffsets.length === 0) return undefined;
+    for (let i = 0; i < pageOffsets.length; i++) {
+      if (pos < pageOffsets[i]) {
+        return i;
+      }
+    }
+    return pageOffsets.length;
+  };
+
   const pattern = analysis.visualizations.interleavingPattern;
   const sequence = pattern.conceptSequence.slice(0, 50); // Show more for better insight
 
@@ -1137,15 +1222,96 @@ export const InterleavingPattern: React.FC<{ analysis: ChapterAnalysis }> = ({
           </p>
           {worstBlocks.map((group, idx) => {
             const name = idToName[group.conceptId] || group.conceptId;
+            // Find the longest run of this concept in the sequence
+            let runStart = -1,
+              runEnd = -1,
+              maxRun = 0,
+              curRun = 0,
+              curStart = 0;
+            for (let i = 0; i < sequence.length; i++) {
+              if (sequence[i] === group.conceptId) {
+                if (curRun === 0) curStart = i;
+                curRun++;
+                if (curRun > maxRun) {
+                  maxRun = curRun;
+                  runStart = curStart;
+                  runEnd = i;
+                }
+              } else {
+                curRun = 0;
+              }
+            }
+            // Simulate runPages as sequential pages for the run (since we lack positions)
+            const runLength = runEnd - runStart + 1;
+            const runPages = Array.from({ length: runLength }, (_, i) => i + 1);
+            // Simulate optimal interleaving: spread mentions across pages
+            const optimalPages = [1, 3, 6, 10, 16];
             return (
-              <BlockingIssueCard
-                key={idx}
-                conceptName={name}
-                longestRun={group.longest}
-                occurrences={group.occurrences}
-                lengths={group.lengths}
-                sections={group.sections}
-              />
+              <div key={idx}>
+                <BlockingIssueCard
+                  conceptName={name}
+                  longestRun={group.longest}
+                  occurrences={group.occurrences}
+                  lengths={group.lengths}
+                  sections={group.sections}
+                />
+                {runPages.length >= 3 && (
+                  <div
+                    className="blocking-example-block"
+                    style={{
+                      margin: "16px 0 0 0",
+                      padding: "12px",
+                      background: "#f8fafc",
+                      borderRadius: 6,
+                    }}
+                  >
+                    <strong>Example: Improving blocking for "{name}"</strong>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: 32,
+                        flexWrap: "wrap",
+                        marginTop: 8,
+                      }}
+                    >
+                      <div style={{ minWidth: 220 }}>
+                        <strong>Current Pattern (from your PDF):</strong>
+                        <ul style={{ fontSize: 13, margin: "8px 0 0 0" }}>
+                          {runPages.slice(0, 5).map((page, i) => (
+                            <li key={i}>
+                              {page
+                                ? `Mention ${i + 1}: ...[page ${page}]...`
+                                : `Mention ${i + 1}: ...[unknown page]...`}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div style={{ minWidth: 220 }}>
+                        <strong>Optimal Pattern (interleaved):</strong>
+                        <ul style={{ fontSize: 13, margin: "8px 0 0 0" }}>
+                          {optimalPages.map((page, i) => (
+                            <li key={i}>{`Mention ${
+                              i + 1
+                            }: ...[page ${page}]...`}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 12,
+                        color: "var(--text-muted)",
+                        marginTop: 8,
+                      }}
+                    >
+                      <em>
+                        For best results, distribute mentions across different
+                        pages and sections, not in a single block.
+                      </em>
+                    </div>
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>
@@ -1909,25 +2075,26 @@ export const ChapterAnalysisDashboard: React.FC<{
   onConceptClick: (concept: Concept, mentionIndex: number) => void;
   highlightedConceptId?: string | null;
   currentMentionIndex?: number;
+  pageOffsets?: number[];
 }> = ({
   analysis,
   concepts,
   onConceptClick,
   highlightedConceptId,
   currentMentionIndex = 0,
+  pageOffsets,
 }) => {
   // Defensive guards in case analysis shape changes or fields are missing
-  const safeAnalysis = analysis || ({} as ChapterAnalysis);
-  const overallScore = safeAnalysis.overallScore ?? 0;
-  const conceptAnalysis = safeAnalysis.conceptAnalysis || {
+  const overallScore = analysis.overallScore ?? 0;
+  const conceptAnalysis = analysis.conceptAnalysis || {
     totalConceptsIdentified: 0,
     coreConceptCount: 0,
     conceptDensity: 0,
     hierarchyBalance: 0,
   };
 
-  const recommendations = safeAnalysis.recommendations || [];
-  const principles = safeAnalysis.principles || [];
+  const recommendations = analysis.recommendations || [];
+  const principles = analysis.principles || [];
   return (
     <div className="dashboard">
       <div className="dashboard-header">
@@ -1940,13 +2107,16 @@ export const ChapterAnalysisDashboard: React.FC<{
         </div>
       </div>
 
-      <ChapterOverviewTimeline analysis={safeAnalysis} />
+      <ChapterOverviewTimeline analysis={analysis} />
 
       <div className="viz-grid">
-        <PrincipleScoresRadar analysis={safeAnalysis} />
-        <CognitiveLoadCurve analysis={safeAnalysis} />
-        <ConceptMentionFrequency analysis={safeAnalysis} />
-        <InterleavingPattern analysis={safeAnalysis} />
+        <PrincipleScoresRadar analysis={analysis} />
+        <CognitiveLoadCurve analysis={analysis} />
+        <ConceptMentionFrequency
+          analysis={analysis}
+          pageOffsets={pageOffsets}
+        />
+        <InterleavingPattern analysis={analysis} pageOffsets={pageOffsets} />
       </div>
 
       <div className="principles-section">

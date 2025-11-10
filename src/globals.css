@@ -22,8 +22,8 @@
     --brand-navy-700: #1e40af; /* blue-900 */
     --brand-accent: #0ea5e9; /* sky-500 */
     --success-600: #166534; /* green-700 */
-    --warn-600: #b45309; /* amber-700 */
-    --danger-600: #b91c1c; /* red-700 */
+    --warn-600: #ffe100; /* yellow for moderate load */
+    --danger-600: #e10600; /* vivid red for high load or blocking */
   }
   /* Greys template: apply by adding class="theme-grey" to <body> or a wrapping container */
   .theme-grey {
@@ -37,7 +37,7 @@
     --brand-navy-700: #374151; /* gray-700 */
     --brand-accent: #6b7280; /* gray-500 */
     --success-600: #166534; /* green-700 */
-    --warn-600: #b45309; /* amber-700 */
+    --warn-600: #ffe100; /* yellow for moderate load */
     --danger-600: #b91c1c; /* red-700 */
   }
   html {

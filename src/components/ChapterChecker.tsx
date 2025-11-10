@@ -627,17 +627,19 @@ export const ChapterChecker: React.FC = () => {
           </button>
 
           {/* Title */}
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0" }}>
             <img
               src="/TomeIQ.png"
               alt="TomeIQ Logo"
-              style={{ height: "80px", width: "auto" }}
+              style={{ height: "128px", width: "auto" }}
             />
             <h1
               style={{
                 margin: 0,
-                fontFamily: "'Brush Script MT', cursive, serif",
+                fontFamily: "'Georgia', 'Palatino', serif",
                 fontSize: "2.5rem",
+                fontWeight: "600",
+                letterSpacing: "0.02em",
                 lineHeight: "1",
               }}
             >
@@ -1377,6 +1379,22 @@ export const ChapterChecker: React.FC = () => {
                   }}
                   highlightedConceptId={highlightedConcept?.id}
                   currentMentionIndex={currentMentionIndex}
+                  pageOffsets={
+                    pdfPageTexts
+                      ? (() => {
+                          // Compute pageOffsets as in extractPdfStructure
+                          const offsets: number[] = [];
+                          let acc = 0;
+                          for (let i = 0; i < pdfPageTexts.length; i++) {
+                            offsets[i] = acc;
+                            acc +=
+                              pdfPageTexts[i].length +
+                              (i < pdfPageTexts.length - 1 ? 2 : 0);
+                          }
+                          return offsets;
+                        })()
+                      : undefined
+                  }
                 />
 
                 {/* Custom Concepts Input - Separate section after analysis */}

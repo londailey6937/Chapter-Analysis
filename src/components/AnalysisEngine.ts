@@ -187,6 +187,7 @@ export class AnalysisEngine {
             conceptId: concept.id,
             conceptName: concept.name,
             mentions,
+            positions, // <-- add real mention positions for visualization
             firstAppearance: concept.firstMentionPosition,
             spacing,
             avgSpacing: Math.round(avgSpacing),
@@ -735,6 +736,7 @@ export class AnalysisEngine {
       };
     }
     const sequence = mentionEvents.map((e) => e.conceptId);
+    const conceptPositions = mentionEvents.map((e) => e.position);
     const blocks: {
       conceptId: string;
       length: number;
@@ -789,6 +791,7 @@ export class AnalysisEngine {
     }
     return {
       conceptSequence: sequence,
+      conceptPositions,
       blockingSegments: blockingBlocks.map((b) => {
         const section = findSectionForPosition(b.startPosition);
         return {
