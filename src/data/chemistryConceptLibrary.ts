@@ -1668,7 +1668,7 @@ export const CHEMISTRY_CONCEPTS: ConceptLibrary = {
     },
 
     // ========== ELEMENTS ==========
-    // Elements are core concepts - fundamental building blocks of chemistry
+    // Elements covered in general chemistry - fundamental building blocks
     // Organized alphabetically for easy lookup
     {
       name: "aluminum",
@@ -1683,9 +1683,39 @@ export const CHEMISTRY_CONCEPTS: ConceptLibrary = {
       importance: "core",
     },
     {
+      name: "arsenic",
+      category: "Elements",
+      subcategory: "Metalloids",
+      importance: "core",
+    },
+    {
+      name: "barium",
+      category: "Elements",
+      subcategory: "Alkaline Earth",
+      importance: "core",
+    },
+    {
+      name: "beryllium",
+      category: "Elements",
+      subcategory: "Alkaline Earth",
+      importance: "core",
+    },
+    {
+      name: "boron",
+      category: "Elements",
+      subcategory: "Metalloids",
+      importance: "core",
+    },
+    {
       name: "bromine",
       category: "Elements",
       subcategory: "Halogens",
+      importance: "core",
+    },
+    {
+      name: "cadmium",
+      category: "Elements",
+      subcategory: "Transition Metals",
       importance: "core",
     },
     {
@@ -1707,6 +1737,18 @@ export const CHEMISTRY_CONCEPTS: ConceptLibrary = {
       importance: "core",
     },
     {
+      name: "chromium",
+      category: "Elements",
+      subcategory: "Transition Metals",
+      importance: "core",
+    },
+    {
+      name: "cobalt",
+      category: "Elements",
+      subcategory: "Transition Metals",
+      importance: "core",
+    },
+    {
       name: "copper",
       category: "Elements",
       subcategory: "Transition Metals",
@@ -1716,6 +1758,12 @@ export const CHEMISTRY_CONCEPTS: ConceptLibrary = {
       name: "fluorine",
       category: "Elements",
       subcategory: "Halogens",
+      importance: "core",
+    },
+    {
+      name: "germanium",
+      category: "Elements",
+      subcategory: "Metalloids",
       importance: "core",
     },
     {
@@ -1749,6 +1797,18 @@ export const CHEMISTRY_CONCEPTS: ConceptLibrary = {
       importance: "core",
     },
     {
+      name: "krypton",
+      category: "Elements",
+      subcategory: "Noble Gases",
+      importance: "core",
+    },
+    {
+      name: "lead",
+      category: "Elements",
+      subcategory: "Metals",
+      importance: "core",
+    },
+    {
       name: "lithium",
       category: "Elements",
       subcategory: "Alkali Metals",
@@ -1761,6 +1821,12 @@ export const CHEMISTRY_CONCEPTS: ConceptLibrary = {
       importance: "core",
     },
     {
+      name: "manganese",
+      category: "Elements",
+      subcategory: "Transition Metals",
+      importance: "core",
+    },
+    {
       name: "mercury",
       category: "Elements",
       subcategory: "Transition Metals",
@@ -1770,6 +1836,12 @@ export const CHEMISTRY_CONCEPTS: ConceptLibrary = {
       name: "neon",
       category: "Elements",
       subcategory: "Noble Gases",
+      importance: "core",
+    },
+    {
+      name: "nickel",
+      category: "Elements",
+      subcategory: "Transition Metals",
       importance: "core",
     },
     {
@@ -1791,9 +1863,33 @@ export const CHEMISTRY_CONCEPTS: ConceptLibrary = {
       importance: "core",
     },
     {
+      name: "platinum",
+      category: "Elements",
+      subcategory: "Transition Metals",
+      importance: "core",
+    },
+    {
       name: "potassium",
       category: "Elements",
       subcategory: "Alkali Metals",
+      importance: "core",
+    },
+    {
+      name: "radon",
+      category: "Elements",
+      subcategory: "Noble Gases",
+      importance: "core",
+    },
+    {
+      name: "rubidium",
+      category: "Elements",
+      subcategory: "Alkali Metals",
+      importance: "core",
+    },
+    {
+      name: "selenium",
+      category: "Elements",
+      subcategory: "Nonmetals",
       importance: "core",
     },
     {
@@ -1815,9 +1911,45 @@ export const CHEMISTRY_CONCEPTS: ConceptLibrary = {
       importance: "core",
     },
     {
+      name: "strontium",
+      category: "Elements",
+      subcategory: "Alkaline Earth",
+      importance: "core",
+    },
+    {
       name: "sulfur",
       category: "Elements",
       subcategory: "Nonmetals",
+      importance: "core",
+    },
+    {
+      name: "tin",
+      category: "Elements",
+      subcategory: "Metals",
+      importance: "core",
+    },
+    {
+      name: "titanium",
+      category: "Elements",
+      subcategory: "Transition Metals",
+      importance: "core",
+    },
+    {
+      name: "uranium",
+      category: "Elements",
+      subcategory: "Actinides",
+      importance: "core",
+    },
+    {
+      name: "xenon",
+      category: "Elements",
+      subcategory: "Noble Gases",
+      importance: "core",
+    },
+    {
+      name: "zinc",
+      category: "Elements",
+      subcategory: "Transition Metals",
       importance: "core",
     },
 
