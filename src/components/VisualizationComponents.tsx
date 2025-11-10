@@ -120,16 +120,25 @@ export const ChapterOverviewTimeline: React.FC<{
   const allSections = analysis.visualizations.cognitiveLoadCurve || [];
   const [zoom, setZoom] = useState(1);
 
-  // Filter out TOC and front matter sections
-  const sections = allSections.filter((sec: any) => {
+  // Filter out TOC and front matter sections, but only filter out 'Page N' if other headings exist
+  let sections = allSections.filter((sec: any) => {
     const heading = (sec.heading || sec.sectionId || "").toLowerCase();
     return (
       !heading.includes("table of contents") &&
       !heading.includes("contents") &&
-      !heading.match(/^(toc|contents|index)$/i) &&
-      !heading.match(/^page \d+$/i)
-    ); // Filter out "Page N" sections
+      !heading.match(/^(toc|contents|index)$/i)
+    );
   });
+  // If after filtering, all headings are 'Page N', allow them
+  if (
+    sections.length === 0 &&
+    allSections.length > 0 &&
+    allSections.every((sec: any) =>
+      (sec.heading || sec.sectionId || "").toLowerCase().match(/^page \d+$/i)
+    )
+  ) {
+    sections = allSections;
+  }
 
   const blockingSegments =
     analysis.visualizations.interleavingPattern.blockingSegments || [];
@@ -158,7 +167,7 @@ export const ChapterOverviewTimeline: React.FC<{
   // Determine color for each section based on issues
   const getSectionColor = (load: number, hasBlocking: boolean): string => {
     if (load > 0.8 || hasBlocking) return "var(--danger-600)"; // red: high load or blocking
-    if (load > 0.6) return "var(--warn-600)"; // amber: moderate load
+    if (load > 0.6) return "#bfa100"; // dark yellow for moderate load
     return "var(--success-600)"; // green: good
   };
 
@@ -335,11 +344,8 @@ export const ChapterOverviewTimeline: React.FC<{
           Well-balanced
         </div>
         <div className="legend-item">
-          <span
-            className="legend-dot"
-            style={{ backgroundColor: "var(--warn-600)" }}
-          />
-          Moderate load
+          <span className="legend-dot" style={{ backgroundColor: "#bfa100" }} />
+          <span style={{ color: "#bfa100" }}>Moderate load</span>
         </div>
         <div className="legend-item">
           <span
@@ -420,6 +426,13 @@ export const PrincipleScoresRadar: React.FC<{ analysis: ChapterAnalysis }> = ({
     fullName: p.displayName,
   }));
 
+  // Determine color for score bands
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "var(--success-600)";
+    if (score >= 60) return "#bfa100"; // dark yellow for moderate
+    return "var(--danger-600)";
+  };
+
   return (
     <div className="viz-container">
       <h3>Learning Principles Coverage</h3>
@@ -448,7 +461,15 @@ export const PrincipleScoresRadar: React.FC<{ analysis: ChapterAnalysis }> = ({
           />
           <Tooltip
             contentStyle={{ backgroundColor: "#fff", border: "1px solid #ccc" }}
-            formatter={(value: any) => `${value.toFixed(0)}/100`}
+            formatter={(value: any, _name: any, props: any) => {
+              const color = getScoreColor(Number(value));
+              return [
+                <span style={{ color, fontWeight: 600 }}>{`${value.toFixed(
+                  0
+                )}/100`}</span>,
+                "Score",
+              ];
+            }}
             labelFormatter={(label: any) => {
               const item = data.find((d) => d.name === label);
               return item ? item.fullName : label;
@@ -457,7 +478,12 @@ export const PrincipleScoresRadar: React.FC<{ analysis: ChapterAnalysis }> = ({
         </RadarChart>
       </ResponsiveContainer>
       <div className="overall-score">
-        <strong>Overall Score: {analysis.overallScore.toFixed(1)}/100</strong>
+        <strong>
+          Overall Score:{" "}
+          <span style={{ color: getScoreColor(analysis.overallScore) }}>
+            {analysis.overallScore.toFixed(1)}/100
+          </span>
+        </strong>
       </div>
       <div className="why-matters-block">
         <strong>Why this matters:</strong> Mapping principle coverage surfaces
@@ -466,11 +492,13 @@ export const PrincipleScoresRadar: React.FC<{ analysis: ChapterAnalysis }> = ({
       </div>
       <div className="recommendation-block">
         <strong>Recommendation:</strong>{" "}
-        {analysis.overallScore >= 80
-          ? "Excellent principle coverage—maintain this balanced approach in future chapters."
-          : analysis.overallScore >= 60
-          ? "Good foundation; focus on strengthening the lowest-scoring principles for maximum impact."
-          : "Several principles need attention—prioritize adding interleaving, elaboration, and retrieval practice."}
+        <span style={{ color: getScoreColor(analysis.overallScore) }}>
+          {analysis.overallScore >= 80
+            ? "Excellent principle coverage—maintain this balanced approach in future chapters."
+            : analysis.overallScore >= 60
+            ? "Good foundation; focus on strengthening the lowest-scoring principles for maximum impact."
+            : "Several principles need attention—prioritize adding interleaving, elaboration, and retrieval practice."}
+        </span>
       </div>
     </div>
   );

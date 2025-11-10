@@ -12,6 +12,7 @@ import {
 import { CHEMISTRY_CONCEPTS } from "./chemistryConceptLibrary";
 import { CROSS_DOMAIN_CONCEPTS } from "./crossDomainConcepts";
 import { ALGEBRA_TRIG_CONCEPTS } from "./algebraTrigConceptLibrary";
+import { financeConceptLibrary } from "./financeConceptLibrary";
 
 // Re-export types for convenience
 export type {
@@ -28,6 +29,18 @@ export type {
  */
 export const CONCEPT_LIBRARIES: Record<Domain, ConceptLibrary> = {
   chemistry: CHEMISTRY_CONCEPTS,
+  finance: {
+    domain: "finance",
+    version: "1.0.0",
+    concepts: financeConceptLibrary.map((c) => ({
+      name: c.name,
+      aliases: [],
+      category: "Finance",
+      importance: c.importance,
+      description: c.definition,
+      misconceptions: c.commonMisconceptions,
+    })),
+  },
   physics: {
     domain: "physics",
     version: "1.0.0",

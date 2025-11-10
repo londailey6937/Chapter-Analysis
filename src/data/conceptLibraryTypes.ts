@@ -31,6 +31,7 @@ export type Domain =
   | "biology"
   | "computing"
   | "mathematics"
+  | "finance"
   | "custom"
   | "cross-domain";
 
@@ -42,6 +43,12 @@ export interface DomainInfo {
 }
 
 export const AVAILABLE_DOMAINS: DomainInfo[] = [
+  {
+    id: "finance",
+    label: "Finance",
+    description: "Finance concepts (interest, NPV, ROI, diversification, etc.)",
+    icon: "💵",
+  },
   {
     id: "biology",
     label: "Biology",

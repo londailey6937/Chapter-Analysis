@@ -131,6 +131,11 @@ export async function extractPdfStructureArrayBuffer(
     outline = resolved
       .sort((a, b) => a.pageNumber - b.pageNumber)
       .filter((v, i, arr) => i === arr.findIndex((x) => x.title === v.title));
+    // Debug log: print outline to console
+    if (typeof window !== "undefined" && outline.length > 0) {
+      // eslint-disable-next-line no-console
+      console.log("[PDF OUTLINE]", outline);
+    }
   } catch {
     outline = [];
   }

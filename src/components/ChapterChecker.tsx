@@ -452,14 +452,14 @@ export const ChapterChecker: React.FC = () => {
 
         setProgress("Building section outline...");
 
+        // Always compute page offsets
+        const pageOffsets: number[] = [];
+        let acc = 0;
+        for (let i = 0; i < pageTexts.length; i++) {
+          pageOffsets[i] = acc;
+          acc += pageTexts[i].length + (i < pageTexts.length - 1 ? 2 : 0);
+        }
         if (outline && outline.length > 0) {
-          // Compute offsets matching join("\n\n") used by extractor
-          const pageOffsets: number[] = [];
-          let acc = 0;
-          for (let i = 0; i < pageTexts.length; i++) {
-            pageOffsets[i] = acc;
-            acc += pageTexts[i].length + (i < pageTexts.length - 1 ? 2 : 0);
-          }
           const hints = outline
             .map((o) => ({
               title: o.title,
@@ -468,7 +468,12 @@ export const ChapterChecker: React.FC = () => {
             .sort((a, b) => a.startIndex - b.startIndex);
           setSectionHints(hints);
         } else {
-          setSectionHints(null);
+          // Fallback: use page numbers as section headings
+          const hints = pageOffsets.map((offset, i) => ({
+            title: `Page ${i + 1}`,
+            startIndex: offset,
+          }));
+          setSectionHints(hints);
         }
 
         setChapterText(text);
