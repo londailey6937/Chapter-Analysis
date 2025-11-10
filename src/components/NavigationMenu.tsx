@@ -400,7 +400,7 @@ export function NavigationMenu({
             desc="Learn about our mission and team"
             onClick={() => {
               alert(
-                "About: Chapter Checker is an AI-powered tool that helps educators create better learning materials using evidence-based cognitive science principles."
+                "About: TomeIQ is an AI-powered tool that helps educators create better learning materials using evidence-based cognitive science principles."
               );
             }}
           />
@@ -425,7 +425,7 @@ export function NavigationMenu({
             desc="Get help with your analysis"
             onClick={() => {
               alert(
-                "Support:\n\nNeed help? We're here for you!\n\n📧 Email: support@chapterchecker.com\n💬 Live Chat: Available Mon-Fri 9am-5pm EST\n📚 Documentation: View Analysis Guide from Quick Actions\n🐛 Report Bug: github.com/londailey6937/Chapter-Analysis/issues"
+                "Support:\n\nNeed help? We're here for you!\n\n📧 Email: support@tomeiq.ai\n💬 Live Chat: Available Mon-Fri 9am-5pm EST\n📚 Documentation: View Analysis Guide from Quick Actions\n🐛 Report Bug: Use feedback option below"
               );
             }}
           />
@@ -437,7 +437,7 @@ export function NavigationMenu({
             desc="Reach out to our team"
             onClick={() => {
               alert(
-                "Contact Us:\n\n📧 General: hello@chapterchecker.com\n💼 Partnerships: partners@chapterchecker.com\n🎓 Education: education@chapterchecker.com\n📰 Press: press@chapterchecker.com\n\n📍 Location: San Francisco, CA"
+                "Contact Us:\n\n📧 General: hello@tomeiq.ai\n💼 Partnerships: partners@tomeiq.ai\n🎓 Education: education@tomeiq.ai\n📰 Press: press@tomeiq.ai\n\n📍 Location: San Francisco, CA"
               );
             }}
           />
@@ -449,7 +449,7 @@ export function NavigationMenu({
             desc="Guides, tutorials, and research"
             onClick={() => {
               alert(
-                "Resources:\n\n📖 User Guide: Built into the app\n🎥 Video Tutorials: Coming soon\n📊 Case Studies: See how educators use Chapter Checker\n🔬 Research: Based on peer-reviewed cognitive science\n📝 Blog: Tips for better educational content\n🎓 Webinars: Monthly learning science workshops"
+                "Resources:\n\n📖 User Guide: Built into the app\n🎥 Video Tutorials: Coming soon\n📊 Case Studies: See how educators use TomeIQ\n🔬 Research: Based on peer-reviewed cognitive science\n📝 Blog: Tips for better educational content\n🎓 Webinars: Monthly learning science workshops"
               );
             }}
           />
@@ -461,7 +461,7 @@ export function NavigationMenu({
             desc="Share your ideas and suggestions"
             onClick={() => {
               alert(
-                "We'd love to hear from you!\n\n💡 Feature Requests: What would make Chapter Checker better?\n🐛 Bug Reports: Found an issue? Let us know\n⭐ Testimonials: Share your success story\n\n📧 Send feedback to: feedback@chapterchecker.com"
+                "We'd love to hear from you!\n\n💡 Feature Requests: What would make TomeIQ better?\n🐛 Bug Reports: Found an issue? Let us know\n⭐ Testimonials: Share your success story\n\n📧 Send feedback to: feedback@tomeiq.ai"
               );
             }}
           />
@@ -494,7 +494,7 @@ export function NavigationMenu({
             desc="Usage terms and conditions"
             onClick={() => {
               alert(
-                "Terms of Service:\n\n• Free to use for educational purposes\n• Analyze unlimited chapters\n• Export and share your results\n• No warranty on analysis accuracy\n• Use responsibly and ethically\n\nFull terms available at:\nchapterchecker.com/terms"
+                "Terms of Service:\n\n• Free to use for educational purposes\n• Analyze unlimited chapters\n• Export and share your results\n• No warranty on analysis accuracy\n• Use responsibly and ethically\n\nFull terms available at:\ntomeiq.ai/terms"
               );
             }}
           />
@@ -505,7 +505,7 @@ export function NavigationMenu({
             desc="How we protect your data"
             onClick={() => {
               alert(
-                "Privacy Policy:\n\n✅ Your data stays local - processed in your browser\n✅ No server uploads of chapter content\n✅ We don't sell your data\n✅ Minimal analytics for improvements\n✅ GDPR & CCPA compliant\n\nFull policy at:\nchapterchecker.com/privacy"
+                "Privacy Policy:\n\n✅ Your data stays local - processed in your browser\n✅ No server uploads of chapter content\n✅ We don't sell your data\n✅ Minimal analytics for improvements\n✅ GDPR & CCPA compliant\n\nFull policy at:\ntomeiq.ai/privacy"
               );
             }}
           />
@@ -516,7 +516,7 @@ export function NavigationMenu({
             desc="How we use cookies"
             onClick={() => {
               alert(
-                "Cookie Policy:\n\n🍪 Essential cookies only\n📊 Optional analytics (with consent)\n🎯 No advertising cookies\n✅ Full control over your preferences\n\nManage cookies at:\nchapterchecker.com/cookies"
+                "Cookie Policy:\n\n🍪 Essential cookies only\n📊 Optional analytics (with consent)\n🎯 No advertising cookies\n✅ Full control over your preferences\n\nManage cookies at:\ntomeiq.ai/cookies"
               );
             }}
           />
