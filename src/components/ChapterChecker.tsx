@@ -627,18 +627,32 @@ export const ChapterChecker: React.FC = () => {
           </button>
 
           {/* Title */}
-          <div
-            style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}
-          >
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             <img
               src="/TomeIQ.png"
               alt="TomeIQ Logo"
-              style={{ height: "40px", width: "auto" }}
+              style={{ height: "70px", width: "auto" }}
             />
-            <div>
-              <h1 style={{ margin: 0 }}>TomeIQ</h1>
-              <p style={{ margin: 0 }}>AI-Powered Textbook Analysis</p>
-            </div>
+            <h1
+              style={{
+                margin: 0,
+                fontFamily: "'Brush Script MT', cursive, serif",
+                fontSize: "2.25rem",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.25rem",
+              }}
+            >
+              <span>TomeIQ</span>
+              <span
+                style={{
+                  fontSize: "0.875rem",
+                  fontFamily: "system-ui, sans-serif",
+                }}
+              >
+                AI-Powered Textbook Analysis
+              </span>
+            </h1>
           </div>
         </div>
       </header>

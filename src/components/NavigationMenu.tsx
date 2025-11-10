@@ -74,16 +74,21 @@ export function NavigationMenu({
             justifyContent: "space-between",
           }}
         >
-          <div
-            style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}
-          >
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             <img
               src="/TomeIQ.png"
               alt="TomeIQ Logo"
-              style={{ height: "36px", width: "auto" }}
+              style={{ height: "60px", width: "auto" }}
             />
             <div>
-              <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: "bold" }}>
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: "1.75rem",
+                  fontWeight: "bold",
+                  fontFamily: "'Brush Script MT', cursive, serif",
+                }}
+              >
                 TomeIQ
               </h2>
               <p

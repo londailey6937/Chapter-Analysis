@@ -73,15 +73,20 @@ export function HelpModal({
             borderTopRightRadius: "12px",
           }}
         >
-          <div
-            style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}
-          >
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             <img
               src="/TomeIQ.png"
               alt="TomeIQ Logo"
-              style={{ height: "32px", width: "auto" }}
+              style={{ height: "56px", width: "auto" }}
             />
-            <h2 style={{ margin: 0, fontSize: "1.5rem", fontWeight: "bold" }}>
+            <h2
+              style={{
+                margin: 0,
+                fontSize: "1.75rem",
+                fontWeight: "bold",
+                fontFamily: "'Brush Script MT', cursive, serif",
+              }}
+            >
               TomeIQ Analysis Guide
             </h2>
           </div>
