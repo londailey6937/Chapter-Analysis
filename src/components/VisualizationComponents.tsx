@@ -1706,7 +1706,9 @@ export const PrincipleFindings: React.FC<{
   return (
     <div className="principle-card" onClick={() => setExpanded(!expanded)}>
       <div className="principle-header">
-        <h4>{principle.principle.replace(/([A-Z])/g, " $1").trim()}</h4>
+        <h4>
+          {PRINCIPLE_NAME_MAP[principle.principle] || principle.principle}
+        </h4>
         <div className="score-badge" style={{ backgroundColor: scoreColor }}>
           {principle.score.toFixed(0)}
         </div>
