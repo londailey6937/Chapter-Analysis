@@ -295,3 +295,4 @@ function ChapterInput({
 }
 
 export default ChapterInput;
+export { HelpModal } from "./HelpModal";

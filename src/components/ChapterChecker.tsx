@@ -8,6 +8,7 @@ import { AnalysisEngine } from "./AnalysisEngine"; // retained for types / futur
 import { ChapterAnalysisDashboard } from "./VisualizationComponents";
 import { PdfViewer } from "./PdfViewer";
 import { ConceptList } from "./ConceptList";
+import { HelpModal } from "./HelpModal";
 import { Chapter, ChapterAnalysis, Concept } from "@/types";
 import {
   extractTextFromPdf,
@@ -48,6 +49,7 @@ export const ChapterChecker: React.FC = () => {
   );
   const [currentMentionIndex, setCurrentMentionIndex] = useState<number>(0);
   const [hasAnalyzedOnce, setHasAnalyzedOnce] = useState(false);
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
   // Detect Mac for keyboard shortcut hints
   const isMac =
@@ -751,10 +753,8 @@ export const ChapterChecker: React.FC = () => {
                       textAlign: "center",
                     }}
                   >
-                    <a
-                      href="https://github.com/londailey6937/Chapter-Analysis/blob/main/docs/ANALYSIS_RESULTS_GUIDE.md"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      onClick={() => setIsHelpModalOpen(true)}
                       style={{
                         display: "inline-flex",
                         alignItems: "center",
@@ -765,7 +765,9 @@ export const ChapterChecker: React.FC = () => {
                         fontWeight: 600,
                         padding: "0.75rem 1.5rem",
                         background: "rgba(255, 255, 255, 0.2)",
+                        border: "none",
                         borderRadius: "6px",
+                        cursor: "pointer",
                         transition: "all 0.2s",
                       }}
                       onMouseEnter={(e) => {
@@ -793,20 +795,7 @@ export const ChapterChecker: React.FC = () => {
                         />
                       </svg>
                       <span>📚 Analysis Results - In-Depth Guide</span>
-                      <svg
-                        style={{ width: "16px", height: "16px" }}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
-                    </a>
+                    </button>
                     <p
                       style={{
                         marginTop: "0.75rem",
@@ -2227,6 +2216,12 @@ export const ChapterChecker: React.FC = () => {
           }
         }
       `}</style>
+
+      {/* Help Modal */}
+      <HelpModal
+        isOpen={isHelpModalOpen}
+        onClose={() => setIsHelpModalOpen(false)}
+      />
     </div>
   );
 };
