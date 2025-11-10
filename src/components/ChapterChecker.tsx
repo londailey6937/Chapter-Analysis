@@ -104,6 +104,22 @@ export const ChapterChecker: React.FC = () => {
    */
   const analysisWorkerRef = useRef<Worker | null>(null);
 
+  const handleCancelAnalysis = () => {
+    if (analysisWorkerRef.current) {
+      analysisWorkerRef.current.terminate();
+      analysisWorkerRef.current = null;
+    }
+    if (analysisTimeoutRef.current) {
+      clearTimeout(analysisTimeoutRef.current);
+      analysisTimeoutRef.current = null;
+    }
+    setIsAnalyzing(false);
+    setIsSlowAnalysis(false);
+    setProgress("");
+    setProgressPercent(0);
+    setError("Analysis cancelled by user");
+  };
+
   const handleAnalyzeChapter = async () => {
     if (!chapterText.trim()) {
       setError("Please enter chapter text to analyze");
@@ -1065,6 +1081,31 @@ export const ChapterChecker: React.FC = () => {
                       ></div>
                     </div>
                   </div>
+
+                  {/* Cancel Button */}
+                  <button
+                    onClick={handleCancelAnalysis}
+                    style={{
+                      marginTop: "16px",
+                      padding: "8px 20px",
+                      backgroundColor: "#ef4444",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "6px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      cursor: "pointer",
+                      transition: "background-color 0.2s",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#dc2626";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "#ef4444";
+                    }}
+                  >
+                    ✕ Cancel Analysis
+                  </button>
                 </div>
               )}
             </div>
