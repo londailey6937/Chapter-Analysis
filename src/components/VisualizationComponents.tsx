@@ -26,6 +26,7 @@ import {
 } from "@/types";
 import { ConceptList } from "./ConceptList";
 import ConceptRelationshipsSection from "./ConceptRelationshipsSection";
+import PatternAnalysisSection from "./PatternAnalysisSection";
 
 // Friendly display names for principle enum codes to avoid raw concatenation (e.g., "dualCoding") in UI copy
 const PRINCIPLE_NAME_MAP: Record<string, string> = {
@@ -2015,6 +2016,14 @@ export const ChapterAnalysisDashboard: React.FC<{
           <ConceptRelationshipsSection
             concepts={analysis.conceptGraph.concepts}
             relationships={analysis.conceptGraph.relationships}
+          />
+        )}
+
+      {/* Learning Patterns Section */}
+      {(analysis as any).patternAnalysis &&
+        (analysis as any).patternAnalysis.totalPatterns > 0 && (
+          <PatternAnalysisSection
+            patternAnalysis={(analysis as any).patternAnalysis}
           />
         )}
 
