@@ -141,6 +141,48 @@ export interface Evidence {
 }
 
 // ============================================================================
+// LEARNING PATTERN DETECTION
+// ============================================================================
+
+export type PatternType =
+  | "workedExample"
+  | "practiceProblem"
+  | "definitionExample"
+  | "formula"
+  | "procedure"
+  | "comparison";
+
+export interface PatternMatch {
+  type: PatternType;
+  confidence: number; // 0-1, how confident we are in this detection
+  startPosition: number;
+  endPosition: number;
+  context: string; // Surrounding text sample
+  title?: string; // e.g., "Example 3.2: Calculating pH"
+  metadata?: {
+    // Pattern-specific metadata
+    steps?: number; // For procedures/worked examples
+    concepts?: string[]; // Related concept IDs
+    difficulty?: "easy" | "medium" | "hard";
+    hasAnswer?: boolean; // For practice problems
+    variableCount?: number; // For formulas
+    comparisonItems?: string[]; // For comparisons
+  };
+}
+
+export interface PatternAnalysis {
+  totalPatterns: number;
+  patternCounts: Record<PatternType, number>;
+  patterns: PatternMatch[];
+  coverage: number; // % of chapter with learning patterns
+  distribution: {
+    // Distribution across chapter sections
+    sectionId: string;
+    patternCount: number;
+  }[];
+}
+
+// ============================================================================
 // ANALYSIS RESULTS
 // ============================================================================
 
@@ -168,6 +210,7 @@ export interface ChapterAnalysis {
   conceptAnalysis?: ConceptAnalysisResult;
   structureAnalysis?: StructureAnalysisResult;
   visualizations?: AnalysisVisualization;
+  patternAnalysis?: PatternAnalysis; // Learning patterns detected
 }
 
 export interface ConceptMapData {

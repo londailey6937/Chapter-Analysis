@@ -35,6 +35,7 @@ import {
 import { ConceptExtractor } from "./ConceptExtractorLibrary";
 import type { Domain } from "@/data/conceptLibraryRegistry";
 import type { ConceptDefinition } from "@/data/conceptLibraryRegistry";
+import { PatternRecognizer } from "@/utils/PatternRecognizer";
 
 // Human-friendly labels for principle codes used in visualization summaries
 const PRINCIPLE_LABELS: Record<string, string> = {
@@ -89,6 +90,17 @@ export class AnalysisEngine {
       // Yield control and allow UI to update
       await new Promise((resolve) => setTimeout(resolve, 200));
       onProgress?.("concept-analysis-complete", "Concept extraction complete");
+
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      onProgress?.("detecting-patterns", "Detecting learning patterns");
+
+      // Detect learning patterns (worked examples, practice problems, etc.)
+      const patternAnalysis = PatternRecognizer.analyzePatterns(chapter);
+      console.log(
+        "[AnalysisEngine] Pattern detection complete, found",
+        patternAnalysis.totalPatterns,
+        "patterns"
+      );
 
       await new Promise((resolve) => setTimeout(resolve, 200));
       onProgress?.(
@@ -321,6 +333,7 @@ export class AnalysisEngine {
         recommendations,
         visualizations: visualization,
         conceptGraph, // Include conceptGraph for concept highlighting
+        patternAnalysis, // Include detected learning patterns
       } as ChapterAnalysis;
     } catch (error) {
       console.error("[AnalysisEngine] Error during analysis:", error);
