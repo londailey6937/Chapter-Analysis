@@ -556,12 +556,18 @@ export const ChapterCheckerV2: React.FC = () => {
                   {selectedDomain ? (
                     <>
                       <span>
-                        {
-                          sortedDomains.find((d) => d.id === selectedDomain)
-                            ?.icon
-                        }{" "}
-                        {sortedDomains.find((d) => d.id === selectedDomain)
-                          ?.label || selectedDomain}
+                        {selectedDomain === "custom" ? (
+                          <>🎨 {customDomainName || "Custom Domain"}</>
+                        ) : (
+                          <>
+                            {
+                              sortedDomains.find((d) => d.id === selectedDomain)
+                                ?.icon
+                            }{" "}
+                            {sortedDomains.find((d) => d.id === selectedDomain)
+                              ?.label || selectedDomain}
+                          </>
+                        )}
                       </span>
                       <div
                         style={{
@@ -573,7 +579,9 @@ export const ChapterCheckerV2: React.FC = () => {
                         <span
                           style={{ fontSize: "12px", fontWeight: "normal" }}
                         >
-                          ✓ Auto-detected
+                          {selectedDomain === "custom"
+                            ? "✓ Custom"
+                            : "✓ Auto-detected"}
                         </span>
                         <button
                           onClick={() => setShowDomainSelector(true)}
@@ -1211,11 +1219,11 @@ export const ChapterCheckerV2: React.FC = () => {
                     setSelectedDomain("custom");
                     setShowCustomDomainDialog(false);
                     setShowDomainSelector(false);
+                    // Keep customDomainName so it can be displayed
                     // TODO: Save custom domain and concepts
                     alert(
                       `Custom domain "${customDomainName}" created! (Feature in development)`
                     );
-                    setCustomDomainName("");
                   }
                 }}
                 disabled={!customDomainName.trim()}
