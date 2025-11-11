@@ -10,6 +10,7 @@ import { ChapterAnalysisDashboard } from "./VisualizationComponents";
 import { HelpModal } from "./HelpModal";
 import { NavigationMenu } from "./NavigationMenu";
 import { UpgradePrompt, InlineUpgradePrompt } from "./UpgradePrompt";
+import { MissingConceptSuggestions } from "./MissingConceptSuggestions";
 import { ChapterAnalysis } from "@/types";
 import { AccessLevel, ACCESS_TIERS } from "../../types";
 import {
@@ -175,6 +176,23 @@ export const ChapterCheckerV2: React.FC = () => {
 
   const handleTextChange = (newText: string) => {
     setChapterText(newText);
+  };
+
+  const handleAcceptMissingConcept = (
+    concept: ConceptDefinition,
+    insertionPoint: number
+  ) => {
+    // Scroll to and highlight the suggested insertion point
+    setHighlightPosition(insertionPoint);
+
+    // You could also insert placeholder text for the concept
+    // For now, just scroll to show where it should go
+    console.log(
+      "💡 Suggesting to add concept:",
+      concept.name,
+      "at position:",
+      insertionPoint
+    );
   };
 
   const handleConceptClick = (concept: any, mentionIndex: number) => {
@@ -1177,6 +1195,29 @@ export const ChapterCheckerV2: React.FC = () => {
                       </div>
                     ))}
                   </div>
+
+                  {/* Missing Concepts - Professional Tier Feature */}
+                  {ACCESS_TIERS[accessLevel].writerMode &&
+                    selectedDomain &&
+                    CONCEPT_LIBRARIES[selectedDomain] && (
+                      <div style={{ marginTop: "24px" }}>
+                        <MissingConceptSuggestions
+                          domain={
+                            getAvailableDomains().find(
+                              (d) => d.id === selectedDomain
+                            )?.label || selectedDomain
+                          }
+                          libraryConcepts={
+                            CONCEPT_LIBRARIES[selectedDomain]?.concepts || []
+                          }
+                          identifiedConcepts={
+                            analysis.conceptGraph?.concepts || []
+                          }
+                          chapterText={chapterText}
+                          onAcceptSuggestion={handleAcceptMissingConcept}
+                        />
+                      </div>
+                    )}
                 </div>
               )}
             </div>
