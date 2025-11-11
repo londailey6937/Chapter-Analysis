@@ -58,6 +58,10 @@ export const ChapterCheckerV2: React.FC = () => {
   const [highlightPosition, setHighlightPosition] = useState<number | null>(
     null
   );
+  const [highlightedConceptId, setHighlightedConceptId] = useState<
+    string | null
+  >(null);
+  const [currentMentionIndex, setCurrentMentionIndex] = useState<number>(0);
 
   // Ref for analysis panel
   const analysisPanelRef = useRef<HTMLDivElement>(null);
@@ -174,6 +178,10 @@ export const ChapterCheckerV2: React.FC = () => {
   };
 
   const handleConceptClick = (concept: any, mentionIndex: number) => {
+    // Set the highlighted concept and mention index
+    setHighlightedConceptId(concept.id);
+    setCurrentMentionIndex(mentionIndex);
+
     // Get the position of the mention
     const mention = concept.mentions?.[mentionIndex];
     if (mention && mention.position !== undefined) {
@@ -182,7 +190,11 @@ export const ChapterCheckerV2: React.FC = () => {
         "📍 Jumping to position:",
         mention.position,
         "for concept:",
-        concept.name
+        concept.name,
+        "mention:",
+        mentionIndex + 1,
+        "/",
+        concept.mentions.length
       );
     }
   };
@@ -1016,6 +1028,8 @@ export const ChapterCheckerV2: React.FC = () => {
                     analysis={analysis}
                     concepts={analysis.conceptGraph?.concepts || []}
                     onConceptClick={handleConceptClick}
+                    highlightedConceptId={highlightedConceptId}
+                    currentMentionIndex={currentMentionIndex}
                     accessLevel={accessLevel}
                   />
                 </>

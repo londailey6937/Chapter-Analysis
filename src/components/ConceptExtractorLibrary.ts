@@ -278,6 +278,14 @@ export class ConceptExtractor {
           continue;
         }
 
+        // For computing domain, validate programming context
+        if (
+          this.domain === "computing" &&
+          !this.isValidProgrammingContext(context, fc.definition)
+        ) {
+          continue;
+        }
+
         validMentions.push({
           position: pos,
           context,
@@ -343,6 +351,170 @@ export class ConceptExtractor {
     if (end < text.length) context = context + "...";
 
     return context.trim();
+  }
+
+  /**
+   * Validate if a concept mention occurs in a valid programming context
+   * Used for computing domain to filter out casual English usage
+   */
+  private isValidProgrammingContext(
+    context: string,
+    definition: ConceptDefinition
+  ): boolean {
+    const lowerContext = context.toLowerCase();
+
+    // Programming keywords that indicate code context
+    const programmingKeywords = [
+      // Control structures
+      "if",
+      "else",
+      "else if",
+      "elseif",
+      "switch",
+      "case",
+      "default",
+      "for",
+      "while",
+      "do",
+      "break",
+      "continue",
+      "return",
+      // Functions and OOP
+      "function",
+      "def",
+      "method",
+      "class",
+      "object",
+      "constructor",
+      "this",
+      "self",
+      "super",
+      "new",
+      "extends",
+      "implements",
+      // Data structures and types
+      "array",
+      "list",
+      "dict",
+      "map",
+      "set",
+      "int",
+      "string",
+      "bool",
+      "var",
+      "let",
+      "const",
+      "type",
+      "interface",
+      "struct",
+      // Common programming terms
+      "algorithm",
+      "data structure",
+      "runtime",
+      "complexity",
+      "compile",
+      "execute",
+      "debug",
+      "syntax",
+      "semantics",
+      "parameter",
+      "argument",
+      "pointer",
+      "reference",
+      "memory",
+      "code",
+      "program",
+      "script",
+      "library",
+      "framework",
+      // Operators and symbols often appear near programming concepts
+      "==",
+      "!=",
+      "<=",
+      ">=",
+      "&&",
+      "||",
+      "++",
+      "--",
+      "=>",
+      "true",
+      "false",
+      "null",
+      "undefined",
+      "none",
+    ];
+
+    // Code syntax patterns (regex, parentheses, brackets, braces)
+    const codeSyntaxPatterns = [
+      /\(.*\)/, // Function calls: something()
+      /\[.*\]/, // Array access: array[0]
+      /\{.*\}/, // Code blocks: { ... }
+      /\w+\s*=\s*\w+/, // Assignments: x = 5
+      /;/, // Semicolons (common in many languages)
+      /\w+\.\w+/, // Dot notation: object.property
+      /::/, // Scope resolution: Class::method
+      /->/, // Arrow notation: pointer->field
+      /=>/, // Arrow functions: () => {}
+      /\$\w+/, // Variables: $var (PHP, shell)
+      /@\w+/, // Decorators: @decorator (Python, Java)
+    ];
+
+    // Check for programming keywords nearby
+    for (const keyword of programmingKeywords) {
+      if (lowerContext.includes(keyword)) {
+        return true;
+      }
+    }
+
+    // Check for code syntax patterns
+    for (const pattern of codeSyntaxPatterns) {
+      if (pattern.test(context)) {
+        return true;
+      }
+    }
+
+    // Specific concept category checks
+    const category = definition.category;
+
+    // Programming Fundamentals should have strong code indicators
+    if (category === "Programming Fundamentals") {
+      // Look for code-like structure: indentation, multiple lines with similar patterns
+      const lines = context.split("\n");
+      if (lines.length > 2) {
+        // Check if multiple lines start with similar indentation (code blocks)
+        const indentedLines = lines.filter((line) => line.match(/^\s{2,}/));
+        if (indentedLines.length >= 2) {
+          return true;
+        }
+      }
+    }
+
+    // Data Structures and Algorithms should appear near technical discussion
+    if (category === "Data Structures" || category === "Algorithms") {
+      const technicalTerms = [
+        "complexity",
+        "time",
+        "space",
+        "efficiency",
+        "optimization",
+        "performance",
+        "access",
+        "search",
+        "insert",
+        "delete",
+        "traverse",
+        "operation",
+        "implementation",
+      ];
+      for (const term of technicalTerms) {
+        if (lowerContext.includes(term)) {
+          return true;
+        }
+      }
+    }
+
+    // If no programming context found, reject this mention
+    return false;
   }
 
   /**

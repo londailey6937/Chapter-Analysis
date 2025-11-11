@@ -25,6 +25,14 @@ export const ConceptList: React.FC<ConceptListProps> = ({
   );
   const totalMentions = highlightedConcept?.mentions.length || 0;
 
+  console.log("[ConceptList] Navigation state:", {
+    highlightedConceptId,
+    highlightedConcept: highlightedConcept?.name,
+    totalMentions,
+    currentMentionIndex,
+    shouldShowNav: !!(highlightedConcept && totalMentions > 1),
+  });
+
   // Group concepts by importance and sort alphabetically within each group
   const groupedConcepts = {
     core: concepts
@@ -117,7 +125,92 @@ export const ConceptList: React.FC<ConceptListProps> = ({
         </div>
       </div>
 
+      {/* Floating Navigation Widget */}
+      {highlightedConcept && totalMentions > 1 && (
+        <div className="floating-nav">
+          <div className="floating-nav-content">
+            <div className="floating-nav-label">
+              <strong>{highlightedConcept.name}</strong>
+              <span className="mention-counter">
+                {currentMentionIndex + 1} / {totalMentions}
+              </span>
+            </div>
+            <div className="floating-nav-buttons">
+              <button
+                onClick={handlePrevious}
+                disabled={currentMentionIndex === 0}
+                className="nav-button"
+                title="Previous mention"
+              >
+                ← Prev
+              </button>
+              <button
+                onClick={handleNext}
+                disabled={currentMentionIndex >= totalMentions - 1}
+                className="nav-button"
+                title="Next mention"
+              >
+                Next →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>{`
+        .floating-nav {
+          position: fixed;
+          bottom: 24px;
+          right: 24px;
+          z-index: 1000;
+          animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+          from {
+            transform: translateY(100px);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+
+        .floating-nav-content {
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+          padding: 16px;
+          min-width: 280px;
+          border: 2px solid #3b82f6;
+        }
+
+        .floating-nav-label {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          margin-bottom: 12px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid #e5e7eb;
+        }
+
+        .floating-nav-label strong {
+          font-size: 15px;
+          color: #1f2937;
+        }
+
+        .mention-counter {
+          font-size: 13px;
+          color: #6b7280;
+          font-weight: 500;
+        }
+
+        .floating-nav-buttons {
+          display: flex;
+          gap: 8px;
+        }
+
         .concept-badge {
           display: inline-flex;
           align-items: center;
@@ -163,7 +256,8 @@ export const ConceptList: React.FC<ConceptListProps> = ({
         }
 
         .nav-button {
-          padding: 6px 12px;
+          flex: 1;
+          padding: 8px 16px;
           border-radius: 6px;
           background: white;
           border: 2px solid #3b82f6;
