@@ -25,14 +25,6 @@ export const ConceptList: React.FC<ConceptListProps> = ({
   );
   const totalMentions = highlightedConcept?.mentions.length || 0;
 
-  console.log("[ConceptList] Navigation state:", {
-    highlightedConceptId,
-    highlightedConcept: highlightedConcept?.name,
-    totalMentions,
-    currentMentionIndex,
-    shouldShowNav: !!(highlightedConcept && totalMentions > 1),
-  });
-
   // Group concepts by importance and sort alphabetically within each group
   const groupedConcepts = {
     core: concepts

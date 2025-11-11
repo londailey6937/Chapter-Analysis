@@ -2126,13 +2126,6 @@ export const ChapterAnalysisDashboard: React.FC<{
   const recommendations = analysis.recommendations || [];
   const principles = analysis.principles || [];
 
-  // Debug logging
-  console.log("[ChapterAnalysisDashboard] Debug Info:", {
-    accessLevel,
-    principlesCount: principles.length,
-    principleNames: principles.map((p: any) => p.principle),
-  });
-
   // Filter principles based on access level
   const filteredPrinciples =
     accessLevel === "free"
@@ -2141,11 +2134,6 @@ export const ChapterAnalysisDashboard: React.FC<{
             p.principle === "spacedRepetition" || p.principle === "dualCoding"
         )
       : principles;
-
-  console.log("[ChapterAnalysisDashboard] After filtering:", {
-    filteredCount: filteredPrinciples.length,
-    filteredNames: filteredPrinciples.map((p: any) => p.principle),
-  });
 
   return (
     <div className="dashboard">

@@ -35,16 +35,6 @@ export const WriterMode: React.FC<WriterModeProps> = ({
   const concepts = analysisResult?.conceptGraph?.concepts || [];
   const principleScores = analysisResult?.principles || [];
 
-  console.log("[WriterMode] Component rendered with:", {
-    hasAnalysisResult: !!analysisResult,
-    principleScoresCount: principleScores.length,
-    principleScores: principleScores.map((ps: any) => ({
-      principle: ps.principle,
-      score: ps.score,
-      scoreType: typeof ps.score,
-    })),
-  });
-
   // Helper to highlight text issues based on principles
   const getTextIssues = () => {
     const issues: Array<{
