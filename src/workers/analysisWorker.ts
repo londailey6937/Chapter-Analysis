@@ -5,18 +5,20 @@ import type { Domain, ConceptDefinition } from "@/data/conceptLibraryRegistry";
 
 interface IncomingMessage {
   chapter: Chapter;
-  domain?: Domain;
-  includeCrossDomain?: boolean;
-  customConcepts?: ConceptDefinition[];
+  options: {
+    domain?: Domain;
+    includeCrossDomain?: boolean;
+    customConcepts?: ConceptDefinition[];
+  };
 }
 
 self.onmessage = async (evt: MessageEvent<IncomingMessage>) => {
+  const { chapter, options } = evt.data;
   const {
-    chapter,
     domain = "chemistry",
     includeCrossDomain = true,
     customConcepts = [],
-  } = evt.data;
+  } = options || {};
 
   // Progress reporting function
   const reportProgress = (step: string, detail?: string) => {
@@ -46,7 +48,7 @@ self.onmessage = async (evt: MessageEvent<IncomingMessage>) => {
     console.error("[Worker] Analysis error:", err);
     (self as any).postMessage({
       type: "error",
-      message: err instanceof Error ? err.message : String(err),
+      error: err instanceof Error ? err.message : String(err),
     });
   }
 };
