@@ -15,11 +15,12 @@ export function HelpModal({
   isOpen,
   onClose,
 }: HelpModalProps): JSX.Element | null {
-  const [activeSection, setActiveSection] = useState<string>("overview");
+  const [activeSection, setActiveSection] = useState<string>("quickStart");
 
   if (!isOpen) return null;
 
   const sections = {
+    quickStart: "Quick Start",
     overview: "Overview",
     overallScore: "Overall Score",
     concepts: "Concept Analysis",
@@ -99,7 +100,7 @@ export function HelpModal({
                 marginLeft: "0.5rem",
               }}
             >
-              Analysis Guide
+              Quick Start Guide
             </span>
           </div>
           <button
@@ -185,6 +186,7 @@ export function HelpModal({
               overflowY: "auto",
             }}
           >
+            {activeSection === "quickStart" && <QuickStartSection />}
             {activeSection === "overview" && <OverviewSection />}
             {activeSection === "overallScore" && <OverallScoreSection />}
             {activeSection === "concepts" && <ConceptsSection />}
@@ -200,6 +202,132 @@ export function HelpModal({
 }
 
 // Section Components
+
+function QuickStartSection() {
+  return (
+    <div>
+      <h4 style={{ marginTop: 0 }}>Document Size Support</h4>
+      <p>
+        <strong>Designed for True "Tome" Analysis</strong>
+      </p>
+      <p>TomeIQ can handle large academic documents:</p>
+      <ul>
+        <li>
+          <strong>Tested up to 200 MB</strong> - Approximately 800-1,200 pages
+        </li>
+        <li>
+          A typical <strong>500-page academic textbook</strong> with moderate
+          images is usually 50-80 MB
+        </li>
+        <li>
+          Comfortably handles even the <strong>largest scholarly works</strong>{" "}
+          or complete multi-volume compilations
+        </li>
+      </ul>
+      <p>
+        <strong>Supported formats:</strong> <code>.docx</code>,{" "}
+        <code>.txt</code>, <code>.md</code>, <code>.html</code>,{" "}
+        <code>.obt</code>
+      </p>
+
+      <h4 style={{ marginTop: "2rem" }}>How to Use TomeIQ</h4>
+      <ol>
+        <li>
+          <strong>Upload or Paste Your Document</strong>
+          <ul>
+            <li>Click "Upload Document" to select a file from your computer</li>
+            <li>Or paste text directly into the text area</li>
+            <li>Documents can include images (automatically processed)</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Select Domain (Optional)</strong>
+          <ul>
+            <li>
+              Choose the subject area: Chemistry, Finance, Algebra/Trigonometry
+            </li>
+            <li>Or use "Auto-detect" for automatic domain identification</li>
+            <li>
+              <strong>Premium/Pro users:</strong> Create custom domains with
+              your own concepts
+            </li>
+          </ul>
+        </li>
+        <li>
+          <strong>Analyze Chapter</strong>
+          <ul>
+            <li>Click the "Analyze Chapter" button</li>
+            <li>Processing may take 10-30 seconds for large documents</li>
+            <li>Web workers prevent UI freezing during analysis</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Review Results</strong>
+          <ul>
+            <li>Overall score shows learning effectiveness (0-100)</li>
+            <li>10 learning principles each scored individually</li>
+            <li>Actionable recommendations for improvement</li>
+            <li>Concept maps and relationship visualizations</li>
+          </ul>
+        </li>
+        <li>
+          <strong>Export or Take Action</strong>
+          <ul>
+            <li>
+              <strong>Premium/Pro:</strong> Export results as DOCX
+            </li>
+            <li>Use recommendations to revise content</li>
+            <li>Compare before/after analyses to track improvements</li>
+          </ul>
+        </li>
+      </ol>
+
+      <h4 style={{ marginTop: "2rem" }}>Tips for Best Results</h4>
+      <ul>
+        <li>
+          <strong>Complete Chapters:</strong> Upload full chapters rather than
+          fragments for accurate analysis
+        </li>
+        <li>
+          <strong>Include Images:</strong> Visual content (diagrams, charts)
+          improves dual coding scores
+        </li>
+        <li>
+          <strong>Domain Selection:</strong> Choose the correct domain for more
+          accurate concept extraction
+        </li>
+        <li>
+          <strong>Multiple Passes:</strong> Re-analyze after making improvements
+          to see progress
+        </li>
+      </ul>
+
+      <h4 style={{ marginTop: "2rem" }}>What Gets Analyzed</h4>
+      <ul>
+        <li>
+          <strong>10 Learning Principles:</strong> Evidence-based cognitive
+          science metrics
+        </li>
+        <li>
+          <strong>Concept Extraction:</strong> Automatic identification of key
+          ideas and relationships
+        </li>
+        <li>
+          <strong>Pattern Recognition:</strong> Domain-specific and universal
+          learning patterns
+        </li>
+        <li>
+          <strong>Structure Analysis:</strong> Content organization, spacing,
+          and interleaving
+        </li>
+        <li>
+          <strong>Cognitive Load:</strong> Information density and complexity
+          assessment
+        </li>
+      </ul>
+    </div>
+  );
+}
 
 function OverviewSection() {
   return (

@@ -178,7 +178,7 @@ export function NavigationMenu({
             }}
           >
             <span style={{ fontSize: "1.25rem" }}>📚</span>
-            <span>View Analysis Guide</span>
+            <span>Quick Start Guide</span>
           </button>
         </div>
 
@@ -441,7 +441,7 @@ export function NavigationMenu({
             desc="Get help with your analysis"
             onClick={() => {
               alert(
-                "Support:\n\nNeed help? We're here for you!\n\n📧 Email: support@tomeiq.ai\n💬 Live Chat: Available Mon-Fri 9am-5pm EST\n📚 Documentation: View Analysis Guide from Quick Actions\n🐛 Report Bug: Use feedback option below"
+                "Support:\n\nNeed help? We're here for you!\n\n📧 Email: support@tomeiq.ai\n💬 Live Chat: Available Mon-Fri 9am-5pm EST\n📚 Documentation: Quick Start Guide from Quick Actions\n🐛 Report Bug: Use feedback option below"
               );
             }}
           />

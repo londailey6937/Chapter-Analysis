@@ -23,16 +23,35 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
       let extractedText = "";
 
       if (fileType === "docx") {
-        // Extract text from DOCX (without images)
+        // Extract text from DOCX with embedded images
         const arrayBuffer = await file.arrayBuffer();
 
-        // Extract plain text without images
-        const textResult = await mammoth.extractRawText({ arrayBuffer });
-        extractedText = textResult.value;
-
-        console.log(
-          `✅ Extracted text from DOCX (${extractedText.length} characters)`
+        // Get HTML with embedded base64 images
+        let imageCount = 0;
+        const htmlResult = await mammoth.convertToHtml(
+          { arrayBuffer },
+          {
+            convertImage: mammoth.images.imgElement((image) => {
+              imageCount++;
+              console.log(`📷 Processing image ${imageCount}`);
+              return image.read("base64").then((imageBuffer) => {
+                // Embed actual base64 image
+                const dataUrl = `data:${image.contentType};base64,${imageBuffer}`;
+                return {
+                  src: dataUrl,
+                  alt: `Image ${imageCount}`,
+                };
+              });
+            }),
+          }
         );
+
+        // Use the HTML directly with embedded images
+        extractedText = htmlResult.value;
+
+        console.log(`✅ Extracted ${imageCount} images with base64 data`);
+        console.log(`� HTML length: ${extractedText.length} characters`);
+        console.log(`� Contains img tags: ${extractedText.includes("<img")}`);
 
         if (extractedText.trim()) {
           onDocumentLoad(extractedText, file.name, "docx");

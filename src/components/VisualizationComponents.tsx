@@ -464,8 +464,8 @@ export const PrincipleScoresRadar: React.FC<{ analysis: ChapterAnalysis }> = ({
             formatter={(value: any, _name: any, props: any) => {
               const color = getScoreColor(Number(value));
               return [
-                <span style={{ color, fontWeight: 600 }}>{`${value.toFixed(
-                  0
+                <span style={{ color, fontWeight: 600 }}>{`${Math.round(
+                  Number(value)
                 )}/100`}</span>,
                 "Score",
               ];
@@ -1906,7 +1906,7 @@ export const PrincipleFindings: React.FC<{
           {PRINCIPLE_NAME_MAP[principle.principle] || principle.principle}
         </h4>
         <div className="score-badge" style={{ backgroundColor: scoreColor }}>
-          {principle.score.toFixed(0)}
+          {Math.round(principle.score)}
         </div>
       </div>
 
@@ -2104,6 +2104,7 @@ export const ChapterAnalysisDashboard: React.FC<{
   highlightedConceptId?: string | null;
   currentMentionIndex?: number;
   pageOffsets?: number[];
+  accessLevel?: "free" | "premium" | "professional";
 }> = ({
   analysis,
   concepts,
@@ -2111,6 +2112,7 @@ export const ChapterAnalysisDashboard: React.FC<{
   highlightedConceptId,
   currentMentionIndex = 0,
   pageOffsets,
+  accessLevel = "professional",
 }) => {
   // Defensive guards in case analysis shape changes or fields are missing
   const overallScore = analysis.overallScore ?? 0;
@@ -2123,6 +2125,28 @@ export const ChapterAnalysisDashboard: React.FC<{
 
   const recommendations = analysis.recommendations || [];
   const principles = analysis.principles || [];
+
+  // Debug logging
+  console.log("[ChapterAnalysisDashboard] Debug Info:", {
+    accessLevel,
+    principlesCount: principles.length,
+    principleNames: principles.map((p: any) => p.principle),
+  });
+
+  // Filter principles based on access level
+  const filteredPrinciples =
+    accessLevel === "free"
+      ? principles.filter(
+          (p: any) =>
+            p.principle === "spacedRepetition" || p.principle === "dualCoding"
+        )
+      : principles;
+
+  console.log("[ChapterAnalysisDashboard] After filtering:", {
+    filteredCount: filteredPrinciples.length,
+    filteredNames: filteredPrinciples.map((p: any) => p.principle),
+  });
+
   return (
     <div className="dashboard">
       <div className="dashboard-header">
@@ -2150,9 +2174,11 @@ export const ChapterAnalysisDashboard: React.FC<{
       <div className="principles-section">
         <h3>Learning Principles Evaluation</h3>
         <p className="section-subtitle">
-          Click each principle to expand findings and actionable suggestions
+          {accessLevel === "free"
+            ? "Free tier: Spacing and Dual Coding analysis. Upgrade for all 10 principles."
+            : "Click each principle to expand findings and actionable suggestions"}
         </p>
-        {principles.map((principle: any) => (
+        {filteredPrinciples.map((principle: any) => (
           <PrincipleFindings key={principle.principle} principle={principle} />
         ))}
       </div>

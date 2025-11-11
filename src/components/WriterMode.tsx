@@ -35,6 +35,16 @@ export const WriterMode: React.FC<WriterModeProps> = ({
   const concepts = analysisResult?.conceptGraph?.concepts || [];
   const principleScores = analysisResult?.principles || [];
 
+  console.log("[WriterMode] Component rendered with:", {
+    hasAnalysisResult: !!analysisResult,
+    principleScoresCount: principleScores.length,
+    principleScores: principleScores.map((ps: any) => ({
+      principle: ps.principle,
+      score: ps.score,
+      scoreType: typeof ps.score,
+    })),
+  });
+
   // Helper to highlight text issues based on principles
   const getTextIssues = () => {
     const issues: Array<{
@@ -158,33 +168,39 @@ export const WriterMode: React.FC<WriterModeProps> = ({
                     Learning Principle Scores
                   </h4>
                   <div className="space-y-2">
-                    {principleScores.map((ps, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between"
-                      >
-                        <span className="text-xs text-gray-700 font-medium">
-                          {ps.principle}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full ${
-                                ps.score >= 80
-                                  ? "bg-green-500"
-                                  : ps.score >= 50
-                                  ? "bg-yellow-500"
-                                  : "bg-red-500"
-                              }`}
-                              style={{ width: `${ps.score}%` }}
-                            />
-                          </div>
-                          <span className="text-xs font-bold text-gray-900 w-8 text-right">
-                            {ps.score.toFixed(0)}
+                    {principleScores.map((ps, idx) => {
+                      const roundedScore = Math.round(Number(ps.score));
+                      console.log(
+                        `[WriterMode] ${ps.principle}: ${ps.score} -> ${roundedScore}`
+                      );
+                      return (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between"
+                        >
+                          <span className="text-xs text-gray-700 font-medium">
+                            {ps.principle}
                           </span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full ${
+                                  roundedScore >= 80
+                                    ? "bg-green-500"
+                                    : roundedScore >= 50
+                                    ? "bg-yellow-500"
+                                    : "bg-red-500"
+                                }`}
+                                style={{ width: `${roundedScore}%` }}
+                              />
+                            </div>
+                            <span className="text-xs font-bold text-gray-900 w-8 text-right">
+                              {roundedScore}/100
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}

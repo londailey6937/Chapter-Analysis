@@ -68,11 +68,11 @@ function PrincipleScoreCard({
                 className={`h-full ${getScoreColor(
                   score
                 )} transition-all duration-500`}
-                style={{ width: `${score}%` }}
+                style={{ width: `${Math.round(score)}%` }}
               />
             </div>
             <span className={`text-sm font-bold ${scoreColor}`}>
-              {score}/100
+              {Math.round(score)}/100
             </span>
           </div>
         </div>

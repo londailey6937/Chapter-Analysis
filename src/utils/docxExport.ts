@@ -57,6 +57,183 @@ export const exportToDocx = async ({
       })
     );
 
+    // Add Spacing and Dual Coding principle details
+    const principleScores = (analysis as any).principleScores || [];
+    const principles = analysis.principles || [];
+
+    const spacingPrinciple =
+      principleScores.find(
+        (p: any) =>
+          p.principleId === "spacing" ||
+          p.principle?.toLowerCase().includes("spacing")
+      ) || principles.find((p) => p.principle === "spacedRepetition");
+    const dualCodingPrinciple =
+      principleScores.find(
+        (p: any) =>
+          p.principleId === "dualCoding" ||
+          p.principle?.toLowerCase().includes("dual coding")
+      ) || principles.find((p) => p.principle === "dualCoding");
+
+    if (spacingPrinciple) {
+      paragraphs.push(
+        new Paragraph({
+          text: "Spacing Analysis",
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 300, after: 150 },
+        })
+      );
+
+      paragraphs.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `Score: ${spacingPrinciple.score}/100`,
+              bold: true,
+            }),
+          ],
+          spacing: { after: 100 },
+        })
+      );
+
+      // Handle both PrincipleScore (details) and PrincipleEvaluation (findings) types
+      const details =
+        (spacingPrinciple as any).details ||
+        (spacingPrinciple as any).findings?.map((f: any) => f.message) ||
+        [];
+
+      if (details.length > 0) {
+        details.forEach((detail: string) => {
+          paragraphs.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `• ${detail}`,
+                }),
+              ],
+              spacing: { after: 80 },
+            })
+          );
+        });
+      }
+
+      const suggestions = (spacingPrinciple as any).suggestions || [];
+
+      if (suggestions.length > 0) {
+        paragraphs.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: "Suggestions:",
+                bold: true,
+                italics: true,
+              }),
+            ],
+            spacing: { before: 100, after: 80 },
+          })
+        );
+
+        suggestions.forEach((suggestion: any) => {
+          const suggestionText =
+            typeof suggestion === "string"
+              ? suggestion
+              : suggestion.text || suggestion.message || "";
+          if (suggestionText) {
+            paragraphs.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: `  → ${suggestionText}`,
+                    color: "2563EB",
+                  }),
+                ],
+                spacing: { after: 80 },
+              })
+            );
+          }
+        });
+      }
+    }
+
+    if (dualCodingPrinciple) {
+      paragraphs.push(
+        new Paragraph({
+          text: "Dual Coding Analysis",
+          heading: HeadingLevel.HEADING_2,
+          spacing: { before: 300, after: 150 },
+        })
+      );
+
+      paragraphs.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: `Score: ${dualCodingPrinciple.score}/100`,
+              bold: true,
+            }),
+          ],
+          spacing: { after: 100 },
+        })
+      );
+
+      // Handle both PrincipleScore (details) and PrincipleEvaluation (findings) types
+      const dcDetails =
+        (dualCodingPrinciple as any).details ||
+        (dualCodingPrinciple as any).findings?.map((f: any) => f.message) ||
+        [];
+
+      if (dcDetails.length > 0) {
+        dcDetails.forEach((detail: string) => {
+          paragraphs.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `• ${detail}`,
+                }),
+              ],
+              spacing: { after: 80 },
+            })
+          );
+        });
+      }
+
+      const dcSuggestions = (dualCodingPrinciple as any).suggestions || [];
+
+      if (dcSuggestions.length > 0) {
+        paragraphs.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: "Suggestions:",
+                bold: true,
+                italics: true,
+              }),
+            ],
+            spacing: { before: 100, after: 80 },
+          })
+        );
+
+        dcSuggestions.forEach((suggestion: any) => {
+          const suggestionText =
+            typeof suggestion === "string"
+              ? suggestion
+              : suggestion.text || suggestion.message || "";
+          if (suggestionText) {
+            paragraphs.push(
+              new Paragraph({
+                children: [
+                  new TextRun({
+                    text: `  → ${suggestionText}`,
+                    color: "2563EB",
+                  }),
+                ],
+                spacing: { after: 80 },
+              })
+            );
+          }
+        });
+      }
+    }
+
     // Add high-priority recommendations
     const highPriorityRecs = analysis.recommendations
       ?.filter((rec: Recommendation) => rec.priority === "high")

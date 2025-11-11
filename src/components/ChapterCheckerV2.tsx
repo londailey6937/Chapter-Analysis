@@ -1008,10 +1008,15 @@ export const ChapterCheckerV2: React.FC = () => {
                       }}
                     />
                   )}
+                  {console.log(
+                    "[ChapterCheckerV2] Passing accessLevel to dashboard:",
+                    accessLevel
+                  )}
                   <ChapterAnalysisDashboard
                     analysis={analysis}
                     concepts={analysis.conceptGraph?.concepts || []}
                     onConceptClick={handleConceptClick}
+                    accessLevel={accessLevel}
                   />
                 </>
               ) : (
@@ -1068,7 +1073,7 @@ export const ChapterCheckerV2: React.FC = () => {
                                 : "#ef4444",
                           }}
                         >
-                          {principle.score}/100
+                          {Math.round(principle.score)}/100
                         </span>
                       </div>
                     ))}
