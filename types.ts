@@ -18,6 +18,7 @@ export interface AccessFeatures {
   fullAnalysis: boolean; // All 10 learning principles
   exportResults: boolean;
   conceptGraphs: boolean;
+  customDomains: boolean; // Create and save custom domains
 
   // Professional tier - Level 3
   writerMode: boolean;
@@ -32,6 +33,7 @@ export const ACCESS_TIERS: Record<AccessLevel, AccessFeatures> = {
     fullAnalysis: false,
     exportResults: false,
     conceptGraphs: false,
+    customDomains: false,
     writerMode: false,
     unlimitedAnalyses: false,
     prioritySupport: false,
@@ -42,6 +44,7 @@ export const ACCESS_TIERS: Record<AccessLevel, AccessFeatures> = {
     fullAnalysis: true,
     exportResults: true,
     conceptGraphs: true,
+    customDomains: true,
     writerMode: false,
     unlimitedAnalyses: false,
     prioritySupport: false,
@@ -52,11 +55,19 @@ export const ACCESS_TIERS: Record<AccessLevel, AccessFeatures> = {
     fullAnalysis: true,
     exportResults: true,
     conceptGraphs: true,
+    customDomains: true,
     writerMode: true,
     unlimitedAnalyses: true,
     prioritySupport: true,
   },
 };
+
+// Custom Domain Storage
+export interface SavedCustomDomain {
+  name: string;
+  concepts: Array<{ name: string; category?: string; importance?: string }>;
+  createdAt: string;
+}
 
 // ============================================================================
 // CONCEPT & KNOWLEDGE STRUCTURE

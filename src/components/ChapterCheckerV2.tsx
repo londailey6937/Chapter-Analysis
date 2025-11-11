@@ -3,7 +3,7 @@
  * Upload DOCX/MD/TXT → Analyze → Edit → Export
  */
 
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { DocumentUploader } from "./DocumentUploader";
 import { DocumentEditor } from "./DocumentEditor";
 import { ChapterAnalysisDashboard } from "./VisualizationComponents";
@@ -18,6 +18,12 @@ import {
   CONCEPT_LIBRARIES,
 } from "@/data/conceptLibraryRegistry";
 import type { ConceptDefinition } from "@/data/conceptLibraryRegistry";
+import {
+  loadCustomDomains,
+  saveCustomDomain,
+  getCustomDomain,
+  convertToConceptDefinitions,
+} from "@/utils/customDomainStorage";
 
 export const ChapterCheckerV2: React.FC = () => {
   // Access control state
@@ -123,6 +129,32 @@ export const ChapterCheckerV2: React.FC = () => {
       .filter((d) => d.id !== "custom" && d.id !== "cross-domain")
       .sort((a, b) => a.label.localeCompare(b.label));
   }, []);
+
+  // Load saved custom domains on startup
+  useEffect(() => {
+    try {
+      // Load custom domain from localStorage if user has access
+      const features = ACCESS_TIERS[accessLevel];
+      if (features.customDomains) {
+        const savedDomains = loadCustomDomains();
+
+        // Try to restore last used custom domain if it exists
+        const lastCustomDomain = localStorage.getItem(
+          "tomeiq_last_custom_domain"
+        );
+        if (lastCustomDomain) {
+          const domain = getCustomDomain(lastCustomDomain);
+          if (domain) {
+            setCustomDomainName(domain.name);
+            setCustomConcepts(convertToConceptDefinitions(domain));
+            // Don't auto-select, just load it for availability
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error loading custom domains:", error);
+    }
+  }, [accessLevel]);
 
   const handleDocumentLoad = (text: string, name: string, type: string) => {
     setChapterText(text);
@@ -622,19 +654,35 @@ export const ChapterCheckerV2: React.FC = () => {
                           Select Domain
                         </button>
                         <button
-                          onClick={() => setShowCustomDomainDialog(true)}
+                          onClick={() => {
+                            // Check access level for custom domains
+                            const features = ACCESS_TIERS[accessLevel];
+                            if (!features.customDomains) {
+                              setUpgradeFeature("Custom Domains");
+                              setUpgradeTarget("premium");
+                              setShowUpgradePrompt(true);
+                              return;
+                            }
+                            setShowCustomDomainDialog(true);
+                          }}
                           style={{
                             padding: "4px 12px",
-                            backgroundColor: "#8b5cf6",
+                            backgroundColor: ACCESS_TIERS[accessLevel]
+                              .customDomains
+                              ? "#8b5cf6"
+                              : "#9ca3af",
                             color: "white",
                             border: "none",
                             borderRadius: "4px",
                             fontSize: "12px",
                             fontWeight: "600",
-                            cursor: "pointer",
+                            cursor: ACCESS_TIERS[accessLevel].customDomains
+                              ? "pointer"
+                              : "not-allowed",
                           }}
                         >
-                          Create Custom
+                          Create Custom{" "}
+                          {!ACCESS_TIERS[accessLevel].customDomains && "🔒"}
                         </button>
                       </div>
                     </>
@@ -651,7 +699,26 @@ export const ChapterCheckerV2: React.FC = () => {
                   <select
                     value={selectedDomain || ""}
                     onChange={(e) => {
-                      setSelectedDomain(e.target.value as Domain);
+                      const value = e.target.value;
+
+                      // Check if it's a saved custom domain
+                      if (value.startsWith("custom:")) {
+                        const domainName = value.substring(7); // Remove "custom:" prefix
+                        const savedDomain = getCustomDomain(domainName);
+                        if (savedDomain) {
+                          setCustomDomainName(savedDomain.name);
+                          setCustomConcepts(
+                            convertToConceptDefinitions(savedDomain)
+                          );
+                          setSelectedDomain("custom");
+                          localStorage.setItem(
+                            "tomeiq_last_custom_domain",
+                            savedDomain.name
+                          );
+                        }
+                      } else {
+                        setSelectedDomain(value as Domain);
+                      }
                       setShowDomainSelector(false);
                     }}
                     disabled={isAnalyzing}
@@ -670,6 +737,23 @@ export const ChapterCheckerV2: React.FC = () => {
                         {domain.icon} {domain.label}
                       </option>
                     ))}
+                    {/* Show saved custom domains if user has access */}
+                    {ACCESS_TIERS[accessLevel].customDomains &&
+                      loadCustomDomains().length > 0 && (
+                        <>
+                          <option disabled>──────────</option>
+                          <optgroup label="📁 Your Custom Domains">
+                            {loadCustomDomains().map((domain) => (
+                              <option
+                                key={`custom:${domain.name}`}
+                                value={`custom:${domain.name}`}
+                              >
+                                🎨 {domain.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                        </>
+                      )}
                   </select>
                   <div style={{ display: "flex", gap: "6px" }}>
                     <button
@@ -689,20 +773,36 @@ export const ChapterCheckerV2: React.FC = () => {
                       Cancel
                     </button>
                     <button
-                      onClick={() => setShowCustomDomainDialog(true)}
+                      onClick={() => {
+                        // Check access level for custom domains
+                        const features = ACCESS_TIERS[accessLevel];
+                        if (!features.customDomains) {
+                          setUpgradeFeature("Custom Domains");
+                          setUpgradeTarget("premium");
+                          setShowUpgradePrompt(true);
+                          setShowDomainSelector(false);
+                          return;
+                        }
+                        setShowCustomDomainDialog(true);
+                      }}
                       style={{
                         flex: 1,
                         padding: "6px",
-                        backgroundColor: "#8b5cf6",
+                        backgroundColor: ACCESS_TIERS[accessLevel].customDomains
+                          ? "#8b5cf6"
+                          : "#9ca3af",
                         color: "white",
                         border: "none",
                         borderRadius: "4px",
                         fontSize: "12px",
                         fontWeight: "600",
-                        cursor: "pointer",
+                        cursor: ACCESS_TIERS[accessLevel].customDomains
+                          ? "pointer"
+                          : "not-allowed",
                       }}
                     >
-                      Create Custom
+                      Create Custom{" "}
+                      {!ACCESS_TIERS[accessLevel].customDomains && "🔒"}
                     </button>
                   </div>
                 </div>
@@ -1216,14 +1316,31 @@ export const ChapterCheckerV2: React.FC = () => {
               <button
                 onClick={() => {
                   if (customDomainName.trim()) {
-                    setSelectedDomain("custom");
-                    setShowCustomDomainDialog(false);
-                    setShowDomainSelector(false);
-                    // Keep customDomainName so it can be displayed
-                    // TODO: Save custom domain and concepts
-                    alert(
-                      `Custom domain "${customDomainName}" created! (Feature in development)`
-                    );
+                    try {
+                      // Save custom domain to localStorage
+                      saveCustomDomain(customDomainName, customConcepts);
+
+                      // Remember last used custom domain
+                      localStorage.setItem(
+                        "tomeiq_last_custom_domain",
+                        customDomainName
+                      );
+
+                      setSelectedDomain("custom");
+                      setShowCustomDomainDialog(false);
+                      setShowDomainSelector(false);
+
+                      // Success message
+                      alert(
+                        `✅ Custom domain "${customDomainName}" saved successfully!\n\n` +
+                          `It will be available next time you open the app.`
+                      );
+                    } catch (error) {
+                      console.error("Error saving custom domain:", error);
+                      alert(
+                        "❌ Failed to save custom domain. Please try again."
+                      );
+                    }
                   }
                 }}
                 disabled={!customDomainName.trim()}
