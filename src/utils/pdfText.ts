@@ -6,7 +6,7 @@ import {
   getDocument,
   type PDFDocumentProxy,
 } from "pdfjs-dist";
-import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+import workerUrl from "pdfjs-dist/build/pdf.worker.min.js?url";
 
 // Assign worker source to the bundled URL (same version as installed dependency)
 GlobalWorkerOptions.workerSrc = workerUrl;

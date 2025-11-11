@@ -6,16 +6,13 @@
 import React, { useState, useRef, useEffect } from "react";
 import { AnalysisEngine } from "./AnalysisEngine"; // retained for types / future direct calls
 import { ChapterAnalysisDashboard } from "./VisualizationComponents";
-import { PdfViewer } from "./PdfViewer";
+import { DocumentUploader } from "./DocumentUploader";
+import { DocumentEditor } from "./DocumentEditor";
 import { ConceptList } from "./ConceptList";
 import { HelpModal } from "./HelpModal";
 import { NavigationMenu } from "./NavigationMenu";
+import { WriterMode } from "./WriterMode";
 import { Chapter, ChapterAnalysis, Concept } from "@/types";
-import {
-  extractTextFromPdf,
-  extractTextFromPdfArrayBuffer,
-  extractPdfStructure,
-} from "@/utils/pdfText";
 import { Domain, getAvailableDomains } from "@/data/conceptLibraryRegistry";
 import type { ConceptDefinition } from "@/data/conceptLibraryRegistry";
 
@@ -25,25 +22,18 @@ import type { ConceptDefinition } from "@/data/conceptLibraryRegistry";
 
 export const ChapterChecker: React.FC = () => {
   const [chapterText, setChapterText] = useState("");
+  const [fileName, setFileName] = useState<string>("");
+  const [fileType, setFileType] = useState<string>("");
   const [selectedDomain, setSelectedDomain] = useState<Domain>("chemistry");
   const [includeCrossDomain, setIncludeCrossDomain] = useState(false);
   const [customConcepts, setCustomConcepts] = useState<ConceptDefinition[]>([]);
-  const [tocEndPage, setTocEndPage] = useState<number>(10); // Configurable TOC end page
-  const [sectionHints, setSectionHints] = useState<
-    { title: string; startIndex: number }[] | null
-  >(null);
-  const [pdfBuffer, setPdfBuffer] = useState<ArrayBuffer | null>(null);
-  const [pdfPageTexts, setPdfPageTexts] = useState<string[] | null>(null);
   const [analysis, setAnalysis] = useState<ChapterAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<string>("");
   const [progressPercent, setProgressPercent] = useState<number>(0);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const loadAnalysisInputRef = useRef<HTMLInputElement>(null);
-  const [isSlowPdf, setIsSlowPdf] = useState(false);
   const [isSlowAnalysis, setIsSlowAnalysis] = useState(false);
-  const fileProcessingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const analysisTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [highlightedConcept, setHighlightedConcept] = useState<Concept | null>(
     null
@@ -52,6 +42,7 @@ export const ChapterChecker: React.FC = () => {
   const [hasAnalyzedOnce, setHasAnalyzedOnce] = useState(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"analysis" | "writer">("analysis");
 
   // Detect Mac for keyboard shortcut hints
   const isMac =
@@ -61,22 +52,13 @@ export const ChapterChecker: React.FC = () => {
 
   /**
    * Keyboard shortcuts
-   * - Cmd/Ctrl + U: Upload file
    * - Cmd/Ctrl + Enter: Analyze chapter
-   * - Escape: Close expanded sections (future: close modals)
+   * - Escape: Close expanded sections
    */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Detect Mac (Cmd) vs PC (Ctrl)
       const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
       const modifierKey = isMac ? e.metaKey : e.ctrlKey;
-
-      // Cmd/Ctrl + U: Upload file
-      if (modifierKey && e.key === "u") {
-        e.preventDefault();
-        fileInputRef.current?.click();
-        return;
-      }
 
       // Cmd/Ctrl + Enter: Analyze chapter
       if (modifierKey && e.key === "Enter") {
@@ -89,7 +71,6 @@ export const ChapterChecker: React.FC = () => {
 
       // Escape: Close expanded details sections
       if (e.key === "Escape") {
-        // Find all open details elements and close them
         const openDetails = document.querySelectorAll("details[open]");
         if (openDetails.length > 0) {
           e.preventDefault();
@@ -103,6 +84,53 @@ export const ChapterChecker: React.FC = () => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [chapterText, isAnalyzing]); // Re-bind when these change
+
+  /**
+   * Listen for jump-to-position events from timeline/visualization components
+   */
+  useEffect(() => {
+    const handleJumpToPosition = (e: Event) => {
+      const customEvent = e as CustomEvent<{ position: number }>;
+      const position = customEvent.detail?.position;
+
+      if (
+        typeof position === "number" &&
+        pdfPageTexts &&
+        pdfPageTexts.length > 0
+      ) {
+        console.log(
+          "🎯 [ChapterChecker] jump-to-position received, position:",
+          position
+        );
+
+        // Calculate page offsets
+        const offsets: number[] = [];
+        let acc = 0;
+        for (let i = 0; i < pdfPageTexts.length; i++) {
+          offsets.push(acc);
+          acc += pdfPageTexts[i].length + (i < pdfPageTexts.length - 1 ? 2 : 0);
+        }
+
+        // Find which page contains this position
+        let pageNum = 1;
+        for (let i = 0; i < offsets.length; i++) {
+          if (position >= offsets[i]) pageNum = i + 1;
+          else break;
+        }
+
+        console.log(
+          "📄 [ChapterChecker] Calculated page:",
+          pageNum,
+          "calling setCurrentPage"
+        );
+        setCurrentPage(pageNum);
+      }
+    };
+
+    window.addEventListener("jump-to-position", handleJumpToPosition);
+    return () =>
+      window.removeEventListener("jump-to-position", handleJumpToPosition);
+  }, [pdfPageTexts]); // Re-bind when pdfPageTexts changes
 
   /**
    * Handle chapter analysis
@@ -400,130 +428,21 @@ export const ChapterChecker: React.FC = () => {
   };
 
   /**
-   * Handle file upload with optimized PDF loading
+   * Handle document upload (DOCX, MD, TXT)
    */
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const handleDocumentLoad = (text: string, name: string, type: string) => {
+    setChapterText(text);
+    setFileName(name);
+    setFileType(type);
     setError(null);
-    setProgress("Loading file...");
-    setIsSlowPdf(false);
+    console.log(`✅ Loaded ${name} (${type}): ${text.length} characters`);
+  };
 
-    // Set a timeout to detect slow PDFs
-    fileProcessingTimeoutRef.current = setTimeout(() => {
-      setIsSlowPdf(true);
-    }, 10000); // 10 seconds
-
-    try {
-      if (
-        file.type === "application/pdf" ||
-        file.name.toLowerCase().endsWith(".pdf")
-      ) {
-        setProgress("Processing PDF...");
-
-        // Read buffer once for all operations
-        const originalBuffer = await file.arrayBuffer();
-
-        // Set buffer for viewer immediately (no text extraction needed in viewer now)
-        setPdfBuffer(originalBuffer.slice(0));
-
-        setProgress("Extracting text and structure...");
-
-        // Extract structure for analysis - this is the only text extraction we need
-        const { text, pageTexts, outline } = await extractPdfStructure(
-          file,
-          (progressText) => {
-            setProgress(progressText);
-            // Extract progress percentage from progress text
-            const match = progressText.match(/(\d+) of (\d+)/);
-            if (match) {
-              const [, current, total] = match;
-              const percent = Math.round(
-                (parseInt(current) / parseInt(total)) * 100
-              );
-              setProgressPercent(percent);
-            }
-          }
-        );
-
-        // Store page texts for later use in analysis view
-        setPdfPageTexts(pageTexts);
-
-        setProgress("Building section outline...");
-
-        // Always compute page offsets
-        const pageOffsets: number[] = [];
-        let acc = 0;
-        for (let i = 0; i < pageTexts.length; i++) {
-          pageOffsets[i] = acc;
-          acc += pageTexts[i].length + (i < pageTexts.length - 1 ? 2 : 0);
-        }
-        if (outline && outline.length > 0) {
-          const hints = outline
-            .map((o) => ({
-              title: o.title,
-              startIndex: pageOffsets[Math.max(0, o.pageNumber - 1)] ?? 0,
-            }))
-            .sort((a, b) => a.startIndex - b.startIndex);
-          setSectionHints(hints);
-        } else {
-          // Fallback: use page numbers as section headings
-          const hints = pageOffsets.map((offset, i) => ({
-            title: `Page ${i + 1}`,
-            startIndex: offset,
-          }));
-          setSectionHints(hints);
-        }
-
-        setChapterText(text);
-        setProgress("");
-        setProgressPercent(0);
-
-        // Clear timeout on success
-        if (fileProcessingTimeoutRef.current) {
-          clearTimeout(fileProcessingTimeoutRef.current);
-          fileProcessingTimeoutRef.current = null;
-        }
-        setIsSlowPdf(false);
-
-        // Clear timeout since processing completed
-        if (fileProcessingTimeoutRef.current) {
-          clearTimeout(fileProcessingTimeoutRef.current);
-          fileProcessingTimeoutRef.current = null;
-        }
-        setIsSlowPdf(false);
-      } else {
-        setPdfBuffer(null);
-        setPdfPageTexts(null);
-        setProgress("Reading text file...");
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const content = event.target?.result as string;
-          setChapterText(content);
-          setSectionHints(null);
-          setProgress("");
-          setProgressPercent(0);
-        };
-        reader.readAsText(file);
-      }
-    } catch (err) {
-      setError(
-        `Failed to read file: ${
-          err instanceof Error ? err.message : String(err)
-        }`
-      );
-      setProgress("");
-      setProgressPercent(0);
-
-      // Clear timeout on error
-      if (fileProcessingTimeoutRef.current) {
-        clearTimeout(fileProcessingTimeoutRef.current);
-        fileProcessingTimeoutRef.current = null;
-      }
-      setIsSlowPdf(false);
-    }
+  /**
+   * Handle text changes from editor
+   */
+  const handleTextChange = (newText: string) => {
+    setChapterText(newText);
   };
 
   /**
@@ -549,10 +468,10 @@ export const ChapterChecker: React.FC = () => {
    */
   const handleClear = () => {
     setChapterText("");
-    setPdfBuffer(null);
+    setFileName("");
+    setFileType("");
     setAnalysis(null);
     setError(null);
-    setSectionHints(null);
   };
 
   /**
@@ -652,17 +571,18 @@ export const ChapterChecker: React.FC = () => {
               <>
                 <h3>📄 Chapter PDF</h3>
                 <div className="pdf-viewer-container">
-                  <PdfViewer
+                  <CustomPdfViewer
                     fileBuffer={pdfBuffer}
-                    skipTextExtraction={true}
-                    preExtractedPageTexts={pdfPageTexts || undefined}
-                    highlightedConcept={highlightedConcept}
-                    chapterText={chapterText}
-                    currentMentionIndex={currentMentionIndex}
-                    onMentionNavigate={(newIndex) =>
-                      setCurrentMentionIndex(newIndex)
-                    }
-                    tocEndPage={tocEndPage}
+                    currentPage={currentPage}
+                    onPageChange={setCurrentPage}
+                    onTextEdit={(editedText) => {
+                      console.log(
+                        "✏️ [ChapterChecker] Text edited in PDF viewer"
+                      );
+                      setChapterText(editedText);
+                      // Optionally trigger re-analysis
+                      // handleAnalyzeChapter();
+                    }}
                   />
                 </div>
               </>
@@ -1328,6 +1248,48 @@ export const ChapterChecker: React.FC = () => {
             {/* Analysis Results - Shows when available */}
             {analysis && (
               <div className="analysis-results">
+                {/* Mode Toggle - Analysis vs Writer */}
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "12px",
+                    marginBottom: "20px",
+                    padding: "16px",
+                    backgroundColor: "#f8fafc",
+                    borderRadius: "8px",
+                    border: "1px solid #e2e8f0",
+                  }}
+                >
+                  <button
+                    onClick={() => setViewMode("analysis")}
+                    className={`btn ${
+                      viewMode === "analysis" ? "btn-primary" : "btn-secondary"
+                    }`}
+                    style={{
+                      flex: 1,
+                      padding: "10px 20px",
+                      fontSize: "15px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    📊 Analysis View
+                  </button>
+                  <button
+                    onClick={() => setViewMode("writer")}
+                    className={`btn ${
+                      viewMode === "writer" ? "btn-primary" : "btn-secondary"
+                    }`}
+                    style={{
+                      flex: 1,
+                      padding: "10px 20px",
+                      fontSize: "15px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    ✍️ Writer Mode
+                  </button>
+                </div>
+
                 {/* Save/Load Analysis Buttons */}
                 <div
                   style={{
@@ -1389,32 +1351,79 @@ export const ChapterChecker: React.FC = () => {
                   />
                 </div>
 
-                <ChapterAnalysisDashboard
-                  analysis={analysis}
-                  concepts={analysis.conceptGraph?.concepts || []}
-                  onConceptClick={(concept, mentionIndex) => {
-                    setHighlightedConcept(concept);
-                    setCurrentMentionIndex(mentionIndex);
-                  }}
-                  highlightedConceptId={highlightedConcept?.id}
-                  currentMentionIndex={currentMentionIndex}
-                  pageOffsets={
-                    pdfPageTexts
-                      ? (() => {
-                          // Compute pageOffsets as in extractPdfStructure
-                          const offsets: number[] = [];
-                          let acc = 0;
-                          for (let i = 0; i < pdfPageTexts.length; i++) {
-                            offsets[i] = acc;
-                            acc +=
-                              pdfPageTexts[i].length +
-                              (i < pdfPageTexts.length - 1 ? 2 : 0);
-                          }
-                          return offsets;
-                        })()
-                      : undefined
-                  }
-                />
+                {/* Conditional View based on mode */}
+                {viewMode === "analysis" ? (
+                  <ChapterAnalysisDashboard
+                    analysis={analysis}
+                    concepts={analysis.conceptGraph?.concepts || []}
+                    onConceptClick={(concept, mentionIndex) => {
+                      console.log(
+                        "🔵 [Concept Click]",
+                        concept.name,
+                        "mention:",
+                        mentionIndex
+                      );
+                      setHighlightedConcept(concept);
+                      setCurrentMentionIndex(mentionIndex);
+                      // Find the page for this mention and set currentPage
+                      if (pdfPageTexts && concept.mentions?.[mentionIndex]) {
+                        // Compute pageOffsets as in extractPdfStructure
+                        const offsets: number[] = [];
+                        let acc = 0;
+                        for (let i = 0; i < pdfPageTexts.length; i++) {
+                          offsets[i] = acc;
+                          acc +=
+                            pdfPageTexts[i].length +
+                            (i < pdfPageTexts.length - 1 ? 2 : 0);
+                        }
+                        const pos = concept.mentions[mentionIndex].position;
+                        console.log(
+                          "📍 [Concept Click] Position:",
+                          pos,
+                          "Total pages:",
+                          pdfPageTexts.length
+                        );
+                        let pageNum = 1;
+                        for (let i = 0; i < offsets.length; i++) {
+                          if (pos >= offsets[i]) pageNum = i + 1;
+                          else break;
+                        }
+                        console.log(
+                          "📄 [Concept Click] Calculated page:",
+                          pageNum
+                        );
+                        setCurrentPage(pageNum);
+                      }
+                    }}
+                    highlightedConceptId={highlightedConcept?.id}
+                    currentMentionIndex={currentMentionIndex}
+                    pageOffsets={
+                      pdfPageTexts
+                        ? (() => {
+                            // Compute pageOffsets as in extractPdfStructure
+                            const offsets: number[] = [];
+                            let acc = 0;
+                            for (let i = 0; i < pdfPageTexts.length; i++) {
+                              offsets[i] = acc;
+                              acc +=
+                                pdfPageTexts[i].length +
+                                (i < pdfPageTexts.length - 1 ? 2 : 0);
+                            }
+                            return offsets;
+                          })()
+                        : undefined
+                    }
+                  />
+                ) : (
+                  <WriterMode
+                    extractedText={chapterText}
+                    analysisResult={analysis}
+                    onTextChange={(newText) => {
+                      setChapterText(newText);
+                      console.log("📝 Text updated in Writer Mode");
+                    }}
+                  />
+                )}
 
                 {/* Custom Concepts Input - Separate section after analysis */}
                 <div className="custom-concepts-section custom-concepts-after-analysis">

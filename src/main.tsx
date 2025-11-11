@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { ChapterChecker } from "@components/ChapterChecker";
+import App from "@components/App";
 import "./globals.css";
 
 /**
@@ -13,6 +13,6 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <ChapterChecker />
+    <App />
   </React.StrictMode>
 );

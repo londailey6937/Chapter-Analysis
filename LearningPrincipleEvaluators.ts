@@ -2322,15 +2322,17 @@ export class DualCodingEvaluator {
   }
 
   private static countVisualReferences(text: string): number {
+    // Only count actual figure/diagram references with numbers (e.g., "Figure 1", "Diagram 2")
+    // Not just mentions of the words "diagram" or "figure"
     const patterns = [
-      /diagram/gi,
-      /chart/gi,
-      /graph/gi,
-      /image/gi,
-      /figure/gi,
-      /illustration/gi,
-      /visualize/gi,
-      /see figure/gi,
+      /\bfigure\s+\d+/gi, // "Figure 1", "Figure 12"
+      /\bdiagram\s+\d+/gi, // "Diagram 1"
+      /\bchart\s+\d+/gi, // "Chart 1"
+      /\bgraph\s+\d+/gi, // "Graph 1"
+      /\bimage\s+\d+/gi, // "Image 1"
+      /\billustration\s+\d+/gi, // "Illustration 1"
+      /\(see\s+figure\s+\d+\)/gi, // "(see Figure 1)"
+      /\bfig\.\s*\d+/gi, // "Fig. 1"
     ];
 
     return patterns.reduce((sum, pattern) => {
