@@ -405,6 +405,7 @@ export const ChapterCheckerV2: React.FC = () => {
               initialText={chapterText}
               onTextChange={handleTextChange}
               showSpacingIndicators={true}
+              showVisualSuggestions={true}
               highlightPosition={highlightPosition}
               onSave={
                 analysis && viewMode === "writer" ? handleExportDocx : undefined

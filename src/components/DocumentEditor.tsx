@@ -1,9 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import {
+  DualCodingAnalyzer,
+  VisualSuggestion,
+} from "@/utils/dualCodingAnalyzer";
 
 interface DocumentEditorProps {
   initialText: string;
   onTextChange: (text: string) => void;
   showSpacingIndicators?: boolean;
+  showVisualSuggestions?: boolean;
   readOnly?: boolean;
   highlightPosition?: number | null;
   onSave?: () => void;
@@ -13,6 +18,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   initialText,
   onTextChange,
   showSpacingIndicators = true,
+  showVisualSuggestions = true,
   readOnly = false,
   highlightPosition = null,
   onSave,
@@ -27,6 +33,12 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   // Undo/Redo stacks
   const [history, setHistory] = useState<string[]>([initialText]);
   const [historyIndex, setHistoryIndex] = useState(0);
+
+  // Analyze text for visual suggestions
+  const visualSuggestions = useMemo(() => {
+    if (!showVisualSuggestions) return [];
+    return DualCodingAnalyzer.analyzeForVisuals(text);
+  }, [text, showVisualSuggestions]);
 
   useEffect(() => {
     setText(initialText);
@@ -238,6 +250,24 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   const renderTextWithSpacing = () => {
     const paragraphs = text.split(/\n\n+/);
 
+    // Build position map for visual suggestions
+    const visualSuggestionMap = new Map<number, VisualSuggestion>();
+    let charCount = 0;
+    paragraphs.forEach((para, index) => {
+      const trimmedPara = para.trim();
+      if (trimmedPara) {
+        // Find suggestions that fall within this paragraph
+        const suggestions = visualSuggestions.filter(
+          (s) =>
+            s.position >= charCount && s.position < charCount + para.length + 2
+        );
+        if (suggestions.length > 0) {
+          visualSuggestionMap.set(index, suggestions[0]); // Use highest priority
+        }
+      }
+      charCount += para.length + 2; // +2 for \n\n
+    });
+
     return (
       <div style={{ fontFamily: "ui-sans-serif, system-ui, sans-serif" }}>
         {paragraphs.map((para, index) => {
@@ -251,6 +281,8 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
             ((currentLength > 500 && nextPara.length > 500) ||
               (currentLength < 100 && nextPara.length > 200) ||
               (/[.!?]$/.test(trimmedPara) && nextPara.match(/^[A-Z]/)));
+
+          const visualSuggestion = visualSuggestionMap.get(index);
 
           return (
             <div
@@ -284,6 +316,125 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
                 </div>
               )}
 
+              {/* Visual Suggestion Alert - BEFORE paragraph */}
+              {showVisualSuggestions && visualSuggestion && (
+                <div
+                  style={{
+                    padding: "12px 16px",
+                    marginBottom: "12px",
+                    backgroundColor:
+                      visualSuggestion.priority === "high"
+                        ? "#fef3c7"
+                        : visualSuggestion.priority === "medium"
+                        ? "#dbeafe"
+                        : "#f3f4f6",
+                    border: `2px solid ${
+                      visualSuggestion.priority === "high"
+                        ? "#f59e0b"
+                        : visualSuggestion.priority === "medium"
+                        ? "#3b82f6"
+                        : "#9ca3af"
+                    }`,
+                    borderRadius: "8px",
+                    position: "relative",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "start",
+                      gap: "12px",
+                    }}
+                  >
+                    <div style={{ fontSize: "24px" }}>
+                      {visualSuggestion.visualType === "diagram"
+                        ? "📊"
+                        : visualSuggestion.visualType === "flowchart"
+                        ? "🔄"
+                        : visualSuggestion.visualType === "graph"
+                        ? "📈"
+                        : visualSuggestion.visualType === "concept-map"
+                        ? "🗺️"
+                        : "🖼️"}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          marginBottom: "6px",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            fontWeight: "700",
+                            padding: "2px 8px",
+                            borderRadius: "4px",
+                            backgroundColor:
+                              visualSuggestion.priority === "high"
+                                ? "#f59e0b"
+                                : visualSuggestion.priority === "medium"
+                                ? "#3b82f6"
+                                : "#6b7280",
+                            color: "white",
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          {visualSuggestion.priority}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: "600",
+                            color: "#374151",
+                          }}
+                        >
+                          Add {visualSuggestion.visualType}
+                        </span>
+                      </div>
+                      <p
+                        style={{
+                          margin: "0 0 6px 0",
+                          fontSize: "13px",
+                          color: "#1f2937",
+                          fontWeight: "500",
+                        }}
+                      >
+                        💡 {visualSuggestion.reason}
+                      </p>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "11px",
+                          color: "#6b7280",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        Dual coding improves comprehension by presenting
+                        information both visually and verbally
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "8px",
+                      right: "8px",
+                      fontSize: "10px",
+                      color: "#9ca3af",
+                      backgroundColor: "white",
+                      padding: "2px 6px",
+                      borderRadius: "4px",
+                      border: "1px solid #e5e7eb",
+                    }}
+                  >
+                    ↓ Visual needed
+                  </div>
+                </div>
+              )}
+
               {/* Paragraph text */}
               <p
                 id={`para-${index}`}
@@ -294,6 +445,19 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
                   fontSize: "16px",
                   color: "#1f2937",
                   transition: "background-color 0.5s ease",
+                  ...(visualSuggestion && {
+                    borderLeft: `4px solid ${
+                      visualSuggestion.priority === "high"
+                        ? "#f59e0b"
+                        : visualSuggestion.priority === "medium"
+                        ? "#3b82f6"
+                        : "#9ca3af"
+                    }`,
+                    paddingLeft: "12px",
+                    backgroundColor: visualSuggestion
+                      ? "#fefce8"
+                      : "transparent",
+                  }),
                 }}
                 onMouseUp={handleSelection}
               >
