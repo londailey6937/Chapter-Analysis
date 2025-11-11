@@ -8,6 +8,53 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prose content styling for HTML documents with images */
+.prose-content {
+  max-width: 100%;
+}
+
+.prose-content img {
+  max-width: 100%;
+  height: auto;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: block;
+}
+
+.prose-content p {
+  margin: 1rem 0;
+  line-height: 1.8;
+}
+
+.prose-content h1,
+.prose-content h2,
+.prose-content h3 {
+  margin: 1.5rem 0 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.prose-content h1 {
+  font-size: 2rem;
+}
+.prose-content h2 {
+  font-size: 1.5rem;
+}
+.prose-content h3 {
+  font-size: 1.25rem;
+}
+
+.prose-content ul,
+.prose-content ol {
+  margin: 1rem 0;
+  padding-left: 2rem;
+}
+
+.prose-content li {
+  margin: 0.5rem 0;
+}
+
 /* Base layer customizations */
 @layer base {
   :root {

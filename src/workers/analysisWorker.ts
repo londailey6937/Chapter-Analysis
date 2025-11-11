@@ -46,9 +46,10 @@ self.onmessage = async (evt: MessageEvent<IncomingMessage>) => {
     (self as any).postMessage({ type: "complete", result });
   } catch (err) {
     console.error("[Worker] Analysis error:", err);
+    const errorMessage = err instanceof Error ? err.message : String(err);
     (self as any).postMessage({
       type: "error",
-      error: err instanceof Error ? err.message : String(err),
+      error: errorMessage || "Unknown analysis error",
     });
   }
 };

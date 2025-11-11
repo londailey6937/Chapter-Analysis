@@ -14,11 +14,38 @@ export interface VisualSuggestion {
 
 export class DualCodingAnalyzer {
   /**
+   * Strip HTML tags from text for analysis
+   */
+  private static stripHtml(html: string): string {
+    // Check if content appears to be HTML
+    if (!html.includes("<")) {
+      return html;
+    }
+
+    // Create a temporary div to parse HTML
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = html;
+    return tempDiv.textContent || tempDiv.innerText || html;
+  }
+
+  /**
+   * Count existing images in content
+   */
+  static countExistingImages(text: string): number {
+    // Count <img tags for HTML content
+    const imgMatches = text.match(/<img[^>]*>/gi);
+    return imgMatches ? imgMatches.length : 0;
+  }
+
+  /**
    * Analyze text and identify where visual aids should be inserted
    */
   static analyzeForVisuals(text: string): VisualSuggestion[] {
     const suggestions: VisualSuggestion[] = [];
-    const paragraphs = text.split(/\n\n+/);
+
+    // Strip HTML if present to analyze plain text
+    const plainText = this.stripHtml(text);
+    const paragraphs = plainText.split(/\n\n+/);
     let currentPosition = 0;
 
     paragraphs.forEach((para, index) => {

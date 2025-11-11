@@ -23,19 +23,53 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
       let extractedText = "";
 
       if (fileType === "docx") {
-        // Extract text from DOCX
+        // Extract text from DOCX with embedded images
         const arrayBuffer = await file.arrayBuffer();
-        const result = await mammoth.extractRawText({ arrayBuffer });
-        extractedText = result.value;
 
-        if (result.messages.length > 0) {
-          console.warn("📄 DOCX extraction warnings:", result.messages);
+        // Get HTML with embedded base64 images
+        let imageCount = 0;
+        const htmlResult = await mammoth.convertToHtml(
+          { arrayBuffer },
+          {
+            convertImage: mammoth.images.imgElement((image) => {
+              imageCount++;
+              console.log(`📷 Processing image ${imageCount}`);
+              return image.read("base64").then((imageBuffer) => {
+                // Embed actual base64 image
+                const dataUrl = `data:${image.contentType};base64,${imageBuffer}`;
+                return {
+                  src: dataUrl,
+                  alt: `Image ${imageCount}`,
+                };
+              });
+            }),
+          }
+        );
+
+        // Use the HTML directly with embedded images
+        extractedText = htmlResult.value;
+
+        console.log(`✅ Extracted ${imageCount} images with base64 data`);
+        console.log(`� HTML length: ${extractedText.length} characters`);
+        console.log(`� Contains img tags: ${extractedText.includes("<img")}`);
+
+        if (extractedText.trim()) {
+          onDocumentLoad(extractedText, file.name, "docx");
+        } else {
+          throw new Error("No content extracted from DOCX");
         }
-      } else if (fileType === "md" || fileType === "txt") {
-        // Read plain text/markdown
+        return;
+      } else if (
+        fileType === "md" ||
+        fileType === "txt" ||
+        fileType === "html" ||
+        fileType === "htm" ||
+        fileType === "obt"
+      ) {
+        // Read plain text/markdown/HTML/OBT
         extractedText = await file.text();
       } else {
-        alert("Please upload a .docx, .md, or .txt file");
+        alert("Please upload a .docx, .md, .txt, .html, or .obt file");
         return;
       }
 
@@ -66,7 +100,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
       <input
         ref={fileInputRef}
         type="file"
-        accept=".docx,.md,.txt"
+        accept=".docx,.md,.txt,.html,.htm,.obt"
         onChange={handleFileChange}
         disabled={disabled}
         style={{ display: "none" }}
@@ -97,7 +131,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
           }
         }}
       >
-        📄 Upload Document (.docx, .md, .txt)
+        📄 Upload Document (.docx, .md, .txt, .html, .obt)
       </label>
       <div
         style={{
@@ -106,7 +140,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
           color: "#6b7280",
         }}
       >
-        Supported: Word documents, Markdown, Plain text
+        Supported: Word documents, Markdown, Plain text, HTML, Open Library Text
       </div>
     </div>
   );

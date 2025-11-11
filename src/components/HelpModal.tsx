@@ -89,7 +89,8 @@ export function HelpModal({
                 marginRight: "0.5rem",
               }}
             >
-              TomeIQ
+              Tome
+              <span style={{ fontStyle: "italic", fontWeight: "700" }}>IQ</span>
             </span>
             <span
               style={{

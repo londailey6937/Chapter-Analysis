@@ -30,6 +30,13 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Check if content is HTML with images
+  const isHtmlContent = useMemo(() => {
+    return (
+      text.includes("<img") || text.includes("<p>") || text.includes("<h1>")
+    );
+  }, [text]);
+
   // Undo/Redo stacks
   const [history, setHistory] = useState<string[]>([initialText]);
   const [historyIndex, setHistoryIndex] = useState(0);
@@ -244,6 +251,22 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       document.body.removeChild(textArea);
       alert("✅ Text copied to clipboard");
     });
+  };
+
+  // Render HTML content with images
+  const renderHtmlContent = () => {
+    return (
+      <div
+        dangerouslySetInnerHTML={{ __html: text }}
+        style={{
+          fontFamily: "ui-sans-serif, system-ui, sans-serif",
+          lineHeight: "1.8",
+          color: "#1f2937",
+        }}
+        // Apply CSS to format HTML elements
+        className="prose-content"
+      />
+    );
   };
 
   // Render text with spacing indicators
@@ -697,7 +720,11 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
           </div>
 
           {readOnly ? (
-            renderTextWithSpacing()
+            isHtmlContent ? (
+              renderHtmlContent()
+            ) : (
+              renderTextWithSpacing()
+            )
           ) : (
             <textarea
               ref={textareaRef}

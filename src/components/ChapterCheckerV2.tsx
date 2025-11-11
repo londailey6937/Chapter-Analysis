@@ -9,7 +9,9 @@ import { DocumentEditor } from "./DocumentEditor";
 import { ChapterAnalysisDashboard } from "./VisualizationComponents";
 import { HelpModal } from "./HelpModal";
 import { NavigationMenu } from "./NavigationMenu";
+import { UpgradePrompt, InlineUpgradePrompt } from "./UpgradePrompt";
 import { ChapterAnalysis } from "@/types";
+import { AccessLevel, ACCESS_TIERS } from "../../types";
 import {
   Domain,
   getAvailableDomains,
@@ -18,6 +20,14 @@ import {
 import type { ConceptDefinition } from "@/data/conceptLibraryRegistry";
 
 export const ChapterCheckerV2: React.FC = () => {
+  // Access control state
+  const [accessLevel, setAccessLevel] = useState<AccessLevel>("free");
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const [upgradeTarget, setUpgradeTarget] = useState<
+    "premium" | "professional"
+  >("premium");
+  const [upgradeFeature, setUpgradeFeature] = useState("");
+
   // Document state
   const [chapterText, setChapterText] = useState("");
   const [fileName, setFileName] = useState("");
@@ -164,6 +174,15 @@ export const ChapterCheckerV2: React.FC = () => {
       return;
     }
 
+    // Check access level for full analysis
+    const features = ACCESS_TIERS[accessLevel];
+    if (!features.fullAnalysis) {
+      setUpgradeFeature("Full 10-Principle Analysis");
+      setUpgradeTarget("premium");
+      setShowUpgradePrompt(true);
+      return;
+    }
+
     setIsAnalyzing(true);
     setError(null);
     setProgress("Analyzing chapter...");
@@ -230,7 +249,8 @@ export const ChapterCheckerV2: React.FC = () => {
       };
 
       worker.onerror = (err) => {
-        setError(`Worker error: ${err.message}`);
+        console.error("Worker error:", err);
+        setError(`Worker error: ${err.message || "Unknown worker error"}`);
         setProgress("");
         setIsAnalyzing(false);
         worker.terminate();
@@ -291,27 +311,68 @@ export const ChapterCheckerV2: React.FC = () => {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <img src="/TomeIQ.png" alt="TomeIQ" style={{ height: "48px" }} />
-          <div>
-            <h1 style={{ margin: 0, fontSize: "1.5rem" }}>TomeIQ</h1>
-            <p style={{ margin: 0, fontSize: "0.875rem", opacity: 0.9 }}>
-              AI-Powered Textbook Analysis
-            </p>
-          </div>
           <button
             onClick={() => setIsNavigationOpen(true)}
             style={{
-              marginLeft: "auto",
               padding: "8px 16px",
               backgroundColor: "rgba(255,255,255,0.2)",
               color: "white",
               border: "none",
               borderRadius: "6px",
               cursor: "pointer",
+              fontSize: "18px",
             }}
           >
-            ☰ Menu
+            ☰
           </button>
+
+          <img src="/TomeIQ.png" alt="TomeIQ" style={{ height: "96px" }} />
+          <div>
+            <h1 style={{ margin: 0, fontSize: "1.5rem" }}>
+              Tome
+              <span style={{ fontStyle: "italic", fontWeight: "700" }}>IQ</span>
+            </h1>
+            <p style={{ margin: 0, fontSize: "0.875rem", opacity: 0.9 }}>
+              AI-Powered Textbook Analysis
+            </p>
+          </div>
+
+          {/* Access Level Selector (for demo purposes) */}
+          <div
+            style={{
+              marginLeft: "auto",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+            }}
+          >
+            <span style={{ fontSize: "0.875rem", opacity: 0.9 }}>
+              Demo Mode:
+            </span>
+            <select
+              value={accessLevel}
+              onChange={(e) => setAccessLevel(e.target.value as AccessLevel)}
+              style={{
+                padding: "6px 12px",
+                backgroundColor: "rgba(255,255,255,0.2)",
+                color: "white",
+                border: "1px solid rgba(255,255,255,0.3)",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontSize: "0.875rem",
+              }}
+            >
+              <option value="free" style={{ color: "#000" }}>
+                Free (Spacing + Dual Coding)
+              </option>
+              <option value="premium" style={{ color: "#000" }}>
+                Premium (Full Analysis)
+              </option>
+              <option value="professional" style={{ color: "#000" }}>
+                Professional (Writer Mode)
+              </option>
+            </select>
+          </div>
         </div>
       </header>
 
@@ -403,7 +464,17 @@ export const ChapterCheckerV2: React.FC = () => {
           {chapterText ? (
             <DocumentEditor
               initialText={chapterText}
-              onTextChange={handleTextChange}
+              onTextChange={(text) => {
+                // Check access for Writer Mode editing
+                const features = ACCESS_TIERS[accessLevel];
+                if (viewMode === "writer" && !features.writerMode) {
+                  setUpgradeFeature("Writer Mode");
+                  setUpgradeTarget("professional");
+                  setShowUpgradePrompt(true);
+                  return;
+                }
+                handleTextChange(text);
+              }}
               showSpacingIndicators={true}
               showVisualSuggestions={true}
               highlightPosition={highlightPosition}
@@ -525,7 +596,7 @@ export const ChapterCheckerV2: React.FC = () => {
                     </>
                   ) : (
                     <>
-                      <span>⚠️ Domain not detected</span>
+                      <span>⚠️ Domain not detected: upload document</span>
                       <div style={{ display: "flex", gap: "6px" }}>
                         <button
                           onClick={() => setShowDomainSelector(true)}
@@ -654,6 +725,45 @@ export const ChapterCheckerV2: React.FC = () => {
               {isAnalyzing ? "⏳ Analyzing..." : "🔍 Analyze Chapter"}
             </button>
 
+            {/* Free tier info */}
+            {accessLevel === "free" && chapterText && !isAnalyzing && (
+              <div
+                style={{
+                  marginTop: "12px",
+                  padding: "12px",
+                  backgroundColor: "#e0f2fe",
+                  borderLeft: "4px solid #3b82f6",
+                  borderRadius: "6px",
+                  fontSize: "13px",
+                  lineHeight: "1.6",
+                }}
+              >
+                <div
+                  style={{
+                    fontWeight: "600",
+                    marginBottom: "6px",
+                    color: "#1e40af",
+                  }}
+                >
+                  🎁 Free Preview Available
+                </div>
+                <div style={{ color: "#1e3a8a" }}>
+                  <strong>Spacing Analysis:</strong> See optimal concept
+                  repetition patterns for better retention.
+                  <br />
+                  <strong>Dual Coding:</strong> Get AI suggestions for where to
+                  add visuals, diagrams, and illustrations.
+                  <br />
+                  <br />
+                  <span style={{ fontSize: "12px", opacity: 0.9 }}>
+                    💡 Upgrade to Premium for full 10-principle analysis with
+                    concept graphs, pattern recognition, and detailed
+                    recommendations.
+                  </span>
+                </div>
+              </div>
+            )}
+
             {error && (
               <div
                 style={{
@@ -720,6 +830,14 @@ export const ChapterCheckerV2: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
+                    // Check access for Writer Mode
+                    const features = ACCESS_TIERS[accessLevel];
+                    if (!features.writerMode) {
+                      setUpgradeFeature("Writer Mode");
+                      setUpgradeTarget("professional");
+                      setShowUpgradePrompt(true);
+                      return;
+                    }
                     setViewMode("writer");
                     setTimeout(() => {
                       if (analysisPanelRef.current) {
@@ -740,34 +858,54 @@ export const ChapterCheckerV2: React.FC = () => {
                     fontWeight: "600",
                   }}
                 >
-                  ✍️ Writer
+                  ✍️ Writer {!ACCESS_TIERS[accessLevel].writerMode && "👑"}
                 </button>
               </div>
 
               <button
                 onClick={handleExport}
+                disabled={!ACCESS_TIERS[accessLevel].exportResults}
                 style={{
                   width: "100%",
                   padding: "8px",
-                  backgroundColor: "#8b5cf6",
+                  backgroundColor: ACCESS_TIERS[accessLevel].exportResults
+                    ? "#8b5cf6"
+                    : "#d1d5db",
                   color: "white",
                   border: "none",
                   borderRadius: "6px",
-                  cursor: "pointer",
+                  cursor: ACCESS_TIERS[accessLevel].exportResults
+                    ? "pointer"
+                    : "not-allowed",
                   fontSize: "14px",
                   fontWeight: "600",
                   marginBottom: "16px",
                 }}
               >
-                📥 Export JSON
+                📥 Export JSON{" "}
+                {!ACCESS_TIERS[accessLevel].exportResults && "🔒"}
               </button>
 
               {viewMode === "analysis" ? (
-                <ChapterAnalysisDashboard
-                  analysis={analysis}
-                  concepts={analysis.conceptGraph?.concepts || []}
-                  onConceptClick={handleConceptClick}
-                />
+                <>
+                  {!ACCESS_TIERS[accessLevel].fullAnalysis && (
+                    <InlineUpgradePrompt
+                      targetLevel="premium"
+                      feature="Full Analysis - 10 Learning Principles"
+                      description="Unlock comprehensive analysis with all 10 evidence-based learning principles, concept graphs, pattern recognition, and detailed recommendations."
+                      onUpgrade={() => {
+                        setUpgradeFeature("Full Analysis");
+                        setUpgradeTarget("premium");
+                        setShowUpgradePrompt(true);
+                      }}
+                    />
+                  )}
+                  <ChapterAnalysisDashboard
+                    analysis={analysis}
+                    concepts={analysis.conceptGraph?.concepts || []}
+                    onConceptClick={handleConceptClick}
+                  />
+                </>
               ) : (
                 <div style={{ padding: "20px", overflow: "auto" }}>
                   <h3
@@ -1099,6 +1237,21 @@ export const ChapterCheckerV2: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Upgrade Prompt Modal */}
+      {showUpgradePrompt && (
+        <UpgradePrompt
+          currentLevel={accessLevel}
+          targetLevel={upgradeTarget}
+          feature={upgradeFeature}
+          onUpgrade={() => {
+            // In production, this would redirect to payment page
+            alert(`Upgrade to ${upgradeTarget} would happen here!`);
+            setShowUpgradePrompt(false);
+          }}
+          onDismiss={() => setShowUpgradePrompt(false)}
+        />
       )}
     </div>
   );

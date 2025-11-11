@@ -4,6 +4,61 @@
  */
 
 // ============================================================================
+// ACCESS CONTROL & PRICING TIERS
+// ============================================================================
+
+export type AccessLevel = "free" | "premium" | "professional";
+
+export interface AccessFeatures {
+  // Free tier - Level 1
+  spacingAnalysis: boolean;
+  dualCodingAnalysis: boolean;
+
+  // Premium tier - Level 2
+  fullAnalysis: boolean; // All 10 learning principles
+  exportResults: boolean;
+  conceptGraphs: boolean;
+
+  // Professional tier - Level 3
+  writerMode: boolean;
+  unlimitedAnalyses: boolean;
+  prioritySupport: boolean;
+}
+
+export const ACCESS_TIERS: Record<AccessLevel, AccessFeatures> = {
+  free: {
+    spacingAnalysis: true,
+    dualCodingAnalysis: true,
+    fullAnalysis: false,
+    exportResults: false,
+    conceptGraphs: false,
+    writerMode: false,
+    unlimitedAnalyses: false,
+    prioritySupport: false,
+  },
+  premium: {
+    spacingAnalysis: true,
+    dualCodingAnalysis: true,
+    fullAnalysis: true,
+    exportResults: true,
+    conceptGraphs: true,
+    writerMode: false,
+    unlimitedAnalyses: false,
+    prioritySupport: false,
+  },
+  professional: {
+    spacingAnalysis: true,
+    dualCodingAnalysis: true,
+    fullAnalysis: true,
+    exportResults: true,
+    conceptGraphs: true,
+    writerMode: true,
+    unlimitedAnalyses: true,
+    prioritySupport: true,
+  },
+};
+
+// ============================================================================
 // CONCEPT & KNOWLEDGE STRUCTURE
 // ============================================================================
 

@@ -22,5 +22,38 @@ export default defineConfig({
     sourcemap: false,
     // Use esbuild default minify to avoid requiring optional terser dependency
     minify: true,
+    chunkSizeWarningLimit: 1000, // Increase limit for document processing libraries
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // React core libraries
+          "react-vendor": ["react", "react-dom"],
+          // Split document processing libraries separately
+          "mammoth-vendor": ["mammoth"],
+          "docx-vendor": ["docx"],
+          // Large evaluators and analysis engine
+          "analysis-engine": [
+            "./src/components/AnalysisEngine.ts",
+            "./LearningPrincipleEvaluators.ts",
+          ],
+          // Concept extraction and domain libraries
+          "concept-libs": [
+            "./src/components/ConceptExtractor.ts",
+            "./src/components/ConceptExtractorLibrary.ts",
+            "./src/data/chemistryConceptLibrary.ts",
+            "./src/data/algebraTrigConceptLibrary.ts",
+            "./src/data/financeConceptLibrary.ts",
+            "./src/data/crossDomainConcepts.ts",
+          ],
+          // Visualization and UI components
+          visualization: [
+            "./src/components/VisualizationComponents.tsx",
+            "./src/components/PatternAnalysisSection.tsx",
+            "./src/components/ConceptAnalysisSection.tsx",
+            "./src/components/ConceptRelationshipsSection.tsx",
+          ],
+        },
+      },
+    },
   },
 });

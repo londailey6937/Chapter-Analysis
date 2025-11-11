@@ -78,7 +78,7 @@ export function NavigationMenu({
             <img
               src="/TomeIQ.png"
               alt="TomeIQ Logo"
-              style={{ height: "60px", width: "auto" }}
+              style={{ height: "96px", width: "auto" }}
             />
             <div>
               <h2
@@ -86,10 +86,12 @@ export function NavigationMenu({
                   margin: 0,
                   fontSize: "1.75rem",
                   fontWeight: "bold",
-                  fontFamily: "'Brush Script MT', cursive, serif",
                 }}
               >
-                TomeIQ
+                Tome
+                <span style={{ fontStyle: "italic", fontWeight: "700" }}>
+                  IQ
+                </span>
               </h2>
               <p
                 style={{
