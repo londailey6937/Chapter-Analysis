@@ -587,76 +587,63 @@ export const ChapterChecker: React.FC = () => {
     <div className="chapter-checker">
       <header className="app-header">
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          {/* Menu Button */}
+          {/* Hamburger Menu Button (white) */}
           <button
+            aria-label="Open navigation menu"
             onClick={() => setIsNavigationOpen(true)}
             style={{
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              background: "none",
               border: "none",
-              color: "white",
-              padding: "0.75rem",
-              borderRadius: "8px",
               cursor: "pointer",
+              marginRight: "1rem",
+              padding: 0,
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              transition: "transform 0.2s, box-shadow 0.2s",
-              boxShadow: "0 2px 8px rgba(102, 126, 234, 0.3)",
+              height: "128px",
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "scale(1.05)";
-              e.currentTarget.style.boxShadow =
-                "0 4px 12px rgba(102, 126, 234, 0.4)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "scale(1)";
-              e.currentTarget.style.boxShadow =
-                "0 2px 8px rgba(102, 126, 234, 0.3)";
-            }}
-            title="Open Menu"
           >
             <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
+              width="36"
+              height="36"
+              viewBox="0 0 36 36"
               fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
+              <rect y="8" width="36" height="4" rx="2" fill="#FFFFFF" />
+              <rect y="16" width="36" height="4" rx="2" fill="#FFFFFF" />
+              <rect y="24" width="36" height="4" rx="2" fill="#FFFFFF" />
             </svg>
           </button>
-
-          {/* Title */}
-          <div style={{ display: "flex", alignItems: "center", gap: "0" }}>
-            <img
-              src="/TomeIQ.png"
-              alt="TomeIQ Logo"
-              style={{ height: "128px", width: "auto" }}
-            />
-            <h1
-              style={{
-                margin: 0,
-                fontFamily: "'Georgia', 'Palatino', serif",
-                fontSize: "2.5rem",
-                fontWeight: "600",
-                letterSpacing: "0.02em",
-                lineHeight: "1",
-              }}
-            >
-              TomeIQ
-            </h1>
-          </div>
+          {/* Logo and Header (restored) */}
+          <img
+            src="/TomeIQ.png"
+            alt="TomeIQ Logo"
+            style={{ height: "128px", width: "auto" }}
+          />
+          <h1
+            style={{
+              margin: 0,
+              fontFamily: "'Georgia', 'Palatino', serif",
+              fontSize: "2.5rem",
+              fontWeight: "600",
+              letterSpacing: "0.02em",
+              lineHeight: "1",
+            }}
+          >
+            TomeIQ
+          </h1>
           <p style={{ margin: "0.5rem 0 0 0", fontSize: "0.875rem" }}>
             AI-Powered Textbook Analysis
           </p>
         </div>
       </header>
 
+      {/* Navigation Menu (restored) */}
+      <NavigationMenu
+        isOpen={isNavigationOpen}
+        onClose={() => setIsNavigationOpen(false)}
+        onOpenHelp={() => setIsHelpModalOpen(true)}
+      />
       <div className="app-container">
         <div className="unified-layout">
           {/* LEFT PANEL: PDF Viewer */}
@@ -704,8 +691,35 @@ export const ChapterChecker: React.FC = () => {
             {/* How It Works - Always visible, collapsible */}
             <div className="how-it-works-section">
               <details open={false}>
-                <summary className="how-it-works-header">
-                  <span>🎓 How the Analyzer Works</span>
+                <summary
+                  className="how-it-works-header"
+                  style={{ display: "flex", alignItems: "center", gap: "1rem" }}
+                >
+                  <img
+                    src="/TomeIQ.png"
+                    alt="TomeIQ Logo"
+                    style={{ height: "64px", width: "auto" }}
+                  />
+                  <span
+                    style={{
+                      fontFamily: "'Georgia', 'Palatino', serif",
+                      fontSize: "2rem",
+                      fontWeight: 600,
+                      letterSpacing: "0.02em",
+                      lineHeight: 1,
+                    }}
+                  >
+                    TomeIQ
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "1.1rem",
+                      color: "#667eea",
+                      marginLeft: "0.5rem",
+                    }}
+                  >
+                    Analysis Guide
+                  </span>
                   <span className="toggle-icon">▼</span>
                 </summary>
                 <div className="how-it-works-content">

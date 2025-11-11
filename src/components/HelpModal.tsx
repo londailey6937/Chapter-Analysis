@@ -77,18 +77,29 @@ export function HelpModal({
             <img
               src="/TomeIQ.png"
               alt="TomeIQ Logo"
-              style={{ height: "56px", width: "auto" }}
+              style={{ height: "96px", width: "auto" }}
             />
-            <h2
+            <span
               style={{
-                margin: 0,
-                fontSize: "1.75rem",
-                fontWeight: "bold",
-                fontFamily: "'Brush Script MT', cursive, serif",
+                fontFamily: "'Georgia', 'Palatino', serif",
+                fontSize: "2.2rem",
+                fontWeight: 600,
+                letterSpacing: "0.02em",
+                lineHeight: 1,
+                marginRight: "0.5rem",
               }}
             >
-              TomeIQ Analysis Guide
-            </h2>
+              TomeIQ
+            </span>
+            <span
+              style={{
+                fontSize: "1.2rem",
+                color: "#e0e7ff",
+                marginLeft: "0.5rem",
+              }}
+            >
+              Analysis Guide
+            </span>
           </div>
           <button
             onClick={onClose}
