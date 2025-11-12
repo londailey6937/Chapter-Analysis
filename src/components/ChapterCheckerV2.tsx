@@ -161,6 +161,28 @@ export const ChapterCheckerV2: React.FC = () => {
     }
   }, [accessLevel]);
 
+  // Listen for jump-to-position events (from dual coding buttons, etc.)
+  useEffect(() => {
+    const handleJumpToPosition = (event: CustomEvent) => {
+      const position = event.detail?.position;
+      if (typeof position === "number") {
+        setHighlightPosition(position);
+      }
+    };
+
+    window.addEventListener(
+      "jump-to-position" as any,
+      handleJumpToPosition as any
+    );
+
+    return () => {
+      window.removeEventListener(
+        "jump-to-position" as any,
+        handleJumpToPosition as any
+      );
+    };
+  }, []);
+
   const handleDocumentLoad = (text: string, name: string, type: string) => {
     setChapterText(text);
     setFileName(name);

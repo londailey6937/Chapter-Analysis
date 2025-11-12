@@ -49,10 +49,6 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       hasMultipleParagraphs ||
       hasImages;
 
-    console.log(
-      `[DocumentEditor] isHtmlContent=${hasHtmlStructure} (starts: ${startsWithHtml}, blocks: ${hasMultipleBlockElements}, paragraphs: ${hasMultipleParagraphs}, images: ${hasImages}), text preview:`,
-      text.substring(0, 200)
-    );
     return hasHtmlStructure;
   }, [text]);
 
@@ -65,6 +61,38 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     if (!showVisualSuggestions) return [];
     return DualCodingAnalyzer.analyzeForVisuals(text);
   }, [text, showVisualSuggestions]);
+
+  // Create a mapping from HTML positions to rendered text positions
+  const htmlToTextPositionMap = useMemo(() => {
+    if (!isHtmlContent) return new Map<number, number>();
+
+    const map = new Map<number, number>();
+    let htmlPos = 0;
+    let textPos = 0;
+
+    // Walk through HTML character by character
+    let insideTag = false;
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+
+      if (char === "<") {
+        insideTag = true;
+        map.set(i, textPos); // Map this HTML position to current text position
+      } else if (char === ">") {
+        insideTag = false;
+        map.set(i, textPos);
+      } else if (!insideTag) {
+        // Count actual text characters
+        map.set(i, textPos);
+        textPos++;
+      } else {
+        // Inside a tag, don't count toward text position
+        map.set(i, textPos);
+      }
+    }
+
+    return map;
+  }, [text, isHtmlContent]);
 
   useEffect(() => {
     setText(initialText);
@@ -122,7 +150,10 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       if (readOnly && containerRef.current) {
         // Read-only mode: scroll to position
         if (isHtmlContent) {
-          // For HTML content, find text node at position and scroll to it
+          // Convert HTML position to rendered text position
+          const textPosition =
+            htmlToTextPositionMap.get(highlightPosition) ?? highlightPosition;
+
           const container = containerRef.current;
           const allTextNodes: Text[] = [];
 
@@ -138,11 +169,18 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
             allTextNodes.push(node as Text);
           }
 
+          console.log(
+            "[DocumentEditor] Found",
+            allTextNodes.length,
+            "text nodes"
+          );
+
           // Find the text node containing our highlight position
           let charCount = 0;
+          let found = false;
           for (const textNode of allTextNodes) {
             const nodeLength = textNode.textContent?.length || 0;
-            if (charCount + nodeLength > highlightPosition) {
+            if (charCount + nodeLength > textPosition) {
               // Found the node, scroll its parent element into view
               const element = textNode.parentElement;
               if (element) {
@@ -154,9 +192,19 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
                   element.style.backgroundColor = originalBg;
                 }, 2000);
               }
+              found = true;
               break;
             }
             charCount += nodeLength;
+          }
+
+          if (!found) {
+            console.warn(
+              "[DocumentEditor] Could not find text node at position:",
+              textPosition,
+              "Total text length:",
+              charCount
+            );
           }
         } else {
           // For plain text rendering, use paragraph IDs
@@ -218,7 +266,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
         }, 2000);
       }
     }
-  }, [highlightPosition, text, readOnly, isHtmlContent]);
+  }, [highlightPosition, text, readOnly, isHtmlContent, htmlToTextPositionMap]);
 
   const addToHistory = (newText: string) => {
     // Remove any "future" history if we're not at the end
@@ -325,11 +373,6 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       .replace(/&amp;/g, "&")
       .trim();
 
-    // Analyze plain text for visual suggestions (dual coding)
-    const visualSuggestions = showVisualSuggestions
-      ? DualCodingAnalyzer.analyzeForVisuals(plainText)
-      : [];
-
     // Parse HTML into paragraphs for spacing analysis
     const htmlParagraphs: { html: string; textLength: number }[] = [];
     if (showSpacingIndicators) {
@@ -366,11 +409,60 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
             <div style={{ fontWeight: "600", marginBottom: "8px" }}>
               📊 Dual Coding Analysis
             </div>
-            <div style={{ fontSize: "14px", color: "#92400e" }}>
+            <div
+              style={{
+                fontSize: "14px",
+                color: "#92400e",
+                marginBottom: "12px",
+              }}
+            >
               Found <strong>{visualSuggestions.length}</strong>{" "}
               {visualSuggestions.length === 1 ? "location" : "locations"} where
               adding visuals (diagrams, charts, illustrations) would improve
               comprehension. Consider adding images at key concept explanations.
+            </div>
+            {/* Jump to location buttons */}
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "8px",
+                marginTop: "12px",
+              }}
+            >
+              {visualSuggestions.map((suggestion, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    // Dispatch custom event to jump to position
+                    window.dispatchEvent(
+                      new CustomEvent("jump-to-position", {
+                        detail: { position: suggestion.position },
+                      })
+                    );
+                  }}
+                  style={{
+                    padding: "6px 12px",
+                    backgroundColor: "#f59e0b",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#d97706";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f59e0b";
+                  }}
+                  title={`${suggestion.reason} - Suggested: ${suggestion.visualType}`}
+                >
+                  Jump to location {index + 1}
+                </button>
+              ))}
             </div>
           </div>
         )}

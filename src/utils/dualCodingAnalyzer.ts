@@ -48,25 +48,81 @@ export class DualCodingAnalyzer {
 
   /**
    * Analyze text and identify where visual aids should be inserted
+   * Works with both plain text and HTML - positions returned are for the original input
    */
   static analyzeForVisuals(text: string): VisualSuggestion[] {
     const suggestions: VisualSuggestion[] = [];
 
-    // Strip HTML if present to analyze plain text
-    const plainText = this.stripHtml(text);
-    const paragraphs = plainText.split(/\n\n+/);
-    let currentPosition = 0;
+    // Check if input is HTML
+    const isHtml = /<[^>]+>/.test(text);
 
-    paragraphs.forEach((para, index) => {
-      const trimmedPara = para.trim();
-      if (!trimmedPara) {
-        currentPosition += para.length + 2;
-        return;
+    let paragraphs: { text: string; position: number }[] = [];
+
+    if (isHtml) {
+      // Parse HTML and extract paragraphs with their positions
+      // Match opening tags for block elements like <p>, <h1>, <h2>, etc.
+      const blockElementRegex = /<(p|h[1-6]|div|li|td|th)[^>]*>/gi;
+      let match;
+      let lastIndex = 0;
+
+      while ((match = blockElementRegex.exec(text)) !== null) {
+        const startPos = match.index + match[0].length; // Position after opening tag
+        const tagName = match[1];
+
+        // Find the closing tag
+        const closingTagRegex = new RegExp(`</${tagName}>`, "i");
+        const closeMatch = closingTagRegex.exec(text.substring(startPos));
+
+        if (closeMatch) {
+          const endPos = startPos + closeMatch.index;
+          const content = text.substring(startPos, endPos);
+          const plainContent = this.stripHtml(content).trim();
+
+          if (plainContent.length > 50) {
+            // Only include substantial paragraphs
+            paragraphs.push({
+              text: plainContent,
+              position: match.index, // Position of the opening tag
+            });
+          }
+        }
       }
 
+      console.log(
+        "[DualCodingAnalyzer] Extracted",
+        paragraphs.length,
+        "HTML paragraphs"
+      );
+    } else {
+      // Plain text: split by double newlines
+      const plainParagraphs = text.split(/\n\n+/);
+      let currentPosition = 0;
+
+      plainParagraphs.forEach((para) => {
+        const trimmed = para.trim();
+        if (trimmed.length > 50) {
+          paragraphs.push({
+            text: trimmed,
+            position: currentPosition,
+          });
+        }
+        currentPosition += para.length + 2; // +2 for the \n\n
+      });
+
+      console.log(
+        "[DualCodingAnalyzer] Extracted",
+        paragraphs.length,
+        "plain text paragraphs"
+      );
+    }
+
+    paragraphs.forEach((para, index) => {
+      const trimmedPara = para.text;
+      const currentPosition = para.position;
+
       const lowerPara = trimmedPara.toLowerCase();
-      const nextPara = paragraphs[index + 1]?.trim() || "";
-      const prevPara = paragraphs[index - 1]?.trim() || "";
+      const nextPara = paragraphs[index + 1]?.text || "";
+      const prevPara = paragraphs[index - 1]?.text || "";
 
       // Pattern 1: Descriptive spatial/structural language
       const spatialPatterns = [
@@ -82,14 +138,21 @@ export class DualCodingAnalyzer {
       );
 
       if (spatialMatches >= 3 && trimmedPara.length > 100) {
-        suggestions.push({
+        const suggestion: VisualSuggestion = {
           position: currentPosition,
           paragraph: trimmedPara.substring(0, 150) + "...",
           reason: "Contains spatial/structural descriptions",
           visualType: "diagram",
           priority: spatialMatches >= 5 ? "high" : "medium",
           context: this.getContext(prevPara, trimmedPara, nextPara),
-        });
+        };
+        console.log(
+          "[DualCodingAnalyzer] Adding spatial suggestion at position:",
+          currentPosition,
+          "paragraph preview:",
+          trimmedPara.substring(0, 50)
+        );
+        suggestions.push(suggestion);
       }
 
       // Pattern 2: Process or sequence descriptions
@@ -206,8 +269,6 @@ export class DualCodingAnalyzer {
           context: this.getContext(prevPara, trimmedPara, nextPara),
         });
       }
-
-      currentPosition += para.length + 2; // +2 for \n\n
     });
 
     // Remove duplicates (same position) and sort by priority
