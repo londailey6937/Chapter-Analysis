@@ -30,6 +30,7 @@ export type Domain =
   | "physics"
   | "biology"
   | "computing"
+  | "react"
   | "mathematics"
   | "finance"
   | "custom"
@@ -68,6 +69,13 @@ export const AVAILABLE_DOMAINS: DomainInfo[] = [
     description:
       "Computer science concepts (algorithm, function, data structure, etc.)",
     icon: "💻",
+  },
+  {
+    id: "react",
+    label: "React",
+    description:
+      "React.js concepts (components, hooks, JSX, state, props, etc.)",
+    icon: "⚛️",
   },
   {
     id: "custom",

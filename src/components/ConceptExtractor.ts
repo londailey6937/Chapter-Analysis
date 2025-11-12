@@ -1158,23 +1158,165 @@ export class ConceptExtractor {
     const mentions: ConceptMention[] = [];
     const regex = new RegExp(`\\b${this.escapeRegex(term)}\\b`, "gi");
     let match;
+    let totalMatches = 0;
+    let filteredMatches = 0;
 
     while ((match = regex.exec(text)) !== null) {
+      totalMatches++;
       const position = match.index;
       const start = Math.max(0, position - 100);
       const end = Math.min(text.length, position + 100);
       const context = text.substring(start, end);
 
-      mentions.push({
-        position,
-        context,
-        depth: this.estimateMentionDepth(context),
-        isRevisit: mentions.length > 0,
-        associatedConcepts: [],
-      });
+      // Filter out non-technical usage (casual English)
+      const passes = this.isTechnicalContext(term, context, text, position);
+      if (passes) {
+        filteredMatches++;
+        mentions.push({
+          position,
+          context,
+          depth: this.estimateMentionDepth(context),
+          isRevisit: mentions.length > 0,
+          associatedConcepts: [],
+        });
+      }
+    }
+
+    // Log filtering results for debugging
+    if (term.toLowerCase() === "promise" && totalMatches > 0) {
+      console.log(
+        `[findAllMentions] "${term}": found ${totalMatches} matches, kept ${filteredMatches} after filtering`
+      );
     }
 
     return mentions;
+  }
+
+  /**
+   * Check if a term appears in a technical context (not casual English)
+   */
+  private isTechnicalContext(
+    term: string,
+    context: string,
+    fullText: string,
+    position: number
+  ): boolean {
+    const lowerTerm = term.toLowerCase();
+    const lowerContext = context.toLowerCase();
+
+    // Get the paragraph containing this mention
+    const paragraphStart = fullText.lastIndexOf("\n\n", position);
+    const paragraphEnd = fullText.indexOf("\n\n", position);
+    const paragraph = fullText.substring(
+      paragraphStart >= 0 ? paragraphStart : 0,
+      paragraphEnd >= 0 ? paragraphEnd : fullText.length
+    );
+
+    // Special handling for commonly confused terms - CHECK FIRST before density
+    const technicalPatterns: Record<string, RegExp[]> = {
+      // Promise - only match in async/programming context
+      promise: [
+        /\b(async|await|then|catch|resolve|reject|promise)\b/i,
+        /new\s+promise/i,
+        /promise\s*\(/i,
+        /\.then\(/i,
+        /\.catch\(/i,
+      ],
+      // Function - only match in programming context
+      function: [
+        /\bfunction\s+\w+\s*\(/i,
+        /=>\s*{/i,
+        /\(.*\)\s*=>/i,
+        /function\s*\(/i,
+        /arrow\s+function/i,
+        /callback/i,
+      ],
+      // Semantic - only match in versioning/meaning context
+      semantic: [
+        /semantic\s+(versioning|version|web|html|meaning)/i,
+        /semver/i,
+      ],
+      // State - only match in programming/React context
+      state: [
+        /\b(useState|setState|state\s+management|component\s+state)\b/i,
+        /this\.state/i,
+        /state\s+variable/i,
+      ],
+      // Object - only match in programming context
+      object: [
+        /\b(object|class|instance|property|method)\b/i,
+        /new\s+\w+\(/i,
+        /\.\w+\s*=/i, // property assignment
+        /\{\s*\w+:/i, // object literal
+      ],
+      // Class - only match in programming context
+      class: [
+        /class\s+\w+/i,
+        /\bextends\b/i,
+        /\bimplements\b/i,
+        /constructor/i,
+      ],
+      // Method - only match in programming context
+      method: [
+        /\bmethod\s+\w+\s*\(/i,
+        /\.\w+\s*\(/i,
+        /class\s+method/i,
+        /instance\s+method/i,
+      ],
+      // Variable - only match in programming context
+      variable: [
+        /\b(var|let|const|variable)\b/i,
+        /variable\s+(declaration|assignment|name)/i,
+      ],
+      // Interface - only match in programming context
+      interface: [
+        /interface\s+\w+/i,
+        /\bimplements\b/i,
+        /API\s+interface/i,
+        /user\s+interface/i,
+      ],
+    };
+
+    // Check if this term has specific patterns - if so, MUST match pattern
+    const patterns = technicalPatterns[lowerTerm];
+    if (patterns) {
+      // Must match at least one technical pattern for these confusing terms
+      const hasPattern = patterns.some((pattern) => pattern.test(paragraph));
+      console.log(
+        `[Context Filter] "${term}" at position ${position}: hasPattern=${hasPattern}`
+      );
+      return hasPattern;
+    }
+
+    // For terms without specific patterns, use concept density as fallback
+    const conceptDensity = this.countConceptsInParagraph(paragraph);
+    const passes = conceptDensity >= 3;
+    console.log(
+      `[Context Filter] "${term}" at position ${position}: density=${conceptDensity}, passes=${passes}`
+    );
+    return passes;
+  }
+
+  /**
+   * Count domain concepts in a paragraph to determine if it's technical
+   */
+  private countConceptsInParagraph(paragraph: string): number {
+    let count = 0;
+    const lowerParagraph = paragraph.toLowerCase();
+
+    // Check against all concepts in library
+    this.conceptLibrary.forEach((conceptDef, conceptName) => {
+      const terms = [conceptName, ...(conceptDef.aliases || [])];
+      for (const term of terms) {
+        const regex = new RegExp(`\\b${this.escapeRegex(term)}\\b`, "i");
+        if (regex.test(lowerParagraph)) {
+          count++;
+          break; // Count each concept only once
+        }
+      }
+    });
+
+    return count;
   }
 
   private determineImportance(

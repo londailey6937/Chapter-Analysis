@@ -14,6 +14,7 @@ import { CROSS_DOMAIN_CONCEPTS } from "./crossDomainConcepts";
 import { ALGEBRA_TRIG_CONCEPTS } from "./algebraTrigConceptLibrary";
 import { financeConceptLibrary } from "./financeConceptLibrary";
 import { COMPUTING_CONCEPTS } from "./computingConceptLibrary";
+import { REACT_CONCEPTS } from "./reactConceptLibrary";
 
 // Re-export types for convenience
 export type {
@@ -1161,6 +1162,7 @@ export const CONCEPT_LIBRARIES: Record<Domain, ConceptLibrary> = {
     ],
   },
   computing: COMPUTING_CONCEPTS,
+  react: REACT_CONCEPTS,
   mathematics: ALGEBRA_TRIG_CONCEPTS,
   custom: {
     domain: "custom",

@@ -297,11 +297,14 @@ export const ChapterCheckerV2: React.FC = () => {
         },
       };
 
-      // Run analysis in worker
-      const worker = new Worker(
-        new URL("../workers/analysisWorker.ts", import.meta.url),
-        { type: "module" }
+      // Run analysis in worker (with cache-busting timestamp for dev)
+      const workerUrl = new URL(
+        "../workers/analysisWorker.ts",
+        import.meta.url
       );
+      // Force worker reload in development by adding timestamp
+      workerUrl.searchParams.set("t", Date.now().toString());
+      const worker = new Worker(workerUrl, { type: "module" });
 
       worker.postMessage({
         chapter,

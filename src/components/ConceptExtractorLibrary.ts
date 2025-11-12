@@ -362,6 +362,62 @@ export class ConceptExtractor {
     definition: ConceptDefinition
   ): boolean {
     const lowerContext = context.toLowerCase();
+    const conceptName = definition.name.toLowerCase();
+
+    // TERM-SPECIFIC VALIDATION - Check confusing terms first
+    const termSpecificPatterns: Record<string, RegExp[]> = {
+      promise: [
+        // Must have explicit Promise API terms - be VERY strict
+        /\b(async|await)\b/i,
+        /\.then\s*\(/i,
+        /\.catch\s*\(/i,
+        /new\s+Promise\s*\(/i,
+        /Promise\.resolve/i,
+        /Promise\.reject/i,
+        /Promise\.all/i,
+      ],
+      function: [
+        /\bfunction\s+\w+\s*\(/i,
+        /=>\s*{/i,
+        /\(.*\)\s*=>/i,
+        /function\s*\(/i,
+        /arrow\s+function/i,
+        /callback/i,
+      ],
+      state: [
+        /\b(useState|setState|state\s+management|component\s+state)\b/i,
+        /this\.state/i,
+        /state\s+variable/i,
+      ],
+      object: [
+        /\b(object|class|instance|property|method)\b/i,
+        /new\s+\w+\(/i,
+        /\.\w+\s*=/i,
+        /\{\s*\w+:/i,
+      ],
+    };
+
+    // If this concept has specific patterns, it MUST match one of them
+    const patterns = termSpecificPatterns[conceptName];
+    if (patterns && Array.isArray(patterns)) {
+      const hasPattern = patterns.some((pattern) => pattern.test(context));
+      if (conceptName === "promise") {
+        // Extra logging for Promise debugging
+        const matchedPattern = patterns.find((p) => p.test(context));
+        console.log(
+          `[isValidProgrammingContext] "${
+            definition.name
+          }" - hasPattern: ${hasPattern}, context: "${context.substring(
+            0,
+            150
+          )}..."`
+        );
+        if (matchedPattern) {
+          console.log(`  Matched pattern: ${matchedPattern}`);
+        }
+      }
+      return hasPattern;
+    }
 
     // Programming keywords that indicate code context
     const programmingKeywords = [

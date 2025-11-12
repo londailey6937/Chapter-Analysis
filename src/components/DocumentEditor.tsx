@@ -27,6 +27,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   const [selectedText, setSelectedText] = useState("");
   const [showReplaceDialog, setShowReplaceDialog] = useState(false);
   const [replacementText, setReplacementText] = useState("");
+  const [showBackToTop, setShowBackToTop] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -214,6 +215,9 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
                   behavior: "smooth",
                 });
 
+                // Show back to top button
+                setShowBackToTop(true);
+
                 // Flash highlight
                 const originalBg = element.style.backgroundColor;
                 element.style.backgroundColor = "#fef3c7";
@@ -247,6 +251,8 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
               const element = document.getElementById(`para-${i}`);
               if (element) {
                 element.scrollIntoView({ behavior: "smooth", block: "center" });
+                // Show back to top button
+                setShowBackToTop(true);
                 // Flash highlight
                 element.style.backgroundColor = "#fef3c7";
                 setTimeout(() => {
@@ -1022,6 +1028,51 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
             </span>
           )}
         </div>
+      )}
+
+      {/* Back to Top Button */}
+      {showBackToTop && readOnly && (
+        <button
+          onClick={() => {
+            if (containerRef.current) {
+              containerRef.current.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              });
+              setShowBackToTop(false);
+            }
+          }}
+          style={{
+            position: "fixed",
+            bottom: "30px",
+            left: "30px",
+            width: "56px",
+            height: "56px",
+            borderRadius: "50%",
+            backgroundColor: "#3b82f6",
+            color: "white",
+            border: "none",
+            boxShadow: "0 4px 12px rgba(59, 130, 246, 0.4)",
+            cursor: "pointer",
+            fontSize: "24px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            transition: "all 0.2s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#2563eb";
+            e.currentTarget.style.transform = "scale(1.1)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "#3b82f6";
+            e.currentTarget.style.transform = "scale(1)";
+          }}
+          title="Back to top"
+        >
+          ⬆️
+        </button>
       )}
 
       {/* Document Content */}
