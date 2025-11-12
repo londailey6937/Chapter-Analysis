@@ -911,5 +911,718 @@ export const COMPUTING_CONCEPTS: ConceptLibrary = {
       description:
         "The meaning and behavior of programming language constructs.",
     },
+
+    // ============================================
+    // MODERN WEB DEVELOPMENT & APIs
+    // ============================================
+    {
+      name: "API",
+      aliases: [
+        "APIs",
+        "application programming interface",
+        "web API",
+        "API call",
+        "API endpoint",
+      ],
+      category: "Web Development",
+      subcategory: "Core Concepts",
+      importance: "core",
+      description:
+        "A set of protocols and tools for building software applications and enabling communication between different systems.",
+    },
+    {
+      name: "REST",
+      aliases: [
+        "RESTful",
+        "REST API",
+        "RESTful API",
+        "representational state transfer",
+        "RESTful service",
+      ],
+      category: "Web Development",
+      subcategory: "API Design",
+      importance: "core",
+      description:
+        "An architectural style for designing networked applications using stateless HTTP requests and standard methods.",
+    },
+    {
+      name: "endpoint",
+      aliases: ["endpoints", "API endpoint", "REST endpoint", "URL endpoint"],
+      category: "Web Development",
+      subcategory: "API Design",
+      importance: "core",
+      description:
+        "A specific URL or URI where an API can be accessed and performs a specific function.",
+    },
+    {
+      name: "JSON",
+      aliases: [
+        "JavaScript object notation",
+        "JSON format",
+        "JSON data",
+        "JSON object",
+        "JSON response",
+      ],
+      category: "Web Development",
+      subcategory: "Data Formats",
+      importance: "core",
+      description:
+        "A lightweight data-interchange format that is easy for humans to read and write and for machines to parse and generate.",
+    },
+    {
+      name: "HTTP methods",
+      aliases: [
+        "HTTP verbs",
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH",
+        "HTTP request methods",
+      ],
+      category: "Web Development",
+      subcategory: "API Design",
+      importance: "core",
+      description:
+        "Standard request methods used in HTTP to indicate the desired action to be performed on a resource.",
+    },
+    {
+      name: "CRUD",
+      aliases: [
+        "create read update delete",
+        "CRUD operations",
+        "CRUD application",
+      ],
+      category: "Web Development",
+      subcategory: "API Design",
+      importance: "supporting",
+      description:
+        "The four basic operations for persistent storage: Create, Read, Update, and Delete.",
+    },
+    {
+      name: "middleware",
+      aliases: [
+        "middleware function",
+        "middleware layer",
+        "express middleware",
+      ],
+      category: "Web Development",
+      subcategory: "Architecture",
+      importance: "supporting",
+      description:
+        "Software that acts as a bridge between different applications or layers, often processing requests before they reach the main handler.",
+    },
+
+    // ============================================
+    // ASYNCHRONOUS PROGRAMMING
+    // ============================================
+    {
+      name: "asynchronous programming",
+      aliases: [
+        "async",
+        "asynchronous",
+        "async programming",
+        "non-blocking",
+        "asynchronous execution",
+      ],
+      category: "Programming Paradigms",
+      subcategory: "Concurrency",
+      importance: "core",
+      description:
+        "A programming paradigm that allows operations to run independently without blocking the execution of other code.",
+    },
+    {
+      name: "promise",
+      aliases: [
+        "promises",
+        "JavaScript promise",
+        "promise object",
+        "promise chain",
+        "promise.then",
+      ],
+      category: "Programming Paradigms",
+      subcategory: "Asynchronous",
+      importance: "core",
+      description:
+        "An object representing the eventual completion or failure of an asynchronous operation and its resulting value.",
+    },
+    {
+      name: "async/await",
+      aliases: [
+        "async await",
+        "await keyword",
+        "async function",
+        "async syntax",
+      ],
+      category: "Programming Paradigms",
+      subcategory: "Asynchronous",
+      importance: "core",
+      description:
+        "Modern syntax for handling asynchronous operations that makes asynchronous code look and behave more like synchronous code.",
+    },
+    {
+      name: "callback",
+      aliases: [
+        "callback function",
+        "callback pattern",
+        "callback hell",
+        "callbacks",
+      ],
+      category: "Programming Paradigms",
+      subcategory: "Asynchronous",
+      importance: "supporting",
+      description:
+        "A function passed as an argument to another function to be executed later, often after an asynchronous operation completes.",
+    },
+
+    // ============================================
+    // FUNCTIONAL PROGRAMMING
+    // ============================================
+    {
+      name: "functional programming",
+      aliases: [
+        "functional paradigm",
+        "functional approach",
+        "FP",
+        "functional style",
+      ],
+      category: "Programming Paradigms",
+      subcategory: "Core Concepts",
+      importance: "supporting",
+      description:
+        "A programming paradigm that treats computation as the evaluation of mathematical functions and avoids changing state and mutable data.",
+    },
+    {
+      name: "lambda",
+      aliases: [
+        "lambda function",
+        "anonymous function",
+        "lambda expression",
+        "arrow function",
+        "lambda calculus",
+      ],
+      category: "Programming Paradigms",
+      subcategory: "Functional Programming",
+      importance: "core",
+      description:
+        "An anonymous function defined without a name, often used for short, throwaway functions passed as arguments.",
+    },
+    {
+      name: "closure",
+      aliases: ["closures", "lexical closure", "function closure"],
+      category: "Programming Paradigms",
+      subcategory: "Functional Programming",
+      importance: "supporting",
+      description:
+        "A function that has access to variables in its outer (enclosing) lexical scope, even after the outer function has returned.",
+    },
+    {
+      name: "higher-order function",
+      aliases: [
+        "higher order function",
+        "HOF",
+        "first-class function",
+        "function as argument",
+      ],
+      category: "Programming Paradigms",
+      subcategory: "Functional Programming",
+      importance: "supporting",
+      description:
+        "A function that takes one or more functions as arguments or returns a function as its result.",
+    },
+    {
+      name: "pure function",
+      aliases: ["pure functions", "function purity", "side-effect-free"],
+      category: "Programming Paradigms",
+      subcategory: "Functional Programming",
+      importance: "supporting",
+      description:
+        "A function that always returns the same output for the same inputs and has no side effects.",
+    },
+
+    // ============================================
+    // TESTING & QUALITY ASSURANCE
+    // ============================================
+    {
+      name: "unit test",
+      aliases: [
+        "unit testing",
+        "unit tests",
+        "test case",
+        "test suite",
+        "unit test case",
+      ],
+      category: "Software Engineering",
+      subcategory: "Testing",
+      importance: "core",
+      description:
+        "A type of testing that validates individual units or components of software in isolation.",
+    },
+    {
+      name: "integration test",
+      aliases: [
+        "integration testing",
+        "integration tests",
+        "integration test case",
+      ],
+      category: "Software Engineering",
+      subcategory: "Testing",
+      importance: "supporting",
+      description:
+        "Testing that verifies the interactions between different components or systems work correctly together.",
+    },
+    {
+      name: "test-driven development",
+      aliases: ["TDD", "test driven development", "test first"],
+      category: "Software Engineering",
+      subcategory: "Testing",
+      importance: "supporting",
+      description:
+        "A software development approach where tests are written before the actual code implementation.",
+    },
+    {
+      name: "mock",
+      aliases: [
+        "mocking",
+        "mock object",
+        "test mock",
+        "mock function",
+        "stub",
+        "stubbing",
+      ],
+      category: "Software Engineering",
+      subcategory: "Testing",
+      importance: "supporting",
+      description:
+        "A simulated object or function that mimics the behavior of real components for testing purposes.",
+    },
+
+    // ============================================
+    // DEVELOPMENT TOOLS & PRACTICES
+    // ============================================
+    {
+      name: "version control",
+      aliases: [
+        "source control",
+        "revision control",
+        "VCS",
+        "version control system",
+      ],
+      category: "Software Engineering",
+      subcategory: "Development Tools",
+      importance: "core",
+      description:
+        "A system that tracks changes to files over time, allowing multiple people to collaborate and revert to previous versions.",
+    },
+    {
+      name: "git",
+      aliases: ["git repository", "git repo", "git workflow"],
+      category: "Software Engineering",
+      subcategory: "Development Tools",
+      importance: "core",
+      description:
+        "A distributed version control system for tracking changes in source code during software development.",
+    },
+    {
+      name: "repository",
+      aliases: [
+        "repo",
+        "code repository",
+        "git repository",
+        "source repository",
+      ],
+      category: "Software Engineering",
+      subcategory: "Development Tools",
+      importance: "core",
+      description:
+        "A central location where code and related files are stored and managed, typically using version control.",
+    },
+    {
+      name: "commit",
+      aliases: ["commits", "git commit", "commit message", "committing"],
+      category: "Software Engineering",
+      subcategory: "Version Control",
+      importance: "core",
+      description:
+        "A snapshot of changes to a repository, recording what was changed and why.",
+    },
+    {
+      name: "branch",
+      aliases: [
+        "branches",
+        "git branch",
+        "feature branch",
+        "branching",
+        "branch strategy",
+      ],
+      category: "Software Engineering",
+      subcategory: "Version Control",
+      importance: "supporting",
+      description:
+        "A parallel version of a repository that allows development without affecting the main codebase.",
+    },
+    {
+      name: "merge",
+      aliases: ["merging", "git merge", "merge conflict", "merge request"],
+      category: "Software Engineering",
+      subcategory: "Version Control",
+      importance: "supporting",
+      description:
+        "The process of integrating changes from one branch into another in version control.",
+    },
+
+    // ============================================
+    // PACKAGE MANAGEMENT & DEPENDENCIES
+    // ============================================
+    {
+      name: "package manager",
+      aliases: [
+        "package management",
+        "dependency manager",
+        "package management system",
+      ],
+      category: "Software Engineering",
+      subcategory: "Development Tools",
+      importance: "core",
+      description:
+        "A tool that automates the process of installing, upgrading, configuring, and removing software packages.",
+    },
+    {
+      name: "npm",
+      aliases: [
+        "node package manager",
+        "npm package",
+        "npm install",
+        "npm registry",
+      ],
+      category: "Software Engineering",
+      subcategory: "Package Managers",
+      importance: "supporting",
+      description:
+        "The default package manager for Node.js, used to install and manage JavaScript libraries and dependencies.",
+    },
+    {
+      name: "dependency",
+      aliases: [
+        "dependencies",
+        "package dependency",
+        "external dependency",
+        "dependency tree",
+      ],
+      category: "Software Engineering",
+      subcategory: "Package Management",
+      importance: "core",
+      description:
+        "An external library or package that a project requires to function properly.",
+    },
+    {
+      name: "library",
+      aliases: [
+        "libraries",
+        "code library",
+        "software library",
+        "third-party library",
+      ],
+      category: "Software Engineering",
+      subcategory: "Core Concepts",
+      importance: "core",
+      description:
+        "A collection of reusable code, functions, or modules that can be used by other programs.",
+    },
+    {
+      name: "framework",
+      aliases: [
+        "frameworks",
+        "application framework",
+        "web framework",
+        "software framework",
+      ],
+      category: "Software Engineering",
+      subcategory: "Core Concepts",
+      importance: "core",
+      description:
+        "A platform providing a foundation and structure for developing software applications, with predefined components and patterns.",
+    },
+
+    // ============================================
+    // DEVOPS & DEPLOYMENT
+    // ============================================
+    {
+      name: "CI/CD",
+      aliases: [
+        "continuous integration",
+        "continuous deployment",
+        "continuous delivery",
+        "CI CD",
+        "CI pipeline",
+      ],
+      category: "Software Engineering",
+      subcategory: "DevOps",
+      importance: "supporting",
+      description:
+        "Practices that automate the integration, testing, and deployment of code changes to production.",
+    },
+    {
+      name: "Docker",
+      aliases: [
+        "docker container",
+        "docker image",
+        "dockerfile",
+        "containerization",
+      ],
+      category: "Software Engineering",
+      subcategory: "DevOps",
+      importance: "supporting",
+      description:
+        "A platform for developing, shipping, and running applications in isolated containers.",
+    },
+    {
+      name: "container",
+      aliases: [
+        "containers",
+        "containerized",
+        "container image",
+        "containerization",
+      ],
+      category: "Software Engineering",
+      subcategory: "DevOps",
+      importance: "supporting",
+      description:
+        "A lightweight, standalone executable package that includes everything needed to run an application.",
+    },
+    {
+      name: "deployment",
+      aliases: [
+        "deploy",
+        "deploying",
+        "production deployment",
+        "deployment process",
+      ],
+      category: "Software Engineering",
+      subcategory: "DevOps",
+      importance: "core",
+      description:
+        "The process of making software available for use, typically by transferring it to a production environment.",
+    },
+
+    // ============================================
+    // MODERN LANGUAGE FEATURES
+    // ============================================
+    {
+      name: "decorator",
+      aliases: [
+        "decorators",
+        "annotation",
+        "annotations",
+        "decorator pattern",
+        "@decorator",
+      ],
+      category: "Programming Fundamentals",
+      subcategory: "Language Features",
+      importance: "supporting",
+      description:
+        "A design pattern and language feature that allows adding behavior to objects or functions dynamically.",
+    },
+    {
+      name: "generator",
+      aliases: [
+        "generators",
+        "generator function",
+        "yield",
+        "generator iterator",
+      ],
+      category: "Programming Fundamentals",
+      subcategory: "Language Features",
+      importance: "supporting",
+      description:
+        "A function that can pause execution and yield multiple values over time, creating an iterator.",
+    },
+    {
+      name: "interface",
+      aliases: [
+        "interfaces",
+        "type interface",
+        "interface definition",
+        "interface implementation",
+      ],
+      category: "Object-Oriented Programming",
+      subcategory: "Abstraction",
+      importance: "core",
+      description:
+        "A contract that defines a set of methods and properties that a class must implement, without specifying how.",
+    },
+
+    // ============================================
+    // CLOUD & DISTRIBUTED SYSTEMS
+    // ============================================
+    {
+      name: "cloud computing",
+      aliases: [
+        "cloud",
+        "cloud service",
+        "cloud platform",
+        "cloud infrastructure",
+      ],
+      category: "Distributed Systems",
+      subcategory: "Core Concepts",
+      importance: "supporting",
+      description:
+        "The delivery of computing services including servers, storage, databases, and software over the internet.",
+    },
+    {
+      name: "microservices",
+      aliases: [
+        "microservice",
+        "microservice architecture",
+        "microservices pattern",
+        "service-oriented architecture",
+      ],
+      category: "Distributed Systems",
+      subcategory: "Architecture",
+      importance: "supporting",
+      description:
+        "An architectural style that structures an application as a collection of loosely coupled, independently deployable services.",
+    },
+    {
+      name: "scalability",
+      aliases: [
+        "scalable",
+        "scaling",
+        "horizontal scaling",
+        "vertical scaling",
+        "scale",
+      ],
+      category: "Distributed Systems",
+      subcategory: "Performance",
+      importance: "supporting",
+      description:
+        "The ability of a system to handle increased load by adding resources, either by scaling up or scaling out.",
+    },
+
+    // ============================================
+    // CONCURRENCY & PARALLELISM
+    // ============================================
+    {
+      name: "thread",
+      aliases: [
+        "threads",
+        "threading",
+        "multithreading",
+        "thread execution",
+        "worker thread",
+      ],
+      category: "Operating Systems",
+      subcategory: "Concurrency",
+      importance: "core",
+      description:
+        "The smallest unit of execution within a process, allowing multiple operations to run concurrently.",
+    },
+    {
+      name: "mutex",
+      aliases: [
+        "mutual exclusion",
+        "lock",
+        "locking",
+        "mutex lock",
+        "synchronization",
+      ],
+      category: "Operating Systems",
+      subcategory: "Concurrency",
+      importance: "supporting",
+      description:
+        "A synchronization mechanism that prevents multiple threads from accessing a shared resource simultaneously.",
+    },
+    {
+      name: "semaphore",
+      aliases: ["semaphores", "counting semaphore", "binary semaphore"],
+      category: "Operating Systems",
+      subcategory: "Concurrency",
+      importance: "supporting",
+      description:
+        "A synchronization primitive that uses a counter to control access to shared resources by multiple processes or threads.",
+    },
+
+    // ============================================
+    // ERROR HANDLING & DEBUGGING
+    // ============================================
+    {
+      name: "exception handling",
+      aliases: [
+        "exception",
+        "exceptions",
+        "error handling",
+        "try catch",
+        "try-catch-finally",
+        "throw exception",
+      ],
+      category: "Programming Fundamentals",
+      subcategory: "Error Handling",
+      importance: "core",
+      description:
+        "A mechanism for handling runtime errors and exceptional conditions in a controlled manner.",
+    },
+    {
+      name: "debugging",
+      aliases: [
+        "debug",
+        "debugger",
+        "debugging tools",
+        "breakpoint",
+        "breakpoints",
+      ],
+      category: "Software Engineering",
+      subcategory: "Development Tools",
+      importance: "core",
+      description:
+        "The process of identifying, analyzing, and removing errors or bugs from software code.",
+    },
+
+    // ============================================
+    // DATA SCIENCE & MACHINE LEARNING (Basic)
+    // ============================================
+    {
+      name: "machine learning",
+      aliases: [
+        "ML",
+        "machine learning model",
+        "ML algorithm",
+        "supervised learning",
+        "unsupervised learning",
+      ],
+      category: "Data Science",
+      subcategory: "Core Concepts",
+      importance: "supporting",
+      description:
+        "A branch of artificial intelligence focused on building systems that learn from data and improve their performance over time.",
+    },
+    {
+      name: "neural network",
+      aliases: [
+        "neural networks",
+        "artificial neural network",
+        "ANN",
+        "deep learning",
+        "deep neural network",
+      ],
+      category: "Data Science",
+      subcategory: "Machine Learning",
+      importance: "supporting",
+      description:
+        "A computing system inspired by biological neural networks, consisting of interconnected nodes that process information.",
+    },
+    {
+      name: "training data",
+      aliases: [
+        "training set",
+        "dataset",
+        "training dataset",
+        "model training",
+      ],
+      category: "Data Science",
+      subcategory: "Machine Learning",
+      importance: "supporting",
+      description:
+        "A dataset used to train a machine learning model by providing examples from which the model learns patterns.",
+    },
   ],
 };
