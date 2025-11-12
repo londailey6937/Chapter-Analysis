@@ -328,27 +328,22 @@ export function NavigationMenu({
             ]}
           />
 
-          {/* PDF & Visualization */}
+          {/* Visualization */}
           <FeatureSection
-            title="📄 PDF & Visualization"
+            title="🎨 Visualization"
             icon="🎨"
             isExpanded={expandedSection === "visual"}
             onToggle={() => toggleSection("visual")}
             features={[
               {
-                icon: "📤",
-                title: "Drag & Drop Upload",
-                desc: "Instant PDF text extraction",
-              },
-              {
-                icon: "👀",
+                icon: "",
                 title: "Side-by-Side Viewer",
-                desc: "View PDF while analyzing",
+                desc: "View document while analyzing",
               },
               {
                 icon: "🎯",
                 title: "Concept Highlighting",
-                desc: "Click concepts to highlight in PDF",
+                desc: "Click concepts to highlight in text",
               },
               {
                 icon: "📊",
@@ -429,7 +424,7 @@ export function NavigationMenu({
             badge="FREE"
             onClick={() => {
               alert(
-                "Pricing:\n\n🎓 Free Plan:\n- Unlimited chapter analysis\n- All 10 learning principles\n- Export results as JSON\n- Community support\n\n🚀 Pro Plan (Coming Soon):\n- Priority processing\n- PDF report exports\n- Custom branding\n- API access\n- Priority support"
+                "Pricing:\n\n🎓 Free Plan:\n- Unlimited chapter analysis\n- All 10 learning principles\n- Export results as JSON\n- Community support\n\n🚀 Pro Plan (Coming Soon):\n- Priority processing\n- Custom report exports\n- Custom branding\n- API access\n- Priority support"
               );
             }}
           />
@@ -567,22 +562,7 @@ export function NavigationMenu({
               desc="DNA, cells, genetics patterns"
             />
             <ComingSoonItem
-              icon="💰"
-              title="Finance Domain"
-              desc="Calculations, case studies"
-            />
-            <ComingSoonItem
-              icon="💻"
-              title="Computer Science"
-              desc="Algorithms, code examples"
-            />
-            <ComingSoonItem
-              icon="📄"
-              title="PDF Reports"
-              desc="Professional formatted exports"
-            />
-            <ComingSoonItem
-              icon="📈"
+              icon="�"
               title="Comparative Analysis"
               desc="Compare multiple chapters"
             />

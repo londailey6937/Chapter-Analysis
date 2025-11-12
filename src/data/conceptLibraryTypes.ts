@@ -64,7 +64,7 @@ export const AVAILABLE_DOMAINS: DomainInfo[] = [
   },
   {
     id: "computing",
-    label: "Computing",
+    label: "Computer Science",
     description:
       "Computer science concepts (algorithm, function, data structure, etc.)",
     icon: "💻",

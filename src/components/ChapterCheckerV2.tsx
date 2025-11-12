@@ -583,10 +583,6 @@ export const ChapterCheckerV2: React.FC = () => {
               <div style={{ fontSize: "18px", fontWeight: "600" }}>
                 Upload a document to get started
               </div>
-              <div style={{ fontSize: "14px" }}>
-                Supported: Word documents, Markdown, Plain text, HTML, Open
-                Library Text
-              </div>
             </div>
           )}
         </div>

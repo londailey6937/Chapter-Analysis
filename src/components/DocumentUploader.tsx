@@ -112,7 +112,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
           }
         }}
       >
-        📄 Upload Document (.docx, .md, .txt, .html, .obt)
+        📄 Upload Document
       </label>
       <div
         style={{
