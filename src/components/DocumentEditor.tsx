@@ -144,6 +144,19 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedText, historyIndex]);
 
+  // Scroll to top when document text changes (new document loaded)
+  useEffect(() => {
+    if (containerRef.current && readOnly) {
+      // Only scroll to top if highlightPosition is null (not jumping to a specific location)
+      if (highlightPosition === null) {
+        containerRef.current.scrollTo({
+          top: 0,
+          behavior: "auto", // Instant scroll on load
+        });
+      }
+    }
+  }, [text, readOnly, highlightPosition]);
+
   // Scroll to highlighted position
   useEffect(() => {
     if (highlightPosition !== null) {
@@ -183,8 +196,24 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
             if (charCount + nodeLength > textPosition) {
               // Found the node, scroll its parent element into view
               const element = textNode.parentElement;
-              if (element) {
-                element.scrollIntoView({ behavior: "smooth", block: "center" });
+              if (element && container) {
+                // Calculate the element's position relative to the container
+                const elementRect = element.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                const relativeTop =
+                  elementRect.top - containerRect.top + container.scrollTop;
+
+                // Scroll to center the element in the viewport
+                const targetScrollTop =
+                  relativeTop -
+                  container.clientHeight / 2 +
+                  elementRect.height / 2;
+
+                container.scrollTo({
+                  top: Math.max(0, targetScrollTop),
+                  behavior: "smooth",
+                });
+
                 // Flash highlight
                 const originalBg = element.style.backgroundColor;
                 element.style.backgroundColor = "#fef3c7";
