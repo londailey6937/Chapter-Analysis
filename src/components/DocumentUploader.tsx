@@ -23,15 +23,15 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
       let extractedText = "";
 
       if (fileType === "docx") {
-        // Extract text from DOCX (without images)
+        // Extract HTML with embedded images from DOCX
         const arrayBuffer = await file.arrayBuffer();
 
-        // Extract plain text without images
-        const textResult = await mammoth.extractRawText({ arrayBuffer });
-        extractedText = textResult.value;
+        // Convert to HTML (includes images as base64)
+        const htmlResult = await mammoth.convertToHtml({ arrayBuffer });
+        extractedText = htmlResult.value;
 
         console.log(
-          `✅ Extracted text from DOCX (${extractedText.length} characters)`
+          `✅ Extracted HTML from DOCX (${extractedText.length} characters)`
         );
 
         if (extractedText.trim()) {

@@ -39,55 +39,6 @@ export const MissingConceptSuggestions: React.FC<
     new Set()
   );
 
-  // Find concepts that are in the library but not in the writer's text
-  const missingConcepts = useMemo(() => {
-    const missing: MissingConcept[] = [];
-    const identifiedNames = new Set(
-      identifiedConcepts.map((c) => c.name.toLowerCase())
-    );
-
-    // Only check core and supporting concepts (not detail level)
-    const importantConcepts = libraryConcepts.filter(
-      (c) => c.importance === "core" || c.importance === "supporting"
-    );
-
-    for (const libConcept of importantConcepts) {
-      // Check if this concept (or any of its aliases) is already identified
-      const isIdentified =
-        identifiedNames.has(libConcept.name.toLowerCase()) ||
-        (libConcept.aliases &&
-          libConcept.aliases.some((alias) =>
-            identifiedNames.has(alias.toLowerCase())
-          ));
-
-      if (!isIdentified && !rejectedConcepts.has(libConcept.name)) {
-        // Find a good place to suggest adding this concept
-        const suggestion = suggestInsertionPoint(
-          libConcept,
-          chapterText,
-          identifiedConcepts
-        );
-        if (suggestion) {
-          missing.push({
-            concept: libConcept,
-            suggestedLocation: suggestion.location,
-            contextSnippet: suggestion.snippet,
-            reason: suggestion.reason,
-          });
-        }
-      }
-    }
-
-    // Sort by importance (core first) and then by suggested location
-    return missing.sort((a, b) => {
-      if (a.concept.importance === "core" && b.concept.importance !== "core")
-        return -1;
-      if (a.concept.importance !== "core" && b.concept.importance === "core")
-        return 1;
-      return a.suggestedLocation - b.suggestedLocation;
-    });
-  }, [libraryConcepts, identifiedConcepts, chapterText, rejectedConcepts]);
-
   // Suggest where to insert a missing concept based on related concepts and categories
   const suggestInsertionPoint = (
     concept: ConceptDefinition,
@@ -152,6 +103,55 @@ export const MissingConceptSuggestions: React.FC<
       reason: "General content area",
     };
   };
+
+  // Find concepts that are in the library but not in the writer's text
+  const missingConcepts = useMemo(() => {
+    const missing: MissingConcept[] = [];
+    const identifiedNames = new Set(
+      identifiedConcepts.map((c) => c.name.toLowerCase())
+    );
+
+    // Only check core and supporting concepts (not detail level)
+    const importantConcepts = libraryConcepts.filter(
+      (c) => c.importance === "core" || c.importance === "supporting"
+    );
+
+    for (const libConcept of importantConcepts) {
+      // Check if this concept (or any of its aliases) is already identified
+      const isIdentified =
+        identifiedNames.has(libConcept.name.toLowerCase()) ||
+        (libConcept.aliases &&
+          libConcept.aliases.some((alias) =>
+            identifiedNames.has(alias.toLowerCase())
+          ));
+
+      if (!isIdentified && !rejectedConcepts.has(libConcept.name)) {
+        // Find a good place to suggest adding this concept
+        const suggestion = suggestInsertionPoint(
+          libConcept,
+          chapterText,
+          identifiedConcepts
+        );
+        if (suggestion) {
+          missing.push({
+            concept: libConcept,
+            suggestedLocation: suggestion.location,
+            contextSnippet: suggestion.snippet,
+            reason: suggestion.reason,
+          });
+        }
+      }
+    }
+
+    // Sort by importance (core first) and then by suggested location
+    return missing.sort((a, b) => {
+      if (a.concept.importance === "core" && b.concept.importance !== "core")
+        return -1;
+      if (a.concept.importance !== "core" && b.concept.importance === "core")
+        return 1;
+      return a.suggestedLocation - b.suggestedLocation;
+    });
+  }, [libraryConcepts, identifiedConcepts, chapterText, rejectedConcepts]);
 
   const handleReject = (conceptName: string) => {
     setRejectedConcepts((prev) => new Set(prev).add(conceptName));

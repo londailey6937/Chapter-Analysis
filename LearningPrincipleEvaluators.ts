@@ -796,6 +796,11 @@ export class SpacedRepetitionEvaluator {
     concepts: ConceptGraph,
     patternAnalysis?: any
   ): PrincipleEvaluation {
+    console.log(
+      "🔍 [SpacedRepetition] EVALUATOR STARTING - Total concepts:",
+      concepts.concepts.length
+    );
+
     const findings: Finding[] = [];
     const evidence: Evidence[] = [];
 
@@ -889,6 +894,18 @@ export class SpacedRepetitionEvaluator {
 
     // NEW: Massed vs. Distributed Practice Detection
     const practiceType = this.detectMassedVsDistributed(chapter, concepts);
+    console.log(
+      "[SpacedRepetition] Practice type:",
+      "massedRatio:",
+      practiceType.massedRatio.toFixed(2),
+      "distributedRatio:",
+      practiceType.distributedRatio.toFixed(2),
+      "massedSegments:",
+      practiceType.massedSegments.length,
+      "massedConcepts:",
+      practiceType.massedConcepts
+    );
+
     evidence.push({
       type: "metric",
       metric: "distributed_practice_ratio",
@@ -911,6 +928,18 @@ export class SpacedRepetitionEvaluator {
         severity: 0.8,
         evidence: `${practiceType.massedSegments.length} segments show concept clustering without spacing`,
       });
+    } else if (
+      practiceType.distributedRatio < 0.7 &&
+      practiceType.massedSegments.length > 0
+    ) {
+      findings.push({
+        type: "warning",
+        message: `Moderate massed practice detected (${(
+          practiceType.massedRatio * 100
+        ).toFixed(0)}%) - some concepts clustered too closely`,
+        severity: 0.6,
+        evidence: `${practiceType.massedSegments.length} segments could benefit from better spacing`,
+      });
     } else if (practiceType.distributedRatio >= 0.7) {
       findings.push({
         type: "positive",
@@ -926,6 +955,16 @@ export class SpacedRepetitionEvaluator {
     const conceptMentionStats = this.analyzeConceptMentionPatterns(
       chapter,
       concepts
+    );
+
+    console.log(
+      "[SpacedRepetition] Concept mentions:",
+      "avgMentions:",
+      conceptMentionStats.avgMentions.toFixed(2),
+      "totalConcepts:",
+      concepts.concepts.length,
+      "conceptsWithMultipleMentions:",
+      concepts.concepts.filter((c) => c.mentions.length >= 2).length
     );
 
     evidence.push({
@@ -974,6 +1013,18 @@ export class SpacedRepetitionEvaluator {
 
     // Analyze spacing gaps
     const spacingAnalysis = this.analyzeSpacingGaps(chapter, concepts);
+    console.log(
+      "[SpacedRepetition] Spacing analysis:",
+      "consistency:",
+      spacingAnalysis.consistency.toFixed(2),
+      "avgGap:",
+      spacingAnalysis.avgGap.toFixed(0),
+      "evenSpacing:",
+      spacingAnalysis.evenSpacing,
+      "unevenConcepts:",
+      spacingAnalysis.unevenConcepts.length
+    );
+
     evidence.push({
       type: "metric",
       metric: "spacing_gap_consistency",
@@ -983,12 +1034,32 @@ export class SpacedRepetitionEvaluator {
     });
 
     if (spacingAnalysis.evenSpacing) {
-      findings.push({
-        type: "positive",
-        message: "✓ Concepts spread evenly throughout chapter",
-        severity: 0,
-        evidence: `Spacing gaps are consistent (${spacingAnalysis.avgGap} characters)`,
-      });
+      // Check if spacing is too short or too long even if consistent
+      const idealMinGap = 500; // ~500 chars = few paragraphs
+      const idealMaxGap = 5000; // ~5000 chars = few pages
+
+      if (spacingAnalysis.avgGap < idealMinGap) {
+        findings.push({
+          type: "warning",
+          message: `Spacing too tight: Concepts revisited every ${spacingAnalysis.avgGap} characters (recommend 500+ chars)`,
+          severity: 0.6,
+          evidence: `Concepts repeated too frequently - may feel redundant`,
+        });
+      } else if (spacingAnalysis.avgGap > idealMaxGap) {
+        findings.push({
+          type: "warning",
+          message: `Spacing too wide: ${spacingAnalysis.avgGap} characters between revisits (recommend < 5000 chars)`,
+          severity: 0.6,
+          evidence: `Long gaps risk forgetting before re-encountering concept`,
+        });
+      } else {
+        findings.push({
+          type: "positive",
+          message: "✓ Concepts spread evenly throughout chapter",
+          severity: 0,
+          evidence: `Spacing gaps are consistent and optimal (${spacingAnalysis.avgGap} characters)`,
+        });
+      }
     } else {
       findings.push({
         type: "warning",
@@ -996,6 +1067,33 @@ export class SpacedRepetitionEvaluator {
           "Uneven spacing: Some concepts revisited early, others abandoned",
         severity: 0.5,
         evidence: spacingAnalysis.unevenConcepts.slice(0, 2).join(", "),
+      });
+    }
+
+    // DEBUG: Check if any spacing-related warnings were generated
+    const spacingWarnings = findings.filter(
+      (f) => f.type === "warning" || f.type === "critical"
+    ).length;
+
+    console.log(
+      `[SpacedRepetition] Generated ${spacingWarnings} warnings/critical findings out of ${findings.length} total findings`
+    );
+
+    // If we have concepts with multiple mentions but no warnings, something is wrong
+    const conceptsWithSpacing = concepts.concepts.filter(
+      (c) => c.mentions.length >= 2
+    ).length;
+    if (
+      conceptsWithSpacing > 0 &&
+      spacingWarnings === 0 &&
+      findings.length > 0
+    ) {
+      // All findings are positive - this is suspicious, add a review suggestion
+      findings.push({
+        type: "neutral",
+        message: `Spacing appears optimal - but manual review recommended for ${conceptsWithSpacing} concepts with multiple mentions`,
+        severity: 0.2,
+        evidence: `Automated analysis found no spacing issues, which may indicate very well-structured content`,
       });
     }
 
@@ -1077,6 +1175,13 @@ export class SpacedRepetitionEvaluator {
         ],
       });
     }
+
+    console.log(
+      "[SpacedRepetition] FINAL RETURN - Findings:",
+      findings.length,
+      "items:",
+      findings.map((f) => `${f.type}: ${f.message.substring(0, 50)}...`)
+    );
 
     return {
       principle: "spacedRepetition",

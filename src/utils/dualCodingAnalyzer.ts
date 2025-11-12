@@ -22,10 +22,19 @@ export class DualCodingAnalyzer {
       return html;
     }
 
-    // Create a temporary div to parse HTML
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = html;
-    return tempDiv.textContent || tempDiv.innerText || html;
+    // Use regex to strip HTML tags instead of DOM parsing to avoid warnings
+    // This is safer and doesn't trigger HTML parsing warnings
+    return html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "") // Remove script tags and content
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "") // Remove style tags and content
+      .replace(/<[^>]+>/g, "") // Remove all other HTML tags
+      .replace(/&nbsp;/g, " ") // Replace &nbsp; with space
+      .replace(/&lt;/g, "<") // Replace &lt; with <
+      .replace(/&gt;/g, ">") // Replace &gt; with >
+      .replace(/&amp;/g, "&") // Replace &amp; with &
+      .replace(/&quot;/g, '"') // Replace &quot; with "
+      .replace(/&#39;/g, "'") // Replace &#39; with '
+      .trim();
   }
 
   /**

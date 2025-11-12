@@ -30,11 +30,30 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Check if content is HTML with images
+  // Check if content is actual HTML document structure (not just code examples with tags)
   const isHtmlContent = useMemo(() => {
-    return (
-      text.includes("<img") || text.includes("<p>") || text.includes("<h1>")
+    // Only treat as HTML if it starts with HTML structure or has multiple HTML block elements
+    // OR if it has images (from DOCX conversion)
+    const startsWithHtml = /^\s*<!DOCTYPE|^\s*<html|^\s*<head|^\s*<body/i.test(
+      text
     );
+    const hasMultipleBlockElements =
+      (text.match(/<(div|section|article|main|header|footer|nav)/gi) || [])
+        .length > 3;
+    const hasMultipleParagraphs = (text.match(/<p>/gi) || []).length > 5; // Mammoth generates <p> tags
+    const hasImages = text.includes("<img");
+    // Treat as HTML if it has HTML structure OR multiple p tags (mammoth output) OR images
+    const hasHtmlStructure =
+      startsWithHtml ||
+      hasMultipleBlockElements ||
+      hasMultipleParagraphs ||
+      hasImages;
+
+    console.log(
+      `[DocumentEditor] isHtmlContent=${hasHtmlStructure} (starts: ${startsWithHtml}, blocks: ${hasMultipleBlockElements}, paragraphs: ${hasMultipleParagraphs}, images: ${hasImages}), text preview:`,
+      text.substring(0, 200)
+    );
+    return hasHtmlStructure;
   }, [text]);
 
   // Undo/Redo stacks
@@ -101,26 +120,66 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   useEffect(() => {
     if (highlightPosition !== null) {
       if (readOnly && containerRef.current) {
-        // Read-only mode: scroll to paragraph
-        let charCount = 0;
-        const paragraphs = text.split(/\n\n+/);
+        // Read-only mode: scroll to position
+        if (isHtmlContent) {
+          // For HTML content, find text node at position and scroll to it
+          const container = containerRef.current;
+          const allTextNodes: Text[] = [];
 
-        for (let i = 0; i < paragraphs.length; i++) {
-          const paraLength = paragraphs[i].length + 2; // +2 for \n\n
-          if (charCount + paraLength > highlightPosition) {
-            // Found the paragraph, scroll to it
-            const element = document.getElementById(`para-${i}`);
-            if (element) {
-              element.scrollIntoView({ behavior: "smooth", block: "center" });
-              // Flash highlight
-              element.style.backgroundColor = "#fef3c7";
-              setTimeout(() => {
-                element.style.backgroundColor = "";
-              }, 2000);
-            }
-            break;
+          // Walk through all text nodes
+          const walker = document.createTreeWalker(
+            container,
+            NodeFilter.SHOW_TEXT,
+            null
+          );
+
+          let node;
+          while ((node = walker.nextNode())) {
+            allTextNodes.push(node as Text);
           }
-          charCount += paraLength;
+
+          // Find the text node containing our highlight position
+          let charCount = 0;
+          for (const textNode of allTextNodes) {
+            const nodeLength = textNode.textContent?.length || 0;
+            if (charCount + nodeLength > highlightPosition) {
+              // Found the node, scroll its parent element into view
+              const element = textNode.parentElement;
+              if (element) {
+                element.scrollIntoView({ behavior: "smooth", block: "center" });
+                // Flash highlight
+                const originalBg = element.style.backgroundColor;
+                element.style.backgroundColor = "#fef3c7";
+                setTimeout(() => {
+                  element.style.backgroundColor = originalBg;
+                }, 2000);
+              }
+              break;
+            }
+            charCount += nodeLength;
+          }
+        } else {
+          // For plain text rendering, use paragraph IDs
+          let charCount = 0;
+          const paragraphs = text.split(/\n\n+/);
+
+          for (let i = 0; i < paragraphs.length; i++) {
+            const paraLength = paragraphs[i].length + 2; // +2 for \n\n
+            if (charCount + paraLength > highlightPosition) {
+              // Found the paragraph, scroll to it
+              const element = document.getElementById(`para-${i}`);
+              if (element) {
+                element.scrollIntoView({ behavior: "smooth", block: "center" });
+                // Flash highlight
+                element.style.backgroundColor = "#fef3c7";
+                setTimeout(() => {
+                  element.style.backgroundColor = "";
+                }, 2000);
+              }
+              break;
+            }
+            charCount += paraLength;
+          }
         }
       } else if (!readOnly && textareaRef.current) {
         // Edit mode: select text in textarea
@@ -159,7 +218,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
         }, 2000);
       }
     }
-  }, [highlightPosition, text, readOnly]);
+  }, [highlightPosition, text, readOnly, isHtmlContent]);
 
   const addToHistory = (newText: string) => {
     // Remove any "future" history if we're not at the end
@@ -253,25 +312,199 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     });
   };
 
-  // Render HTML content with images
+  // Render HTML content with images (with spacing and dual coding overlays)
   const renderHtmlContent = () => {
+    // Extract plain text from HTML for analysis
+    const plainText = text
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
+      .replace(/<[^>]+>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&")
+      .trim();
+
+    // Analyze plain text for visual suggestions (dual coding)
+    const visualSuggestions = showVisualSuggestions
+      ? DualCodingAnalyzer.analyzeForVisuals(plainText)
+      : [];
+
+    // Parse HTML into paragraphs for spacing analysis
+    const htmlParagraphs: { html: string; textLength: number }[] = [];
+    if (showSpacingIndicators) {
+      // Match paragraph tags and extract content
+      const paragraphMatches = text.match(/<p[^>]*>.*?<\/p>/gi) || [];
+      paragraphMatches.forEach((paraHtml) => {
+        // Extract text length for spacing calculation
+        const paraText = paraHtml
+          .replace(/<[^>]+>/g, "")
+          .replace(/&nbsp;/g, " ")
+          .replace(/&lt;/g, "<")
+          .replace(/&gt;/g, ">")
+          .replace(/&amp;/g, "&")
+          .trim();
+        if (paraText.length > 0) {
+          htmlParagraphs.push({ html: paraHtml, textLength: paraText.length });
+        }
+      });
+    }
+
     return (
-      <div
-        dangerouslySetInnerHTML={{ __html: text }}
-        style={{
-          fontFamily: "ui-sans-serif, system-ui, sans-serif",
-          lineHeight: "1.8",
-          color: "#1f2937",
-        }}
-        // Apply CSS to format HTML elements
-        className="prose-content"
-      />
+      <div>
+        {/* Dual Coding Summary */}
+        {showVisualSuggestions && visualSuggestions.length > 0 && (
+          <div
+            style={{
+              padding: "16px",
+              marginBottom: "24px",
+              backgroundColor: "#fef3c7",
+              border: "2px solid #f59e0b",
+              borderRadius: "8px",
+            }}
+          >
+            <div style={{ fontWeight: "600", marginBottom: "8px" }}>
+              📊 Dual Coding Analysis
+            </div>
+            <div style={{ fontSize: "14px", color: "#92400e" }}>
+              Found <strong>{visualSuggestions.length}</strong>{" "}
+              {visualSuggestions.length === 1 ? "location" : "locations"} where
+              adding visuals (diagrams, charts, illustrations) would improve
+              comprehension. Consider adding images at key concept explanations.
+            </div>
+          </div>
+        )}
+
+        {/* Render HTML content with spacing indicators */}
+        {showSpacingIndicators && htmlParagraphs.length > 0 ? (
+          <div>
+            {htmlParagraphs.map((para, index) => {
+              const nextPara = htmlParagraphs[index + 1];
+              const currentLength = para.textLength;
+              const needsMoreSpacing = currentLength > 800; // Long paragraph needs more spacing
+
+              return (
+                <div
+                  key={index}
+                  style={{ marginBottom: needsMoreSpacing ? "32px" : "16px" }}
+                >
+                  {/* Top spacing indicator */}
+                  {index > 0 && (
+                    <div
+                      style={{
+                        width: "100%",
+                        height: "2px",
+                        backgroundColor: "#d1d5db",
+                        marginBottom: "16px",
+                        position: "relative",
+                      }}
+                    >
+                      <span
+                        style={{
+                          position: "absolute",
+                          left: "0",
+                          top: "-10px",
+                          fontSize: "11px",
+                          color: "#6b7280",
+                          backgroundColor: "white",
+                          padding: "2px 8px",
+                          borderRadius: "4px",
+                          fontWeight: "500",
+                        }}
+                      >
+                        ━━━ {currentLength} chars ━━━
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Paragraph content */}
+                  <div
+                    dangerouslySetInnerHTML={{ __html: para.html }}
+                    style={{
+                      fontFamily: "ui-sans-serif, system-ui, sans-serif",
+                      lineHeight: "1.8",
+                      color: "#1f2937",
+                    }}
+                    className="prose-content"
+                  />
+
+                  {/* Bottom spacing indicator */}
+                  {nextPara && (
+                    <div
+                      style={{
+                        width: "100%",
+                        marginTop: "12px",
+                        paddingTop: "8px",
+                        borderTop: needsMoreSpacing
+                          ? "2px dashed #fbbf24"
+                          : "1px solid #e5e7eb",
+                      }}
+                    >
+                      {needsMoreSpacing && (
+                        <div
+                          style={{
+                            fontSize: "11px",
+                            color: "#f59e0b",
+                            fontWeight: "600",
+                            marginTop: "4px",
+                            padding: "4px 8px",
+                            backgroundColor: "#fef3c7",
+                            borderRadius: "4px",
+                            display: "inline-block",
+                          }}
+                        >
+                          ⚠️ Consider more spacing here (topic/section break)
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          /* Fallback: render raw HTML without spacing indicators */
+          <div
+            dangerouslySetInnerHTML={{ __html: text }}
+            style={{
+              fontFamily: "ui-sans-serif, system-ui, sans-serif",
+              lineHeight: "1.8",
+              color: "#1f2937",
+            }}
+            className="prose-content"
+          />
+        )}
+      </div>
     );
   };
 
   // Render text with spacing indicators
   const renderTextWithSpacing = () => {
-    const paragraphs = text.split(/\n\n+/);
+    console.log(
+      `[DocumentEditor] renderTextWithSpacing called, text.length=${text.length}`
+    );
+
+    // Split by double newlines first, but also handle single newlines if no double newlines exist
+    let paragraphs = text.split(/\n\n+/);
+
+    // If only one paragraph and it's very long, split by single newlines instead
+    if (paragraphs.length === 1 && text.length > 1000) {
+      console.log(
+        `[DocumentEditor] Single long paragraph detected (${text.length} chars), splitting by single newlines`
+      );
+      paragraphs = text.split(/\n+/).filter((p) => p.trim().length > 0);
+      console.log(
+        `[DocumentEditor] After split: ${
+          paragraphs.length
+        } paragraphs, first para length: ${
+          paragraphs[0]?.length
+        }, last para length: ${paragraphs[paragraphs.length - 1]?.length}`
+      );
+    } else {
+      console.log(
+        `[DocumentEditor] Split into ${paragraphs.length} paragraphs by double newlines`
+      );
+    }
 
     // Build position map for visual suggestions
     const visualSuggestionMap = new Map<number, VisualSuggestion>();
@@ -295,7 +528,8 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       <div style={{ fontFamily: "ui-sans-serif, system-ui, sans-serif" }}>
         {paragraphs.map((para, index) => {
           const trimmedPara = para.trim();
-          if (!trimmedPara) return null;
+          if (!trimmedPara)
+            return <React.Fragment key={index}></React.Fragment>;
 
           const nextPara = paragraphs[index + 1]?.trim();
           const currentLength = trimmedPara.length;

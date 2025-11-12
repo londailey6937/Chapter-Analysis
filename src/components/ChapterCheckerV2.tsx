@@ -1052,7 +1052,9 @@ export const ChapterCheckerV2: React.FC = () => {
                   />
                 </>
               ) : (
-                <div style={{ padding: "20px", overflow: "auto" }}>
+                <div
+                  style={{ padding: "20px", overflow: "auto", height: "100%" }}
+                >
                   <h3
                     style={{
                       margin: "0 0 16px 0",

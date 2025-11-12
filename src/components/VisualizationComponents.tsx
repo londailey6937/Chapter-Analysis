@@ -752,7 +752,7 @@ export const ConceptMentionFrequency: React.FC<{
           <h4>Example: Improving Spacing for "{exampleConcept.concept}"</h4>
           <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
             <div style={{ minWidth: 220 }}>
-              <strong>Current Pattern (from your PDF):</strong>
+              <strong>Current Pattern (from your document):</strong>
               <ul style={{ fontSize: 13, margin: "8px 0 0 0" }}>
                 {beforeExample.map((ex, i) => (
                   <li key={i}>{ex}</li>
@@ -1303,7 +1303,7 @@ export const InterleavingPattern: React.FC<{
                       }}
                     >
                       <div style={{ minWidth: 220 }}>
-                        <strong>Current Pattern (from your PDF):</strong>
+                        <strong>Current Pattern (from your document):</strong>
                         <ul style={{ fontSize: 13, margin: "8px 0 0 0" }}>
                           {runPages.slice(0, 5).map((page, i) => (
                             <li key={i}>
