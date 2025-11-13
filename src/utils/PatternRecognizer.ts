@@ -244,22 +244,101 @@ export class PatternRecognizer {
           startPos +
           (endMatch > 0 ? endMatch : Math.min(600, lookAhead.length));
 
-        const context = text.substring(
-          startPos,
-          Math.min(startPos + 300, endPos)
-        );
+        const context = this.extractSentenceContext(text, startPos, endPos);
 
         patterns.push({
           type: "definitionExample",
           confidence: 0.85,
           startPosition: startPos,
           endPosition: endPos,
-          context: context.trim(),
+          context,
         });
       }
     });
 
     return patterns;
+  }
+
+  private static extractSentenceContext(
+    text: string,
+    matchStart: number,
+    matchEnd: number,
+    minSentences = 2,
+    maxChars = 500
+  ): string {
+    const windowStart = Math.max(0, matchStart - 200);
+    const windowEnd = Math.min(text.length, matchEnd + 400);
+    const maxWindowEnd = Math.min(windowEnd, windowStart + maxChars);
+
+    const sentences: Array<{ start: number; end: number }> = [];
+    let sentenceStart = windowStart;
+
+    for (let i = windowStart; i < maxWindowEnd; i++) {
+      const char = text[i];
+      if (char === "." || char === "!" || char === "?") {
+        sentences.push({ start: sentenceStart, end: i + 1 });
+        sentenceStart = i + 1;
+      }
+    }
+
+    if (sentenceStart < maxWindowEnd) {
+      sentences.push({ start: sentenceStart, end: maxWindowEnd });
+    }
+
+    if (sentences.length === 0) {
+      const fallback = text.slice(windowStart, maxWindowEnd).trim();
+      return this.ensureLeadingCapital(fallback);
+    }
+
+    const containingIndex = sentences.findIndex(
+      (segment) => matchStart >= segment.start && matchStart < segment.end
+    );
+
+    const startIndex = containingIndex !== -1 ? containingIndex : 0;
+    let endIndex = startIndex;
+    let totalChars = sentences[endIndex].end - sentences[endIndex].start;
+    let sentencesIncluded = 1;
+
+    while (
+      (sentencesIncluded < minSentences || totalChars < 200) &&
+      endIndex + 1 < sentences.length
+    ) {
+      endIndex += 1;
+      totalChars += sentences[endIndex].end - sentences[endIndex].start;
+      sentencesIncluded += 1;
+      if (totalChars >= maxChars) {
+        break;
+      }
+    }
+
+    const snippet = sentences
+      .slice(startIndex, endIndex + 1)
+      .map((segment) => text.slice(segment.start, segment.end))
+      .join("")
+      .trim();
+
+    return this.ensureLeadingCapital(snippet);
+  }
+
+  private static ensureLeadingCapital(snippet: string): string {
+    if (!snippet) {
+      return snippet;
+    }
+
+    const match = snippet.match(/[a-zA-Z]/);
+    if (!match || !match[0]) {
+      return snippet;
+    }
+
+    const index = match.index ?? 0;
+    const char = match[0];
+    if (char === char.toUpperCase()) {
+      return snippet;
+    }
+
+    return (
+      snippet.slice(0, index) + char.toUpperCase() + snippet.slice(index + 1)
+    );
   }
 
   /**

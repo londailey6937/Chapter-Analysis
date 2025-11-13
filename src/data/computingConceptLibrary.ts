@@ -199,7 +199,15 @@ export const COMPUTING_CONCEPTS: ConceptLibrary = {
     },
     {
       name: "library",
-      aliases: ["libraries", "module", "package", "import"],
+      aliases: [
+        "libraries",
+        "module",
+        "package",
+        "import",
+        "code library",
+        "software library",
+        "third-party library",
+      ],
       category: "Programming Fundamentals",
       subcategory: "Supporting Concepts",
       importance: "supporting",
@@ -483,7 +491,14 @@ export const COMPUTING_CONCEPTS: ConceptLibrary = {
     // Software Engineering
     {
       name: "debugging",
-      aliases: ["debug", "debugger", "troubleshooting"],
+      aliases: [
+        "debug",
+        "debugger",
+        "troubleshooting",
+        "debugging tools",
+        "breakpoint",
+        "breakpoints",
+      ],
       category: "Software Engineering",
       subcategory: "Core Concepts",
       importance: "core",
@@ -501,7 +516,13 @@ export const COMPUTING_CONCEPTS: ConceptLibrary = {
     },
     {
       name: "version control",
-      aliases: ["git", "source control", "revision control"],
+      aliases: [
+        "git",
+        "source control",
+        "revision control",
+        "VCS",
+        "version control system",
+      ],
       category: "Software Engineering",
       subcategory: "Core Concepts",
       importance: "core",
@@ -663,7 +684,14 @@ export const COMPUTING_CONCEPTS: ConceptLibrary = {
     },
     {
       name: "API",
-      aliases: ["application programming interface", "REST API", "web API"],
+      aliases: [
+        "application programming interface",
+        "REST API",
+        "web API",
+        "APIs",
+        "API call",
+        "API endpoint",
+      ],
       category: "Web Development",
       subcategory: "Core Concepts",
       importance: "core",
@@ -775,7 +803,13 @@ export const COMPUTING_CONCEPTS: ConceptLibrary = {
     },
     {
       name: "thread",
-      aliases: ["threads", "threading", "multithreading"],
+      aliases: [
+        "threads",
+        "threading",
+        "multithreading",
+        "thread execution",
+        "worker thread",
+      ],
       category: "Operating Systems",
       subcategory: "Core Concepts",
       importance: "core",
@@ -915,21 +949,6 @@ export const COMPUTING_CONCEPTS: ConceptLibrary = {
     // ============================================
     // MODERN WEB DEVELOPMENT & APIs
     // ============================================
-    {
-      name: "API",
-      aliases: [
-        "APIs",
-        "application programming interface",
-        "web API",
-        "API call",
-        "API endpoint",
-      ],
-      category: "Web Development",
-      subcategory: "Core Concepts",
-      importance: "core",
-      description:
-        "A set of protocols and tools for building software applications and enabling communication between different systems.",
-    },
     {
       name: "REST",
       aliases: [
@@ -1202,20 +1221,6 @@ export const COMPUTING_CONCEPTS: ConceptLibrary = {
     // DEVELOPMENT TOOLS & PRACTICES
     // ============================================
     {
-      name: "version control",
-      aliases: [
-        "source control",
-        "revision control",
-        "VCS",
-        "version control system",
-      ],
-      category: "Software Engineering",
-      subcategory: "Development Tools",
-      importance: "core",
-      description:
-        "A system that tracks changes to files over time, allowing multiple people to collaborate and revert to previous versions.",
-    },
-    {
       name: "git",
       aliases: ["git repository", "git repo", "git workflow"],
       category: "Software Engineering",
@@ -1315,20 +1320,6 @@ export const COMPUTING_CONCEPTS: ConceptLibrary = {
       importance: "core",
       description:
         "An external library or package that a project requires to function properly.",
-    },
-    {
-      name: "library",
-      aliases: [
-        "libraries",
-        "code library",
-        "software library",
-        "third-party library",
-      ],
-      category: "Software Engineering",
-      subcategory: "Core Concepts",
-      importance: "core",
-      description:
-        "A collection of reusable code, functions, or modules that can be used by other programs.",
     },
     {
       name: "framework",
@@ -1504,21 +1495,6 @@ export const COMPUTING_CONCEPTS: ConceptLibrary = {
     // CONCURRENCY & PARALLELISM
     // ============================================
     {
-      name: "thread",
-      aliases: [
-        "threads",
-        "threading",
-        "multithreading",
-        "thread execution",
-        "worker thread",
-      ],
-      category: "Operating Systems",
-      subcategory: "Concurrency",
-      importance: "core",
-      description:
-        "The smallest unit of execution within a process, allowing multiple operations to run concurrently.",
-    },
-    {
       name: "mutex",
       aliases: [
         "mutual exclusion",
@@ -1562,22 +1538,6 @@ export const COMPUTING_CONCEPTS: ConceptLibrary = {
       description:
         "A mechanism for handling runtime errors and exceptional conditions in a controlled manner.",
     },
-    {
-      name: "debugging",
-      aliases: [
-        "debug",
-        "debugger",
-        "debugging tools",
-        "breakpoint",
-        "breakpoints",
-      ],
-      category: "Software Engineering",
-      subcategory: "Development Tools",
-      importance: "core",
-      description:
-        "The process of identifying, analyzing, and removing errors or bugs from software code.",
-    },
-
     // ============================================
     // DATA SCIENCE & MACHINE LEARNING (Basic)
     // ============================================

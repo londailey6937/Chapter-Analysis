@@ -20,7 +20,7 @@ export const UpgradePrompt: React.FC<UpgradePromptProps> = ({
     "✓ Full 10-Principle Learning Analysis",
     "✓ Complete Concept Graphs & Relationships",
     "✓ Detailed Pattern Recognition",
-    "✓ Export Results (PDF, DOCX, JSON)",
+    "✓ Export Results (DOCX, JSON)",
     "✓ All Visualization Charts",
     "✓ Comprehensive Recommendations",
   ];

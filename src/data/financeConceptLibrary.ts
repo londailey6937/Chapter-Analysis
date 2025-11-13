@@ -18,19 +18,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💵",
   },
-  {
-    id: "finance-2",
-    name: "Business finance",
-    definition: "The management of funds in business organizations.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏢",
-  },
+
   {
     id: "finance-3",
     name: "Investments",
@@ -45,6 +33,1176 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📈",
   },
+
+  {
+    id: "finance-2019",
+    name: "Real option exercise rule",
+    definition:
+      "Guidelines for when management should exercise flexibility options based on threshold values.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛎️",
+  },
+
+  {
+    id: "finance-2021",
+    name: "Underlying asset value",
+    definition:
+      "The present value of expected project cash flows without flexibility, used in option models.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📦",
+  },
+
+  {
+    id: "finance-2023",
+    name: "Risk-neutral probability",
+    definition:
+      "A probability measure adjusted for risk preferences used in option pricing trees.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎲",
+  },
+
+  {
+    id: "finance-2025",
+    name: "State-contingent cash flows",
+    definition:
+      "Cash flow outcomes that depend on future states of the world modeled in decision trees.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌈",
+  },
+
+  {
+    id: "finance-2027",
+    name: "Compound option",
+    definition:
+      "An option on an option, such as the choice to expand after delaying a project.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧬",
+  },
+
+  {
+    id: "finance-2029",
+    name: "Decision rules with options",
+    definition:
+      "Adjusting accept-reject criteria to include the value of managerial flexibility.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "✅",
+  },
+
+  {
+    id: "finance-2031",
+    name: "Learning option",
+    definition:
+      "Value derived from waiting for information that improves project forecast accuracy.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📘",
+  },
+
+  {
+    id: "finance-2033",
+    name: "Switching option",
+    definition:
+      "The ability to change inputs or outputs in response to market shifts without abandoning the project.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔄",
+  },
+
+  {
+    id: "finance-2035",
+    name: "Black-Scholes limitations",
+    definition:
+      "Constraints of using the Black-Scholes model for real options due to non-tradable underlyings and path dependency.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-2037",
+    name: "Sensitivity to volatility",
+    definition:
+      "The extent to which option value changes as estimated cash flow volatility varies.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📐",
+  },
+
+  {
+    id: "finance-2039",
+    name: "Subjective probability inputs",
+    definition:
+      "Manager-assigned probabilities for future states when empirical data is limited.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧠",
+  },
+
+  {
+    id: "finance-2041",
+    name: "Contingency planning",
+    definition:
+      "Preparing alternative actions if key assumptions fail, often embedded in option analysis.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📋",
+  },
+
+  {
+    id: "finance-2043",
+    name: "Option valuation tools",
+    definition:
+      "Software and analytical frameworks used to quantify real option value.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛠️",
+  },
+
+  {
+    id: "finance-2045",
+    name: "Hybrid valuation approach",
+    definition:
+      "Combining DCF and option pricing techniques to capture both base value and flexibility value.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧊",
+  },
+
+  {
+    id: "finance-2047",
+    name: "Gross working capital",
+    definition:
+      "The total investment in a firm's current assets without netting current liabilities.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📦",
+  },
+
+  {
+    id: "finance-2049",
+    name: "Current assets",
+    definition:
+      "Assets expected to be converted to cash or used up within a year, such as cash, receivables, and inventory.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💰",
+  },
+
+  {
+    id: "finance-2051",
+    name: "Liquidity",
+    definition:
+      "The ease with which assets can be converted to cash without significant value loss to meet obligations.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💧",
+  },
+
+  {
+    id: "finance-2053",
+    name: "Cash cycle",
+    definition:
+      "The time between cash outflows for inputs and cash inflows from sales, measuring working capital efficiency.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔄",
+  },
+
+  {
+    id: "finance-2055",
+    name: "Operating cycle",
+    definition:
+      "The time required to purchase inventory, sell products, and collect cash from customers.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛒",
+  },
+
+  {
+    id: "finance-2057",
+    name: "Receivables collection period",
+    definition:
+      "Average number of days required to collect cash after a sale on credit.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📨",
+  },
+
+  {
+    id: "finance-2059",
+    name: "Days of inventory",
+    definition:
+      "Average number of days inventory is held before sale, calculated as 365 divided by inventory turnover.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📊",
+  },
+
+  {
+    id: "finance-2061",
+    name: "Average collection period",
+    definition:
+      "Another term for days sales outstanding, measuring receivables management efficiency.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧮",
+  },
+
+  {
+    id: "finance-2063",
+    name: "Current ratio",
+    definition:
+      "Current assets divided by current liabilities, indicating short-term solvency.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📐",
+  },
+
+  {
+    id: "finance-2065",
+    name: "Cash ratio",
+    definition:
+      "(Cash and cash equivalents plus marketable securities) divided by current liabilities.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💵",
+  },
+
+  {
+    id: "finance-2067",
+    name: "Marketable securities",
+    definition:
+      "Short-term financial instruments that can be quickly sold for cash, such as Treasury bills and commercial paper.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📄",
+  },
+
+  {
+    id: "finance-2069",
+    name: "Inventory",
+    definition:
+      "Goods held for sale or production, including raw materials, work-in-process, and finished goods.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📦",
+  },
+
+  {
+    id: "finance-2071",
+    name: "Notes payable",
+    definition:
+      "Formal written promises to repay borrowed amounts, often bearing interest and with specific due dates.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📝",
+  },
+
+  {
+    id: "finance-2073",
+    name: "Trade credit",
+    definition:
+      "Supplier-provided financing that allows buyers to defer cash payment for purchases.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🤝",
+  },
+
+  {
+    id: "finance-2075",
+    name: "Net terms",
+    definition:
+      "The maximum time allowed for payment of invoices, such as net 30 or net 60.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🗓️",
+  },
+
+  {
+    id: "finance-2077",
+    name: "Cash discount",
+    definition:
+      "A reduction in invoice price offered for early payment, such as 2/10 net 30.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💸",
+  },
+
+  {
+    id: "finance-2079",
+    name: "Quick payment",
+    definition:
+      "Early settlement of invoices to capture cash discounts or maintain supplier goodwill.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💨",
+  },
+
+  {
+    id: "finance-2081",
+    name: "Cash holdings",
+    definition:
+      "The level of liquid funds a firm retains to meet obligations, seize opportunities, or manage risk.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏦",
+  },
+
+  {
+    id: "finance-2083",
+    name: "Precautionary motive",
+    definition:
+      "Maintaining cash reserves as a buffer against unexpected expenses or cash flow disruptions.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛡️",
+  },
+
+  {
+    id: "finance-2085",
+    name: "Compensating balances",
+    definition:
+      "Minimum bank balances required by lenders as part of a loan agreement, reducing effective funds available.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏛️",
+  },
+
+  {
+    id: "finance-2087",
+    name: "Cash budget",
+    definition:
+      "A forecast of cash inflows and outflows over a period, used to plan financing needs and investments.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧾",
+  },
+
+  {
+    id: "finance-2089",
+    name: "US Treasury bills",
+    definition:
+      "Short-term U.S. government debt securities with maturities of one year or less, considered risk-free.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🇺🇸",
+  },
+
+  {
+    id: "finance-2091",
+    name: "Certificates of deposit",
+    definition:
+      "Bank time deposits that pay interest over a fixed term and are insured up to regulatory limits.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📜",
+  },
+
+  {
+    id: "finance-2093",
+    name: "Creditworthiness",
+    definition:
+      "An assessment of a borrower's ability and willingness to repay debts on time.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "✅",
+  },
+
+  {
+    id: "finance-2095",
+    name: "Credit limit",
+    definition:
+      "The maximum amount of credit a firm extends to a customer at one time.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🚫",
+  },
+
+  {
+    id: "finance-2097",
+    name: "Delinquent accounts",
+    definition:
+      "Customer receivables that have not been paid within the agreed credit period.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚠️",
+  },
+
+  {
+    id: "finance-2099",
+    name: "Allowance for doubtful accounts",
+    definition:
+      "A contra-asset account that reduces gross receivables to their estimated collectible amount.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-2101",
+    name: "Notes receivable",
+    definition:
+      "Written promises from customers to pay specific amounts on stated dates, often with interest.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🖊️",
+  },
+
+  {
+    id: "finance-2103",
+    name: "Accounts receivable turnover ratio",
+    definition:
+      "Credit sales divided by average receivables, showing how efficiently a firm collects cash.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "♻️",
+  },
+
+  {
+    id: "finance-2105",
+    name: "Capacity",
+    definition:
+      "A borrower's ability to repay debt based on cash flow, earnings stability, and existing obligations.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-2107",
+    name: "Collateral",
+    definition:
+      "Assets pledged to secure a loan, which can be seized if the borrower defaults.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🗝️",
+  },
+
+  {
+    id: "finance-2109",
+    name: "Credit rating",
+    definition:
+      "An independent assessment of default risk assigned by rating agencies to debt issuers or securities.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⭐",
+  },
+
+  {
+    id: "finance-2111",
+    name: "Bankruptcy",
+    definition:
+      "A legal process for resolving insolvency by restructuring or liquidating a debtor's obligations.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚖️",
+  },
+
+  {
+    id: "finance-2113",
+    name: "Days in inventory ratio",
+    definition:
+      "365 divided by inventory turnover, indicating the average time inventory remains on hand.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📆",
+  },
+
+  {
+    id: "finance-2115",
+    name: "Economic order quantity",
+    definition:
+      "The purchase quantity that minimizes total inventory costs by balancing ordering and carrying costs.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📐",
+  },
+
+  {
+    id: "finance-2117",
+    name: "Supply chain",
+    definition:
+      "The network of suppliers, manufacturers, and distributors involved in producing and delivering products.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔗",
+  },
+
+  {
+    id: "finance-2119",
+    name: "Carrying costs",
+    definition:
+      "Cost of holding inventory over time, including storage, insurance, and opportunity cost of capital.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏬",
+  },
+
+  {
+    id: "finance-2121",
+    name: "Stockout costs",
+    definition:
+      "Lost sales and customer dissatisfaction costs that arise when inventory levels are insufficient.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🚫",
+  },
+
+  {
+    id: "finance-2123",
+    name: "Letter of credit",
+    definition:
+      "A bank guarantee ensuring a seller receives payment if contractual conditions are met.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📨",
+  },
+
+  {
+    id: "finance-2125",
+    name: "Factoring",
+    definition:
+      "Selling accounts receivable to a third party for immediate cash, often at a discount.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💳",
+  },
+
+  {
+    id: "finance-2127",
+    name: "Line of credit",
+    definition:
+      "A flexible borrowing arrangement that allows firms to draw funds up to a predetermined limit as needed.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📎",
+  },
+
+  {
+    id: "finance-2129",
+    name: "Operating budget",
+    definition:
+      "A detailed projection of revenues and expenses for ongoing operations over a specific period.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧮",
+  },
+
+  {
+    id: "finance-2131",
+    name: "Purchases budget",
+    definition:
+      "A plan detailing the inventory acquisitions needed to meet sales and production targets.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛍️",
+  },
+
+  {
+    id: "finance-2133",
+    name: "Operating expense budget",
+    definition:
+      "Projected costs for selling, general, and administrative activities during a budgeting period.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💼",
+  },
+
+  {
+    id: "finance-2135",
+    name: "Risk",
+    definition:
+      "The variability of future outcomes and the potential for losses relative to expectations.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚠️",
+  },
+
+  {
+    id: "finance-2137",
+    name: "Hedging",
+    definition:
+      "Entering offsetting positions to reduce exposure to price or rate fluctuations.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛡️",
+  },
+
+  {
+    id: "finance-2139",
+    name: "Commodity price risk",
+    definition:
+      "Exposure to adverse movements in the prices of raw materials or goods.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌾",
+  },
+
+  {
+    id: "finance-2141",
+    name: "Vertical integration",
+    definition:
+      "Owning multiple stages of production or distribution to control supply and manage risk.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏗️",
+  },
+
+  {
+    id: "finance-2143",
+    name: "Margin",
+    definition:
+      "Collateral deposited with a broker to cover potential losses on leveraged positions such as futures.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💹",
+  },
+
+  {
+    id: "finance-2145",
+    name: "Exchange rate",
+    definition:
+      "The price of one currency in terms of another, determined by foreign exchange markets.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💱",
+  },
+
+  {
+    id: "finance-2147",
+    name: "Appreciate",
+    definition: "To increase in value relative to another asset or currency.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⬆️",
+  },
+
+  {
+    id: "finance-2149",
+    name: "Transaction risk",
+    definition:
+      "Foreign exchange exposure on contractual cash flows denominated in another currency.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔄",
+  },
+
+  {
+    id: "finance-2151",
+    name: "Economic risk",
+    definition:
+      "Long-term impact of currency movements on a firm's competitive position and market value.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌍",
+  },
+
+  {
+    id: "finance-2153",
+    name: "Counterparty risk",
+    definition:
+      "The possibility that the other party to a contract will default on its obligations.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🤝",
+  },
+
+  {
+    id: "finance-2155",
+    name: "Financial option",
+    definition:
+      "A derivative giving the holder the right, but not the obligation, to buy or sell an asset at a set price.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-2157",
+    name: "Strike price",
+    definition:
+      "The price at which an option holder can buy or sell the underlying asset.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-2159",
+    name: "Premium",
+    definition:
+      "The price paid by an option buyer to the seller for the rights conveyed by the contract.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💰",
+  },
+
+  {
+    id: "finance-2161",
+    name: "American option",
+    definition:
+      "An option that can be exercised at any time up to and including the expiration date.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🇺🇸",
+  },
+
+  {
+    id: "finance-2163",
+    name: "Exercising",
+    definition:
+      "Taking action to invoke an option contract by buying or selling the underlying asset at the strike price.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏋️",
+  },
+
+  {
+    id: "finance-2165",
+    name: "Put option",
+    definition:
+      "An option giving the holder the right to sell the underlying asset at the strike price.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🪙",
+  },
+
+  {
+    id: "finance-2167",
+    name: "Zero-sum game",
+    definition:
+      "A situation where one party's gains are exactly offset by another's losses, common in derivative markets.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚖️",
+  },
+
+  {
+    id: "finance-2169",
+    name: "Duration",
+    definition:
+      "A measure of a bond's price sensitivity to interest rate changes, expressed in years.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⏳",
+  },
+
+  {
+    id: "finance-2171",
+    name: "Floating rate",
+    definition:
+      "An interest rate that adjusts periodically based on a reference benchmark.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌊",
+  },
+
+  {
+    id: "finance-2173",
+    name: "LIBOR",
+    definition:
+      "The London Interbank Offered Rate, formerly a key benchmark for short-term interest rates worldwide.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🇬🇧",
+  },
+
   {
     id: "finance-4",
     name: "Financial markets and institutions",
@@ -59,20 +1217,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏦",
   },
-  {
-    id: "finance-5",
-    name: "Working capital management",
-    definition:
-      "Managing short-term assets and liabilities to ensure a company can meet its operational expenses.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔄",
-  },
+
   {
     id: "finance-6",
     name: "Capital budgeting",
@@ -87,19 +1232,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🗂️",
   },
-  {
-    id: "finance-7",
-    name: "Capital structure",
-    definition: "The mix of debt and equity financing used by a firm.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏗️",
-  },
+
   {
     id: "finance-8",
     name: "Risk and return",
@@ -114,20 +1247,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "⚖️",
   },
-  {
-    id: "finance-9",
-    name: "Default risk",
-    definition:
-      "The risk that a borrower will not be able to make required payments.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "❗",
-  },
+
   {
     id: "finance-10",
     name: "Inflation risk",
@@ -142,19 +1262,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📉",
   },
-  {
-    id: "finance-11",
-    name: "Diversifiable risk",
-    definition: "Risk that can be eliminated through diversification.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔀",
-  },
+
   {
     id: "finance-12",
     name: "Non-diversifiable risk",
@@ -169,20 +1277,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🌐",
   },
-  {
-    id: "finance-13",
-    name: "Political risk",
-    definition:
-      "The risk of loss due to political instability or changes in a country.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏛️",
-  },
+
   {
     id: "finance-14",
     name: "Money market",
@@ -197,20 +1292,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💱",
   },
-  {
-    id: "finance-15",
-    name: "Primary market",
-    definition:
-      "The market where new securities are issued and sold for the first time.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🆕",
-  },
+
   {
     id: "finance-16",
     name: "Secondary market",
@@ -225,20 +1307,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🔁",
   },
-  {
-    id: "finance-17",
-    name: "Dealers",
-    definition:
-      "Individuals or firms that buy and sell securities for their own account.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "👤",
-  },
+
   {
     id: "finance-18",
     name: "Brokers",
@@ -253,20 +1322,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🤝",
   },
-  {
-    id: "finance-19",
-    name: "Financial intermediaries",
-    definition:
-      "Institutions that connect borrowers and lenders in financial markets.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏦",
-  },
+
   {
     id: "finance-20",
     name: "Microeconomics",
@@ -281,20 +1337,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📊",
   },
-  {
-    id: "finance-21",
-    name: "Macroeconomics",
-    definition:
-      "The study of the behavior and performance of an economy as a whole.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🌎",
-  },
+
   {
     id: "finance-22",
     name: "Time value",
@@ -309,20 +1352,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "⏳",
   },
-  {
-    id: "finance-23",
-    name: "Demand",
-    definition:
-      "The quantity of a good or service that consumers are willing and able to buy at various prices.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📈",
-  },
+
   {
     id: "finance-24",
     name: "Supply",
@@ -337,20 +1367,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📉",
   },
-  {
-    id: "finance-25",
-    name: "Equilibrium price",
-    definition:
-      "The price at which the quantity demanded equals the quantity supplied.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "⚖️",
-  },
+
   {
     id: "finance-26",
     name: "Law of demand",
@@ -365,20 +1382,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📉",
   },
-  {
-    id: "finance-27",
-    name: "Supply curve",
-    definition:
-      "A graph showing the relationship between the price of a good and the quantity supplied.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📊",
-  },
+
   {
     id: "finance-28",
     name: "Inflation",
@@ -393,20 +1397,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💹",
   },
-  {
-    id: "finance-29",
-    name: "Consumer price index",
-    definition:
-      "A measure that examines the weighted average of prices of a basket of consumer goods and services.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🛒",
-  },
+
   {
     id: "finance-30",
     name: "Core inflation index",
@@ -421,20 +1412,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📊",
   },
-  {
-    id: "finance-31",
-    name: "Producer price index",
-    definition:
-      "An index that measures the average change over time in the selling prices received by domestic producers for their output.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏭",
-  },
+
   {
     id: "finance-32",
     name: "GDP deflator",
@@ -449,20 +1427,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💰",
   },
-  {
-    id: "finance-33",
-    name: "Unemployment",
-    definition:
-      "The situation when people who are able and willing to work cannot find a job.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🚫",
-  },
+
   {
     id: "finance-34",
     name: "Gross domestic product",
@@ -477,20 +1442,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🌍",
   },
-  {
-    id: "finance-35",
-    name: "Business cycle",
-    definition:
-      "A cycle or series of cycles of economic expansion and contraction.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔄",
-  },
+
   {
     id: "finance-36",
     name: "Expansion",
@@ -505,20 +1457,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "⬆️",
   },
-  {
-    id: "finance-37",
-    name: "Recession",
-    definition:
-      "A period of temporary economic decline during which trade and industrial activity are reduced.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "⬇️",
-  },
+
   {
     id: "finance-38",
     name: "Peak",
@@ -533,20 +1472,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🔝",
   },
-  {
-    id: "finance-39",
-    name: "Trough",
-    definition:
-      "The lowest point in the business cycle, marking the end of a period of declining business activity and the transition to expansion.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔻",
-  },
+
   {
     id: "finance-40",
     name: "Interest rate",
@@ -561,19 +1487,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💲",
   },
-  {
-    id: "finance-41",
-    name: "Nominal interest rate",
-    definition: "The interest rate before taking inflation into account.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💵",
-  },
+
   {
     id: "finance-42",
     name: "Real interest rate",
@@ -588,20 +1502,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📉",
   },
-  {
-    id: "finance-43",
-    name: "Risk premium",
-    definition:
-      "The return in excess of the risk-free rate of return that an investment is expected to yield.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📈",
-  },
+
   {
     id: "finance-44",
     name: "Market for loanable funds",
@@ -616,20 +1517,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏦",
   },
-  {
-    id: "finance-45",
-    name: "Exchange rate",
-    definition:
-      "The value of one currency for the purpose of conversion to another.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💱",
-  },
+
   {
     id: "finance-46",
     name: "Currency appreciation",
@@ -644,20 +1532,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "⬆️",
   },
-  {
-    id: "finance-47",
-    name: "Currency depreciation",
-    definition:
-      "A decrease in the value of one currency in relation to another currency.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "⬇️",
-  },
+
   {
     id: "finance-48",
     name: "Spot exchange rate",
@@ -672,20 +1547,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🕒",
   },
-  {
-    id: "finance-49",
-    name: "Transaction exposure",
-    definition:
-      "The risk of exchange rate fluctuations affecting the value of a company's financial transactions.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💼",
-  },
+
   {
     id: "finance-50",
     name: "Translation exposure",
@@ -700,20 +1562,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🔄",
   },
-  {
-    id: "finance-51",
-    name: "Economic exposure",
-    definition:
-      "The risk that a firm's market value will be affected by unexpected exchange rate fluctuations.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🌍",
-  },
+
   {
     id: "finance-52",
     name: "FRED",
@@ -728,20 +1577,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏦",
   },
-  {
-    id: "finance-53",
-    name: "Cash-basis accounting",
-    definition:
-      "An accounting method where revenues and expenses are recorded when cash is received or paid.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💵",
-  },
+
   {
     id: "finance-54",
     name: "Accrual-basis accounting",
@@ -756,20 +1592,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📅",
   },
-  {
-    id: "finance-55",
-    name: "Matching principle",
-    definition:
-      "The accounting principle that requires expenses to be matched with related revenues in the period in which they are incurred.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔗",
-  },
+
   {
     id: "finance-56",
     name: "Revenue recognition principle",
@@ -784,20 +1607,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💰",
   },
-  {
-    id: "finance-57",
-    name: "Expense recognition principle",
-    definition:
-      "The principle that expenses should be recognized in the period in which they are incurred.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💸",
-  },
+
   {
     id: "finance-58",
     name: "Accounting equation",
@@ -812,20 +1622,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "➕",
   },
-  {
-    id: "finance-59",
-    name: "Double-entry accounting",
-    definition:
-      "An accounting system in which every transaction affects at least two accounts.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔄",
-  },
+
   {
     id: "finance-60",
     name: "Debit",
@@ -840,20 +1637,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "⬅️",
   },
-  {
-    id: "finance-61",
-    name: "Credit",
-    definition:
-      "An entry on the right side of an account, representing an increase in liability, equity, or revenue or a decrease in assets or expense.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "➡️",
-  },
+
   {
     id: "finance-62",
     name: "T-account",
@@ -868,20 +1652,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🅿️",
   },
-  {
-    id: "finance-63",
-    name: "Account",
-    definition:
-      "A record in the general ledger that is used to collect and store debit and credit amounts.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📒",
-  },
+
   {
     id: "finance-64",
     name: "General ledger",
@@ -896,20 +1667,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📚",
   },
-  {
-    id: "finance-65",
-    name: "Normal balance",
-    definition:
-      "The expected debit or credit balance for a specified account type.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "⚖️",
-  },
+
   {
     id: "finance-66",
     name: "Fixed asset",
@@ -924,19 +1682,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏭",
   },
-  {
-    id: "finance-67",
-    name: "Tangible asset",
-    definition: "An asset that has a physical form.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏠",
-  },
+
   {
     id: "finance-68",
     name: "Capitalize",
@@ -951,20 +1697,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💾",
   },
-  {
-    id: "finance-69",
-    name: "Depreciation",
-    definition:
-      "The allocation of the cost of a tangible asset over its useful life.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📉",
-  },
+
   {
     id: "finance-70",
     name: "Book value",
@@ -979,20 +1712,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📖",
   },
-  {
-    id: "finance-71",
-    name: "Useful life",
-    definition:
-      "The estimated time period that an asset is expected to be used by a company.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "⏳",
-  },
+
   {
     id: "finance-72",
     name: "Salvage value",
@@ -1007,20 +1727,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💲",
   },
-  {
-    id: "finance-73",
-    name: "Depreciable base",
-    definition:
-      "The total amount of cost that can be depreciated over an asset's useful life.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📊",
-  },
+
   {
     id: "finance-74",
     name: "Straight-line depreciation",
@@ -1035,19 +1742,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📏",
   },
-  {
-    id: "finance-75",
-    name: "Units-of-production depreciation",
-    definition: "A method of depreciation based on actual usage or production.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "⚙️",
-  },
+
   {
     id: "finance-76",
     name: "Double-declining-balance depreciation",
@@ -1062,20 +1757,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "2️⃣",
   },
-  {
-    id: "finance-77",
-    name: "Accumulated depreciation",
-    definition:
-      "The total amount of depreciation expense that has been recorded against an asset.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📉",
-  },
+
   {
     id: "finance-78",
     name: "Contra account",
@@ -1090,19 +1772,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "➖",
   },
-  {
-    id: "finance-79",
-    name: "Revenue",
-    definition: "Income generated from normal business operations.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💵",
-  },
+
   {
     id: "finance-80",
     name: "Expense",
@@ -1117,20 +1787,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💸",
   },
-  {
-    id: "finance-81",
-    name: "Gains",
-    definition:
-      "Increases in equity from peripheral or incidental transactions.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📈",
-  },
+
   {
     id: "finance-82",
     name: "Losses",
@@ -1145,20 +1802,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📉",
   },
-  {
-    id: "finance-83",
-    name: "Net income",
-    definition:
-      "The total profit of a company after all expenses and taxes have been deducted from revenue.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💰",
-  },
+
   {
     id: "finance-84",
     name: "Net loss",
@@ -1172,20 +1816,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🔻",
   },
-  {
-    id: "finance-85",
-    name: "High-quality earnings",
-    definition:
-      "Earnings that are repeatable, controllable, and not due to one-time events.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏅",
-  },
+
   {
     id: "finance-86",
     name: "Sustainable earnings",
@@ -1199,19 +1830,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🌱",
   },
-  {
-    id: "finance-87",
-    name: "Permanent earnings",
-    definition: "Earnings that are expected to persist indefinitely.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔒",
-  },
+
   {
     id: "finance-88",
     name: "Infrequent earnings",
@@ -1225,19 +1844,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "⏲️",
   },
-  {
-    id: "finance-89",
-    name: "Temporary earnings",
-    definition: "Earnings that are not expected to persist into the future.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "⏳",
-  },
+
   {
     id: "finance-90",
     name: "Cash flow",
@@ -1252,20 +1859,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💧",
   },
-  {
-    id: "finance-91",
-    name: "Income statement",
-    definition:
-      "A financial statement that shows a company's revenues and expenses over a period of time.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📄",
-  },
+
   {
     id: "finance-92",
     name: "Balance sheet",
@@ -1280,20 +1874,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📊",
   },
-  {
-    id: "finance-93",
-    name: "Statement of cash flows",
-    definition:
-      "A financial statement that shows how changes in balance sheet accounts and income affect cash and cash equivalents.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💦",
-  },
+
   {
     id: "finance-94",
     name: "Sales revenue",
@@ -1307,20 +1888,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💵",
   },
-  {
-    id: "finance-95",
-    name: "Gross sales",
-    definition:
-      "The total sales before deducting returns, allowances, and discounts.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🛒",
-  },
+
   {
     id: "finance-96",
     name: "Sales returns and allowances",
@@ -1335,19 +1903,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "↩️",
   },
-  {
-    id: "finance-97",
-    name: "Net sales",
-    definition: "Gross sales minus sales returns, allowances, and discounts.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💲",
-  },
+
   {
     id: "finance-98",
     name: "Cost of goods sold",
@@ -1362,19 +1918,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏷️",
   },
-  {
-    id: "finance-99",
-    name: "Gross profit",
-    definition: "Net sales minus cost of goods sold.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📈",
-  },
+
   {
     id: "finance-100",
     name: "Gross margin",
@@ -1388,20 +1932,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📊",
   },
-  {
-    id: "finance-101",
-    name: "Operating expenses",
-    definition:
-      "Expenses incurred in the normal course of business operations.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💸",
-  },
+
   {
     id: "finance-102",
     name: "Operating income",
@@ -1415,20 +1946,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💰",
   },
-  {
-    id: "finance-103",
-    name: "EBITDA",
-    definition:
-      "Earnings before interest, taxes, depreciation, and amortization.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🧮",
-  },
+
   {
     id: "finance-104",
     name: "Amortization",
@@ -1443,20 +1961,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📉",
   },
-  {
-    id: "finance-105",
-    name: "Intangible assets",
-    definition:
-      "Non-physical assets such as patents, trademarks, and goodwill.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💡",
-  },
+
   {
     id: "finance-106",
     name: "Bottom line",
@@ -1471,19 +1976,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🔚",
   },
-  {
-    id: "finance-107",
-    name: "Interest expense",
-    definition: "The cost incurred by an entity for borrowed funds.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💳",
-  },
+
   {
     id: "finance-108",
     name: "Income tax expense",
@@ -1497,48 +1990,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🧾",
   },
-  {
-    id: "finance-109",
-    name: "Classified balance sheet",
-    definition:
-      "A balance sheet that groups assets and liabilities into current and noncurrent categories.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🗂️",
-  },
-  {
-    id: "finance-110",
-    name: "Current assets",
-    definition:
-      "Assets that are expected to be converted to cash or used up within one year.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💰",
-  },
-  {
-    id: "finance-111",
-    name: "Noncurrent assets",
-    definition:
-      "Assets that are not expected to be converted to cash or used up within one year.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏢",
-  },
+
   {
     id: "finance-112",
     name: "Current liabilities",
@@ -1552,19 +2004,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💳",
   },
-  {
-    id: "finance-113",
-    name: "Noncurrent liabilities",
-    definition: "Obligations not due within one year.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏦",
-  },
+
   {
     id: "finance-114",
     name: "Owner's equity",
@@ -1578,19 +2018,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "👤",
   },
-  {
-    id: "finance-115",
-    name: "Stockholders' equity",
-    definition: "The owners' claims to the assets of a corporation.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "👥",
-  },
+
   {
     id: "finance-116",
     name: "Contributed capital",
@@ -1605,20 +2033,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💲",
   },
-  {
-    id: "finance-117",
-    name: "Earned capital",
-    definition:
-      "The accumulated net income of a corporation that is retained in the business.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💼",
-  },
+
   {
     id: "finance-118",
     name: "Retained earnings",
@@ -1633,19 +2048,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📈",
   },
-  {
-    id: "finance-119",
-    name: "Common stock",
-    definition: "A form of corporate equity ownership, a type of security.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📄",
-  },
+
   {
     id: "finance-120",
     name: "Preferred stock",
@@ -1660,20 +2063,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "⭐",
   },
-  {
-    id: "finance-121",
-    name: "Treasury stock",
-    definition:
-      "Shares that were issued and later reacquired by the issuing company.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏦",
-  },
+
   {
     id: "finance-122",
     name: "Additional paid-in capital",
@@ -1688,47 +2078,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "➕",
   },
-  {
-    id: "finance-123",
-    name: "Historical cost",
-    definition: "The original monetary value of an asset.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📜",
-  },
-  {
-    id: "finance-124",
-    name: "Allowance for doubtful accounts",
-    definition:
-      "A contra-asset account that reduces accounts receivable to the amount expected to be collected.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "❓",
-  },
-  {
-    id: "finance-125",
-    name: "Allowance for bad debt",
-    definition:
-      "An estimate of the amount of accounts receivable that will not be collected.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🚫",
-  },
+
   {
     id: "finance-126",
     name: "Statement of retained earnings",
@@ -1743,19 +2093,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📈",
   },
-  {
-    id: "finance-127",
-    name: "Dividends",
-    definition: "Payments made by a corporation to its shareholder members.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💵",
-  },
+
   {
     id: "finance-128",
     name: "Stock dividend",
@@ -1770,20 +2108,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📈",
   },
-  {
-    id: "finance-129",
-    name: "Property dividend",
-    definition:
-      "A dividend paid to shareholders in the form of assets other than cash.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏠",
-  },
+
   {
     id: "finance-130",
     name: "Statement of owner's equity",
@@ -1798,20 +2123,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "👤",
   },
-  {
-    id: "finance-131",
-    name: "Direct method",
-    definition:
-      "A method of preparing the statement of cash flows that shows operating cash receipts and payments.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "➡️",
-  },
+
   {
     id: "finance-132",
     name: "Indirect method",
@@ -1826,19 +2138,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "↩️",
   },
-  {
-    id: "finance-133",
-    name: "Operating activities",
-    definition: "The principal revenue-producing activities of the business.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "⚙️",
-  },
+
   {
     id: "finance-134",
     name: "Investing activities",
@@ -1853,20 +2153,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏗️",
   },
-  {
-    id: "finance-135",
-    name: "Financing activities",
-    definition:
-      "Activities that result in changes in the size and composition of the equity capital and borrowings of the entity.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💳",
-  },
+
   {
     id: "finance-136",
     name: "Operating cash flow",
@@ -1880,20 +2167,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💧",
   },
-  {
-    id: "finance-137",
-    name: "Free cash flow",
-    definition:
-      "Cash a company generates after cash outflows to support operations and maintain its capital assets.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🆓",
-  },
+
   {
     id: "finance-138",
     name: "Capital expenditures",
@@ -1908,20 +2182,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏢",
   },
-  {
-    id: "finance-139",
-    name: "Common-size statement",
-    definition:
-      "A financial statement in which each line item is expressed as a percentage of a base amount.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📊",
-  },
+
   {
     id: "finance-140",
     name: "Vertical analysis",
@@ -1936,20 +2197,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📈",
   },
-  {
-    id: "finance-141",
-    name: "Fiscal year",
-    definition:
-      "A one-year period that companies and governments use for financial reporting and budgeting.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📅",
-  },
+
   {
     id: "finance-142",
     name: "Calendar year",
@@ -1964,20 +2212,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🗓️",
   },
-  {
-    id: "finance-143",
-    name: "Annual report",
-    definition:
-      "A comprehensive report on a company's activities throughout the preceding year.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📑",
-  },
+
   {
     id: "finance-144",
     name: "10-K",
@@ -1992,20 +2227,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🔟",
   },
-  {
-    id: "finance-145",
-    name: "10-Q",
-    definition:
-      "A comprehensive report of a company's performance that must be submitted quarterly to the SEC.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🧾",
-  },
+
   {
     id: "finance-146",
     name: "Management discussion and analysis",
@@ -2020,20 +2242,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💬",
   },
-  {
-    id: "finance-147",
-    name: "Audit report",
-    definition:
-      "A written opinion of an auditor regarding an entity's financial statements.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📝",
-  },
+
   {
     id: "finance-148",
     name: "8-K",
@@ -2048,20 +2257,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "8️⃣",
   },
-  {
-    id: "finance-149",
-    name: "Time period principle",
-    definition:
-      "The accounting principle that allows the activities of a business to be divided into time periods.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "⏲️",
-  },
+
   {
     id: "finance-150",
     name: "Financial analysis",
@@ -2076,20 +2272,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📊",
   },
-  {
-    id: "finance-1001",
-    name: "Financial analysis",
-    definition:
-      "The process of evaluating businesses, projects, budgets, and other finance-related entities.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📊",
-  },
+
   {
     id: "finance-1002",
     name: "Financial ratios",
@@ -2104,20 +2287,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "➗",
   },
-  {
-    id: "finance-1003",
-    name: "Liquidity ratios",
-    definition:
-      "Ratios that measure a company's ability to meet its short-term obligations.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💧",
-  },
+
   {
     id: "finance-1004",
     name: "Solvency ratios",
@@ -2132,20 +2302,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏦",
   },
-  {
-    id: "finance-1005",
-    name: "Efficiency ratios",
-    definition:
-      "Ratios that measure how well a company uses its assets and liabilities.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "⚙️",
-  },
+
   {
     id: "finance-1006",
     name: "Profitability ratios",
@@ -2159,20 +2316,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💰",
   },
-  {
-    id: "finance-1007",
-    name: "Operating cycle",
-    definition:
-      "The average period between the acquisition of inventory and the receipt of cash from sales.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔄",
-  },
+
   {
     id: "finance-1008",
     name: "Cash conversion cycle",
@@ -2187,20 +2331,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💵",
   },
-  {
-    id: "finance-1009",
-    name: "Accounts receivable turnover ratio",
-    definition:
-      "A measure of how efficiently a company collects its receivables.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔁",
-  },
+
   {
     id: "finance-1010",
     name: "Total asset turnover",
@@ -2215,20 +2346,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🔄",
   },
-  {
-    id: "finance-1011",
-    name: "Inventory turnover",
-    definition:
-      "A ratio showing how many times a company's inventory is sold and replaced over a period.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📦",
-  },
+
   {
     id: "finance-1012",
     name: "Days' sales in inventory",
@@ -2242,20 +2360,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📅",
   },
-  {
-    id: "finance-1013",
-    name: "Current ratio",
-    definition:
-      "A liquidity ratio that measures a company's ability to pay short-term obligations.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📈",
-  },
+
   {
     id: "finance-1014",
     name: "Quick ratio",
@@ -2270,47 +2375,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "⚡",
   },
-  {
-    id: "finance-1015",
-    name: "Acid-test ratio",
-    definition: "Another name for the quick ratio.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🧪",
-  },
-  {
-    id: "finance-1016",
-    name: "Cash ratio",
-    definition:
-      "A liquidity ratio that measures a company's ability to pay off short-term debt with cash and cash equivalents.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💵",
-  },
-  {
-    id: "finance-1017",
-    name: "Debt-to-assets ratio",
-    definition:
-      "A measure of the percentage of a company's assets that are financed by debt.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📊",
-  },
+
   {
     id: "finance-1018",
     name: "Debt-to-equity ratio",
@@ -2325,20 +2390,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "⚖️",
   },
-  {
-    id: "finance-1019",
-    name: "Times interest earned ratio",
-    definition:
-      "A measure of a company's ability to meet its debt obligations based on its current income.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "⏱️",
-  },
+
   {
     id: "finance-1020",
     name: "Earnings per share",
@@ -2353,20 +2405,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💹",
   },
-  {
-    id: "finance-1021",
-    name: "Basic earnings per share",
-    definition:
-      "Earnings per share calculated using the weighted average number of shares outstanding during the period.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📄",
-  },
+
   {
     id: "finance-1022",
     name: "Diluted earnings per share",
@@ -2381,20 +2420,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💧",
   },
-  {
-    id: "finance-1023",
-    name: "Weighted average shares",
-    definition:
-      "The number of shares outstanding during a period, weighted by the portion of the period they were outstanding.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "⚖️",
-  },
+
   {
     id: "finance-1024",
     name: "Price/earnings ratio",
@@ -2409,20 +2435,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💲",
   },
-  {
-    id: "finance-1025",
-    name: "P/E TTM",
-    definition:
-      "Price/earnings ratio calculated using trailing twelve months earnings.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📆",
-  },
+
   {
     id: "finance-1026",
     name: "Book value per share",
@@ -2437,20 +2450,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📚",
   },
-  {
-    id: "finance-1027",
-    name: "Profit margin",
-    definition:
-      "A measure of profitability calculated as net income divided by revenue.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📈",
-  },
+
   {
     id: "finance-1028",
     name: "Return on total assets",
@@ -2465,20 +2465,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏦",
   },
-  {
-    id: "finance-1029",
-    name: "Return on equity",
-    definition:
-      "A measure of financial performance calculated by dividing net income by shareholders' equity.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🧾",
-  },
+
   {
     id: "finance-1030",
     name: "DuPont method",
@@ -2493,20 +2480,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏁",
   },
-  {
-    id: "finance-1031",
-    name: "Equity multiplier",
-    definition:
-      "A measure of financial leverage calculated as total assets divided by total equity.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "✖️",
-  },
+
   {
     id: "finance-1032",
     name: "Leverage",
@@ -2521,20 +2495,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🪜",
   },
-  {
-    id: "finance-1033",
-    name: "Trend analysis",
-    definition:
-      "A technique used in technical analysis that attempts to predict future stock price movements based on recently observed trend data.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📉",
-  },
+
   {
     id: "finance-1034",
     name: "Internally generated assets",
@@ -2549,19 +2510,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏭",
   },
-  {
-    id: "finance-1035",
-    name: "Human capital",
-    definition: "The economic value of a worker's experience and skills.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🧑‍💼",
-  },
+
   {
     id: "finance-1036",
     name: "Time value of money",
@@ -2576,20 +2525,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "⏳",
   },
-  {
-    id: "finance-1037",
-    name: "Present value",
-    definition:
-      "The current value of a future sum of money or stream of cash flows given a specified rate of return.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💵",
-  },
+
   {
     id: "finance-1038",
     name: "Future value",
@@ -2604,20 +2540,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📈",
   },
-  {
-    id: "finance-1039",
-    name: "Principal",
-    definition:
-      "The original sum of money borrowed or invested, excluding any interest or dividends.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💰",
-  },
+
   {
     id: "finance-1040",
     name: "Interest income",
@@ -2632,20 +2555,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💲",
   },
-  {
-    id: "finance-1041",
-    name: "Lump sum",
-    definition:
-      "A single payment of money, as opposed to a series of payments made over time.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💵",
-  },
+
   {
     id: "finance-1042",
     name: "Single-period scenario",
@@ -2660,20 +2570,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "1️⃣",
   },
-  {
-    id: "finance-1043",
-    name: "Compound interest",
-    definition:
-      "Interest calculated on the initial principal and also on the accumulated interest of previous periods.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔁",
-  },
+
   {
     id: "finance-1044",
     name: "Interest on interest",
@@ -2688,20 +2585,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "➕",
   },
-  {
-    id: "finance-1045",
-    name: "Compounding period",
-    definition:
-      "The time interval between when interest is added to the principal balance of an investment or loan.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📆",
-  },
+
   {
     id: "finance-1046",
     name: "Growth rate",
@@ -2716,20 +2600,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📈",
   },
-  {
-    id: "finance-1047",
-    name: "Future value interest factor",
-    definition:
-      "A factor used to calculate the future value of a sum invested today at a given interest rate for a certain period.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔢",
-  },
+
   {
     id: "finance-1048",
     name: "Simple interest",
@@ -2744,20 +2615,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "➗",
   },
-  {
-    id: "finance-1049",
-    name: "Timeline",
-    definition:
-      "A graphical representation of the timing of cash flows associated with a financial transaction.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📊",
-  },
+
   {
     id: "finance-1050",
     name: "Financial calculator",
@@ -2772,20 +2630,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🧮",
   },
-  {
-    id: "finance-1051",
-    name: "Cash flow sign convention",
-    definition:
-      "A convention in financial calculations where cash inflows are positive and cash outflows are negative.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔢",
-  },
+
   {
     id: "finance-1052",
     name: "Discount rate",
@@ -2800,20 +2645,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📉",
   },
-  {
-    id: "finance-1053",
-    name: "Present value interest factor",
-    definition:
-      "A factor used to calculate the present value of a sum that is to be received in the future.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔢",
-  },
+
   {
     id: "finance-1054",
     name: "Nominal interest rate",
@@ -2827,20 +2659,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💵",
   },
-  {
-    id: "finance-1055",
-    name: "Real interest rate",
-    definition:
-      "The interest rate that has been adjusted to remove the effects of inflation.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📉",
-  },
+
   {
     id: "finance-1056",
     name: "Fisher effect",
@@ -2855,20 +2674,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🔄",
   },
-  {
-    id: "finance-1057",
-    name: "Inflation",
-    definition:
-      "A general increase in prices and fall in the purchasing value of money.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💹",
-  },
+
   {
     id: "finance-1058",
     name: "Purchasing power",
@@ -2883,20 +2689,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🛒",
   },
-  {
-    id: "finance-1059",
-    name: "Money supply",
-    definition:
-      "The total amount of money in circulation or in existence in a country.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💲",
-  },
+
   {
     id: "finance-1060",
     name: "Nominal rate",
@@ -2911,20 +2704,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💵",
   },
-  {
-    id: "finance-1061",
-    name: "Rule of 72",
-    definition:
-      "A formula used to estimate the number of years required to double the invested money at a given annual rate of return.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🧮",
-  },
+
   {
     id: "finance-1062",
     name: "Financial risk",
@@ -2939,19 +2719,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "⚠️",
   },
-  {
-    id: "finance-1063",
-    name: "Investment",
-    definition: "The action or process of investing money for profit.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💸",
-  },
+
   {
     id: "finance-1064",
     name: "Opportunity cost",
@@ -2966,20 +2734,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🔄",
   },
-  {
-    id: "finance-1065",
-    name: "Liquid asset",
-    definition:
-      "An asset that can be quickly converted into cash with minimal impact to its value.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💧",
-  },
+
   {
     id: "finance-1066",
     name: "Money market investments",
@@ -2994,20 +2749,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏦",
   },
-  {
-    id: "finance-1067",
-    name: "Treasury investments",
-    definition:
-      "Investments in government securities such as Treasury bills, notes, and bonds.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏛️",
-  },
+
   {
     id: "finance-1068",
     name: "Uninvested",
@@ -3021,20 +2763,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💤",
   },
-  {
-    id: "finance-1069",
-    name: "Underinvested",
-    definition:
-      "A situation where available funds are not fully invested to maximize returns.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📉",
-  },
+
   {
     id: "finance-1070",
     name: "Interest",
@@ -3049,20 +2778,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💲",
   },
-  {
-    id: "finance-1071",
-    name: "Compounding",
-    definition:
-      "The process in which an asset's earnings, from either capital gains or interest, are reinvested to generate additional earnings over time.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔁",
-  },
+
   {
     id: "finance-1072",
     name: "Perpetuity",
@@ -3077,19 +2793,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "♾️",
   },
-  {
-    id: "finance-1073",
-    name: "Constant perpetuity",
-    definition: "A perpetuity with unchanging, fixed payments.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔁",
-  },
+
   {
     id: "finance-1074",
     name: "Growing perpetuity",
@@ -3104,20 +2808,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📈",
   },
-  {
-    id: "finance-1075",
-    name: "Annuity",
-    definition:
-      "A series of equal payments made at regular intervals for a specified period.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📆",
-  },
+
   {
     id: "finance-1076",
     name: "Ordinary annuity",
@@ -3131,20 +2822,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "⏰",
   },
-  {
-    id: "finance-1077",
-    name: "Annuity due",
-    definition:
-      "An annuity where payments are made at the beginning of each period.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🕒",
-  },
+
   {
     id: "finance-1078",
     name: "Required rate of return",
@@ -3159,20 +2837,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🎯",
   },
-  {
-    id: "finance-1079",
-    name: "Present value of annuity",
-    definition:
-      "The current value of a series of future annuity payments, discounted at a specific rate.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💵",
-  },
+
   {
     id: "finance-1080",
     name: "Future value of annuity",
@@ -3187,20 +2852,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📈",
   },
-  {
-    id: "finance-1081",
-    name: "Lump sum",
-    definition:
-      "A single payment of money, as opposed to a series of payments made over time.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💵",
-  },
+
   {
     id: "finance-1082",
     name: "Structured settlements",
@@ -3215,20 +2867,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📑",
   },
-  {
-    id: "finance-1083",
-    name: "Preferred discount rate",
-    definition:
-      "The interest rate used to discount future cash flows to their present value, preferred by an investor or company.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏷️",
-  },
+
   {
     id: "finance-1084",
     name: "Loan amortization",
@@ -3243,20 +2882,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📉",
   },
-  {
-    id: "finance-1085",
-    name: "Term loans",
-    definition:
-      "Loans that are repaid in regular payments over a set period of time.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📆",
-  },
+
   {
     id: "finance-1086",
     name: "Revolving lines of credit",
@@ -3271,20 +2897,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🔄",
   },
-  {
-    id: "finance-1087",
-    name: "Personal lines of credit",
-    definition:
-      "A flexible loan from a bank or financial institution that consists of a defined amount of money that you can access as needed.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "👤",
-  },
+
   {
     id: "finance-1088",
     name: "Unsecured personal loan",
@@ -3299,20 +2912,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🔓",
   },
-  {
-    id: "finance-1089",
-    name: "Secured personal loan",
-    definition:
-      "A loan that is backed by collateral, such as a car or savings account.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔒",
-  },
+
   {
     id: "finance-1090",
     name: "Mortgage loan",
@@ -3327,48 +2927,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏠",
   },
-  {
-    id: "finance-1091",
-    name: "Student loans",
-    definition:
-      "Loans offered to students to help pay for education-related expenses.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🎓",
-  },
-  {
-    id: "finance-1092",
-    name: "Collateral",
-    definition:
-      "An asset pledged as security for repayment of a loan, to be forfeited in the event of a default.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏦",
-  },
-  {
-    id: "finance-1093",
-    name: "Fixed-rate loans",
-    definition:
-      "Loans with an interest rate that remains the same for the entire term of the loan.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📏",
-  },
+
   {
     id: "finance-1094",
     name: "Facilities",
@@ -3383,20 +2942,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏢",
   },
-  {
-    id: "finance-1095",
-    name: "Amortization schedule",
-    definition:
-      "A table detailing each periodic payment on a loan, showing the amounts going to principal and interest.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📋",
-  },
+
   {
     id: "finance-1096",
     name: "Stated interest rate",
@@ -3411,20 +2957,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📝",
   },
-  {
-    id: "finance-1097",
-    name: "Effective interest rate",
-    definition:
-      "The interest rate on a loan or financial product restated from the nominal interest rate as an interest rate with annual compound interest payable in arrears.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📊",
-  },
+
   {
     id: "finance-1098",
     name: "Payday advance loan",
@@ -3439,20 +2972,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💸",
   },
-  {
-    id: "finance-1099",
-    name: "Usury",
-    definition:
-      "The practice of lending money at unreasonably high interest rates.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🚫",
-  },
+
   {
     id: "finance-1100",
     name: "Refund anticipation loans",
@@ -3467,20 +2987,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💲",
   },
-  {
-    id: "finance-1101",
-    name: "Absolute reference",
-    definition:
-      "A reference that remains constant even if the formula or cell is copied to another location (finance context: fixed reference in calculations).",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📌",
-  },
+
   {
     id: "finance-1102",
     name: "Income",
@@ -3495,20 +3002,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💰",
   },
-  {
-    id: "finance-1103",
-    name: "Wealth",
-    definition:
-      "An abundance of valuable financial assets or physical possessions.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏦",
-  },
+
   {
     id: "finance-1104",
     name: "Paying yourself first",
@@ -3523,20 +3017,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💸",
   },
-  {
-    id: "finance-1105",
-    name: "Experian",
-    definition:
-      "One of the three major credit reporting agencies in the United States.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏢",
-  },
+
   {
     id: "finance-1106",
     name: "Equifax",
@@ -3551,20 +3032,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏢",
   },
-  {
-    id: "finance-1107",
-    name: "TransUnion",
-    definition:
-      "One of the three major credit reporting agencies in the United States.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏢",
-  },
+
   {
     id: "finance-1108",
     name: "Foreclose",
@@ -3579,20 +3047,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏚️",
   },
-  {
-    id: "finance-1109",
-    name: "Repossessed",
-    definition:
-      "Property taken back by a lender or seller from the borrower, usually due to default.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🚗",
-  },
+
   {
     id: "finance-1110",
     name: "Default",
@@ -3607,47 +3062,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "❌",
   },
-  {
-    id: "finance-1111",
-    name: "Capital investment",
-    definition:
-      "Funds invested in a firm or enterprise for the purpose of furthering its business objectives.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏢",
-  },
-  {
-    id: "finance-1112",
-    name: "Cash flow",
-    definition:
-      "The total amount of money being transferred into and out of a business, especially as affecting liquidity.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💧",
-  },
-  {
-    id: "finance-1113",
-    name: "Mixed stream",
-    definition: "A series of cash flows that are not all the same amount.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔀",
-  },
+
   {
     id: "finance-1114",
     name: "Future value of mixed stream",
@@ -3662,20 +3077,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📈",
   },
-  {
-    id: "finance-1115",
-    name: "Present value of mixed stream",
-    definition:
-      "The current value of a series of future cash flows that are not all the same amount, discounted at a specific rate.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💵",
-  },
+
   {
     id: "finance-1116",
     name: "Discounting",
@@ -3690,20 +3092,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📉",
   },
-  {
-    id: "finance-1117",
-    name: "Compounding",
-    definition:
-      "The process in which an asset's earnings, from either capital gains or interest, are reinvested to generate additional earnings over time.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔁",
-  },
+
   {
     id: "finance-1118",
     name: "Net present value",
@@ -3718,19 +3107,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💹",
   },
-  {
-    id: "finance-1119",
-    name: "Uneven cash flows",
-    definition: "Cash flows that are not the same in amount or timing.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔀",
-  },
+
   {
     id: "finance-1120",
     name: "Timing of cash flows",
@@ -3745,20 +3122,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "⏱️",
   },
-  {
-    id: "finance-1121",
-    name: "Liquidity management",
-    definition:
-      "The strategy of ensuring that a business has enough cash to meet its short-term obligations.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💧",
-  },
+
   {
     id: "finance-1122",
     name: "Cash management discipline",
@@ -3773,20 +3137,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📊",
   },
-  {
-    id: "finance-1123",
-    name: "Venture money",
-    definition:
-      "Funds invested in a new or growing business, typically with higher risk and potential for high returns.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🚀",
-  },
+
   {
     id: "finance-1124",
     name: "Cash is king",
@@ -3801,20 +3152,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "👑",
   },
-  {
-    id: "finance-1125",
-    name: "Capital decisions",
-    definition:
-      "Choices made by a business regarding investments in long-term assets.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏗️",
-  },
+
   {
     id: "finance-1126",
     name: "Know thy numbers",
@@ -3829,20 +3167,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🔢",
   },
-  {
-    id: "finance-1127",
-    name: "Forecasting",
-    definition:
-      "The process of making predictions about future financial outcomes based on historical data and analysis.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔮",
-  },
+
   {
     id: "finance-1128",
     name: "Profitability",
@@ -3857,20 +3182,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💵",
   },
-  {
-    id: "finance-1129",
-    name: "Transparent assessment",
-    definition:
-      "The practice of openly and clearly evaluating financial performance and risks.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔍",
-  },
+
   {
     id: "finance-1130",
     name: "Mature organization",
@@ -3885,20 +3197,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏢",
   },
-  {
-    id: "finance-1131",
-    name: "Start-up organization",
-    definition:
-      "A newly established business, often characterized by innovation and rapid growth.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🌱",
-  },
+
   {
     id: "finance-1132",
     name: "Effective matching of cash inflows and outflows",
@@ -3913,20 +3212,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🔄",
   },
-  {
-    id: "finance-1133",
-    name: "NPV function",
-    definition:
-      "A financial function used to calculate the net present value of a series of cash flows.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📉",
-  },
+
   {
     id: "finance-1134",
     name: "Bond",
@@ -3941,20 +3227,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💵",
   },
-  {
-    id: "finance-1135",
-    name: "Par value",
-    definition:
-      "The face value of a bond, or the amount paid to the holder at maturity.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏷️",
-  },
+
   {
     id: "finance-1136",
     name: "Face value",
@@ -3968,20 +3241,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏷️",
   },
-  {
-    id: "finance-1137",
-    name: "Face amount",
-    definition:
-      "The amount of money a bond will be worth at its maturity, and the amount the bond issuer agrees to pay the bondholder at that time.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💲",
-  },
+
   {
     id: "finance-1138",
     name: "Coupon rate",
@@ -3996,20 +3256,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💸",
   },
-  {
-    id: "finance-1139",
-    name: "Coupon payment",
-    definition:
-      "The periodic interest payment made to the bondholders during the life of the bond.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💰",
-  },
+
   {
     id: "finance-1140",
     name: "Maturity date",
@@ -4024,20 +3271,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📅",
   },
-  {
-    id: "finance-1141",
-    name: "Yield to maturity",
-    definition:
-      "The total return anticipated on a bond if the bond is held until it matures.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📈",
-  },
+
   {
     id: "finance-1142",
     name: "Fixed-income securities",
@@ -4052,47 +3286,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💵",
   },
-  {
-    id: "finance-1143",
-    name: "Government bonds",
-    definition:
-      "Bonds issued by a government to support government spending and obligations.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏛️",
-  },
-  {
-    id: "finance-1144",
-    name: "US Treasury bills",
-    definition:
-      "Short-term government securities with maturities of one year or less.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🇺🇸",
-  },
-  {
-    id: "finance-1145",
-    name: "Treasury notes",
-    definition: "Government debt securities with maturities of 2 to 10 years.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📝",
-  },
+
   {
     id: "finance-1146",
     name: "Treasury bonds",
@@ -4107,20 +3301,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏦",
   },
-  {
-    id: "finance-1147",
-    name: "Savings bonds",
-    definition:
-      "Non-marketable securities issued by the U.S. government and sold to the public.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💵",
-  },
+
   {
     id: "finance-1148",
     name: "Municipal bonds",
@@ -4135,19 +3316,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏙️",
   },
-  {
-    id: "finance-1149",
-    name: "Corporate bonds",
-    definition: "Bonds issued by corporations to raise capital.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏢",
-  },
+
   {
     id: "finance-1150",
     name: "Zero-coupon bonds",
@@ -4162,20 +3331,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "0️⃣",
   },
-  {
-    id: "finance-1151",
-    name: "Convertible bonds",
-    definition:
-      "Bonds that can be converted into a predetermined number of the issuing company's shares.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔄",
-  },
+
   {
     id: "finance-1152",
     name: "Junk bonds",
@@ -4190,19 +3346,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💣",
   },
-  {
-    id: "finance-1153",
-    name: "Non-investment grade",
-    definition: "Bonds rated below investment grade, also known as junk bonds.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "⚠️",
-  },
+
   {
     id: "finance-1154",
     name: "Floating-rate bonds",
@@ -4216,19 +3360,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🌊",
   },
-  {
-    id: "finance-1155",
-    name: "Deep discount bonds",
-    definition: "Bonds sold at a price much lower than their face value.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💲",
-  },
+
   {
     id: "finance-1156",
     name: "Premium bond",
@@ -4242,19 +3374,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "💎",
   },
-  {
-    id: "finance-1157",
-    name: "Discount bond",
-    definition: "A bond that is selling for less than its par value.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔻",
-  },
+
   {
     id: "finance-1158",
     name: "Par value bond",
@@ -4268,19 +3388,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏷️",
   },
-  {
-    id: "finance-1159",
-    name: "Bond pricing",
-    definition: "The process of determining the fair price of a bond.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💲",
-  },
+
   {
     id: "finance-1160",
     name: "Bond valuation",
@@ -4295,20 +3403,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📊",
   },
-  {
-    id: "finance-1161",
-    name: "Inverse relationship",
-    definition:
-      "The relationship between bond prices and yields, where they move in opposite directions.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "↔️",
-  },
+
   {
     id: "finance-1162",
     name: "Interest rate risk",
@@ -4323,20 +3418,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📉",
   },
-  {
-    id: "finance-1163",
-    name: "Default risk",
-    definition:
-      "The risk that a bond issuer will be unable to make the required payments.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "❗",
-  },
+
   {
     id: "finance-1164",
     name: "Credit risk",
@@ -4351,20 +3433,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "⚠️",
   },
-  {
-    id: "finance-1165",
-    name: "Liquidity risk",
-    definition:
-      "The risk that a bondholder will not be able to sell the bond quickly without reducing its price.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💧",
-  },
+
   {
     id: "finance-1166",
     name: "Duration risk",
@@ -4379,20 +3448,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "⏳",
   },
-  {
-    id: "finance-1167",
-    name: "Call risk",
-    definition:
-      "The risk that a bond may be redeemed by the issuer before its maturity date.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📞",
-  },
+
   {
     id: "finance-1168",
     name: "Reinvestment risk",
@@ -4407,48 +3463,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🔄",
   },
-  {
-    id: "finance-1169",
-    name: "Term risk",
-    definition:
-      "The risk associated with the length of time until a bond's maturity.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📆",
-  },
-  {
-    id: "finance-1170",
-    name: "Duration",
-    definition:
-      "A measure of the sensitivity of the price of a bond to a change in interest rates.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "⏱️",
-  },
-  {
-    id: "finance-1171",
-    name: "Term premium",
-    definition:
-      "The excess yield that investors require to commit to holding a long-term bond instead of a series of shorter-term bonds.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "➕",
-  },
+
   {
     id: "finance-1172",
     name: "Bond ratings",
@@ -4463,20 +3478,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "⭐",
   },
-  {
-    id: "finance-1173",
-    name: "Rating agencies",
-    definition:
-      "Organizations that assign credit ratings for issuers of certain types of debt securities.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏢",
-  },
+
   {
     id: "finance-1174",
     name: "Investment grade",
@@ -4491,20 +3493,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "✅",
   },
-  {
-    id: "finance-1175",
-    name: "High-yield bond",
-    definition:
-      "A bond that has a lower credit rating than investment-grade bonds and offers a higher yield to compensate for higher risk.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📈",
-  },
+
   {
     id: "finance-1176",
     name: "Fitch Ratings",
@@ -4519,20 +3508,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏢",
   },
-  {
-    id: "finance-1177",
-    name: "Moody's Investors Service",
-    definition:
-      "A leading provider of credit ratings, research, and risk analysis for bonds and other financial instruments.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏢",
-  },
+
   {
     id: "finance-1178",
     name: "Standard & Poor's",
@@ -4547,20 +3523,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🏢",
   },
-  {
-    id: "finance-1179",
-    name: "Callable bond",
-    definition:
-      "A bond that can be redeemed by the issuer before its maturity date.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📞",
-  },
+
   {
     id: "finance-1180",
     name: "Bond call",
@@ -4575,19 +3538,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📞",
   },
-  {
-    id: "finance-1181",
-    name: "Capital gains",
-    definition: "The profit from the sale of a bond or other investment.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📈",
-  },
+
   {
     id: "finance-1182",
     name: "Capital loss",
@@ -4602,20 +3553,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📉",
   },
-  {
-    id: "finance-1183",
-    name: "Bond laddering",
-    definition:
-      "An investment strategy that involves purchasing bonds with different maturities to reduce interest rate risk.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🪜",
-  },
+
   {
     id: "finance-1184",
     name: "Bond ladder",
@@ -4630,20 +3568,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🪜",
   },
-  {
-    id: "finance-1185",
-    name: "Yield curve",
-    definition:
-      "A graph that plots the yields of similar-quality bonds against their maturities.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "📈",
-  },
+
   {
     id: "finance-1186",
     name: "Term structure of interest rates",
@@ -4658,20 +3583,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📊",
   },
-  {
-    id: "finance-1187",
-    name: "Risk-free yield curve",
-    definition:
-      "A yield curve based on risk-free government securities, such as U.S. Treasury bonds.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🟢",
-  },
+
   {
     id: "finance-1188",
     name: "Normal yield curve",
@@ -4686,20 +3598,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "📈",
   },
-  {
-    id: "finance-1189",
-    name: "Inverted yield curve",
-    definition:
-      "A yield curve that slopes downward, indicating that shorter-term bonds have higher yields than longer-term bonds.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔻",
-  },
+
   {
     id: "finance-1190",
     name: "Flat yield curve",
@@ -4714,20 +3613,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "➖",
   },
-  {
-    id: "finance-1191",
-    name: "Federal Reserve funds rate",
-    definition:
-      "The interest rate at which depository institutions trade federal funds with each other overnight.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏦",
-  },
+
   {
     id: "finance-1192",
     name: "London Interbank Offered Rate",
@@ -4742,20 +3628,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🌍",
   },
-  {
-    id: "finance-1193",
-    name: "Prime rate",
-    definition:
-      "The interest rate that commercial banks charge their most creditworthy customers.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🏦",
-  },
+
   {
     id: "finance-1194",
     name: "US Treasury note rate",
@@ -4769,48 +3642,7 @@ export const financeConceptLibrary: Concept[] = [
     commonMisconceptions: [],
     emoji: "🇺🇸",
   },
-  {
-    id: "finance-1195",
-    name: "Realized return",
-    definition:
-      "The actual return earned on an investment over a specific period.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💵",
-  },
-  {
-    id: "finance-1196",
-    name: "Interest income",
-    definition:
-      "The income earned from lending money or from interest-bearing accounts or securities.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "💲",
-  },
-  {
-    id: "finance-1197",
-    name: "Secondary market",
-    definition:
-      "The market where investors buy and sell securities they already own.",
-    importance: "core",
-    firstMentionPosition: 0,
-    mentions: [],
-    relatedConcepts: [],
-    prerequisites: [],
-    applications: [],
-    commonMisconceptions: [],
-    emoji: "🔁",
-  },
+
   {
     id: "finance-1198",
     name: "Coupon bonds",
@@ -4824,5 +3656,6108 @@ export const financeConceptLibrary: Concept[] = [
     applications: [],
     commonMisconceptions: [],
     emoji: "💸",
+  },
+
+  {
+    id: "finance-1200",
+    name: "Price-to-earnings ratio",
+    definition:
+      "A valuation metric calculated by dividing a company’s current share price by its earnings per share.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚖️",
+  },
+
+  {
+    id: "finance-1204",
+    name: "Trailing 12 months",
+    definition:
+      "A reporting period covering the most recent twelve consecutive months of financial data, often used in valuation ratios.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📅",
+  },
+
+  {
+    id: "finance-1206",
+    name: "Leading P/E",
+    definition:
+      "Another term for forward price-to-earnings ratio that uses projected earnings instead of historical results.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🚦",
+  },
+
+  {
+    id: "finance-1208",
+    name: "Price-to-book ratio",
+    definition:
+      "A valuation multiple computed by dividing a company’s market price per share by its book value per share.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📘",
+  },
+
+  {
+    id: "finance-1210",
+    name: "Market-to-book ratio",
+    definition:
+      "A ratio comparing a company’s market capitalization to its book value, indicating how the market values its equity.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏷️",
+  },
+
+  {
+    id: "finance-1212",
+    name: "Market value",
+    definition:
+      "The current aggregate value of a security or company as determined by prevailing market prices.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💲",
+  },
+
+  {
+    id: "finance-1216",
+    name: "Net asset value",
+    definition:
+      "The value of a fund’s assets minus its liabilities, often expressed per share for mutual funds or ETFs.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💼",
+  },
+
+  {
+    id: "finance-1218",
+    name: "Equity multiples",
+    definition:
+      "Valuation ratios that compare a company’s equity market value to financial performance metrics like earnings or book value.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧮",
+  },
+
+  {
+    id: "finance-1220",
+    name: "Enterprise value",
+    definition:
+      "A comprehensive measure of a company’s total value equal to market capitalization plus debt minus cash and equivalents.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💰",
+  },
+
+  {
+    id: "finance-1222",
+    name: "Comparable company analysis",
+    definition:
+      "A relative valuation technique that assesses a company by comparing its metrics to similar publicly traded firms.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📊",
+  },
+
+  {
+    id: "finance-1224",
+    name: "Price-to-sales ratio",
+    definition:
+      "A valuation multiple calculated by dividing a company’s market capitalization by its total revenue.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧾",
+  },
+
+  {
+    id: "finance-1226",
+    name: "Price-to-cash-flow ratio",
+    definition:
+      "A valuation metric comparing a company’s market capitalization to its operating cash flow.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💧",
+  },
+
+  {
+    id: "finance-1228",
+    name: "Dividend yield",
+    definition:
+      "An income metric calculated as annual dividends per share divided by current share price.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌱",
+  },
+
+  {
+    id: "finance-1230",
+    name: "Earnings before interest and taxes",
+    definition:
+      "A profitability measure equal to revenue minus operating expenses excluding interest and tax costs.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📗",
+  },
+
+  {
+    id: "finance-1232",
+    name: "Earnings before interest, taxes, depreciation, and amortization",
+    definition:
+      "The full expression for EBITDA highlighting operating performance before non-operational expenses and non-cash charges.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧾",
+  },
+
+  {
+    id: "finance-1234",
+    name: "Capital employed",
+    definition:
+      "The total capital investment used by a company, typically equal to total assets minus current liabilities.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏭",
+  },
+
+  {
+    id: "finance-1236",
+    name: "DDM",
+    definition:
+      "An acronym for the dividend discount model used to price dividend-paying stocks based on present value of payouts.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1240",
+    name: "Zero growth DDM",
+    definition:
+      "A dividend discount model variant that assumes dividends remain constant over time with no growth.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "0️⃣",
+  },
+
+  {
+    id: "finance-1242",
+    name: "Constant growth DDM",
+    definition:
+      "A dividend discount approach where dividends are assumed to grow at a fixed perpetual rate.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "♾️",
+  },
+
+  {
+    id: "finance-1244",
+    name: "Nonconstant growth DDM",
+    definition:
+      "Another term for a dividend discount model that models varying dividend growth before reaching stability.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1246",
+    name: "Terminal value",
+    definition:
+      "The value of an investment or business at the end of a forecast period when future cash flows are assumed to grow steadily.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🚪",
+  },
+
+  {
+    id: "finance-1248",
+    name: "DCF model",
+    definition:
+      "An acronym for the discounted cash flow model that values assets by discounting projected cash flows.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-1250",
+    name: "Terminal cash flow",
+    definition:
+      "The final cash flow in a capital budgeting project, typically including salvage value and working capital recovery.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📦",
+  },
+
+  {
+    id: "finance-1252",
+    name: "Cumulative preferred stock",
+    definition:
+      "Preferred shares that accumulate unpaid dividends, requiring arrears to be paid before dividends to common shareholders.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧾",
+  },
+
+  {
+    id: "finance-1254",
+    name: "Conversion feature",
+    definition:
+      "A provision allowing preferred stock or bonds to be exchanged for a predetermined number of common shares.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔄",
+  },
+
+  {
+    id: "finance-1256",
+    name: "Operational efficiency",
+    definition:
+      "The ability of markets or firms to execute transactions quickly and at low cost without unnecessary frictions.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏃",
+  },
+
+  {
+    id: "finance-1258",
+    name: "Efficient market hypothesis",
+    definition:
+      "A theory stating that it is impossible to consistently achieve returns exceeding market averages because prices already incorporate all information.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📚",
+  },
+
+  {
+    id: "finance-1260",
+    name: "Semi-strong form efficient markets",
+    definition:
+      "An EMH form claiming security prices reflect all publicly available information in addition to past prices.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🪙",
+  },
+
+  {
+    id: "finance-1262",
+    name: "Technical analysis",
+    definition:
+      "An investment approach that studies price charts and trading volume to forecast future market movements.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-1264",
+    name: "Stock value",
+    definition:
+      "The worth of an equity security as determined by market price, dividends, and underlying fundamentals.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💹",
+  },
+
+  {
+    id: "finance-1266",
+    name: "Capital gains",
+    definition:
+      "Profits realized when an asset is sold for more than its purchase price.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🚀",
+  },
+
+  {
+    id: "finance-1268",
+    name: "Long-term capital gains",
+    definition:
+      "Profits earned from selling assets held longer than one year, often taxed at preferential rates.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🗓️",
+  },
+
+  {
+    id: "finance-1272",
+    name: "NYSE",
+    definition:
+      "An acronym for the New York Stock Exchange, one of the largest equity markets in the world.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🗽",
+  },
+
+  {
+    id: "finance-1274",
+    name: "NASDAQ",
+    definition:
+      "An electronic securities exchange known for listing technology and growth-oriented companies.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💻",
+  },
+
+  {
+    id: "finance-1276",
+    name: "Super Display Book",
+    definition:
+      "An NYSE electronic order management platform that replaced SuperDOT for handling trades.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📘",
+  },
+
+  {
+    id: "finance-1278",
+    name: "Universal Trading Platform",
+    definition:
+      "An NYSE Euronext electronic trading infrastructure designed to support multiple asset classes globally.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌐",
+  },
+
+  {
+    id: "finance-1280",
+    name: "Small-order execution system",
+    definition:
+      "A NASDAQ system providing automatic execution for qualifying small trade orders to enhance liquidity for retail investors.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📠",
+  },
+
+  {
+    id: "finance-1282",
+    name: "T-bills",
+    definition:
+      "An abbreviated term for Treasury bills, emphasizing their role as low-risk, short-term government securities.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧾",
+  },
+
+  {
+    id: "finance-1284",
+    name: "Commercial paper",
+    definition:
+      "Unsecured short-term corporate debt issued to finance working capital needs such as inventory or receivables.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📄",
+  },
+
+  {
+    id: "finance-1286",
+    name: "Negotiable certificates of deposit",
+    definition:
+      "Large-denomination bank CDs that can be traded in secondary markets prior to maturity and are typically uninsured.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏦",
+  },
+
+  {
+    id: "finance-1288",
+    name: "NCDs",
+    definition:
+      "An acronym for negotiable certificates of deposit, emphasizing their tradability and large minimum denominations.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔁",
+  },
+
+  {
+    id: "finance-1290",
+    name: "MMMFs",
+    definition:
+      "A shorthand for money market mutual funds commonly used when comparing taxable and tax-exempt cash equivalents.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔁",
+  },
+
+  {
+    id: "finance-1292",
+    name: "Federal funds rate",
+    definition:
+      "The interest rate targeted by the Federal Reserve for overnight lending of reserves between financial institutions.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-1294",
+    name: "Treasury Inflation-Protected Securities",
+    definition:
+      "U.S. government bonds whose principal adjusts with inflation, keeping real coupon payments stable over time.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1298",
+    name: "General obligation bonds",
+    definition:
+      "Municipal bonds backed by the full taxing power of the issuing government rather than specific project revenues.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛡️",
+  },
+
+  {
+    id: "finance-1300",
+    name: "Debenture",
+    definition:
+      "An unsecured corporate bond that relies on the issuer’s general creditworthiness rather than specific collateral.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔐",
+  },
+
+  {
+    id: "finance-1302",
+    name: "Exchange-traded fund",
+    definition:
+      "A pooled investment vehicle that holds a basket of assets and trades on exchanges like a single stock.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧺",
+  },
+
+  {
+    id: "finance-1304",
+    name: "Initial public offering",
+    definition:
+      "The first sale of a company’s shares to the public, transitioning the firm from private to publicly traded status.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🚀",
+  },
+
+  {
+    id: "finance-1306",
+    name: "Seasoned equity offering",
+    definition:
+      "A sale of additional shares by a company that is already public, often used to raise new capital after an IPO.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌾",
+  },
+
+  {
+    id: "finance-1308",
+    name: "Shelf registration",
+    definition:
+      "An SEC rule that lets firms register securities in advance so they can issue them quickly when market conditions are favorable.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🗂️",
+  },
+
+  {
+    id: "finance-1310",
+    name: "SPAC",
+    definition:
+      "An acronym for special purpose acquisition company, emphasizing its blank-check nature and merger-driven listing path.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧾",
+  },
+
+  {
+    id: "finance-1312",
+    name: "Limit order",
+    definition:
+      "A trade instruction to buy or sell a security only at a specified price or better.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎚️",
+  },
+
+  {
+    id: "finance-1314",
+    name: "Average",
+    definition:
+      "A general measure of central tendency that summarizes a data set, often referring to the arithmetic mean.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📊",
+  },
+
+  {
+    id: "finance-1316",
+    name: "Mean",
+    definition:
+      "A synonym for the arithmetic average, representing the central tendency of a numerical data set.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚖️",
+  },
+
+  {
+    id: "finance-1318",
+    name: "Population data",
+    definition:
+      "The complete set of all possible observations or measurements for the group under study.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌍",
+  },
+
+  {
+    id: "finance-1320",
+    name: "Sample size",
+    definition:
+      "The number of observations included in a sample, typically denoted by n.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔢",
+  },
+
+  {
+    id: "finance-1322",
+    name: "Extreme values",
+    definition:
+      "Observations that lie at the far upper or lower ends of a data set, potentially influencing summary measures.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🚨",
+  },
+
+  {
+    id: "finance-1324",
+    name: "Mode",
+    definition:
+      "The value or class that occurs most frequently within a data set.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1326",
+    name: "Geometric mean",
+    definition:
+      "The nth root of the product of n positive values, often used for average growth rates.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📦",
+  },
+
+  {
+    id: "finance-1328",
+    name: "Certificate of deposit",
+    definition:
+      "A time deposit offered by banks that pays interest over a fixed term and restricts early withdrawals.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏦",
+  },
+
+  {
+    id: "finance-1330",
+    name: "Standard deviation",
+    definition:
+      "The square root of variance, measuring average deviation of observations from the mean.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-1332",
+    name: "Population standard deviation",
+    definition:
+      "The standard deviation calculated using the entire population and dividing by the population size.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌐",
+  },
+
+  {
+    id: "finance-1334",
+    name: "Spread",
+    definition:
+      "The overall width of a data distribution, often summarized by range or interquartile range.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📏",
+  },
+
+  {
+    id: "finance-1336",
+    name: "Variance",
+    definition:
+      "The average of squared deviations from the mean, quantifying dispersion in squared units.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📐",
+  },
+
+  {
+    id: "finance-1338",
+    name: "Population variance",
+    definition:
+      "The variance computed using all population members and dividing by the population size.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌏",
+  },
+
+  {
+    id: "finance-1340",
+    name: "z-score",
+    definition:
+      "A standardized value indicating how many standard deviations an observation lies from the mean.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧭",
+  },
+
+  {
+    id: "finance-1342",
+    name: "Measurement",
+    definition:
+      "The process of assigning numbers or labels to characteristics of observations according to consistent rules.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📏",
+  },
+
+  {
+    id: "finance-1344",
+    name: "Quartiles",
+    definition:
+      "Three percentile cutoffs that divide ordered data into four equal parts.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🪜",
+  },
+
+  {
+    id: "finance-1346",
+    name: "First quartile",
+    definition:
+      "The 25th percentile of a distribution, marking the lower quartile of the data.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "1️⃣",
+  },
+
+  {
+    id: "finance-1348",
+    name: "25th percentile",
+    definition:
+      "The percentile value below which one-quarter of the ordered observations lie, identical to Q1.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📊",
+  },
+
+  {
+    id: "finance-1350",
+    name: "Q3",
+    definition:
+      "A shorthand notation for the third quartile, corresponding to the 75th percentile.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔣",
+  },
+
+  {
+    id: "finance-1352",
+    name: "Second quartile",
+    definition:
+      "The median or 50th percentile that splits ordered data into two equal halves.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "2️⃣",
+  },
+
+  {
+    id: "finance-1354",
+    name: "Interquartile range",
+    definition:
+      "The difference between the third and first quartiles, measuring the middle 50% spread of data.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📏",
+  },
+
+  {
+    id: "finance-1356",
+    name: "Lower bound",
+    definition:
+      "The minimum threshold value used in calculations such as confidence intervals or outlier fences.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⬇️",
+  },
+
+  {
+    id: "finance-1358",
+    name: "Outlier detection",
+    definition:
+      "Techniques that flag unusual observations using rules such as the IQR fences or z-score thresholds.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🕵️",
+  },
+
+  {
+    id: "finance-1360",
+    name: "Class width",
+    definition:
+      "The numerical size of the intervals used in a grouped frequency distribution or histogram.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📏",
+  },
+
+  {
+    id: "finance-1362",
+    name: "Relative frequency",
+    definition:
+      "The proportion of observations in a class relative to the total number of observations.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1364",
+    name: "Normal distribution",
+    definition:
+      "A continuous bell-shaped probability distribution defined by its mean and standard deviation.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1366",
+    name: "Continuous distribution",
+    definition:
+      "A probability distribution where outcomes can take any value within a continuous range.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌈",
+  },
+
+  {
+    id: "finance-1368",
+    name: "Numerical descriptive measures",
+    definition:
+      "Quantitative summaries of data such as means, medians, variances, and percentiles.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📊",
+  },
+
+  {
+    id: "finance-1370",
+    name: "Exponential distribution",
+    definition:
+      "A continuous probability distribution describing time between independent events occurring at a constant rate.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-1372",
+    name: "Probability distribution",
+    definition:
+      "A mathematical description of the possible outcomes of a random variable and their associated probabilities.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎲",
+  },
+
+  {
+    id: "finance-1374",
+    name: "Portfolio",
+    definition:
+      "A collection of financial assets held by an investor to achieve diversification and target returns.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💼",
+  },
+
+  {
+    id: "finance-1376",
+    name: "Lower-volatility investments",
+    definition:
+      "Assets whose returns fluctuate less dramatically than the broad market, such as short-term bonds.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛡️",
+  },
+
+  {
+    id: "finance-1378",
+    name: "Expected value",
+    definition:
+      "The probability-weighted average outcome of a random variable, representing its long-run average.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📐",
+  },
+
+  {
+    id: "finance-1380",
+    name: "Data visualization",
+    definition:
+      "The practice of presenting data graphically to reveal patterns, trends, or relationships.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🖼️",
+  },
+
+  {
+    id: "finance-1382",
+    name: "Histogram",
+    definition:
+      "A graph that shows the frequency distribution of continuous data using adjacent bars.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏗️",
+  },
+
+  {
+    id: "finance-1384",
+    name: "Scatter plot",
+    definition:
+      "A graph displaying pairs of data points to visualize the relationship between two variables.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-1386",
+    name: "Frequency",
+    definition:
+      "The count of how often a particular value or class occurs within a data set.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1388",
+    name: "Bivariate data",
+    definition:
+      "Paired observations recorded on two variables for each subject or time period.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "2️⃣",
+  },
+
+  {
+    id: "finance-1390",
+    name: "CPI",
+    definition:
+      "An acronym for the consumer price index, tracking average price changes for a basket of goods and services.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛒",
+  },
+
+  {
+    id: "finance-1392",
+    name: "Correlation",
+    definition:
+      "A statistical measure expressing the strength and direction of a linear relationship between two variables.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔗",
+  },
+
+  {
+    id: "finance-1394",
+    name: "R statistical analysis tool",
+    definition:
+      "The open-source R environment used for statistical computing, graphics, and data analysis.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💻",
+  },
+
+  {
+    id: "finance-1396",
+    name: "Vector",
+    definition:
+      "An ordered collection of elements in R representing a one-dimensional data structure.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "➡️",
+  },
+
+  {
+    id: "finance-1398",
+    name: "R console",
+    definition:
+      "The interactive command-line interface used to execute R code and view output.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🖥️",
+  },
+
+  {
+    id: "finance-1400",
+    name: "Assignment operator",
+    definition: "Syntax such as <- or = used in R to store values in objects.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📝",
+  },
+
+  {
+    id: "finance-1402",
+    name: "seq function",
+    definition:
+      "An R function that generates sequences of numbers with specified start, end, and increment values.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1404",
+    name: "sd function",
+    definition:
+      "An R function that calculates the sample standard deviation of numeric data.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-1406",
+    name: "weighted.mean function",
+    definition:
+      "An R function that calculates a weighted arithmetic mean given values and corresponding weights.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚖️",
+  },
+
+  {
+    id: "finance-1408",
+    name: "barplot function",
+    definition:
+      "An R function that creates bar charts for categorical or aggregated numerical data.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📊",
+  },
+
+  {
+    id: "finance-1410",
+    name: "hist function",
+    definition:
+      "An R function that constructs histograms for visualizing frequency distributions of numeric data.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏗️",
+  },
+
+  {
+    id: "finance-1412",
+    name: "Data analysis",
+    definition:
+      "The systematic process of inspecting, cleaning, and modeling data to discover useful information.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔍",
+  },
+
+  {
+    id: "finance-1414",
+    name: "Core Concepts from Document 14 (Regression Analysis in Finance)",
+    definition:
+      "Key regression-analysis themes highlighted in the training material’s fourteenth document for finance learners.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📚",
+  },
+
+  {
+    id: "finance-1416",
+    name: "Regression analysis",
+    definition:
+      "A statistical technique that models the relationship between a dependent variable and one or more independent variables.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-1420",
+    name: "Measure of association",
+    definition:
+      "A statistic such as correlation or covariance that quantifies how variables relate to each other.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "➰",
+  },
+
+  {
+    id: "finance-1422",
+    name: "Independent variable",
+    definition:
+      "A predictor variable whose changes are used to explain variation in a dependent variable.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔁",
+  },
+
+  {
+    id: "finance-1424",
+    name: "x-variable",
+    definition:
+      "Notation commonly used for the independent variable plotted along the horizontal axis.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "❌",
+  },
+
+  {
+    id: "finance-1426",
+    name: "Response variable",
+    definition:
+      "Another term for the dependent variable, representing the outcome being predicted.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📌",
+  },
+
+  {
+    id: "finance-1428",
+    name: "Positive correlation",
+    definition:
+      "A relationship where increases in one variable are associated with increases in another.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "➕",
+  },
+
+  {
+    id: "finance-1430",
+    name: "Linear pattern",
+    definition:
+      "A straight-line trend observed in a scatter plot indicating proportional change between variables.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1432",
+    name: "Sample statistic",
+    definition:
+      "A numerical summary computed from sample data used to estimate a population parameter.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧮",
+  },
+
+  {
+    id: "finance-1434",
+    name: "Karl Pearson",
+    definition:
+      "A statistician who developed the Pearson correlation coefficient widely used in linear analysis.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "👤",
+  },
+
+  {
+    id: "finance-1436",
+    name: "Strength of correlation",
+    definition:
+      "Reflects how closely data points cluster around a fitted line, with values near ±1 showing stronger relationships.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💪",
+  },
+
+  {
+    id: "finance-1438",
+    name: "Perfect negative correlation",
+    definition:
+      "A correlation coefficient of -1 indicating points lie exactly on a downward sloping line.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔻",
+  },
+
+  {
+    id: "finance-1440",
+    name: "Causation",
+    definition:
+      "A relationship where changes in one variable directly produce changes in another, stronger than mere correlation.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "➡️",
+  },
+
+  {
+    id: "finance-1442",
+    name: "Null hypothesis",
+    definition:
+      "The baseline assumption in a hypothesis test that there is no effect or difference.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "0️⃣",
+  },
+
+  {
+    id: "finance-1444",
+    name: "Level of significance",
+    definition:
+      "The probability threshold for rejecting the null hypothesis, commonly denoted alpha.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "α",
+  },
+
+  {
+    id: "finance-1446",
+    name: "Chief financial officer",
+    definition:
+      "The senior executive responsible for managing a company’s financial activities and strategy.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "👔",
+  },
+
+  {
+    id: "finance-1448",
+    name: "Linear regression analysis",
+    definition:
+      "The application of linear regression techniques to interpret relationships and make predictions.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📐",
+  },
+
+  {
+    id: "finance-1450",
+    name: "Slope",
+    definition:
+      "The rate of change in the dependent variable for each one-unit change in the independent variable.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1452",
+    name: "y-hat",
+    definition:
+      "Notation for the predicted value produced by a regression equation.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-1454",
+    name: "Observed value",
+    definition:
+      "The actual recorded value of the dependent variable in the data set.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "👀",
+  },
+
+  {
+    id: "finance-1456",
+    name: "Method of least squares",
+    definition:
+      "An estimation technique that finds parameter values minimizing the sum of squared residuals.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧮",
+  },
+
+  {
+    id: "finance-1458",
+    name: "Linear regression model",
+    definition:
+      "An equation expressing a dependent variable as a linear function of one or more predictors plus error.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧩",
+  },
+
+  {
+    id: "finance-1460",
+    name: "Linear relationship",
+    definition:
+      "A proportional association between variables that can be represented by a straight line.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "➡️",
+  },
+
+  {
+    id: "finance-1462",
+    name: "Random sample",
+    definition:
+      "A subset of a population selected so that each member has an equal chance of inclusion.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎲",
+  },
+
+  {
+    id: "finance-1464",
+    name: "Best-fit linear regression model",
+    definition:
+      "The linear model parameters that minimize residual sums of squares for the data set.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1466",
+    name: "Technology",
+    definition:
+      "Tools such as software, calculators, or platforms leveraged to perform financial and statistical analysis.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛠️",
+  },
+
+  {
+    id: "finance-1470",
+    name: "INTERCEPT command",
+    definition:
+      "An Excel function that calculates the y-intercept of the regression line through given data.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-1472",
+    name: "Interpretation of slope",
+    definition:
+      "Explaining what the estimated slope implies about changes in the dependent variable per unit change in the predictor.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📝",
+  },
+
+  {
+    id: "finance-1474",
+    name: "Fortune 500 company",
+    definition:
+      "A firm listed among Fortune magazine’s 500 largest U.S. corporations by total revenue.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏢",
+  },
+
+  {
+    id: "finance-1476",
+    name: "Dow Jones Industrial Average",
+    definition:
+      "A price-weighted index of 30 large U.S. industrial and consumer companies used as a market barometer.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏛️",
+  },
+
+  {
+    id: "finance-1478",
+    name: "Stock market indices",
+    definition:
+      "Composite measures that track the performance of groups of stocks to represent market segments.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1480",
+    name: "Benchmark",
+    definition:
+      "A reference portfolio or index used to evaluate the relative performance of an investment strategy.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-1482",
+    name: "Monthly returns",
+    definition:
+      "Investment performance computed over one-month intervals, useful for time-series analysis.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🗓️",
+  },
+
+  {
+    id: "finance-1484",
+    name: "Forecast",
+    definition:
+      "A projection of future values based on historical data, models, or expert judgment.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔮",
+  },
+
+  {
+    id: "finance-1486",
+    name: "Point estimates",
+    definition:
+      "Single-value statistics used to estimate population parameters, such as sample means or slopes.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📍",
+  },
+
+  {
+    id: "finance-1488",
+    name: "Confidence level",
+    definition:
+      "The probability that a confidence interval includes the true population parameter.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔒",
+  },
+
+  {
+    id: "finance-1490",
+    name: "Prediction interval",
+    definition:
+      "A range that estimates where a future individual observation is likely to fall given a model.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-1492",
+    name: "Critical value",
+    definition:
+      "A threshold from a probability distribution used to decide whether to reject the null hypothesis.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-1494",
+    name: "95% confidence",
+    definition:
+      "A commonly used confidence level indicating a 5% risk of excluding the true parameter from the interval.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "✅",
+  },
+
+  {
+    id: "finance-1496",
+    name: "Range of data collection",
+    definition:
+      "The span of time or values over which observations are gathered for analysis.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📆",
+  },
+
+  {
+    id: "finance-1498",
+    name: "Central weight of data",
+    definition:
+      "A descriptive phrase for the balance point of a distribution, similar to its mean or centroid.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚖️",
+  },
+
+  {
+    id: "finance-1500",
+    name: "lm function",
+    definition:
+      "An R function that fits linear models using formula syntax and least squares estimation.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-1502",
+    name: "Separator",
+    definition:
+      "A character such as a comma used to delineate elements within commands or data structures.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: ",",
+  },
+
+  {
+    id: "finance-1504",
+    name: "Residuals",
+    definition:
+      "The set of residual values from a regression model, used to diagnose fit and assumptions.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-1506",
+    name: "Data frame",
+    definition:
+      "An R data structure that organizes observations in rows and variables in columns.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🗂️",
+  },
+
+  {
+    id: "finance-1508",
+    name: "Prediction intervals",
+    definition:
+      "Plural reference to intervals that provide likely ranges for future individual observations.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛡️",
+  },
+
+  {
+    id: "finance-1510",
+    name: "Return",
+    definition:
+      "The gain or loss generated by an investment over a specified period, expressed in dollars or percentages.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💹",
+  },
+
+  {
+    id: "finance-1512",
+    name: "Profit",
+    definition:
+      "The positive difference between revenues and costs generated by an investment or business activity.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💰",
+  },
+
+  {
+    id: "finance-1514",
+    name: "Individual asset",
+    definition:
+      "A single security such as a stock or bond viewed separately from a diversified portfolio.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-1516",
+    name: "Total return",
+    definition:
+      "A comprehensive measure that combines income and capital appreciation over a period.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "➕",
+  },
+
+  {
+    id: "finance-1518",
+    name: "Capital gain",
+    definition:
+      "The increase in value of an asset between the purchase price and the selling price.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1520",
+    name: "Total percent return",
+    definition:
+      "The percentage change in value of an investment after accounting for income and appreciation.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📊",
+  },
+
+  {
+    id: "finance-1522",
+    name: "Capital gain yield",
+    definition:
+      "The percentage price appreciation portion of an investment's total return.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🚀",
+  },
+
+  {
+    id: "finance-1526",
+    name: "Annualized basis",
+    definition:
+      "Expressing returns as if they were earned over a one-year period to allow comparisons.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📆",
+  },
+
+  {
+    id: "finance-1528",
+    name: "EAR",
+    definition:
+      "An abbreviation for effective annual rate, showing the true yearly interest after compounding.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔁",
+  },
+
+  {
+    id: "finance-1532",
+    name: "Yearly returns",
+    definition:
+      "Investment gains or losses calculated over a calendar or fiscal year.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📅",
+  },
+
+  {
+    id: "finance-1534",
+    name: "Geometric average return",
+    definition:
+      "The compound rate of return that would produce the same cumulative performance as the actual sequence of returns.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "✖️",
+  },
+
+  {
+    id: "finance-1536",
+    name: "Mean return",
+    definition:
+      "A general term for the average return across a set of investment outcomes.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📐",
+  },
+
+  {
+    id: "finance-1538",
+    name: "Volatility of returns",
+    definition:
+      "The degree to which investment returns fluctuate over time, reflecting uncertainty.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌪️",
+  },
+
+  {
+    id: "finance-1540",
+    name: "Risk measurement",
+    definition:
+      "Quantitative techniques used to assess the uncertainty associated with investment outcomes.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📐",
+  },
+
+  {
+    id: "finance-1542",
+    name: "Bell-shaped curve",
+    definition:
+      "A common visualization of the normal distribution showing most outcomes near the mean.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏔️",
+  },
+
+  {
+    id: "finance-1544",
+    name: "Typical year",
+    definition:
+      "An investing period expected to fall within the central range of historical returns.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📆",
+  },
+
+  {
+    id: "finance-1546",
+    name: "Firm-specific risk",
+    definition:
+      "Uncertainty tied to an individual company that can be reduced through diversification.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏢",
+  },
+
+  {
+    id: "finance-1548",
+    name: "Stock price",
+    definition:
+      "The current market value of a single share of stock reflecting supply and demand.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💵",
+  },
+
+  {
+    id: "finance-1550",
+    name: "Future expenses",
+    definition:
+      "Expected costs that investors factor into forecasts of profitability and cash flow.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧾",
+  },
+
+  {
+    id: "finance-1552",
+    name: "Good news",
+    definition:
+      "Information that improves expectations about an investment and can raise prices.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "👍",
+  },
+
+  {
+    id: "finance-1554",
+    name: "Announcements",
+    definition:
+      "Scheduled disclosures such as earnings reports that convey new information to markets.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📣",
+  },
+
+  {
+    id: "finance-1556",
+    name: "Collection of stocks",
+    definition:
+      "A focused description of a portfolio composed primarily of equity securities.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📦",
+  },
+
+  {
+    id: "finance-1558",
+    name: "Variety of stocks",
+    definition:
+      "Holding shares from multiple companies or sectors to support diversification.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧃",
+  },
+
+  {
+    id: "finance-1560",
+    name: "Risk management",
+    definition:
+      "Processes for identifying, assessing, and mitigating investment risks.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛡️",
+  },
+
+  {
+    id: "finance-1562",
+    name: "Weighted average",
+    definition:
+      "An average in which each component contributes proportionally to its assigned weight, common in portfolio math.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚖️",
+  },
+
+  {
+    id: "finance-1564",
+    name: "Perfect positive correlation",
+    definition:
+      "A correlation coefficient of +1 indicating two assets move exactly together.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "➕",
+  },
+
+  {
+    id: "finance-1566",
+    name: "Same industry",
+    definition:
+      "Companies operating within the same sector, often sharing correlated performance drivers.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏭",
+  },
+
+  {
+    id: "finance-1568",
+    name: "Market conditions",
+    definition:
+      "The prevailing trends and sentiment in financial markets influencing returns.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-1570",
+    name: "Less correlated",
+    definition:
+      "Describes assets whose returns move more independently, enhancing diversification benefits.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-1572",
+    name: "Diversifiable risk",
+    definition:
+      "Another term for unsystematic risk, highlighting that it can be reduced through diversification.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧩",
+  },
+
+  {
+    id: "finance-1574",
+    name: "Unsystematic risk protection",
+    definition:
+      "The reduction in company-specific volatility achieved by holding many assets.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛡️",
+  },
+
+  {
+    id: "finance-1576",
+    name: "Market portfolio",
+    definition:
+      "A theoretical bundle of all risky investments held in proportion to their market values.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧺",
+  },
+
+  {
+    id: "finance-1578",
+    name: "Federal Reserve Bank",
+    definition:
+      "The central banking system of the United States whose actions influence markets.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏦",
+  },
+
+  {
+    id: "finance-1580",
+    name: "Interest rates",
+    definition:
+      "The cost of borrowing money, often set or influenced by central bank policy.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-1582",
+    name: "Major storms",
+    definition:
+      "Natural disasters that can disrupt economic activity and affect financial markets.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌪️",
+  },
+
+  {
+    id: "finance-1584",
+    name: "Entire market",
+    definition:
+      "A reference to broad market performance encompassing most traded securities.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌐",
+  },
+
+  {
+    id: "finance-1586",
+    name: "Risk reduction",
+    definition:
+      "The lowering of overall portfolio risk through diversification or hedging.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔽",
+  },
+
+  {
+    id: "finance-1588",
+    name: "Highly correlated",
+    definition:
+      "Describes assets whose returns move closely together, limiting diversification benefits.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔗",
+  },
+
+  {
+    id: "finance-1590",
+    name: "Heavy concentration",
+    definition:
+      "A portfolio allocation dominated by a small number of holdings, increasing idiosyncratic risk.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-1592",
+    name: "Dozen stocks",
+    definition:
+      "A practical rule of thumb suggesting diversification improves meaningfully after holding around twelve securities.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "1️⃣2️⃣",
+  },
+
+  {
+    id: "finance-1594",
+    name: "CAPM",
+    definition:
+      "An acronym for the capital asset pricing model, used to estimate required rates of return.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🅰️",
+  },
+
+  {
+    id: "finance-1596",
+    name: "Higher systematic risk",
+    definition:
+      "Exposure to market-wide factors above the average level, implying higher expected return.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⬆️",
+  },
+
+  {
+    id: "finance-1598",
+    name: "Risk-free investment",
+    definition:
+      "An asset with negligible default risk used as a baseline for comparing risk premiums.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛡️",
+  },
+
+  {
+    id: "finance-1600",
+    name: "US Treasury security",
+    definition:
+      "A bond, note, or bill issued by the U.S. Treasury to finance government operations.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏛️",
+  },
+
+  {
+    id: "finance-1604",
+    name: "Investing benchmark",
+    definition:
+      "A standard, such as a market index, used to evaluate an investment's performance.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-1606",
+    name: "Volatility",
+    definition:
+      "A measure of how widely investment returns fluctuate around their average.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌪️",
+  },
+
+  {
+    id: "finance-1608",
+    name: "Risk premium",
+    definition:
+      "The additional return demanded by investors for taking on risk above the risk-free rate.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "➕",
+  },
+
+  {
+    id: "finance-1610",
+    name: "S&P 500 stock index",
+    definition:
+      "A market-cap-weighted index tracking 500 large U.S. companies, often used as a benchmark.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📊",
+  },
+
+  {
+    id: "finance-1612",
+    name: "More volatile",
+    definition:
+      "Describes an asset with larger swings in returns compared with a benchmark.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-1614",
+    name: "Difference between returns",
+    definition:
+      "The spread in performance between two assets or time periods, often illustrating risk premiums.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "➖",
+  },
+
+  {
+    id: "finance-1616",
+    name: "Beta",
+    definition:
+      "A measure of how an asset's returns move relative to the market, quantifying systematic risk.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "β",
+  },
+
+  {
+    id: "finance-1618",
+    name: "Market movement",
+    definition:
+      "The direction and magnitude of changes in broad market indexes.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔄",
+  },
+
+  {
+    id: "finance-1620",
+    name: "Market move",
+    definition:
+      "A noticeable change in market index levels that affects individual securities.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-1622",
+    name: "Same direction",
+    definition:
+      "Describes two variables or securities that rise and fall together, implying positive correlation.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "➡️",
+  },
+
+  {
+    id: "finance-1624",
+    name: "Riskier than average",
+    definition:
+      "An investment whose volatility or beta exceeds that of a broad market benchmark.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚠️",
+  },
+
+  {
+    id: "finance-1626",
+    name: "Overall market",
+    definition:
+      "A broad reference to aggregate equity performance, often proxied by large indexes.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌍",
+  },
+
+  {
+    id: "finance-1630",
+    name: "Slope of line",
+    definition:
+      "The rate of change in a regression line, interpreted as beta in stock-versus-market plots.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📐",
+  },
+
+  {
+    id: "finance-1632",
+    name: "Risk percentage",
+    definition:
+      "Expressing risk as a percent-based metric, such as standard deviation or beta multiples.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "%",
+  },
+
+  {
+    id: "finance-1634",
+    name: "Expected return",
+    definition:
+      "The weighted average of possible investment outcomes based on probabilities or models like CAPM.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🤔",
+  },
+
+  {
+    id: "finance-1636",
+    name: "Investment information",
+    definition:
+      "Data resources such as filings, quotes, and analyst reports that inform portfolio decisions.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "ℹ️",
+  },
+
+  {
+    id: "finance-1638",
+    name: "MarketWatch",
+    definition:
+      "A financial media site delivering market data, analysis, and investment tools.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "👀",
+  },
+
+  {
+    id: "finance-1640",
+    name: "Time frame",
+    definition:
+      "The interval over which data is sampled or performance is evaluated.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🕒",
+  },
+
+  {
+    id: "finance-1642",
+    name: "Weekly data",
+    definition:
+      "Investment observations sampled once per week as an alternative to monthly series.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📅",
+  },
+
+  {
+    id: "finance-1644",
+    name: "Common measures",
+    definition:
+      "Frequently used metrics like mean returns, standard deviation, and beta for evaluating performance.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📏",
+  },
+
+  {
+    id: "finance-1646",
+    name: "Sharpe ratio",
+    definition:
+      "A risk-adjusted performance metric defined as excess return divided by standard deviation.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧮",
+  },
+
+  {
+    id: "finance-1648",
+    name: "Excess return",
+    definition:
+      "Return above a benchmark such as the risk-free rate or market index.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "➕",
+  },
+
+  {
+    id: "finance-1650",
+    name: "Units of risk",
+    definition:
+      "The denominators used in risk-adjusted metrics, such as standard deviation or beta.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📏",
+  },
+
+  {
+    id: "finance-1652",
+    name: "William F. Sharpe",
+    definition:
+      "Economist who developed the Sharpe ratio and advanced portfolio theory.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "👨‍🏫",
+  },
+
+  {
+    id: "finance-1654",
+    name: "Treynor ratio",
+    definition:
+      "A reward-to-risk measure that divides excess return by a portfolio's beta.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧮",
+  },
+
+  {
+    id: "finance-1656",
+    name: "Beta of portfolio",
+    definition:
+      "The weighted average beta of the securities in a portfolio, indicating market sensitivity.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "β",
+  },
+
+  {
+    id: "finance-1658",
+    name: "Relative measures",
+    definition:
+      "Metrics that compare performance to a benchmark rather than reporting absolute values.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚖️",
+  },
+
+  {
+    id: "finance-1660",
+    name: "Benchmark index",
+    definition:
+      "A reference index used to evaluate an investment manager's performance.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-1662",
+    name: "Raw portfolio return",
+    definition:
+      "The unadjusted rate of return earned by a portfolio before benchmarking or risk adjustment.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1664",
+    name: "Abnormal return",
+    definition:
+      "The portion of performance unexplained by risk factors, indicating out- or under-performance.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌟",
+  },
+
+  {
+    id: "finance-1666",
+    name: "Portfolio return exactly expected",
+    definition:
+      "A situation where realized performance matches the model-predicted return, yielding zero alpha.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-1668",
+    name: "Hard-earned funds",
+    definition:
+      "Investor capital accumulated through work or savings, emphasizing stewardship responsibility.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💼",
+  },
+
+  {
+    id: "finance-1670",
+    name: "Average annual return",
+    definition:
+      "A yearly summary of performance, often reported without communicating associated risk.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📅",
+  },
+
+  {
+    id: "finance-1672",
+    name: "Riskiness",
+    definition:
+      "The level of uncertainty associated with an investment's future returns.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚠️",
+  },
+
+  {
+    id: "finance-1674",
+    name: "Investment performance",
+    definition:
+      "How well an investment achieves its return goals relative to risk and benchmarks.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1676",
+    name: "Portfolio risk premium",
+    definition:
+      "The excess return earned by a portfolio above the risk-free rate.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎁",
+  },
+
+  {
+    id: "finance-1678",
+    name: "Highly volatile",
+    definition:
+      "Describes investments with large and frequent price fluctuations.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌪️",
+  },
+
+  {
+    id: "finance-1680",
+    name: "Risk reduction benefit",
+    definition:
+      "The improvement in risk profile achieved by combining less-correlated assets.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "👍",
+  },
+
+  {
+    id: "finance-1682",
+    name: "SPDR S&P 500 Trust",
+    definition:
+      "The SPY exchange-traded fund that tracks the S&P 500 index and serves as a market benchmark.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🕊️",
+  },
+
+  {
+    id: "finance-1686",
+    name: "Overall market performance",
+    definition:
+      "The aggregate returns of broad market indexes over a selected time period.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1688",
+    name: "Chart menu",
+    definition:
+      "Excel interface for selecting chart types and customizing visualization settings.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📊",
+  },
+
+  {
+    id: "finance-1690",
+    name: "Horizontal axis",
+    definition:
+      "The x-axis of a chart, often used for market returns in scatter plots.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "↔️",
+  },
+
+  {
+    id: "finance-1692",
+    name: "Chart formatting menu",
+    definition:
+      "Excel options that control visual elements like axes, labels, and trendlines.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎨",
+  },
+
+  {
+    id: "finance-1694",
+    name: "Linear trendline",
+    definition:
+      "A straight-line best fit through data, equivalent to a simple linear regression result.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📏",
+  },
+
+  {
+    id: "finance-1696",
+    name: "Best-fit line",
+    definition:
+      "The regression line that minimizes squared errors between actual data points and predicted values.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1698",
+    name: "Broader market",
+    definition:
+      "A general reference to major indexes that represent overall economic performance.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌐",
+  },
+
+  {
+    id: "finance-1700",
+    name: "Average stock",
+    definition:
+      "A representative equity whose beta equals one, moving in line with the market.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📊",
+  },
+
+  {
+    id: "finance-1702",
+    name: "Major projects",
+    definition:
+      "Large-scale corporate investments such as plants, products, or acquisitions requiring capital budgeting analysis.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📦",
+  },
+
+  {
+    id: "finance-1704",
+    name: "Fixed assets",
+    definition:
+      "Long-term tangible resources such as buildings and equipment acquired through capital budgeting.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏭",
+  },
+
+  {
+    id: "finance-1706",
+    name: "Existing products",
+    definition:
+      "Current offerings evaluated for upgrades or expansion through capital budgeting.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📦",
+  },
+
+  {
+    id: "finance-1710",
+    name: "Payback period method",
+    definition:
+      "A capital budgeting technique that measures how long it takes to recover the initial investment from cash inflows.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⏳",
+  },
+
+  {
+    id: "finance-1712",
+    name: "Initial cost",
+    definition:
+      "The total upfront investment required to begin a project, including purchase and installation.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💲",
+  },
+
+  {
+    id: "finance-1714",
+    name: "Accumulated inflow",
+    definition:
+      "The running total of cash received to date, used in payback period calculations.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1716",
+    name: "Simplicity",
+    definition:
+      "An advantage of the payback method, making it easy to explain even if it ignores time value.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🙂",
+  },
+
+  {
+    id: "finance-1718",
+    name: "Finance training",
+    definition:
+      "Formal education in financial concepts that helps practitioners use more advanced capital budgeting tools.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎓",
+  },
+
+  {
+    id: "finance-1720",
+    name: "Present value",
+    definition:
+      "Today's worth of future cash flows after discounting for time and risk.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💰",
+  },
+
+  {
+    id: "finance-1722",
+    name: "Cash inflows",
+    definition:
+      "Money received from a project, such as revenues or cost savings.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⬇️",
+  },
+
+  {
+    id: "finance-1724",
+    name: "Comparing cash flows",
+    definition:
+      "Evaluating inflows versus outflows over consistent periods to judge project viability.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚖️",
+  },
+
+  {
+    id: "finance-1726",
+    name: "Rejection criterion",
+    definition:
+      "A decision rule that causes a project to be declined when its metrics fall short.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔴",
+  },
+
+  {
+    id: "finance-1728",
+    name: "Financial reasoning",
+    definition:
+      "Using sound economic logic and cash flow analysis to support investment decisions.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧠",
+  },
+
+  {
+    id: "finance-1730",
+    name: "Cash flows after payback period",
+    definition:
+      "Future benefits ignored by the payback rule, underscoring its limitations.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⏭️",
+  },
+
+  {
+    id: "finance-1732",
+    name: "Quick cash flows",
+    definition:
+      "Rapid early inflows favored by the payback rule, sometimes at the expense of strategic gains.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💨",
+  },
+
+  {
+    id: "finance-1734",
+    name: "Uncertain cash flows",
+    definition:
+      "Projected cash streams with variability that require risk-adjusted evaluation.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌫️",
+  },
+
+  {
+    id: "finance-1736",
+    name: "Low-risk",
+    definition:
+      "Investments with more predictable cash flows and lower required returns.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛡️",
+  },
+
+  {
+    id: "finance-1738",
+    name: "NPV",
+    definition:
+      "A common abbreviation for net present value used in finance discussions and spreadsheets.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🅽",
+  },
+
+  {
+    id: "finance-1740",
+    name: "Present value of cash inflows",
+    definition:
+      "The discounted value of future benefits generated by a project.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💰",
+  },
+
+  {
+    id: "finance-1742",
+    name: "Add value",
+    definition:
+      "The goal of selecting projects with positive NPV that increase shareholder wealth.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "➕",
+  },
+
+  {
+    id: "finance-1744",
+    name: "Negative NPV",
+    definition:
+      "A project with discounted inflows less than costs, typically rejected.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "❌",
+  },
+
+  {
+    id: "finance-1746",
+    name: "Common time period",
+    definition:
+      "Expressing cash flows in the same temporal terms to allow valid comparison and discounting.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🗓️",
+  },
+
+  {
+    id: "finance-1750",
+    name: "NPV calculation",
+    definition:
+      "The process of discounting cash flows and summing them to evaluate project viability.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧾",
+  },
+
+  {
+    id: "finance-1752",
+    name: "Accept or reject",
+    definition:
+      "The binary choice in capital budgeting based on NPV and other investment metrics.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔀",
+  },
+
+  {
+    id: "finance-1754",
+    name: "Finance background",
+    definition:
+      "Prior education or experience that enables managers to apply advanced capital budgeting techniques.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎓",
+  },
+
+  {
+    id: "finance-1756",
+    name: "Limited capital",
+    definition:
+      "Constraints on funding that force firms to prioritize among positive NPV projects.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🚧",
+  },
+
+  {
+    id: "finance-1758",
+    name: "NPV profile",
+    definition:
+      "A plot showing how a project's net present value changes with different discount rates.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1760",
+    name: "Sensitive to discount rate",
+    definition:
+      "Describes how small changes in the required return can swing the NPV result.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎚️",
+  },
+
+  {
+    id: "finance-1762",
+    name: "Breakeven",
+    definition:
+      "The discount rate or time at which cumulative inflows equal outflows, leading to zero NPV.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚖️",
+  },
+
+  {
+    id: "finance-1764",
+    name: "Internal rate of return",
+    definition:
+      "The discount rate that sets a project's net present value equal to zero.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1766",
+    name: "Discount rate sets NPV to zero",
+    definition:
+      "The defining property of IRR, marking the breakeven required return.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "0️⃣",
+  },
+
+  {
+    id: "finance-1768",
+    name: "Iterative process",
+    definition:
+      "Repeating calculations with refined inputs, as used in IRR estimation.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔄",
+  },
+
+  {
+    id: "finance-1770",
+    name: "Time-consuming",
+    definition:
+      "Describes the effort required to solve for IRR or evaluate many scenarios manually.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⌛",
+  },
+
+  {
+    id: "finance-1772",
+    name: "Mathematical calculations",
+    definition:
+      "The quantitative operations required to value projects, often handled by software.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "∑",
+  },
+
+  {
+    id: "finance-1774",
+    name: "Annual percentage returns",
+    definition:
+      "IRR outputs expressed as yearly rates making project comparisons easier for investors.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📅",
+  },
+
+  {
+    id: "finance-1776",
+    name: "Interpretation",
+    definition:
+      "Understanding what capital budgeting metrics mean for decision-making and communication.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🗣️",
+  },
+
+  {
+    id: "finance-1778",
+    name: "No single mathematical solution",
+    definition:
+      "A drawback of IRR when unconventional cash flows create multiple possible rates.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "♾️",
+  },
+
+  {
+    id: "finance-1780",
+    name: "Multiple periods",
+    definition:
+      "Projects with cash flows spanning several years, necessitating discounting and IRR analysis.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1782",
+    name: "Reinvestment rate assumption",
+    definition:
+      "The implicit belief that interim cash flows can be reinvested at the IRR, often unrealistic.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "♻️",
+  },
+
+  {
+    id: "finance-1784",
+    name: "Rate of return",
+    definition:
+      "The percentage gain or loss on an investment, used broadly in capital budgeting.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "%",
+  },
+
+  {
+    id: "finance-1786",
+    name: "Differences in scale",
+    definition:
+      "Variations in project size that can make percentage-based metrics misleading when ranking.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📏",
+  },
+
+  {
+    id: "finance-1788",
+    name: "Size or scale",
+    definition:
+      "The absolute investment required by a project, relevant when comparing mutually exclusive options.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📦",
+  },
+
+  {
+    id: "finance-1790",
+    name: "PI",
+    definition:
+      "Abbreviation for profitability index used in project appraisal discussions.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🅿️",
+  },
+
+  {
+    id: "finance-1792",
+    name: "Numerator",
+    definition:
+      "The top part of a financial ratio, such as the present value of benefits in PI calculations.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔢",
+  },
+
+  {
+    id: "finance-1794",
+    name: "Present value of benefits",
+    definition:
+      "Discounted inflows forming the numerator of the profitability index.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💰",
+  },
+
+  {
+    id: "finance-1796",
+    name: "Accept-or-reject",
+    definition:
+      "Decision rules applied after computing PI or NPV to determine whether to fund a project.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "✅",
+  },
+
+  {
+    id: "finance-1798",
+    name: "Discounted payback period",
+    definition:
+      "A payback calculation that discounts cash flows, addressing the traditional method's time value flaw.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🕰️",
+  },
+
+  {
+    id: "finance-1800",
+    name: "Breakeven time period",
+    definition:
+      "When cumulative discounted inflows equal outflows under the discounted payback method.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⏱️",
+  },
+
+  {
+    id: "finance-1802",
+    name: "Theoretical underpinning",
+    definition:
+      "The academic support explaining why a capital budgeting metric leads to value creation.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📚",
+  },
+
+  {
+    id: "finance-1804",
+    name: "MIRR",
+    definition:
+      "A common abbreviation for the modified internal rate of return.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "ℹ️",
+  },
+
+  {
+    id: "finance-1806",
+    name: "Project terminal value",
+    definition:
+      "The total future value of inflows at the end of a project's life under MIRR analysis.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏁",
+  },
+
+  {
+    id: "finance-1808",
+    name: "Reinvestment rate",
+    definition:
+      "The rate at which interim cash flows are assumed to grow in MIRR calculations.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "♻️",
+  },
+
+  {
+    id: "finance-1810",
+    name: "Single solution",
+    definition:
+      "An advantage of MIRR, which yields one rate even for unconventional cash flows.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "1️⃣",
+  },
+
+  {
+    id: "finance-1812",
+    name: "Mutually exclusive projects",
+    definition:
+      "Investment choices where selecting one project eliminates the option to pursue another.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🚫",
+  },
+
+  {
+    id: "finance-1814",
+    name: "Highest NPV",
+    definition:
+      "The project ranking criterion that maximizes shareholder value when choices are mutually exclusive.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⬆️",
+  },
+
+  {
+    id: "finance-1816",
+    name: "Repeat",
+    definition:
+      "Extending projects to common time horizons by assuming they can be replicated in future cycles.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔁",
+  },
+
+  {
+    id: "finance-1818",
+    name: "Consecutive projects",
+    definition:
+      "Sequencing the same project multiple times to equalize evaluation horizons.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔗",
+  },
+
+  {
+    id: "finance-1820",
+    name: "Equal annuity approach",
+    definition:
+      "Converting project NPVs into equivalent annual cash flows to compare unequal life projects.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔁",
+  },
+
+  {
+    id: "finance-1822",
+    name: "Replicable",
+    definition:
+      "Describes a project that can be repeated in future periods to match evaluation horizons.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📎",
+  },
+
+  {
+    id: "finance-1824",
+    name: "Unavoidable issues",
+    definition:
+      "Factors like inflation or market shifts that complicate long-term project forecasts.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚠️",
+  },
+
+  {
+    id: "finance-1826",
+    name: "Changing market conditions",
+    definition:
+      "Evolving competitive or economic environments that impact long-term project forecasts.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌪️",
+  },
+
+  {
+    id: "finance-1828",
+    name: "Scarce resource",
+    definition:
+      "Capital or other constraints that limit the number of projects a firm can undertake.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💎",
+  },
+
+  {
+    id: "finance-1830",
+    name: "Maximize NPV",
+    definition:
+      "The objective of selecting the mix of projects that yields the greatest total net present value.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🚀",
+  },
+
+  {
+    id: "finance-1832",
+    name: "Array of projects",
+    definition:
+      "The set of potential investments evaluated during capital budgeting season.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🗂️",
+  },
+
+  {
+    id: "finance-1834",
+    name: "Best allocation",
+    definition:
+      "The selection of projects that maximizes value subject to capital constraints.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏆",
+  },
+
+  {
+    id: "finance-1836",
+    name: "Crystal ball",
+    definition:
+      "A metaphor for perfect foresight that managers wish they possessed when forecasting cash flows.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔮",
+  },
+
+  {
+    id: "finance-1838",
+    name: "Estimates",
+    definition:
+      "Approximations of cash flows or discount rates built from incomplete information.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "✏️",
+  },
+
+  {
+    id: "finance-1840",
+    name: "Oil company",
+    definition:
+      "An example industry often used to illustrate capital budgeting decisions with large, risky projects.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛢️",
+  },
+
+  {
+    id: "finance-1842",
+    name: "Equipment",
+    definition:
+      "Physical assets purchased for projects that drive initial capital expenditures.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚙️",
+  },
+
+  {
+    id: "finance-1844",
+    name: "Oil prices",
+    definition:
+      "Commodity prices affecting revenue projections for energy sector investments.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💧",
+  },
+
+  {
+    id: "finance-1846",
+    name: "Future market",
+    definition:
+      "Expectations about future conditions that influence project valuation in volatile industries.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔮",
+  },
+
+  {
+    id: "finance-1848",
+    name: "Economic developments",
+    definition:
+      "Macro trends like growth or recessions that influence project cash flows.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-1850",
+    name: "Pandemic shock",
+    definition:
+      "An unexpected global event dramatically altering economic assumptions for projects.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🦠",
+  },
+
+  {
+    id: "finance-1852",
+    name: "Dramatically changing conditions",
+    definition:
+      "Rapid shifts that can render original project forecasts obsolete.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚡",
+  },
+
+  {
+    id: "finance-1854",
+    name: "Cash resources",
+    definition:
+      "Liquidity available to sustain projects during economic downturns.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💧",
+  },
+
+  {
+    id: "finance-1856",
+    name: "Corporate cash flows",
+    definition:
+      "Company-wide inflows and outflows that capital budgeting decisions influence.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏢",
+  },
+
+  {
+    id: "finance-1858",
+    name: "Automate",
+    definition:
+      "Using spreadsheet formulas and functions to streamline repetitive capital budgeting calculations.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "♻️",
+  },
+
+  {
+    id: "finance-1860",
+    name: "Versatile tool",
+    definition:
+      "A description of Excel's flexibility in supporting multiple financial analyses.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧰",
+  },
+
+  {
+    id: "finance-1862",
+    name: "Updated information",
+    definition:
+      "New data incorporated into models to refine project valuations and decisions.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔄",
+  },
+
+  {
+    id: "finance-1864",
+    name: "Present value formula",
+    definition:
+      "The mathematical expression for discounting future cash flows to the present.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧮",
+  },
+
+  {
+    id: "finance-1866",
+    name: "Sum",
+    definition:
+      "Adding discounted cash flows to compute NPV, often implemented with Excel's SUM function.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "➕",
+  },
+
+  {
+    id: "finance-1868",
+    name: "Financial functions",
+    definition:
+      "Excel formulas such as NPV(), IRR(), and MIRR() used to evaluate projects quickly.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧮",
+  },
+
+  {
+    id: "finance-1870",
+    name: "Period 1",
+    definition:
+      "The first time period in Excel's NPV function, necessitating separate treatment of initial investments.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "1️⃣",
+  },
+
+  {
+    id: "finance-1872",
+    name: "Time period zero",
+    definition:
+      "The starting point for project cash flows, separate from the stream used in Excel's NPV().",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "0️⃣",
+  },
+
+  {
+    id: "finance-1874",
+    name: "Excel-programmed NPV function",
+    definition:
+      "The spreadsheet implementation of NPV that handles only future cash flows beyond time zero.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🖥️",
+  },
+
+  {
+    id: "finance-1876",
+    name: "All project cash flows",
+    definition:
+      "The complete series of inflows and outflows required by Excel's IRR function.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔁",
+  },
+
+  {
+    id: "finance-1878",
+    name: "Estimate",
+    definition:
+      "An iterative or approximated value for project metrics when exact calculations are complex.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📝",
+  },
+
+  {
+    id: "finance-1880",
+    name: "Economic conditions",
+    definition:
+      "Macroeconomic factors such as growth, inflation, and employment that influence the cost of capital.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌎",
+  },
+
+  {
+    id: "finance-1882",
+    name: "Volatile markets",
+    definition:
+      "Periods of heightened uncertainty that can alter financing costs and investment decisions.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌪️",
+  },
+
+  {
+    id: "finance-1884",
+    name: "Financing costs",
+    definition:
+      "Expenses associated with raising debt or equity capital, reflected in the discount rate.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💵",
+  },
+
+  {
+    id: "finance-1886",
+    name: "What-If Analysis",
+    definition:
+      "Excel suite of tools, including data tables, used to explore sensitivity of capital budgeting models.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "❔",
+  },
+
+  {
+    id: "finance-1888",
+    name: "NPV profile graph",
+    definition:
+      "A chart plotting NPVs against discount rates created from data table results.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1890",
+    name: "Insert tab (Excel)",
+    definition:
+      "The ribbon section in Excel where charts, tables, and other objects are added.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📍",
+  },
+
+  {
+    id: "finance-1892",
+    name: "Customize",
+    definition:
+      "Adjusting Excel charts to improve clarity, labeling, and presentation of financial data.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎨",
+  },
+
+  {
+    id: "finance-1894",
+    name: "Labeling axes",
+    definition:
+      "Annotating chart axes to clarify which variables, such as discount rates or NPVs, are displayed.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏷️",
+  },
+
+  {
+    id: "finance-1896",
+    name: "x-axis",
+    definition:
+      "The horizontal axis of a chart, frequently assigned to discount rates in NPV profiles.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "↔️",
+  },
+
+  {
+    id: "finance-1898",
+    name: "NPV zero",
+    definition:
+      "The point where the discounted benefits equal costs, indicating the project's break-even rate.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "0️⃣",
+  },
+
+  {
+    id: "finance-1900",
+    name: "Negative NPV (chart)",
+    definition:
+      "The region of an NPV profile below zero indicating value destruction at certain hurdle rates.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔴",
+  },
+
+  {
+    id: "finance-1902",
+    name: "Underestimating",
+    definition:
+      "Failing to fully account for financing costs, leading managers to incorrectly reject good projects.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-1904",
+    name: "Good project",
+    definition:
+      "An opportunity with positive NPV that should be accepted if capital is available.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "👍",
+  },
+
+  {
+    id: "finance-1906",
+    name: "Assets",
+    definition:
+      "Resources owned by a firm, represented on the balance sheet and influenced by investment decisions.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏢",
+  },
+
+  {
+    id: "finance-1908",
+    name: "Capital",
+    definition:
+      "Financial resources, including debt and equity, used to fund company operations and investments.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💼",
+  },
+
+  {
+    id: "finance-1910",
+    name: "Borrowing",
+    definition:
+      "Obtaining funds through debt instruments to finance investments or operations.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🤝",
+  },
+
+  {
+    id: "finance-1912",
+    name: "Ownership",
+    definition:
+      "The rights held by equity investors to claim residual profits and vote on corporate matters.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🗳️",
+  },
+
+  {
+    id: "finance-1914",
+    name: "Capital structure",
+    definition:
+      "The mix of debt, equity, and other financing sources used by a firm.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏗️",
+  },
+
+  {
+    id: "finance-1916",
+    name: "Weighted average cost of capital",
+    definition:
+      "The blended required return on a firm's debt and equity financing, abbreviated WACC.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚖️",
+  },
+
+  {
+    id: "finance-1918",
+    name: "Book values",
+    definition:
+      "Accounting amounts recorded on financial statements based on historical cost.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📚",
+  },
+
+  {
+    id: "finance-1920",
+    name: "Current market values",
+    definition:
+      "The prices at which assets or liabilities could be exchanged today.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💲",
+  },
+
+  {
+    id: "finance-1924",
+    name: "Cost of equity capital",
+    definition:
+      "The return required by shareholders for providing equity financing.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1926",
+    name: "Yield to maturity",
+    definition:
+      "The internal rate of return on a bond held to maturity, reflecting its cost of debt.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧮",
+  },
+
+  {
+    id: "finance-1928",
+    name: "Coupon payment",
+    definition: "The periodic interest cash flow received by bondholders.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💵",
+  },
+
+  {
+    id: "finance-1930",
+    name: "Tax-deductible expense",
+    definition:
+      "An outlay, such as interest, that reduces taxable income and lowers effective costs.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📉",
+  },
+
+  {
+    id: "finance-1932",
+    name: "Effective cost of debt",
+    definition:
+      "The net borrowing cost after accounting for tax shields and issuance expenses.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-1934",
+    name: "Tax rate",
+    definition:
+      "The statutory percentage applied to taxable income, affecting after-tax costs.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "%",
+  },
+
+  {
+    id: "finance-1936",
+    name: "Ownership shares",
+    definition:
+      "Units of equity that represent proportional ownership in a corporation.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔗",
+  },
+
+  {
+    id: "finance-1938",
+    name: "Systematic risk exposure",
+    definition:
+      "The portion of risk linked to market-wide factors that equity capital must compensate.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌐",
+  },
+
+  {
+    id: "finance-1940",
+    name: "Shareholders",
+    definition:
+      "Owners of a company who supply equity capital and expect returns commensurate with risk.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "👥",
+  },
+
+  {
+    id: "finance-1942",
+    name: "Dividend per share",
+    definition:
+      "The cash distribution paid to each outstanding share, a key input in dividend discount models.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💵",
+  },
+
+  {
+    id: "finance-1944",
+    name: "Stock price input",
+    definition:
+      "The current market price of a share used when estimating cost of equity via dividend models.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💲",
+  },
+
+  {
+    id: "finance-1946",
+    name: "Weight of debt",
+    definition:
+      "The proportion of total capital represented by debt in the WACC calculation.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚖️",
+  },
+
+  {
+    id: "finance-1948",
+    name: "Weight of common equity",
+    definition:
+      "The fraction of financing supplied by common shareholders in the WACC formula.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📊",
+  },
+
+  {
+    id: "finance-1950",
+    name: "US Treasury bonds",
+    definition:
+      "Long-term government debt instruments forming part of the risk-free benchmark set.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏛️",
+  },
+
+  {
+    id: "finance-1952",
+    name: "Total debt",
+    definition:
+      "The sum of a firm's short- and long-term borrowing obligations.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧾",
+  },
+
+  {
+    id: "finance-1954",
+    name: "Long-term debt",
+    definition:
+      "Borrowings with maturities beyond one year, forming a major capital structure component.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📅",
+  },
+
+  {
+    id: "finance-1956",
+    name: "Treasury bills",
+    definition:
+      "Short-term government securities often held as cash equivalents and risk-free benchmarks.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏦",
+  },
+
+  {
+    id: "finance-1960",
+    name: "Project capital structure",
+    definition:
+      "The mix of debt and equity specifically chosen to finance an individual investment project.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧱",
+  },
+
+  {
+    id: "finance-1962",
+    name: "Retained earnings financing",
+    definition:
+      "Using accumulated profits as a source of equity capital with an opportunity cost equal to shareholder returns.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💹",
+  },
+
+  {
+    id: "finance-1964",
+    name: "Flotation cost adjustment",
+    definition:
+      "The additional percentage added to cost of equity to reflect issuance expenses on new stock.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧾",
+  },
+
+  {
+    id: "finance-1966",
+    name: "After-tax cost of debt",
+    definition:
+      "The effective borrowing rate once interest tax shields are considered in capital budgeting.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧮",
+  },
+
+  {
+    id: "finance-1968",
+    name: "Pretax cost of debt",
+    definition:
+      "The contractual interest rate a firm pays lenders before tax effects are considered.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧾",
+  },
+
+  {
+    id: "finance-1970",
+    name: "Preferred dividends",
+    definition:
+      "Contractual cash distributions to preferred shareholders, informing cost of preferred equity.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-1972",
+    name: "Cost of preferred equity",
+    definition:
+      "The required return for preferred shareholders, typically dividend divided by price.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📊",
+  },
+
+  {
+    id: "finance-1974",
+    name: "Market value of equity",
+    definition:
+      "Total value of outstanding shares at current prices, used in capital structure analysis.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💹",
+  },
+
+  {
+    id: "finance-1976",
+    name: "Capital provider required return",
+    definition:
+      "The return demanded by each financing source, forming the components of WACC.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎯",
+  },
+
+  {
+    id: "finance-1978",
+    name: "Division-specific WACC",
+    definition:
+      "A tailored discount rate reflecting the risk and capital structure of a particular business unit.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🏢",
+  },
+
+  {
+    id: "finance-1980",
+    name: "Risk-adjusted discount rate",
+    definition:
+      "A rate that increases with project risk to ensure investors are compensated appropriately.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚠️",
+  },
+
+  {
+    id: "finance-1982",
+    name: "Comparable firms",
+    definition:
+      "Companies operating in similar industries used to benchmark project risk characteristics.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🤝",
+  },
+
+  {
+    id: "finance-1984",
+    name: "Equity beta",
+    definition:
+      "A beta measure capturing both business and financial risk borne by shareholders.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📈",
+  },
+
+  {
+    id: "finance-1986",
+    name: "Unlevering beta",
+    definition:
+      "The process of removing financial leverage effects from an observed equity beta to isolate business risk.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧮",
+  },
+
+  {
+    id: "finance-1988",
+    name: "Subjective risk approach",
+    definition:
+      "Adjusting discount rates up or down based on management judgment about project risk categories.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧠",
+  },
+
+  {
+    id: "finance-1990",
+    name: "Risk categories",
+    definition:
+      "Project groupings such as low, average, and high risk that determine subjective rate adjustments.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🗂️",
+  },
+
+  {
+    id: "finance-1992",
+    name: "Operating leverage impact",
+    definition:
+      "The way fixed operating costs amplify business risk and affect project betas.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚙️",
+  },
+
+  {
+    id: "finance-1994",
+    name: "Diversification limits",
+    definition:
+      "The residual systematic risk that remains even after portfolio diversification.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🚧",
+  },
+
+  {
+    id: "finance-1996",
+    name: "Capital rationing",
+    definition:
+      "Limiting investment to projects with the best risk-adjusted returns when capital is scarce.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔒",
+  },
+
+  {
+    id: "finance-1998",
+    name: "Hard capital rationing",
+    definition:
+      "External financing constraints that cap available investment funds.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧱",
+  },
+
+  {
+    id: "finance-2000",
+    name: "Project screening",
+    definition:
+      "Initial evaluation steps that filter proposals before detailed capital budgeting analysis.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔍",
+  },
+
+  {
+    id: "finance-2002",
+    name: "Profitability index threshold",
+    definition:
+      "A minimum PI cutoff ensuring only value-creating projects receive funding when capital is limited.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🪙",
+  },
+
+  {
+    id: "finance-2004",
+    name: "Strategic fit evaluation",
+    definition:
+      "Assessing how a project aligns with corporate strategy before allocating scarce capital.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧭",
+  },
+
+  {
+    id: "finance-2006",
+    name: "Project champion",
+    definition:
+      "An internal advocate responsible for guiding a capital project through evaluation and execution.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🥇",
+  },
+
+  {
+    id: "finance-2008",
+    name: "Managerial flexibility",
+    definition:
+      "The ability to revise or abandon projects as new information emerges, captured in real options value.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "♻️",
+  },
+
+  {
+    id: "finance-2010",
+    name: "Option to abandon",
+    definition:
+      "The flexibility to cease a project and recover salvage value, limiting downside risk.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🚪",
+  },
+
+  {
+    id: "finance-2012",
+    name: "Option to switch",
+    definition:
+      "Flexibility to change inputs, outputs, or processes to adapt to market conditions.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔁",
+  },
+
+  {
+    id: "finance-2014",
+    name: "Risk-neutral valuation",
+    definition:
+      "Pricing real options by discounting expected payoffs using risk-neutral probabilities.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚖️",
+  },
+
+  {
+    id: "finance-2016",
+    name: "Real option payoff diagram",
+    definition:
+      "A visual showing project payoffs with and without flexible decision points.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📊",
+  },
+
+  {
+    id: "finance-2018",
+    name: "Real option premium",
+    definition:
+      "The incremental value added to a project due to managerial flexibility rights.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💎",
+  },
+
+  {
+    id: "finance-2020",
+    name: "Option maturity",
+    definition:
+      "The time remaining before a project decision point must be taken, affecting option value.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⌛",
+  },
+
+  {
+    id: "finance-2022",
+    name: "Exercise price in real options",
+    definition:
+      "The cost required to expand, delay, or abandon a project when exercising flexibility.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "💳",
+  },
+
+  {
+    id: "finance-2024",
+    name: "Managerial decision nodes",
+    definition:
+      "Points within a decision tree where management chooses to continue, expand, or abandon.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧭",
+  },
+
+  {
+    id: "finance-2026",
+    name: "Option to contract",
+    definition:
+      "Flexibility allowing management to reduce project scale if conditions deteriorate.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "➖",
+  },
+
+  {
+    id: "finance-2028",
+    name: "Sequential investment",
+    definition:
+      "Staging project expenditures over time to preserve options and manage risk.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "📆",
+  },
+
+  {
+    id: "finance-2030",
+    name: "Traditional NPV bias",
+    definition:
+      "The tendency of static discounted cash flow analysis to undervalue projects with flexibility.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "⚖️",
+  },
+
+  {
+    id: "finance-2032",
+    name: "Growth option",
+    definition:
+      "An early project that unlocks future expansion opportunities, creating additional option value.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🌱",
+  },
+
+  {
+    id: "finance-2034",
+    name: "Flexibility valuation challenges",
+    definition:
+      "Difficulties in estimating volatility, correlations, and exercise rules for real options.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧩",
+  },
+
+  {
+    id: "finance-2036",
+    name: "Monte Carlo simulation for options",
+    definition:
+      "A numerical technique to estimate option values by simulating many possible project cash flow paths.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🎲",
+  },
+
+  {
+    id: "finance-2038",
+    name: "Correlation assumptions",
+    definition:
+      "Assumptions about relationships between project cash flows and market factors in option models.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔗",
+  },
+
+  {
+    id: "finance-2040",
+    name: "Adaptive capital budgeting",
+    definition:
+      "An iterative approach that updates investment decisions as new information emerges.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🔄",
+  },
+
+  {
+    id: "finance-2042",
+    name: "Risk mitigation option",
+    definition:
+      "Flexibility choices designed to reduce downside exposure in uncertain projects.",
+    importance: "supporting",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🛡️",
+  },
+
+  {
+    id: "finance-2044",
+    name: "Option-aware capital budgeting",
+    definition:
+      "Incorporating real option valuation into project selection alongside traditional metrics.",
+    importance: "core",
+    firstMentionPosition: 0,
+    mentions: [],
+    relatedConcepts: [],
+    prerequisites: [],
+    applications: [],
+    commonMisconceptions: [],
+    emoji: "🧮",
   },
 ];
