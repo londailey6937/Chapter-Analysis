@@ -35,20 +35,61 @@ export const ConceptList: React.FC<ConceptListProps> = ({
     return canonicalIndex >= 0 ? canonicalIndex : 0;
   };
 
+  const findNextMentionIndex = (
+    concept: Concept | undefined,
+    startIndex: number,
+    direction: 1 | -1
+  ): number | null => {
+    if (!concept?.mentions || concept.mentions.length === 0) {
+      return null;
+    }
+
+    const { mentions } = concept;
+    const hasCanonical = mentions.some((mention) => mention.isAlias !== true);
+    let index = startIndex + direction;
+
+    while (index >= 0 && index < mentions.length) {
+      const mention = mentions[index];
+      if (!mention) {
+        index += direction;
+        continue;
+      }
+
+      if (mention.isAlias !== true) {
+        return index;
+      }
+
+      if (!hasCanonical) {
+        return index;
+      }
+
+      index += direction;
+    }
+
+    return null;
+  };
+
   // Sort concepts alphabetically (all are core concepts now)
   const sortedConcepts = [...concepts].sort((a, b) =>
     a.name.localeCompare(b.name)
   );
 
+  const previousMentionIndex = highlightedConcept
+    ? findNextMentionIndex(highlightedConcept, currentMentionIndex, -1)
+    : null;
+  const nextMentionIndex = highlightedConcept
+    ? findNextMentionIndex(highlightedConcept, currentMentionIndex, 1)
+    : null;
+
   const handlePrevious = () => {
-    if (highlightedConcept && currentMentionIndex > 0) {
-      onConceptClick(highlightedConcept, currentMentionIndex - 1);
+    if (highlightedConcept && previousMentionIndex !== null) {
+      onConceptClick(highlightedConcept, previousMentionIndex);
     }
   };
 
   const handleNext = () => {
-    if (highlightedConcept && currentMentionIndex < totalMentions - 1) {
-      onConceptClick(highlightedConcept, currentMentionIndex + 1);
+    if (highlightedConcept && nextMentionIndex !== null) {
+      onConceptClick(highlightedConcept, nextMentionIndex);
     }
   };
 
@@ -106,7 +147,7 @@ export const ConceptList: React.FC<ConceptListProps> = ({
             <div className="floating-nav-buttons">
               <button
                 onClick={handlePrevious}
-                disabled={currentMentionIndex === 0}
+                disabled={previousMentionIndex === null}
                 className="nav-button"
                 title="Previous mention"
               >
@@ -114,7 +155,7 @@ export const ConceptList: React.FC<ConceptListProps> = ({
               </button>
               <button
                 onClick={handleNext}
-                disabled={currentMentionIndex >= totalMentions - 1}
+                disabled={nextMentionIndex === null}
                 className="nav-button"
                 title="Next mention"
               >

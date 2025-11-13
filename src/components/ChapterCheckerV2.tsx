@@ -247,13 +247,36 @@ export const ChapterCheckerV2: React.FC = () => {
     if (mention && mention.position !== undefined) {
       console.log("🎯 Setting highlightPosition to:", mention.position);
       setHighlightPosition(mention.position);
-      const matchedText = mention.matchedText
-        ? mention.matchedText.replace(/\s+/g, " ").trim()
-        : null;
-      setSearchWord(
-        matchedText && matchedText.length > 0 ? matchedText : concept.name
-      );
-      setSearchOccurrence(mentionIndex); // Which occurrence (0-indexed)
+      const normalizeMatchedText = (text: string | null | undefined) =>
+        text ? text.replace(/\s+/g, " ").trim() : "";
+
+      const matchedTextRaw = normalizeMatchedText(mention.matchedText);
+      const effectiveSearchWord =
+        matchedTextRaw && matchedTextRaw.length > 0
+          ? matchedTextRaw
+          : concept.name;
+
+      const normalizedTarget = effectiveSearchWord.toLowerCase();
+      const occurrenceIndex = concept.mentions
+        ?.slice(0, mentionIndex)
+        .reduce((count: number, currentMention: any) => {
+          if (!currentMention) {
+            return count;
+          }
+          const currentMatched = normalizeMatchedText(
+            currentMention.matchedText
+          );
+          const currentSearchWord = (
+            currentMatched && currentMatched.length > 0
+              ? currentMatched
+              : concept.name
+          ).toLowerCase();
+
+          return currentSearchWord === normalizedTarget ? count + 1 : count;
+        }, 0) ?? 0;
+
+      setSearchWord(effectiveSearchWord);
+      setSearchOccurrence(occurrenceIndex);
       console.log(
         "📍 Jumping to position:",
         mention.position,
