@@ -853,15 +853,10 @@ export const ConceptMapVisualization: React.FC<ConceptMapProps> = ({
   const centerX = width / 2;
   const centerY = height / 2;
 
-  // Position nodes by importance/angle
+  // Position nodes in a circle (all core concepts, equal positioning)
   const positioned = nodes.map((node, idx) => {
     const angle = (idx / nodes.length) * Math.PI * 2;
-    const radius =
-      node.importance === "core"
-        ? 80
-        : node.importance === "supporting"
-        ? 150
-        : 220;
+    const radius = 120; // All concepts at same radius
 
     return {
       ...node,
@@ -958,20 +953,6 @@ export const ConceptMapVisualization: React.FC<ConceptMapProps> = ({
             style={{ backgroundColor: "#FF6B6B" }}
           />
           Core Concepts
-        </div>
-        <div className="legend-item">
-          <span
-            className="legend-color"
-            style={{ backgroundColor: "#4ECDC4" }}
-          />
-          Supporting
-        </div>
-        <div className="legend-item">
-          <span
-            className="legend-color"
-            style={{ backgroundColor: "#95E1D3" }}
-          />
-          Details
         </div>
       </div>
       <div className="why-matters-block">
@@ -2220,16 +2201,6 @@ export const ChapterAnalysisDashboard: React.FC<{
           </div>
         </div>
       </div>
-
-      {/* Concept Relationships Section */}
-      {analysis.conceptGraph?.concepts &&
-        analysis.conceptGraph?.relationships &&
-        analysis.conceptGraph.relationships.length > 0 && (
-          <ConceptRelationshipsSection
-            concepts={analysis.conceptGraph.concepts}
-            relationships={analysis.conceptGraph.relationships}
-          />
-        )}
 
       {/* Learning Patterns Section */}
       {(analysis as any).patternAnalysis &&

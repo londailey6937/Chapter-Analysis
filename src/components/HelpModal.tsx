@@ -559,11 +559,11 @@ function ConceptsSection() {
 
       <h4>What It Shows</h4>
       <p>
-        Identifies and categorizes the key concepts (ideas, terms, theories)
-        present in the chapter. Concepts are color-coded by importance level.
+        Identifies the fundamental concepts (ideas, terms, theories) present in
+        the chapter. All concepts are core-level - essential for understanding.
       </p>
 
-      <h4>Importance Levels</h4>
+      <h4>Core Concepts</h4>
       <div style={{ marginBottom: "1rem" }}>
         <div
           style={{
@@ -574,30 +574,8 @@ function ConceptsSection() {
             borderRadius: "4px",
           }}
         >
-          <strong>🔥 High:</strong> Core concepts essential to understanding the
-          chapter
-        </div>
-        <div
-          style={{
-            padding: "0.5rem",
-            marginBottom: "0.5rem",
-            backgroundColor: "#dbeafe",
-            borderLeft: "4px solid #3b82f6",
-            borderRadius: "4px",
-          }}
-        >
-          <strong>⭐ Medium:</strong> Supporting concepts that enhance
-          understanding
-        </div>
-        <div
-          style={{
-            padding: "0.5rem",
-            backgroundColor: "#f3f4f6",
-            borderLeft: "4px solid #6b7280",
-            borderRadius: "4px",
-          }}
-        >
-          <strong>ℹ️ Low:</strong> Supplementary concepts or terminology
+          <strong>🔥 Core:</strong> Fundamental concepts essential to
+          understanding the chapter (e.g., function, variable, loop, array)
         </div>
       </div>
 

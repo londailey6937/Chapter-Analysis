@@ -25,18 +25,20 @@ export const ConceptList: React.FC<ConceptListProps> = ({
   );
   const totalMentions = highlightedConcept?.mentions.length || 0;
 
-  // Group concepts by importance and sort alphabetically within each group
-  const groupedConcepts = {
-    core: concepts
-      .filter((c) => c.importance === "core")
-      .sort((a, b) => a.name.localeCompare(b.name)),
-    supporting: concepts
-      .filter((c) => c.importance === "supporting")
-      .sort((a, b) => a.name.localeCompare(b.name)),
-    detail: concepts
-      .filter((c) => c.importance === "detail")
-      .sort((a, b) => a.name.localeCompare(b.name)),
+  const getPrimaryMentionIndex = (concept: Concept): number => {
+    if (!concept?.mentions || concept.mentions.length === 0) {
+      return 0;
+    }
+    const canonicalIndex = concept.mentions.findIndex(
+      (mention) => mention && mention.isAlias !== true
+    );
+    return canonicalIndex >= 0 ? canonicalIndex : 0;
   };
+
+  // Sort concepts alphabetically (all are core concepts now)
+  const sortedConcepts = [...concepts].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
 
   const handlePrevious = () => {
     if (highlightedConcept && currentMentionIndex > 0) {
@@ -50,66 +52,40 @@ export const ConceptList: React.FC<ConceptListProps> = ({
     }
   };
 
-  const renderConceptGroup = (
-    title: string,
-    groupConcepts: Concept[],
-    colorClass: string
-  ) => {
-    if (groupConcepts.length === 0) return null;
-
-    return (
-      <div className="concept-group mb-4">
-        <h4 className="text-sm font-semibold text-gray-700 mb-2">{title}</h4>
-        <div className="flex flex-wrap gap-2">
-          {groupConcepts.map((concept) => (
-            <button
-              key={concept.id}
-              onClick={() => onConceptClick(concept, 0)}
-              className={`concept-badge ${colorClass} ${
-                highlightedConceptId === concept.id
-                  ? "ring-2 ring-offset-2 ring-blue-500 font-bold"
-                  : ""
-              }`}
-              title={`${concept.name} - ${concept.mentions.length} mentions`}
-            >
-              {concept.name}
-              <span className="ml-1 text-xs opacity-75">
-                ({concept.mentions.length})
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="concept-list">
       <div className="card">
         <div className="card-header">
-          <h3 className="text-xl font-bold">📚 Identified Concepts</h3>
+          <h3 className="text-xl font-bold">📚 Core Concepts Identified</h3>
           <p className="text-sm text-gray-600 mt-1">
-            Overview of concepts covered - Click a concept to highlight it in
-            the PDF
+            Fundamental programming concepts covered - Click to highlight in
+            document
           </p>
         </div>
         <div className="card-body">
-          {renderConceptGroup(
-            "Core Concepts",
-            groupedConcepts.core,
-            "concept-badge-core"
-          )}
-          {renderConceptGroup(
-            "Supporting Concepts",
-            groupedConcepts.supporting,
-            "concept-badge-supporting"
-          )}
-          {renderConceptGroup(
-            "Details",
-            groupedConcepts.detail,
-            "concept-badge-detail"
-          )}
-          {concepts.length === 0 && (
+          {sortedConcepts.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {sortedConcepts.map((concept) => (
+                <button
+                  key={concept.id}
+                  onClick={() =>
+                    onConceptClick(concept, getPrimaryMentionIndex(concept))
+                  }
+                  className={`concept-badge concept-badge-core ${
+                    highlightedConceptId === concept.id
+                      ? "ring-2 ring-offset-2 ring-blue-500 font-bold"
+                      : ""
+                  }`}
+                  title={`${concept.name} - ${concept.mentions.length} mentions`}
+                >
+                  {concept.name}
+                  <span className="ml-1 text-xs opacity-75">
+                    ({concept.mentions.length})
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : (
             <p className="text-gray-500 text-center py-4">
               No concepts identified yet
             </p>

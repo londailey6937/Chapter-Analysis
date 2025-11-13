@@ -36,7 +36,12 @@ export const ChapterCheckerV2: React.FC = () => {
   const [upgradeFeature, setUpgradeFeature] = useState("");
 
   // Document state
-  const [chapterText, setChapterText] = useState("");
+  const [chapterText, setChapterText] = useState(""); // Keep for backwards compatibility
+  const [chapterData, setChapterData] = useState<{
+    html: string;
+    plainText: string;
+    isHybridDocx: boolean;
+  } | null>(null); // Single source of truth - extracted at upload
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
 
@@ -56,13 +61,15 @@ export const ChapterCheckerV2: React.FC = () => {
   const [viewMode, setViewMode] = useState<"analysis" | "writer">("analysis");
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
-  const [highlightPosition, setHighlightPosition] = useState<number | null>(
-    null
-  );
   const [highlightedConceptId, setHighlightedConceptId] = useState<
     string | null
   >(null);
   const [currentMentionIndex, setCurrentMentionIndex] = useState<number>(0);
+  const [highlightPosition, setHighlightPosition] = useState<number | null>(
+    null
+  );
+  const [searchWord, setSearchWord] = useState<string | null>(null);
+  const [searchOccurrence, setSearchOccurrence] = useState<number>(0); // Which occurrence to find
 
   // Ref for analysis panel
   const analysisPanelRef = useRef<HTMLDivElement>(null);
@@ -91,13 +98,8 @@ export const ChapterCheckerV2: React.FC = () => {
         const regex = new RegExp(`\\b${conceptName}\\b`, "gi");
         const matches = lowerText.match(regex);
         if (matches) {
-          // Core concepts are weighted more heavily
-          const weight =
-            concept.importance === "core"
-              ? 3
-              : concept.importance === "supporting"
-              ? 2
-              : 1;
+          // All concepts are core, equal weighting
+          const weight = 3;
           score += matches.length * weight;
         }
 
@@ -184,11 +186,19 @@ export const ChapterCheckerV2: React.FC = () => {
   }, []);
 
   const handleDocumentLoad = (text: string, name: string, type: string) => {
-    setChapterText(text);
+    setChapterText(text); // Plain text only - no JSON
     setFileName(name);
     setFileType(type);
     setError(null);
     setAnalysis(null); // Clear previous analysis
+
+    // Store plain text directly - no JSON parsing, no HTML
+    console.log("📄 Storing plain text - no HTML, no JSON");
+    setChapterData({
+      html: text, // Just plain text (keeping name for compatibility)
+      plainText: text, // Same plain text
+      isHybridDocx: false,
+    });
 
     // Auto-detect domain
     const detected = detectDomain(text);
@@ -218,14 +228,32 @@ export const ChapterCheckerV2: React.FC = () => {
   };
 
   const handleConceptClick = (concept: any, mentionIndex: number) => {
+    console.log(
+      "🎯 CONCEPT CLICKED:",
+      concept.name,
+      "mentionIndex:",
+      mentionIndex
+    );
+    console.log("🎯 Concept object:", concept);
+
     // Set the highlighted concept and mention index
     setHighlightedConceptId(concept.id);
     setCurrentMentionIndex(mentionIndex);
 
     // Get the position of the mention
     const mention = concept.mentions?.[mentionIndex];
+    console.log("🎯 Mention object:", mention);
+
     if (mention && mention.position !== undefined) {
+      console.log("🎯 Setting highlightPosition to:", mention.position);
       setHighlightPosition(mention.position);
+      const matchedText = mention.matchedText
+        ? mention.matchedText.replace(/\s+/g, " ").trim()
+        : null;
+      setSearchWord(
+        matchedText && matchedText.length > 0 ? matchedText : concept.name
+      );
+      setSearchOccurrence(mentionIndex); // Which occurrence (0-indexed)
       console.log(
         "📍 Jumping to position:",
         mention.position,
@@ -235,6 +263,17 @@ export const ChapterCheckerV2: React.FC = () => {
         mentionIndex + 1,
         "/",
         concept.mentions.length
+      );
+
+      // DEBUG: Show first 5 positions for this concept
+      console.log(
+        "🔍 First 5 positions for",
+        concept.name,
+        ":",
+        concept.mentions
+          .slice(0, 5)
+          .map((m: any, i: number) => `[${i}]: pos=${m.position}`)
+          .join(", ")
       );
     }
   };
@@ -272,12 +311,25 @@ export const ChapterCheckerV2: React.FC = () => {
     setProgress("Analyzing chapter...");
 
     try {
-      // Create Chapter object
+      // Use normalized chapter data - no need to re-parse
+      if (!chapterData) {
+        throw new Error("No chapter data loaded");
+      }
+
+      // Use PLAIN TEXT everywhere - no HTML
+      const textForAnalysis = chapterData.plainText; // Plain text
+      const displayText = chapterData.plainText; // Same plain text for display
+      const isHybridDocx = chapterData.isHybridDocx;
+
+      console.log("📄 Using plain text for everything - no HTML");
+      console.log("  Text length:", textForAnalysis.length);
+
+      // Create Chapter object with plain text
       const chapter = {
         id: `chapter-${Date.now()}`,
         title: fileName || "Untitled Chapter",
-        content: chapterText,
-        wordCount: chapterText.split(/\s+/).length,
+        content: textForAnalysis, // Plain text
+        wordCount: textForAnalysis.split(/\s+/).length,
         sections: [],
         conceptGraph: {
           concepts: [],
@@ -290,7 +342,7 @@ export const ChapterCheckerV2: React.FC = () => {
           domain: selectedDomain,
           targetAudience: "adult learners",
           estimatedReadingTime: Math.ceil(
-            chapterText.split(/\s+/).length / 200
+            textForAnalysis.split(/\s+/).length / 200
           ),
           createdAt: new Date(),
           lastAnalyzed: new Date(),
@@ -318,6 +370,20 @@ export const ChapterCheckerV2: React.FC = () => {
       worker.onmessage = (e) => {
         if (e.data.type === "complete") {
           setAnalysis(e.data.result);
+
+          // DEBUG: Show first mention positions for all concepts
+          const concepts = e.data.result?.conceptGraph?.concepts || [];
+          console.log("🔍 === CONCEPT FIRST MENTION POSITIONS ===");
+          concepts.forEach((c: any) => {
+            const firstPos = c.mentions?.[0]?.position ?? "undefined";
+            console.log(
+              `  ${c.name}: position ${firstPos} (${
+                c.mentions?.length || 0
+              } total mentions)`
+            );
+          });
+          console.log("🔍 =========================================");
+
           setProgress("");
           setIsAnalyzing(false);
           worker.terminate();
@@ -511,7 +577,7 @@ export const ChapterCheckerV2: React.FC = () => {
                 </div>
               )}
 
-              {chapterText && !isAnalyzing && (
+              {chapterData && !isAnalyzing && (
                 <>
                   <button
                     onClick={handleClear}
@@ -548,9 +614,11 @@ export const ChapterCheckerV2: React.FC = () => {
             </div>
           </div>
 
-          {chapterText ? (
+          {chapterData ? (
             <DocumentEditor
-              initialText={chapterText}
+              key={fileName} // Force new component instance when file changes
+              initialText={chapterData.plainText} // Plain text for display
+              searchText={chapterData.plainText} // Same plain text for searching
               onTextChange={(text) => {
                 // Check access for Writer Mode editing
                 const features = ACCESS_TIERS[accessLevel];
@@ -565,6 +633,8 @@ export const ChapterCheckerV2: React.FC = () => {
               showSpacingIndicators={true}
               showVisualSuggestions={true}
               highlightPosition={highlightPosition}
+              searchWord={searchWord}
+              searchOccurrence={searchOccurrence}
               onSave={
                 analysis && viewMode === "writer" ? handleExportDocx : undefined
               }

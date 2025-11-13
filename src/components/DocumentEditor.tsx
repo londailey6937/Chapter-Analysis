@@ -4,96 +4,103 @@ import {
   VisualSuggestion,
 } from "@/utils/dualCodingAnalyzer";
 
+interface ParagraphSegment {
+  id: number;
+  start: number;
+  end: number;
+  raw: string;
+}
+
 interface DocumentEditorProps {
   initialText: string;
+  searchText?: string | null;
   onTextChange: (text: string) => void;
   showSpacingIndicators?: boolean;
   showVisualSuggestions?: boolean;
-  readOnly?: boolean;
-  highlightPosition?: number | null;
+  highlightPosition: number | null;
+  searchWord: string | null;
+  searchOccurrence: number;
   onSave?: () => void;
+  readOnly?: boolean;
 }
+
+const computeParagraphSegments = (input: string): ParagraphSegment[] => {
+  const normalized = input.replace(/\r\n/g, "\n");
+
+  if (!normalized.length) {
+    return [
+      {
+        id: 0,
+        start: 0,
+        end: 0,
+        raw: "",
+      },
+    ];
+  }
+
+  const segments: ParagraphSegment[] = [];
+  const parts = normalized.split(/(\n\s*\n+)/);
+  let offset = 0;
+
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    if (!part) {
+      continue;
+    }
+
+    let raw = part;
+    if (i + 1 < parts.length && /\n\s*\n+/.test(parts[i + 1])) {
+      raw += parts[i + 1];
+      i++;
+    }
+
+    const end = offset + raw.length;
+    segments.push({
+      id: segments.length,
+      start: offset,
+      end,
+      raw,
+    });
+    offset = end;
+  }
+
+  if (segments.length === 0) {
+    segments.push({
+      id: 0,
+      start: 0,
+      end: normalized.length,
+      raw: normalized,
+    });
+  }
+
+  return segments;
+};
 
 export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   initialText,
+  searchText,
   onTextChange,
-  showSpacingIndicators = true,
-  showVisualSuggestions = true,
-  readOnly = false,
-  highlightPosition = null,
+  showSpacingIndicators = false,
+  showVisualSuggestions = false,
+  highlightPosition,
+  searchWord,
+  searchOccurrence,
   onSave,
+  readOnly = false,
 }) => {
-  const [text, setText] = useState(initialText);
-  const [selectedText, setSelectedText] = useState("");
-  const [showReplaceDialog, setShowReplaceDialog] = useState(false);
-  const [replacementText, setReplacementText] = useState("");
-  const [showBackToTop, setShowBackToTop] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  // Check if content is actual HTML document structure (not just code examples with tags)
-  const isHtmlContent = useMemo(() => {
-    // Only treat as HTML if it starts with HTML structure or has multiple HTML block elements
-    // OR if it has images (from DOCX conversion)
-    const startsWithHtml = /^\s*<!DOCTYPE|^\s*<html|^\s*<head|^\s*<body/i.test(
-      text
-    );
-    const hasMultipleBlockElements =
-      (text.match(/<(div|section|article|main|header|footer|nav)/gi) || [])
-        .length > 3;
-    const hasMultipleParagraphs = (text.match(/<p>/gi) || []).length > 5; // Mammoth generates <p> tags
-    const hasImages = text.includes("<img");
-    // Treat as HTML if it has HTML structure OR multiple p tags (mammoth output) OR images
-    const hasHtmlStructure =
-      startsWithHtml ||
-      hasMultipleBlockElements ||
-      hasMultipleParagraphs ||
-      hasImages;
-
-    return hasHtmlStructure;
-  }, [text]);
-
-  // Undo/Redo stacks
+  const [text, setText] = useState(() => initialText);
   const [history, setHistory] = useState<string[]>([initialText]);
   const [historyIndex, setHistoryIndex] = useState(0);
+  const [selectedText, setSelectedText] = useState("");
+  const [replacementText, setReplacementText] = useState("");
+  const [showReplaceDialog, setShowReplaceDialog] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [visualSuggestions, setVisualSuggestions] = useState<
+    VisualSuggestion[]
+  >([]);
 
-  // Analyze text for visual suggestions
-  const visualSuggestions = useMemo(() => {
-    if (!showVisualSuggestions) return [];
-    return DualCodingAnalyzer.analyzeForVisuals(text);
-  }, [text, showVisualSuggestions]);
-
-  // Create a mapping from HTML positions to rendered text positions
-  const htmlToTextPositionMap = useMemo(() => {
-    if (!isHtmlContent) return new Map<number, number>();
-
-    const map = new Map<number, number>();
-    let htmlPos = 0;
-    let textPos = 0;
-
-    // Walk through HTML character by character
-    let insideTag = false;
-    for (let i = 0; i < text.length; i++) {
-      const char = text[i];
-
-      if (char === "<") {
-        insideTag = true;
-        map.set(i, textPos); // Map this HTML position to current text position
-      } else if (char === ">") {
-        insideTag = false;
-        map.set(i, textPos);
-      } else if (!insideTag) {
-        // Count actual text characters
-        map.set(i, textPos);
-        textPos++;
-      } else {
-        // Inside a tag, don't count toward text position
-        map.set(i, textPos);
-      }
-    }
-
-    return map;
-  }, [text, isHtmlContent]);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     setText(initialText);
@@ -101,207 +108,230 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     setHistoryIndex(0);
   }, [initialText]);
 
-  // Keyboard shortcuts
+  const paragraphSegments = useMemo(
+    () => computeParagraphSegments(text),
+    [text]
+  );
+
+  const isHtmlContent = useMemo(() => {
+    const trimmed = text.trim();
+    return trimmed.startsWith("<") && trimmed.includes("</");
+  }, [text]);
+
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
-      const modKey = isMac ? e.metaKey : e.ctrlKey;
+    if (!showVisualSuggestions) {
+      setVisualSuggestions([]);
+      return;
+    }
 
-      // Cmd/Ctrl + Z: Undo
-      if (modKey && e.key === "z" && !e.shiftKey) {
-        e.preventDefault();
-        handleUndo();
-        return;
+    try {
+      const suggestions = DualCodingAnalyzer.analyzeForVisuals(text);
+      setVisualSuggestions(suggestions);
+    } catch (error) {
+      console.error("Error running dual coding analyzer:", error);
+      setVisualSuggestions([]);
+    }
+  }, [text, showVisualSuggestions]);
+
+  useEffect(() => {
+    const searchContent = searchText ?? text;
+
+    const resolveHighlightStart = (): number | null => {
+      if (typeof highlightPosition === "number" && highlightPosition >= 0) {
+        return highlightPosition;
       }
 
-      // Cmd/Ctrl + Shift + Z or Cmd/Ctrl + Y: Redo
-      if (
-        (modKey && e.shiftKey && e.key === "z") ||
-        (modKey && e.key === "y")
-      ) {
-        e.preventDefault();
-        handleRedo();
-        return;
+      if (!searchWord) {
+        return null;
       }
 
-      // Cmd/Ctrl + C: Copy (browser default, but we show feedback)
-      if (modKey && e.key === "c" && selectedText) {
-        // Let browser handle it, but show feedback
-        setTimeout(() => {
-          const msg = document.createElement("div");
-          msg.textContent = "✅ Copied to clipboard";
-          msg.style.cssText =
-            "position:fixed;top:20px;right:20px;background:#10b981;color:white;padding:12px 24px;border-radius:8px;z-index:10000;font-size:14px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,0.15)";
-          document.body.appendChild(msg);
-          setTimeout(() => msg.remove(), 2000);
-        }, 100);
+      const escaped = searchWord.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(escaped, "gi");
+      const haystack = searchContent.toLowerCase();
+      let match: RegExpExecArray | null;
+      let occurrenceIndex = 0;
+
+      while ((match = regex.exec(haystack)) !== null) {
+        if (occurrenceIndex === searchOccurrence) {
+          return match.index;
+        }
+        occurrenceIndex += 1;
+
+        // Prevent zero-length match infinite loops
+        if (match.index === regex.lastIndex) {
+          regex.lastIndex += 1;
+        }
       }
 
-      // Cmd/Ctrl + X: Cut (browser default)
-      // Cmd/Ctrl + V: Paste (browser default)
+      return null;
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedText, historyIndex]);
+    const deriveHighlightLength = (startIndex: number): number => {
+      let highlightLength = 1;
 
-  // Scroll to top when document text changes (new document loaded)
-  useEffect(() => {
-    if (containerRef.current && readOnly) {
-      // Only scroll to top if highlightPosition is null (not jumping to a specific location)
-      if (highlightPosition === null) {
-        containerRef.current.scrollTo({
-          top: 0,
-          behavior: "auto", // Instant scroll on load
-        });
-      }
-    }
-  }, [text, readOnly, highlightPosition]);
+      if (searchWord && searchWord.trim().length > 0) {
+        const escapedWord = searchWord.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const anchoredRegex = new RegExp(
+          `^${escapedWord.replace(/\s+/g, "\\s+")}`,
+          "i"
+        );
+        const segment = searchContent.slice(startIndex);
+        const anchoredMatch = anchoredRegex.exec(segment);
 
-  // Scroll to highlighted position
-  useEffect(() => {
-    if (highlightPosition !== null) {
-      if (readOnly && containerRef.current) {
-        // Read-only mode: scroll to position
-        if (isHtmlContent) {
-          // Convert HTML position to rendered text position
-          const textPosition =
-            htmlToTextPositionMap.get(highlightPosition) ?? highlightPosition;
-
-          const container = containerRef.current;
-          const allTextNodes: Text[] = [];
-
-          // Walk through all text nodes
-          const walker = document.createTreeWalker(
-            container,
-            NodeFilter.SHOW_TEXT,
-            null
-          );
-
-          let node;
-          while ((node = walker.nextNode())) {
-            allTextNodes.push(node as Text);
-          }
-
-          console.log(
-            "[DocumentEditor] Found",
-            allTextNodes.length,
-            "text nodes"
-          );
-
-          // Find the text node containing our highlight position
-          let charCount = 0;
-          let found = false;
-          for (const textNode of allTextNodes) {
-            const nodeLength = textNode.textContent?.length || 0;
-            if (charCount + nodeLength > textPosition) {
-              // Found the node, scroll its parent element into view
-              const element = textNode.parentElement;
-              if (element && container) {
-                // Calculate the element's position relative to the container
-                const elementRect = element.getBoundingClientRect();
-                const containerRect = container.getBoundingClientRect();
-                const relativeTop =
-                  elementRect.top - containerRect.top + container.scrollTop;
-
-                // Scroll to center the element in the viewport
-                const targetScrollTop =
-                  relativeTop -
-                  container.clientHeight / 2 +
-                  elementRect.height / 2;
-
-                container.scrollTo({
-                  top: Math.max(0, targetScrollTop),
-                  behavior: "smooth",
-                });
-
-                // Show back to top button
-                setShowBackToTop(true);
-
-                // Flash highlight
-                const originalBg = element.style.backgroundColor;
-                element.style.backgroundColor = "#fef3c7";
-                setTimeout(() => {
-                  element.style.backgroundColor = originalBg;
-                }, 2000);
-              }
-              found = true;
-              break;
-            }
-            charCount += nodeLength;
-          }
-
-          if (!found) {
-            console.warn(
-              "[DocumentEditor] Could not find text node at position:",
-              textPosition,
-              "Total text length:",
-              charCount
-            );
-          }
+        if (anchoredMatch && anchoredMatch[0].length > 0) {
+          highlightLength = anchoredMatch[0].length;
         } else {
-          // For plain text rendering, use paragraph IDs
-          let charCount = 0;
-          const paragraphs = text.split(/\n\n+/);
+          highlightLength = Math.max(searchWord.length, 1);
+        }
+      } else {
+        const fallbackMatch = searchContent.slice(startIndex).match(/^\S+/);
+        if (fallbackMatch && fallbackMatch[0].length > 0) {
+          highlightLength = fallbackMatch[0].length;
+        }
+      }
 
-          for (let i = 0; i < paragraphs.length; i++) {
-            const paraLength = paragraphs[i].length + 2; // +2 for \n\n
-            if (charCount + paraLength > highlightPosition) {
-              // Found the paragraph, scroll to it
-              const element = document.getElementById(`para-${i}`);
-              if (element) {
-                element.scrollIntoView({ behavior: "smooth", block: "center" });
-                // Show back to top button
-                setShowBackToTop(true);
-                // Flash highlight
-                element.style.backgroundColor = "#fef3c7";
-                setTimeout(() => {
-                  element.style.backgroundColor = "";
-                }, 2000);
+      return Math.max(highlightLength, 1);
+    };
+
+    const targetStart = resolveHighlightStart();
+    if (targetStart === null || targetStart < 0) {
+      return;
+    }
+
+    const highlightLength = deriveHighlightLength(targetStart);
+
+    if (readOnly) {
+      const container = containerRef.current;
+      if (!container) {
+        return;
+      }
+
+      let targetElement: HTMLElement | null = null;
+
+      for (let i = 0; i < paragraphSegments.length; i++) {
+        const segment = paragraphSegments[i];
+        if (targetStart >= segment.start && targetStart < segment.end) {
+          targetElement = document.getElementById(`para-${i}`);
+          break;
+        }
+      }
+
+      if (!targetElement && paragraphSegments.length > 0) {
+        const fallbackIndex = paragraphSegments.length - 1;
+        targetElement = document.getElementById(`para-${fallbackIndex}`);
+      }
+
+      if (!targetElement) {
+        return;
+      }
+
+      targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      setShowBackToTop(true);
+      targetElement.style.backgroundColor = "#fef3c7";
+      setTimeout(() => {
+        targetElement!.style.backgroundColor = "";
+      }, 2000);
+
+      setTimeout(() => {
+        const selection = window.getSelection();
+        if (!selection) {
+          return;
+        }
+        selection.removeAllRanges();
+
+        const walker = document.createTreeWalker(
+          container,
+          NodeFilter.SHOW_TEXT,
+          {
+            acceptNode: (node: Node) => {
+              let parent = node.parentElement;
+              while (parent && parent !== container) {
+                if (parent.getAttribute("data-paragraph-text") === "true") {
+                  return NodeFilter.FILTER_ACCEPT;
+                }
+                parent = parent.parentElement;
               }
-              break;
-            }
-            charCount += paraLength;
+              return NodeFilter.FILTER_SKIP;
+            },
+          }
+        );
+
+        let currentPos = 0;
+        let targetNode: Node | null = null;
+        let offsetInNode = 0;
+        let walkerNode: Node | null;
+
+        while ((walkerNode = walker.nextNode())) {
+          const nodeLength = walkerNode.textContent?.length || 0;
+          if (currentPos + nodeLength > targetStart) {
+            targetNode = walkerNode;
+            offsetInNode = targetStart - currentPos;
+            break;
+          }
+          currentPos += nodeLength;
+        }
+
+        if (!targetNode) {
+          return;
+        }
+
+        const range = document.createRange();
+        range.setStart(targetNode, offsetInNode);
+
+        let remaining = highlightLength;
+        let currentNode: Node | null = targetNode;
+        let startOffset = offsetInNode;
+
+        while (currentNode && remaining > 0) {
+          const nodeText = currentNode.textContent || "";
+          const available = nodeText.length - startOffset;
+
+          if (available >= remaining) {
+            range.setEnd(currentNode, startOffset + remaining);
+            remaining = 0;
+          } else {
+            range.setEnd(currentNode, nodeText.length);
+            remaining -= available;
+            currentNode = walker.nextNode();
+            startOffset = 0;
           }
         }
-      } else if (!readOnly && textareaRef.current) {
-        // Edit mode: select text in textarea
-        const textarea = textareaRef.current;
 
-        // Set selection to the word at this position
-        const beforeText = text.substring(0, highlightPosition);
-        const afterText = text.substring(highlightPosition);
+        selection.addRange(range);
+      }, 120);
+    } else if (textareaRef.current) {
+      const textarea = textareaRef.current;
+      const beforeText = text.substring(0, targetStart);
 
-        // Find word boundaries
-        const wordStart = beforeText.search(/\S+$/);
-        const startPos =
-          wordStart >= 0
-            ? beforeText.length - beforeText.substring(wordStart).length
-            : highlightPosition;
-        const wordMatch = afterText.match(/^\S+/);
-        const endPos = wordMatch
-          ? highlightPosition + wordMatch[0].length
-          : highlightPosition + 10;
+      const wordStart = beforeText.search(/\S+$/);
+      const startPos =
+        wordStart >= 0
+          ? beforeText.length - beforeText.substring(wordStart).length
+          : targetStart;
+      const endPos = targetStart + highlightLength;
 
-        // Select the text
-        textarea.focus();
-        textarea.setSelectionRange(startPos, endPos);
+      textarea.focus();
+      textarea.setSelectionRange(startPos, endPos);
 
-        // Scroll into view
-        // Calculate line height and position
-        const lineHeight = parseInt(getComputedStyle(textarea).lineHeight);
-        const lines = text.substring(0, highlightPosition).split("\n").length;
-        const scrollPosition = Math.max(0, (lines - 5) * lineHeight);
-        textarea.scrollTop = scrollPosition;
+      const lineHeight = parseInt(getComputedStyle(textarea).lineHeight);
+      const lines = text.substring(0, targetStart).split("\n").length;
+      const scrollPosition = Math.max(0, (lines - 5) * lineHeight);
+      textarea.scrollTop = scrollPosition;
 
-        // Flash background color on the textarea briefly
-        textarea.style.backgroundColor = "#fef3c7";
-        setTimeout(() => {
-          textarea.style.backgroundColor = "";
-        }, 2000);
-      }
+      textarea.style.backgroundColor = "#fef3c7";
+      setTimeout(() => {
+        textarea.style.backgroundColor = "";
+      }, 2000);
     }
-  }, [highlightPosition, text, readOnly, isHtmlContent, htmlToTextPositionMap]);
+  }, [
+    highlightPosition,
+    searchWord,
+    searchOccurrence,
+    readOnly,
+    searchText,
+    text,
+    paragraphSegments,
+  ]);
 
   const addToHistory = (newText: string) => {
     // Remove any "future" history if we're not at the end
@@ -503,7 +533,9 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
         )}
 
         {/* Render HTML content with spacing indicators */}
-        {showSpacingIndicators && htmlParagraphs.length > 0 ? (
+        {showSpacingIndicators &&
+        htmlParagraphs.length > 0 &&
+        !text.includes("<img") ? (
           <div>
             {htmlParagraphs.map((para, index) => {
               const nextPara = htmlParagraphs[index + 1];
@@ -591,15 +623,28 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
           </div>
         ) : (
           /* Fallback: render raw HTML without spacing indicators */
-          <div
-            dangerouslySetInnerHTML={{ __html: text }}
-            style={{
-              fontFamily: "ui-sans-serif, system-ui, sans-serif",
-              lineHeight: "1.8",
-              color: "#1f2937",
-            }}
-            className="prose-content"
-          />
+          <>
+            {(() => {
+              console.log("🖼️ Rendering HTML content");
+              console.log("  Text length:", text.length);
+              console.log("  Has <img tags:", text.includes("<img"));
+              console.log(
+                "  Number of <img tags:",
+                (text.match(/<img/g) || []).length
+              );
+              console.log("  First 500 chars:", text.substring(0, 500));
+              return null;
+            })()}
+            <div
+              dangerouslySetInnerHTML={{ __html: text }}
+              style={{
+                fontFamily: "ui-sans-serif, system-ui, sans-serif",
+                lineHeight: "1.8",
+                color: "#1f2937",
+              }}
+              className="prose-content"
+            />
+          </>
         )}
       </div>
     );
@@ -610,70 +655,68 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     console.log(
       `[DocumentEditor] renderTextWithSpacing called, text.length=${text.length}`
     );
+    console.log(
+      `[DocumentEditor] Using ${paragraphSegments.length} paragraph segments`
+    );
 
-    // Split by double newlines first, but also handle single newlines if no double newlines exist
-    let paragraphs = text.split(/\n\n+/);
-
-    // If only one paragraph and it's very long, split by single newlines instead
-    if (paragraphs.length === 1 && text.length > 1000) {
-      console.log(
-        `[DocumentEditor] Single long paragraph detected (${text.length} chars), splitting by single newlines`
-      );
-      paragraphs = text.split(/\n+/).filter((p) => p.trim().length > 0);
-      console.log(
-        `[DocumentEditor] After split: ${
-          paragraphs.length
-        } paragraphs, first para length: ${
-          paragraphs[0]?.length
-        }, last para length: ${paragraphs[paragraphs.length - 1]?.length}`
-      );
-    } else {
-      console.log(
-        `[DocumentEditor] Split into ${paragraphs.length} paragraphs by double newlines`
-      );
-    }
-
-    // Build position map for visual suggestions
     const visualSuggestionMap = new Map<number, VisualSuggestion>();
-    let charCount = 0;
-    paragraphs.forEach((para, index) => {
-      const trimmedPara = para.trim();
-      if (trimmedPara) {
-        // Find suggestions that fall within this paragraph
-        const suggestions = visualSuggestions.filter(
-          (s) =>
-            s.position >= charCount && s.position < charCount + para.length + 2
-        );
-        if (suggestions.length > 0) {
-          visualSuggestionMap.set(index, suggestions[0]); // Use highest priority
-        }
+    paragraphSegments.forEach((segment, index) => {
+      const trimmed = segment.raw.trim();
+      if (!trimmed) {
+        return;
       }
-      charCount += para.length + 2; // +2 for \n\n
+      const suggestions = visualSuggestions.filter(
+        (suggestion) =>
+          suggestion.position >= segment.start &&
+          suggestion.position < segment.end
+      );
+      if (suggestions.length > 0) {
+        visualSuggestionMap.set(index, suggestions[0]);
+      }
     });
 
     return (
       <div style={{ fontFamily: "ui-sans-serif, system-ui, sans-serif" }}>
-        {paragraphs.map((para, index) => {
-          const trimmedPara = para.trim();
-          if (!trimmedPara)
-            return <React.Fragment key={index}></React.Fragment>;
+        {paragraphSegments.map((segment, index) => {
+          const rawParagraph = segment.raw;
+          const trimmedParagraph = rawParagraph.trim();
+          const nextSegment = paragraphSegments[index + 1];
+          const nextTrimmed = nextSegment ? nextSegment.raw.trim() : "";
 
-          const nextPara = paragraphs[index + 1]?.trim();
-          const currentLength = trimmedPara.length;
+          if (!trimmedParagraph) {
+            return (
+              <p
+                key={segment.id}
+                id={`para-${index}`}
+                data-paragraph-text="true"
+                style={{
+                  margin: 0,
+                  whiteSpace: "pre-wrap",
+                  lineHeight: "1.8",
+                  fontSize: "16px",
+                  color: "#1f2937",
+                }}
+                onMouseUp={handleSelection}
+              >
+                {rawParagraph}
+              </p>
+            );
+          }
+
+          const currentLength = trimmedParagraph.length;
           const needsMoreSpacing =
-            nextPara &&
-            ((currentLength > 500 && nextPara.length > 500) ||
-              (currentLength < 100 && nextPara.length > 200) ||
-              (/[.!?]$/.test(trimmedPara) && nextPara.match(/^[A-Z]/)));
+            nextTrimmed &&
+            ((currentLength > 500 && nextTrimmed.length > 500) ||
+              (currentLength < 100 && nextTrimmed.length > 200) ||
+              (/[.!?]$/.test(trimmedParagraph) && /^[A-Z]/.test(nextTrimmed)));
 
           const visualSuggestion = visualSuggestionMap.get(index);
 
           return (
             <div
-              key={index}
+              key={segment.id}
               style={{ marginBottom: needsMoreSpacing ? "32px" : "16px" }}
             >
-              {/* Top spacing line */}
               {showSpacingIndicators && (
                 <div
                   style={{
@@ -700,7 +743,6 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
                 </div>
               )}
 
-              {/* Visual Suggestion Alert - BEFORE paragraph */}
               {showVisualSuggestions && visualSuggestion && (
                 <div
                   style={{
@@ -819,9 +861,9 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
                 </div>
               )}
 
-              {/* Paragraph text */}
               <p
                 id={`para-${index}`}
+                data-paragraph-text="true"
                 style={{
                   margin: 0,
                   whiteSpace: "pre-wrap",
@@ -838,18 +880,15 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
                         : "#9ca3af"
                     }`,
                     paddingLeft: "12px",
-                    backgroundColor: visualSuggestion
-                      ? "#fefce8"
-                      : "transparent",
+                    backgroundColor: "#fefce8",
                   }),
                 }}
                 onMouseUp={handleSelection}
               >
-                {trimmedPara}
+                {rawParagraph}
               </p>
 
-              {/* Bottom spacing indicator */}
-              {showSpacingIndicators && nextPara && (
+              {showSpacingIndicators && nextTrimmed && (
                 <div
                   style={{
                     width: "100%",
@@ -1040,11 +1079,12 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
                 behavior: "smooth",
               });
               setShowBackToTop(false);
+              console.log("🔝 Scrolling to top, hiding button");
             }
           }}
           style={{
             position: "fixed",
-            bottom: "30px",
+            bottom: "320px",
             left: "30px",
             width: "56px",
             height: "56px",
@@ -1058,8 +1098,9 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            zIndex: 1000,
+            zIndex: 9999,
             transition: "all 0.2s ease",
+            pointerEvents: "auto",
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = "#2563eb";
@@ -1298,3 +1339,5 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     </div>
   );
 };
+
+export default DocumentEditor;

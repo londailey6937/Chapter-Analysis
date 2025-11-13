@@ -53,8 +53,16 @@ export class DualCodingAnalyzer {
   static analyzeForVisuals(text: string): VisualSuggestion[] {
     const suggestions: VisualSuggestion[] = [];
 
-    // Check if input is HTML
-    const isHtml = /<[^>]+>/.test(text);
+    // Check if input is HTML by looking for common HTML paragraph/block tags
+    const isHtml =
+      text.includes("<p>") || text.includes("<div>") || text.includes("<h1>");
+
+    console.log(
+      "[DualCodingAnalyzer] isHtml:",
+      isHtml,
+      "text length:",
+      text.length
+    );
 
     let paragraphs: { text: string; position: number }[] = [];
 
@@ -97,6 +105,10 @@ export class DualCodingAnalyzer {
       // Plain text: split by double newlines
       const plainParagraphs = text.split(/\n\n+/);
       let currentPosition = 0;
+
+      console.log("[DualCodingAnalyzer] Plain text mode");
+      console.log("  Total paragraphs from split:", plainParagraphs.length);
+      console.log("  Text preview:", text.substring(0, 300));
 
       plainParagraphs.forEach((para) => {
         const trimmed = para.trim();

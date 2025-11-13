@@ -210,7 +210,7 @@ export const COMPUTING_CONCEPTS: ConceptLibrary = {
     // Data Structures
     {
       name: "array",
-      aliases: ["arrays", "list", "lists"],
+      aliases: ["Array", "arrays", "list", "lists"],
       category: "Data Structures",
       subcategory: "Core Concepts",
       importance: "core",
@@ -282,7 +282,7 @@ export const COMPUTING_CONCEPTS: ConceptLibrary = {
     },
     {
       name: "set",
-      aliases: ["sets", "hash set"],
+      aliases: ["Set", "sets", "hash set"],
       category: "Data Structures",
       subcategory: "Supporting Concepts",
       importance: "supporting",
@@ -290,7 +290,7 @@ export const COMPUTING_CONCEPTS: ConceptLibrary = {
     },
     {
       name: "map",
-      aliases: ["maps", "mapping"],
+      aliases: ["Map", "maps", "mapping"],
       category: "Data Structures",
       subcategory: "Supporting Concepts",
       importance: "supporting",
@@ -1034,6 +1034,7 @@ export const COMPUTING_CONCEPTS: ConceptLibrary = {
     {
       name: "promise",
       aliases: [
+        "Promise",
         "promises",
         "JavaScript promise",
         "promise object",

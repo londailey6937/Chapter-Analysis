@@ -65,33 +65,11 @@ export class AnalysisEngine {
     try {
       onProgress?.("extracting-concepts", "Analyzing chapter structure");
 
-      // Strip HTML tags from content for accurate analysis
-      let cleanContent = chapter.content;
-      if (cleanContent.includes("<")) {
-        console.log(
-          "[AnalysisEngine] Stripping HTML tags from content for analysis"
-        );
-        cleanContent = cleanContent
-          .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-          .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
-          .replace(/<[^>]+>/g, "")
-          .replace(/&nbsp;/g, " ")
-          .replace(/&lt;/g, "<")
-          .replace(/&gt;/g, ">")
-          .replace(/&amp;/g, "&")
-          .replace(/&quot;/g, '"')
-          .replace(/&#39;/g, "'")
-          .trim();
-        console.log(
-          `[AnalysisEngine] Content: ${chapter.content.length} chars (HTML) -> ${cleanContent.length} chars (plain text)`
-        );
-      }
-
-      // Create chapter with clean content - always defined
-      const cleanChapter: Chapter = {
-        ...chapter,
-        content: cleanContent,
-      };
+      // Note: HTML conversion already handled in ChapterCheckerV2
+      // Content should be plain text at this point
+      console.log(
+        `[AnalysisEngine] Analyzing content (${chapter.content.length} chars)`
+      );
 
       // Allow UI to update
       await new Promise((resolve) => setTimeout(resolve, 200));
@@ -102,8 +80,8 @@ export class AnalysisEngine {
       );
       // Extract concepts and build graph with progress reporting
       const conceptGraph = await ConceptExtractor.extractConceptsFromChapter(
-        cleanChapter.content,
-        cleanChapter.sections,
+        chapter.content,
+        chapter.sections,
         onProgress,
         domain,
         includeCrossDomain,
@@ -146,7 +124,7 @@ export class AnalysisEngine {
       console.log("[AnalysisEngine] Starting principle evaluations...");
       // Evaluate all learning principles (full evaluations used by UI)
       const principleEvaluations = await this.runEvaluators(
-        cleanChapter,
+        chapter,
         conceptGraph,
         patternAnalysis,
         onProgress

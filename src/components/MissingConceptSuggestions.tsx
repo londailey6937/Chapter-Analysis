@@ -39,38 +39,13 @@ export const MissingConceptSuggestions: React.FC<
     new Set()
   );
 
-  // Suggest where to insert a missing concept based on related concepts and categories
+  // Suggest where to insert a missing concept based on categories
   const suggestInsertionPoint = (
     concept: ConceptDefinition,
     text: string,
     existing: Concept[]
   ): { location: number; snippet: string; reason: string } | null => {
-    // Strategy 1: Find concepts in the same category
-    const relatedConcepts = existing.filter(
-      (c) =>
-        c.definition?.includes(concept.category || "") ||
-        concept.relatedConcepts?.includes(c.name)
-    );
-
-    if (relatedConcepts.length > 0) {
-      // Suggest after the last related concept
-      const lastRelated = relatedConcepts[relatedConcepts.length - 1];
-      const lastMention = lastRelated.mentions[lastRelated.mentions.length - 1];
-      const location = lastMention.position + 200; // After the last mention
-
-      const snippet = text.slice(
-        Math.max(0, location - 100),
-        Math.min(text.length, location + 100)
-      );
-
-      return {
-        location,
-        snippet: "..." + snippet.trim() + "...",
-        reason: `Near related concept: "${lastRelated.name}"`,
-      };
-    }
-
-    // Strategy 2: Find keywords from the concept's category in the text
+    // Strategy 1: Find keywords from the concept's category in the text
     const categoryKeywords = concept.category?.toLowerCase().split(" ") || [];
     for (const keyword of categoryKeywords) {
       const regex = new RegExp(`\\b${keyword}\\b`, "i");
@@ -90,7 +65,7 @@ export const MissingConceptSuggestions: React.FC<
       }
     }
 
-    // Strategy 3: Suggest in the middle of the document (default)
+    // Strategy 2: Suggest in the middle of the document (default)
     const location = Math.floor(text.length / 2);
     const snippet = text.slice(
       Math.max(0, location - 100),
@@ -111,9 +86,9 @@ export const MissingConceptSuggestions: React.FC<
       identifiedConcepts.map((c) => c.name.toLowerCase())
     );
 
-    // Only check core and supporting concepts (not detail level)
+    // All library concepts are core concepts now
     const importantConcepts = libraryConcepts.filter(
-      (c) => c.importance === "core" || c.importance === "supporting"
+      (c) => c.importance === "core"
     );
 
     for (const libConcept of importantConcepts) {
@@ -216,15 +191,9 @@ export const MissingConceptSuggestions: React.FC<
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span
-                      className={`text-xs font-semibold px-2 py-0.5 rounded ${
-                        missing.concept.importance === "core"
-                          ? "bg-red-100 text-red-700"
-                          : "bg-blue-100 text-blue-700"
-                      }`}
+                      className={`text-xs font-semibold px-2 py-0.5 rounded ${"bg-red-100 text-red-700"}`}
                     >
-                      {missing.concept.importance === "core"
-                        ? "CORE"
-                        : "SUPPORTING"}
+                      CORE
                     </span>
                     <h4 className="font-semibold text-sm text-gray-900">
                       {missing.concept.name}

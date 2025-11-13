@@ -14,10 +14,12 @@
  */
 export interface ConceptMention {
   position: number;
+  matchedText?: string;
   context: string;
   depth: "shallow" | "moderate" | "deep";
   isRevisit: boolean;
   associatedConcepts: string[];
+  isAlias?: boolean;
 }
 
 /**

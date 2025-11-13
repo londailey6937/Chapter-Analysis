@@ -103,50 +103,6 @@ export class ConceptExtractor {
         conceptsWithMentions.length
       } concepts in ${phase2Time.toFixed(2)}ms`
     );
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    // Phase 3: Establish relationships
-    onProgress?.("concept-phase-3", "Establishing concept relationships");
-    const phase3Start = performance.now();
-    const relationships = extractor.establishRelationships(
-      conceptsWithMentions,
-      chapter
-    );
-    const phase3Time = performance.now() - phase3Start;
-    console.log(
-      `[ConceptExtractor] Phase 3: Found ${
-        relationships.length
-      } relationships in ${phase3Time.toFixed(2)}ms`
-    );
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    // Phase 3.5: Populate prerequisites from relationships
-    extractor.populatePrerequisites(conceptsWithMentions, relationships);
-
-    // Phase 4: Build hierarchy
-    onProgress?.("concept-phase-4", "Building concept hierarchy");
-    const phase4Start = performance.now();
-    const hierarchy = extractor.buildHierarchy(conceptsWithMentions);
-    const phase4Time = performance.now() - phase4Start;
-    console.log(
-      `[ConceptExtractor] Phase 4: Hierarchy built in ${phase4Time.toFixed(
-        2
-      )}ms - core: ${hierarchy.core.length}, supporting: ${
-        hierarchy.supporting.length
-      }`
-    );
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    // Phase 5: Extract concept sequence
-    onProgress?.("concept-phase-5", "Extracting concept sequence");
-    const phase5Start = performance.now();
-    const sequence = extractor.extractConceptSequence(conceptsWithMentions);
-    const phase5Time = performance.now() - phase5Start;
-    console.log(
-      `[ConceptExtractor] Phase 5: Sequence extracted (${
-        sequence.length
-      } items) in ${phase5Time.toFixed(2)}ms`
-    );
 
     const overallTime = performance.now() - overallStart;
     console.log(
@@ -157,14 +113,13 @@ export class ConceptExtractor {
     console.log(
       `[ConceptExtractor] Phase breakdown: P1=${phase1Time.toFixed(
         0
-      )}ms P2=${phase2Time.toFixed(0)}ms P3=${phase3Time.toFixed(
-        0
-      )}ms P4=${phase4Time.toFixed(0)}ms P5=${phase5Time.toFixed(0)}ms`
+      )}ms P2=${phase2Time.toFixed(0)}ms`
     );
 
+    // Return simple concept list with no relationships or complex hierarchies
     return {
       concepts: conceptsWithMentions,
-      relationships,
+      relationships: [], // No relationship inference
       hierarchy: {
         core: conceptsWithMentions.filter((c) => c.importance === "core"),
         supporting: conceptsWithMentions.filter(
@@ -172,7 +127,7 @@ export class ConceptExtractor {
         ),
         detail: conceptsWithMentions.filter((c) => c.importance === "detail"),
       },
-      sequence: sequence,
+      sequence: conceptsWithMentions.map((c) => c.id), // Simple ID sequence
     };
   }
 
@@ -181,65 +136,102 @@ export class ConceptExtractor {
    * OPTIMIZED: Pre-compile all regex patterns, single-pass scanning
    */
   private searchLibraryConcepts(text: string): FoundConcept[] {
+    console.error("🚨🚨🚨 SEARCH LIBRARY CONCEPTS CALLED 🚨🚨🚨");
+    console.log(
+      `🔧 [ConceptExtractor] CODE VERSION: 2024-11-12-v4-FORCE-RELOAD - Phase 1 starting`
+    );
     const startTime = performance.now();
-    const found: FoundConcept[] = [];
 
-    // OPTIMIZATION 1: Pre-compile all regex patterns once
-    interface SearchPattern {
-      regex: RegExp;
-      definition: ConceptDefinition;
+    interface ConceptMatches {
+      canonical: MentionMatch[];
+      aliases: MentionMatch[];
     }
 
-    const patterns: SearchPattern[] = [];
+    const foundMap = new Map<ConceptDefinition, ConceptMatches>();
 
-    for (const libraryDef of this.conceptLibrary) {
-      // Collect all search terms (name + aliases)
-      const searchTerms = [libraryDef.name.toLowerCase()];
-      if (libraryDef.aliases) {
-        searchTerms.push(...libraryDef.aliases.map((a) => a.toLowerCase()));
+    const addMatch = (
+      definition: ConceptDefinition,
+      index: number,
+      text: string,
+      isAlias: boolean
+    ) => {
+      let entry = foundMap.get(definition);
+      if (!entry) {
+        entry = { canonical: [], aliases: [] };
+        foundMap.set(definition, entry);
       }
 
-      // Create one pattern per unique term
-      for (const term of searchTerms) {
-        const regex = new RegExp(`\\b${this.escapeRegex(term)}\\b`, "gi");
-        patterns.push({ regex, definition: libraryDef });
+      const target = isAlias ? entry.aliases : entry.canonical;
+
+      if (isAlias) {
+        // Skip alias match if canonical already recorded at this index
+        if (entry.canonical.some((m) => m.index === index)) {
+          return;
+        }
+        // Keep the longest alias for the same index
+        if (
+          target.some(
+            (m) => m.index === index && m.text.length >= (text?.length || 0)
+          )
+        ) {
+          return;
+        }
+      } else {
+        // Prefer canonical matches; drop duplicate shorter ones
+        const existingCanonical = target.find((m) => m.index === index);
+        if (existingCanonical) {
+          if (existingCanonical.text.length >= (text?.length || 0)) {
+            return;
+          }
+          entry.canonical = entry.canonical.filter((m) => m.index !== index);
+        }
+        // Remove any aliases recorded at this index
+        entry.aliases = entry.aliases.filter((m) => m.index !== index);
+      }
+
+      target.push({ index, text: text ?? definition.name, isAlias });
+    };
+
+    const collectMatches = (
+      definition: ConceptDefinition,
+      term: string,
+      isAlias: boolean
+    ) => {
+      const trimmed = term?.trim();
+      if (!trimmed) {
+        return;
+      }
+      const regex = this.createFlexibleRegex(trimmed);
+      let match: RegExpExecArray | null;
+      while ((match = regex.exec(text)) !== null) {
+        addMatch(definition, match.index, match[0], isAlias);
+      }
+    };
+
+    for (const definition of this.conceptLibrary) {
+      // Always collect canonical matches first
+      collectMatches(definition, definition.name, false);
+
+      if (definition.aliases) {
+        for (const alias of definition.aliases) {
+          collectMatches(definition, alias, true);
+        }
       }
     }
 
     console.log(
-      `[ConceptExtractor] Pre-compiled ${patterns.length} search patterns`
+      `🔍 [ConceptExtractor] foundMap has ${foundMap.size} concept entries`
     );
 
-    // OPTIMIZATION 2: Track found concepts by definition reference
-    const foundMap = new Map<
-      ConceptDefinition,
-      { count: number; positions: number[] }
-    >();
+    const found: FoundConcept[] = [];
+    for (const [definition, matches] of foundMap.entries()) {
+      const mentions = [...matches.canonical, ...matches.aliases].sort(
+        (a, b) => a.index - b.index
+      );
 
-    // OPTIMIZATION 3: Scan text once per pattern (unavoidable for position tracking)
-    for (const { regex, definition } of patterns) {
-      let match;
-
-      while ((match = regex.exec(text)) !== null) {
-        if (!foundMap.has(definition)) {
-          foundMap.set(definition, { count: 0, positions: [] });
-        }
-        const entry = foundMap.get(definition)!;
-        entry.count++;
-        entry.positions.push(match.index);
+      if (mentions.length > 0) {
+        found.push({ definition, mentions });
       }
-
-      // Reset regex lastIndex
-      regex.lastIndex = 0;
-    }
-
-    // Convert map to array
-    for (const [definition, data] of foundMap.entries()) {
-      found.push({
-        definition,
-        count: data.count,
-        positions: data.positions.sort((a, b) => a - b),
-      });
     }
 
     const endTime = performance.now();
@@ -248,9 +240,12 @@ export class ConceptExtractor {
         found.length
       } concepts in ${(endTime - startTime).toFixed(2)}ms`
     );
+    console.log(
+      `[ConceptExtractor] Phase 1 concepts found:`,
+      found.map((f) => `${f.definition.name}(${f.mentions.length})`).join(", ")
+    );
 
-    // Sort by frequency (most mentioned first)
-    return found.sort((a, b) => b.count - a.count);
+    return found.sort((a, b) => b.mentions.length - a.mentions.length);
   }
 
   /**
@@ -262,36 +257,107 @@ export class ConceptExtractor {
   ): Concept[] {
     const validConcepts: Concept[] = [];
 
+    // VERSION: 2024-11-12-FINAL-FORCE-RELOAD
+    console.error("🚨🚨🚨 TRACK MENTIONS CALLED - VERSION FINAL 🚨🚨🚨");
+    console.warn(
+      `🔍 [trackMentions] Processing ${foundConcepts.length} concepts`
+    );
+    console.warn(
+      `🔍 [trackMentions] Concept names: ${foundConcepts
+        .map((fc) => fc.definition.name)
+        .join(", ")}`
+    );
+
     for (let index = 0; index < foundConcepts.length; index++) {
       const fc = foundConcepts[index];
       const validMentions: ConceptMention[] = [];
 
-      for (const pos of fc.positions) {
+      // DEBUG: Track specific concepts
+      if (fc.definition.name === "promise" || fc.definition.name === "array") {
+        console.error(
+          `🎯 [trackMentions] ${fc.definition.name.toUpperCase()} DETECTED! Positions: ${
+            fc.mentions.length
+          }`
+        );
+        fc.mentions.slice(0, 5).forEach((mention, idx) => {
+          const pos = mention.index;
+          const matchedSample = mention.text;
+          const aliasTag = mention.isAlias ? " (alias)" : "";
+          const contextPreview = text.substring(
+            Math.max(0, pos - 50),
+            Math.min(text.length, pos + matchedSample.length + 50)
+          );
+          // Show the actual word at this position
+          console.error(`   Position ${idx + 1}: ${pos}${aliasTag}`);
+          console.error(`      Matched text: "${matchedSample}"`);
+          console.error(`      Context: "...${contextPreview}..."`);
+        });
+      }
+
+      for (const mention of fc.mentions) {
+        const pos = mention.index;
+        const matchedText = mention.text;
+        const canonicalMatch = this.matchCanonicalAtPosition(
+          text,
+          pos,
+          fc.definition.name
+        );
+        const resolvedMatchedText = canonicalMatch || matchedText;
+        const isAliasMention = mention.isAlias && !canonicalMatch;
         const context = this.extractContext(
           text,
           pos,
-          fc.definition.name.length
+          resolvedMatchedText.length
         );
+
+        // DEBUG: Track position processing
+        if (fc.definition.name === "promise") {
+          console.error(
+            `🎯 [trackMentions] Processing promise position ${pos}, context: "${context.substring(
+              0,
+              50
+            )}..." matched="${matchedText}"`
+          );
+        }
 
         // Skip TOC entries
         if (context.startsWith("[TOC]")) {
+          if (fc.definition.name === "promise") {
+            console.error(`🎯 [trackMentions] Promise skipped - TOC entry`);
+          }
           continue;
         }
 
         // For computing domain, validate programming context
-        if (
-          this.domain === "computing" &&
-          !this.isValidProgrammingContext(context, fc.definition)
-        ) {
-          continue;
+        if (this.domain === "computing") {
+          if (fc.definition.name === "promise") {
+            console.error(
+              `🎯 [trackMentions] Promise about to validate, domain: ${this.domain}`
+            );
+          }
+          const isValid = this.isValidProgrammingContext(
+            context,
+            fc.definition
+          );
+          console.log(
+            `[FILTER CHECK] concept: "${fc.definition.name}" domain: "${this.domain}" isValid: ${isValid}`
+          );
+          if (!isValid) {
+            console.log(
+              `[FILTERED OUT] "${fc.definition.name}" at position ${pos}`
+            );
+            continue;
+          }
         }
 
         validMentions.push({
           position: pos,
+          matchedText: resolvedMatchedText,
           context,
           depth: "moderate" as const,
           isRevisit: false,
           associatedConcepts: [],
+          isAlias: isAliasMention,
         });
       }
 
@@ -299,6 +365,15 @@ export class ConceptExtractor {
       if (validMentions.length === 0) {
         continue;
       }
+
+      const earliestPosition = validMentions.reduce(
+        (min, mention) => Math.min(min, mention.position),
+        Number.POSITIVE_INFINITY
+      );
+
+      const mentionsByPosition = validMentions
+        .slice()
+        .sort((a, b) => a.position - b.position);
 
       validConcepts.push({
         id: `concept-${validConcepts.length}`,
@@ -309,8 +384,11 @@ export class ConceptExtractor {
             fc.definition.subcategory ? " - " + fc.definition.subcategory : ""
           }`,
         importance: fc.definition.importance || "supporting",
-        firstMentionPosition: validMentions[0].position,
-        mentions: validMentions,
+        firstMentionPosition:
+          earliestPosition === Number.POSITIVE_INFINITY
+            ? validMentions[0].position
+            : earliestPosition,
+        mentions: mentionsByPosition,
         relatedConcepts: fc.definition.relatedConcepts || [],
         prerequisites: [],
         applications: [],
@@ -353,6 +431,24 @@ export class ConceptExtractor {
     return context.trim();
   }
 
+  private matchCanonicalAtPosition(
+    text: string,
+    start: number,
+    canonical: string
+  ): string | null {
+    if (!canonical || !canonical.trim()) {
+      return null;
+    }
+
+    const regex = this.createFlexibleRegex(canonical.trim());
+    regex.lastIndex = start;
+    const match = regex.exec(text);
+    if (match && match.index === start) {
+      return match[0];
+    }
+    return null;
+  }
+
   /**
    * Validate if a concept mention occurs in a valid programming context
    * Used for computing domain to filter out casual English usage
@@ -363,6 +459,13 @@ export class ConceptExtractor {
   ): boolean {
     const lowerContext = context.toLowerCase();
     const conceptName = definition.name.toLowerCase();
+
+    console.log(
+      `[isValidProgrammingContext] Checking concept: "${conceptName}" context: "${context.substring(
+        0,
+        100
+      )}..."`
+    );
 
     // TERM-SPECIFIC VALIDATION - Check confusing terms first
     const termSpecificPatterns: Record<string, RegExp[]> = {
@@ -400,23 +503,11 @@ export class ConceptExtractor {
     // If this concept has specific patterns, it MUST match one of them
     const patterns = termSpecificPatterns[conceptName];
     if (patterns && Array.isArray(patterns)) {
-      const hasPattern = patterns.some((pattern) => pattern.test(context));
-      if (conceptName === "promise") {
-        // Extra logging for Promise debugging
-        const matchedPattern = patterns.find((p) => p.test(context));
-        console.log(
-          `[isValidProgrammingContext] "${
-            definition.name
-          }" - hasPattern: ${hasPattern}, context: "${context.substring(
-            0,
-            150
-          )}..."`
-        );
-        if (matchedPattern) {
-          console.log(`  Matched pattern: ${matchedPattern}`);
-        }
-      }
-      return hasPattern;
+      const hasMatch = patterns.some((pattern) => pattern.test(context));
+      console.log(
+        `[isValidProgrammingContext] "${conceptName}" has term-specific patterns, match result: ${hasMatch}`
+      );
+      return hasMatch;
     }
 
     // Programming keywords that indicate code context
@@ -784,6 +875,18 @@ export class ConceptExtractor {
     return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
+  private createFlexibleRegex(term: string): RegExp {
+    const normalized = term.trim();
+    if (!normalized) {
+      return /$^/gi; // Matches nothing
+    }
+    const pattern = normalized
+      .split(/\s+/)
+      .map((part) => this.escapeRegex(part))
+      .join("[\\s\\-]+");
+    return new RegExp(`\\b${pattern}\\b`, "gi");
+  }
+
   /**
    * Build a concept graph (network visualization)
    */
@@ -813,8 +916,13 @@ export class ConceptExtractor {
 
 interface FoundConcept {
   definition: ConceptDefinition;
-  count: number;
-  positions: number[];
+  mentions: MentionMatch[];
+}
+
+interface MentionMatch {
+  index: number;
+  text: string;
+  isAlias: boolean;
 }
 
 // ============================================================================

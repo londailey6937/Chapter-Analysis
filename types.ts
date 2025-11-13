@@ -89,10 +89,12 @@ export interface Concept {
 
 export interface ConceptMention {
   position: number; // Character position
+  matchedText?: string; // Exact text matched in source
   context: string; // Surrounding text (200 chars)
   depth: "shallow" | "moderate" | "deep"; // How thoroughly explained
   isRevisit: boolean;
   associatedConcepts: string[]; // Other concepts mentioned nearby
+  isAlias?: boolean; // True when match came from an alias term
 }
 
 export interface ConceptGraph {
