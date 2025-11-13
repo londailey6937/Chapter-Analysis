@@ -310,6 +310,22 @@ export class ConceptExtractor {
           resolvedMatchedText.length
         );
 
+        if (isAliasMention) {
+          const canonicalWordCount = fc.definition.name
+            .trim()
+            .split(/\s+/).length;
+          const matchedWordCount = resolvedMatchedText
+            .trim()
+            .split(/\s+/).length;
+
+          if (
+            canonicalWordCount > 1 &&
+            matchedWordCount < canonicalWordCount
+          ) {
+            continue;
+          }
+        }
+
         // DEBUG: Track position processing
         if (fc.definition.name === "promise") {
           console.error(
