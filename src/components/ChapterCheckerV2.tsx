@@ -25,6 +25,7 @@ import {
   getCustomDomain,
   convertToConceptDefinitions,
 } from "@/utils/customDomainStorage";
+import AnalysisWorker from "@/workers/analysisWorker?worker";
 
 export const ChapterCheckerV2: React.FC = () => {
   // Access control state
@@ -416,13 +417,7 @@ export const ChapterCheckerV2: React.FC = () => {
       };
 
       // Run analysis in worker (with cache-busting timestamp for dev)
-      const workerUrl = new URL(
-        "../workers/analysisWorker.ts",
-        import.meta.url
-      );
-      // Force worker reload in development by adding timestamp
-      workerUrl.searchParams.set("t", Date.now().toString());
-      const worker = new Worker(workerUrl, { type: "module" });
+      const worker = new AnalysisWorker({ type: "module" });
 
       worker.postMessage({
         chapter,
@@ -460,7 +455,39 @@ export const ChapterCheckerV2: React.FC = () => {
             }
           }, 100);
         } else if (e.data.type === "error") {
-          setError(e.data.error || "Analysis failed");
+          const details = (e.data as { details?: unknown }).details;
+          if (details) {
+            console.error("[Analysis Worker] error details:", details);
+          }
+
+          const fallbackMessage = (() => {
+            if (typeof e.data.error === "string" && e.data.error.trim()) {
+              return e.data.error;
+            }
+
+            if (details && typeof details === "object") {
+              const detailRecord = details as Record<string, unknown>;
+              const detailName =
+                typeof detailRecord.name === "string"
+                  ? detailRecord.name
+                  : undefined;
+              const detailMessage =
+                typeof detailRecord.message === "string"
+                  ? detailRecord.message
+                  : undefined;
+
+              if (detailName || detailMessage) {
+                return [detailName, detailMessage]
+                  .filter(Boolean)
+                  .join(": ")
+                  .trim();
+              }
+            }
+
+            return "Analysis failed";
+          })();
+
+          setError(fallbackMessage);
           setProgress("");
           setIsAnalyzing(false);
           worker.terminate();
@@ -468,8 +495,39 @@ export const ChapterCheckerV2: React.FC = () => {
       };
 
       worker.onerror = (err) => {
-        console.error("Worker error:", err);
-        setError(`Worker error: ${err.message || "Unknown worker error"}`);
+        console.error("Worker error event:", err);
+
+        let detailMessage = "";
+        const rawError = err.error as unknown;
+
+        if (typeof err.message === "string" && err.message.trim()) {
+          detailMessage = err.message;
+        }
+
+        if (!detailMessage) {
+          if (rawError instanceof Error) {
+            detailMessage = rawError.message;
+            if (rawError.stack) {
+              console.error("Worker error stack:", rawError.stack);
+            }
+          } else if (typeof rawError === "string") {
+            detailMessage = rawError;
+          }
+        }
+
+        const finalMessage = detailMessage?.trim()
+          ? detailMessage.trim()
+          : "Unknown worker error";
+
+        setError(`Worker error: ${finalMessage}`);
+        setProgress("");
+        setIsAnalyzing(false);
+        worker.terminate();
+      };
+
+      worker.onmessageerror = (event) => {
+        console.error("Worker message error:", event);
+        setError("Worker message error: Failed to decode message from worker");
         setProgress("");
         setIsAnalyzing(false);
         worker.terminate();
@@ -679,7 +737,7 @@ export const ChapterCheckerV2: React.FC = () => {
                       fontWeight: "600",
                     }}
                   >
-                    📥 Export DOCX
+                    📥 Export Document
                   </button>
                 </>
               )}
