@@ -60,14 +60,23 @@ export class PatternRecognizer {
     const coverage = text.length > 0 ? patternCharCount / text.length : 0;
 
     // Distribution across sections
-    const distribution = chapter.sections.map((section) => ({
-      sectionId: section.id,
-      patternCount: patterns.filter(
-        (p) =>
-          p.startPosition >= section.startPosition &&
-          p.endPosition <= section.endPosition
-      ).length,
-    }));
+    const distribution = chapter.sections.map((section) => {
+      const hasBounds =
+        typeof section.startPosition === "number" &&
+        typeof section.endPosition === "number" &&
+        section.startPosition <= section.endPosition;
+
+      return {
+        sectionId: section.id,
+        patternCount: hasBounds
+          ? patterns.filter(
+              (p) =>
+                p.startPosition >= (section.startPosition as number) &&
+                p.endPosition <= (section.endPosition as number)
+            ).length
+          : 0,
+      };
+    });
 
     return {
       totalPatterns: patterns.length,

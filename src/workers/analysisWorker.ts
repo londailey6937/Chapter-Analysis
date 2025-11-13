@@ -64,9 +64,6 @@ self.onmessage = async (evt: MessageEvent<IncomingMessage>) => {
   try {
     reportProgress("analysis-start", "Starting analysis pipeline");
 
-    // Yield control to prevent blocking - use real delay for UI updates
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
     // Run analysis with progress callbacks and domain parameters
     const result = await AnalysisEngine.analyzeChapter(
       chapter,

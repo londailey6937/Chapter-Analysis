@@ -7,13 +7,14 @@
 import {
   Domain,
   ConceptLibrary,
+  ConceptDefinition,
   AVAILABLE_DOMAINS,
 } from "./conceptLibraryTypes";
 import { CHEMISTRY_CONCEPTS } from "./chemistryConceptLibrary";
 import { CROSS_DOMAIN_CONCEPTS } from "./crossDomainConcepts";
 import { ALGEBRA_TRIG_CONCEPTS } from "./algebraTrigConceptLibrary";
 import { financeConceptLibrary } from "./financeConceptLibrary";
-import { COMPUTING_CORE_CONCEPTS } from "./computingConceptLibrary.core";
+import { COMPUTING_CONCEPTS } from "./computingConceptLibrary";
 import { REACT_CONCEPTS } from "./reactConceptLibrary";
 
 // Re-export types for convenience
@@ -23,18 +24,66 @@ export type {
   ConceptDefinition,
 } from "./conceptLibraryTypes";
 
+const slugify = (text: string): string => {
+  return text
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/['’`]/g, "")
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-{2,}/g, "-");
+};
+
+const ensureConceptIds = (
+  library: ConceptLibrary,
+  domainKey: Domain
+): ConceptLibrary => {
+  const domainPrefix = slugify(domainKey);
+  const usedIds = new Set<string>();
+
+  const withId = (concept: ConceptDefinition, index: number) => {
+    const rawExisting = concept.id?.trim();
+    if (rawExisting && !usedIds.has(rawExisting)) {
+      usedIds.add(rawExisting);
+      return concept;
+    }
+
+    const nameSlug = slugify(concept.name) || `concept-${index + 1}`;
+    let candidate = `${domainPrefix}-${nameSlug}`;
+    let counter = 2;
+    while (usedIds.has(candidate)) {
+      candidate = `${domainPrefix}-${nameSlug}-${counter}`;
+      counter += 1;
+    }
+    usedIds.add(candidate);
+
+    return {
+      ...concept,
+      id: candidate,
+    };
+  };
+
+  return {
+    ...library,
+    concepts: library.concepts.map(withId),
+  };
+};
+
 /**
  * Registry of all available concept libraries
  */
 /**
  * The central registry of concept libraries by domain.
  */
-export const CONCEPT_LIBRARIES: Record<Domain, ConceptLibrary> = {
+const RAW_CONCEPT_LIBRARIES: Record<Domain, ConceptLibrary> = {
   chemistry: CHEMISTRY_CONCEPTS,
   finance: {
     domain: "finance",
     version: "1.0.0",
     concepts: financeConceptLibrary.map((c) => ({
+      id: c.id,
       name: c.name,
       aliases: [],
       category: "Finance",
@@ -1161,7 +1210,7 @@ export const CONCEPT_LIBRARIES: Record<Domain, ConceptLibrary> = {
       },
     ],
   },
-  computing: COMPUTING_CORE_CONCEPTS,
+  computing: COMPUTING_CONCEPTS,
   react: REACT_CONCEPTS,
   mathematics: ALGEBRA_TRIG_CONCEPTS,
   custom: {
@@ -1171,6 +1220,14 @@ export const CONCEPT_LIBRARIES: Record<Domain, ConceptLibrary> = {
   },
   "cross-domain": CROSS_DOMAIN_CONCEPTS,
 };
+
+export const CONCEPT_LIBRARIES: Record<Domain, ConceptLibrary> = (
+  Object.keys(RAW_CONCEPT_LIBRARIES) as Domain[]
+).reduce((acc, domain) => {
+  const baseLibrary = RAW_CONCEPT_LIBRARIES[domain];
+  acc[domain] = ensureConceptIds(baseLibrary, domain);
+  return acc;
+}, {} as Record<Domain, ConceptLibrary>);
 
 /**
  * Get a concept library by domain

@@ -71,9 +71,6 @@ export class AnalysisEngine {
         `[AnalysisEngine] Analyzing content (${chapter.content.length} chars)`
       );
 
-      // Allow UI to update
-      await new Promise((resolve) => setTimeout(resolve, 200));
-
       console.log(
         "[AnalysisEngine] Starting concept extraction with domain:",
         domain
@@ -93,11 +90,8 @@ export class AnalysisEngine {
         "concepts"
       );
 
-      // Yield control and allow UI to update
-      await new Promise((resolve) => setTimeout(resolve, 200));
       onProgress?.("concept-analysis-complete", "Concept extraction complete");
 
-      await new Promise((resolve) => setTimeout(resolve, 200));
       onProgress?.("detecting-patterns", "Detecting learning patterns");
 
       // Detect learning patterns (worked examples, practice problems, etc.)
@@ -112,14 +106,10 @@ export class AnalysisEngine {
         "patterns"
       );
 
-      await new Promise((resolve) => setTimeout(resolve, 200));
       onProgress?.(
         "evaluating-principles",
         "Evaluating learning science principles"
       );
-
-      // Allow UI to update before heavy computation
-      await new Promise((resolve) => setTimeout(resolve, 100));
 
       console.log("[AnalysisEngine] Starting principle evaluations...");
       // Evaluate all learning principles (full evaluations used by UI)
@@ -131,10 +121,8 @@ export class AnalysisEngine {
       );
       console.log("[AnalysisEngine] Principle evaluations complete");
 
-      await new Promise((resolve) => setTimeout(resolve, 100));
       onProgress?.("principles-complete", "Principle evaluation complete");
 
-      await new Promise((resolve) => setTimeout(resolve, 100));
       onProgress?.(
         "building-visualizations",
         "Creating analysis visualizations"
@@ -149,14 +137,10 @@ export class AnalysisEngine {
           weight: ev.weight ?? 1,
         }));
 
-      await new Promise((resolve) => setTimeout(resolve, 100));
       onProgress?.(
         "analyzing-concepts",
         "Analyzing concept patterns and relationships"
       );
-
-      // Allow UI to update
-      await new Promise((resolve) => setTimeout(resolve, 100));
 
       // Build concept analysis (basic defaults from graph/metrics)
       const reviewPatterns: ReviewPattern[] = conceptGraph.concepts.map(
@@ -329,10 +313,7 @@ export class AnalysisEngine {
         conceptualization: "moderate",
       };
 
-      // Allow UI to update before finalizing
-      await new Promise((resolve) => setTimeout(resolve, 200));
       onProgress?.("finalizing", "Finalizing analysis results");
-      await new Promise((resolve) => setTimeout(resolve, 200));
 
       console.log("[AnalysisEngine] Analysis complete!");
       return {
@@ -390,9 +371,6 @@ export class AnalysisEngine {
 
       results.push(result);
       timings.push({ name, time: evalTime });
-
-      // Yield control between evaluators to allow UI updates
-      await new Promise((resolve) => setTimeout(resolve, 50));
     }
 
     const overallTime = performance.now() - overallStart;

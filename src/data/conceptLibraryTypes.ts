@@ -6,6 +6,7 @@
  */
 
 export interface ConceptDefinition {
+  id?: string;
   name: string;
   aliases?: string[]; // Alternative names/spellings (e.g., "energy" -> ["kinetic energy", "potential energy"])
   category: string;

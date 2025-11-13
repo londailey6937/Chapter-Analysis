@@ -249,7 +249,12 @@ export const ChapterCheckerV2: React.FC = () => {
             isHybridDocx: false,
             imageCount: 0,
           }
-        : prev
+        : {
+            html: newText,
+            plainText: newText,
+            isHybridDocx: false,
+            imageCount: 0,
+          }
     );
   };
 
@@ -288,42 +293,179 @@ export const ChapterCheckerV2: React.FC = () => {
     console.log("🎯 Mention object:", mention);
 
     if (mention && mention.position !== undefined) {
-      console.log("🎯 Setting highlightPosition to:", mention.position);
-      setHighlightPosition(mention.position);
       const normalizeMatchedText = (text: string | null | undefined) =>
         text ? text.replace(/\s+/g, " ").trim() : "";
 
+      const displayText = chapterData?.plainText ?? chapterText ?? "";
+      const displayTextLower = displayText.toLowerCase();
+
       const matchedTextRaw = normalizeMatchedText(mention.matchedText);
-      const effectiveSearchWord =
+      const fallbackTerm = concept.name;
+      const searchTerm =
         matchedTextRaw && matchedTextRaw.length > 0
           ? matchedTextRaw
-          : concept.name;
+          : fallbackTerm;
+      const searchTermLower = searchTerm.toLowerCase();
+      const canonicalLower = fallbackTerm.toLowerCase();
 
-      const normalizedTarget = effectiveSearchWord.toLowerCase();
-      const occurrenceIndex =
-        concept.mentions
-          ?.slice(0, mentionIndex)
-          .reduce((count: number, currentMention: any) => {
-            if (!currentMention) {
-              return count;
-            }
-            const currentMatched = normalizeMatchedText(
-              currentMention.matchedText
-            );
-            const currentSearchWord = (
-              currentMatched && currentMatched.length > 0
-                ? currentMatched
-                : concept.name
-            ).toLowerCase();
+      const escapeRegex = (value: string) =>
+        value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-            return currentSearchWord === normalizedTarget ? count + 1 : count;
-          }, 0) ?? 0;
+      const buildFlexiblePattern = (termLower: string) =>
+        escapeRegex(termLower).replace(/\s+/g, "\\s+");
 
-      setSearchWord(effectiveSearchWord);
-      setSearchOccurrence(occurrenceIndex);
+      const matchFlexibleAtPosition = (position: number, termLower: string) => {
+        if (!termLower || position < 0 || position >= displayTextLower.length) {
+          return null;
+        }
+        const snippet = displayTextLower.slice(position);
+        const regex = new RegExp(`^${buildFlexiblePattern(termLower)}`);
+        const match = regex.exec(snippet);
+        if (match && match[0]) {
+          return { position, length: match[0].length };
+        }
+        return null;
+      };
+
+      const findFlexibleOccurrence = (
+        termLower: string,
+        occurrence: number
+      ) => {
+        if (!termLower || occurrence < 0) {
+          return null;
+        }
+        const regex = new RegExp(buildFlexiblePattern(termLower), "g");
+        let match: RegExpExecArray | null;
+        let count = 0;
+        while ((match = regex.exec(displayTextLower)) !== null) {
+          if (count === occurrence) {
+            return { position: match.index, length: match[0].length };
+          }
+          count++;
+          if (match.index === regex.lastIndex) {
+            regex.lastIndex++;
+          }
+        }
+        return null;
+      };
+
+      const findNearestFlexible = (termLower: string, reference: number) => {
+        if (!termLower) {
+          return null;
+        }
+        const regex = new RegExp(buildFlexiblePattern(termLower), "g");
+        let best: { position: number; length: number } | null = null;
+        let match: RegExpExecArray | null;
+        while ((match = regex.exec(displayTextLower)) !== null) {
+          const candidate = { position: match.index, length: match[0].length };
+          if (
+            !best ||
+            Math.abs(candidate.position - reference) <
+              Math.abs(best.position - reference)
+          ) {
+            best = candidate;
+          }
+          if (match.index === regex.lastIndex) {
+            regex.lastIndex++;
+          }
+        }
+        return best;
+      };
+
+      const getOccurrenceIndex = (termLower: string): number => {
+        if (!termLower) {
+          return 0;
+        }
+        return (
+          concept.mentions
+            ?.slice(0, mentionIndex)
+            .reduce((count: number, currentMention: any) => {
+              if (!currentMention) {
+                return count;
+              }
+              const currentMatched = normalizeMatchedText(
+                currentMention.matchedText
+              );
+              const currentSearchWord = (
+                currentMatched && currentMatched.length > 0
+                  ? currentMatched
+                  : fallbackTerm
+              ).toLowerCase();
+
+              return currentSearchWord === termLower ? count + 1 : count;
+            }, 0) ?? 0
+        );
+      };
+
+      const locateTerm = (
+        termLower: string,
+        preferredStart: number,
+        occurrence: number
+      ) => {
+        if (!termLower) {
+          return null;
+        }
+
+        const direct = matchFlexibleAtPosition(preferredStart, termLower);
+        if (direct) {
+          return direct;
+        }
+
+        const occurrenceMatch = findFlexibleOccurrence(termLower, occurrence);
+        if (occurrenceMatch) {
+          return occurrenceMatch;
+        }
+
+        return findNearestFlexible(termLower, preferredStart);
+      };
+
+      const aliasOccurrenceIndex = getOccurrenceIndex(searchTermLower);
+      const canonicalOccurrenceIndex = getOccurrenceIndex(canonicalLower);
+
+      let matchResult = locateTerm(
+        searchTermLower,
+        Number.isFinite(mention.position) ? (mention.position as number) : 0,
+        aliasOccurrenceIndex
+      );
+
+      if (!matchResult && searchTermLower !== canonicalLower) {
+        matchResult = locateTerm(
+          canonicalLower,
+          Number.isFinite(mention.position) ? (mention.position as number) : 0,
+          canonicalOccurrenceIndex
+        );
+      }
+
+      if (!matchResult) {
+        console.warn(
+          "⚠️ Unable to resolve concept position, skipping highlight",
+          concept.name,
+          "mentionIndex:",
+          mentionIndex
+        );
+        return;
+      }
+
+      const { position: resolvedPosition, length: matchLength } = matchResult;
+      const highlightText = displayText.substring(
+        resolvedPosition,
+        resolvedPosition + matchLength
+      );
+      const finalHighlightText = highlightText || searchTerm;
+      const normalizedFinal =
+        normalizeMatchedText(finalHighlightText).toLowerCase();
+      const finalOccurrenceIndex = getOccurrenceIndex(
+        normalizedFinal || canonicalLower
+      );
+
+      console.log("🎯 Setting highlightPosition to:", resolvedPosition);
+      setHighlightPosition(resolvedPosition);
+      setSearchWord(finalHighlightText);
+      setSearchOccurrence(finalOccurrenceIndex);
+
       console.log(
         "📍 Jumping to position:",
-        mention.position,
+        resolvedPosition,
         "for concept:",
         concept.name,
         "mention:",
@@ -332,7 +474,6 @@ export const ChapterCheckerV2: React.FC = () => {
         concept.mentions.length
       );
 
-      // DEBUG: Show first 5 positions for this concept
       console.log(
         "🔍 First 5 positions for",
         concept.name,
