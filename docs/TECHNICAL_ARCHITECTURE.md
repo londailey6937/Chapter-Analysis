@@ -63,7 +63,7 @@ PDF Processing: pdf.js (text extraction)
 ### Data Flow
 
 ```
-1. User uploads DOCX/MD/TXT
+1. User uploads DOCX/OBT
    ↓
 2. Text extraction (mammoth.js for DOCX)
    ↓

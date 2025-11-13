@@ -2038,10 +2038,12 @@ export const PrincipleFindings: React.FC<{
           color: var(--text-muted);
         }
         .evidence-item {
-          font-size: 12px;
-          color: var(--text-main);
-          margin: 3px 0;
-          font-family: monospace;
+          font-size: 13px;
+          color: var(--text-muted);
+          margin: 4px 0;
+          font-family: inherit;
+          line-height: 1.5;
+          letter-spacing: 0.01em;
         }
         .no-suggestions {
           color: var(--success-600);

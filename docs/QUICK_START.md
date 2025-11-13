@@ -12,7 +12,7 @@ The Chapter Checker can handle large academic documents:
 - A typical **500-page academic textbook** with moderate images is usually 50-80 MB
 - Comfortably handles even the **largest scholarly works** or complete multi-volume compilations
 
-Supported formats: `.docx`, `.pdf`, `.txt`, `.md`, `.html`, `.obt`
+Supported formats: `.docx` and `.obt`
 
 ## ⚡ Quick Setup
 

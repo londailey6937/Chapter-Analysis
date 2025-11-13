@@ -59,17 +59,11 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
           throw new Error("No content extracted from DOCX");
         }
         return;
-      } else if (
-        fileType === "md" ||
-        fileType === "txt" ||
-        fileType === "html" ||
-        fileType === "htm" ||
-        fileType === "obt"
-      ) {
-        // Read plain text/markdown/HTML/OBT
+      } else if (fileType === "obt") {
+        // Read Open Book Text as plain text
         extractedText = await file.text();
       } else {
-        alert("Please upload a .docx, .md, .txt, .html, or .obt file");
+        alert("Please upload a .docx or .obt file");
         return;
       }
 
@@ -100,7 +94,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
       <input
         ref={fileInputRef}
         type="file"
-        accept=".docx,.md,.txt,.html,.htm,.obt"
+        accept=".docx,.obt"
         onChange={handleFileChange}
         disabled={disabled}
         style={{ display: "none" }}
@@ -131,7 +125,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
           }
         }}
       >
-        📄 Upload Document (.docx, .md, .txt, .html, .obt)
+        📄 Upload Document (.docx or .obt)
       </label>
       <div
         style={{
@@ -140,7 +134,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
           color: "#6b7280",
         }}
       >
-        Supported: Word documents, Markdown, Plain text, HTML, Open Library Text
+        Supported: Word documents (.docx) and Open Library Text (.obt)
       </div>
     </div>
   );

@@ -1,10 +1,10 @@
 /**
  * Simplified Chapter Checker - DOCX First Workflow
- * Upload DOCX/MD/TXT → Analyze → Edit → Export
+ * Upload DOCX/OBT → Analyze → Edit → Export
  */
 
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import { DocumentUploader } from "./DocumentUploader";
+import { DocumentUploader, UploadedDocumentPayload } from "./DocumentUploader";
 import { DocumentEditor } from "./DocumentEditor";
 import { ChapterAnalysisDashboard } from "./VisualizationComponents";
 import { HelpModal } from "./HelpModal";
@@ -41,6 +41,7 @@ export const ChapterCheckerV2: React.FC = () => {
     html: string;
     plainText: string;
     isHybridDocx: boolean;
+    imageCount: number;
   } | null>(null); // Single source of truth - extracted at upload
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
@@ -186,29 +187,69 @@ export const ChapterCheckerV2: React.FC = () => {
     };
   }, []);
 
-  const handleDocumentLoad = (text: string, name: string, type: string) => {
-    setChapterText(text); // Plain text only - no JSON
-    setFileName(name);
-    setFileType(type);
+  const handleDocumentLoad = (payload: UploadedDocumentPayload) => {
+    const {
+      content,
+      plainText,
+      fileName: incomingName,
+      fileType,
+      format,
+      imageCount,
+    } = payload;
+
+    const normalizedPlainText = plainText?.trim().length
+      ? plainText.trim()
+      : content
+          .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+          .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
+          .replace(/<[^>]+>/g, " ")
+          .replace(/&nbsp;/g, " ")
+          .replace(/&lt;/g, "<")
+          .replace(/&gt;/g, ">")
+          .replace(/&amp;/g, "&")
+          .replace(/\s+/g, " ")
+          .trim();
+
+    setChapterText(normalizedPlainText);
+    setFileName(incomingName);
+    setFileType(fileType);
     setError(null);
     setAnalysis(null); // Clear previous analysis
 
-    // Store plain text directly - no JSON parsing, no HTML
-    console.log("📄 Storing plain text - no HTML, no JSON");
+    const hasHtmlContent = format === "html" && content.trim().length > 0;
+    console.log(
+      `📄 Stored ${
+        hasHtmlContent ? "hybrid (HTML + text)" : "plain text"
+      } document`
+    );
+    if (imageCount > 0) {
+      console.log(`  📷 Embedded images: ${imageCount}`);
+    }
+
     setChapterData({
-      html: text, // Just plain text (keeping name for compatibility)
-      plainText: text, // Same plain text
-      isHybridDocx: false,
+      html: hasHtmlContent ? content : normalizedPlainText,
+      plainText: normalizedPlainText,
+      isHybridDocx: hasHtmlContent,
+      imageCount,
     });
 
-    // Auto-detect domain
-    const detected = detectDomain(text);
+    const detected = detectDomain(normalizedPlainText);
     setDetectedDomain(detected);
     setSelectedDomain(detected);
   };
 
   const handleTextChange = (newText: string) => {
     setChapterText(newText);
+    setChapterData((prev) =>
+      prev
+        ? {
+            html: newText,
+            plainText: newText,
+            isHybridDocx: false,
+            imageCount: 0,
+          }
+        : prev
+    );
   };
 
   const handleAcceptMissingConcept = (
@@ -258,23 +299,24 @@ export const ChapterCheckerV2: React.FC = () => {
           : concept.name;
 
       const normalizedTarget = effectiveSearchWord.toLowerCase();
-      const occurrenceIndex = concept.mentions
-        ?.slice(0, mentionIndex)
-        .reduce((count: number, currentMention: any) => {
-          if (!currentMention) {
-            return count;
-          }
-          const currentMatched = normalizeMatchedText(
-            currentMention.matchedText
-          );
-          const currentSearchWord = (
-            currentMatched && currentMatched.length > 0
-              ? currentMatched
-              : concept.name
-          ).toLowerCase();
+      const occurrenceIndex =
+        concept.mentions
+          ?.slice(0, mentionIndex)
+          .reduce((count: number, currentMention: any) => {
+            if (!currentMention) {
+              return count;
+            }
+            const currentMatched = normalizeMatchedText(
+              currentMention.matchedText
+            );
+            const currentSearchWord = (
+              currentMatched && currentMatched.length > 0
+                ? currentMatched
+                : concept.name
+            ).toLowerCase();
 
-          return currentSearchWord === normalizedTarget ? count + 1 : count;
-        }, 0) ?? 0;
+            return currentSearchWord === normalizedTarget ? count + 1 : count;
+          }, 0) ?? 0;
 
       setSearchWord(effectiveSearchWord);
       setSearchOccurrence(occurrenceIndex);
@@ -345,7 +387,7 @@ export const ChapterCheckerV2: React.FC = () => {
       const displayText = chapterData.plainText; // Same plain text for display
       const isHybridDocx = chapterData.isHybridDocx;
 
-      console.log("📄 Using plain text for everything - no HTML");
+      console.log("📄 Using normalized plain text for analysis");
       console.log("  Text length:", textForAnalysis.length);
 
       // Create Chapter object with plain text
@@ -442,6 +484,7 @@ export const ChapterCheckerV2: React.FC = () => {
     setChapterText("");
     setFileName("");
     setFileType("");
+    setChapterData(null);
     setAnalysis(null);
     setError(null);
   };
@@ -475,6 +518,10 @@ export const ChapterCheckerV2: React.FC = () => {
     link.click();
     URL.revokeObjectURL(url);
   };
+
+  const tierFeatures = ACCESS_TIERS[accessLevel];
+  const canEditChapter =
+    viewMode === "writer" && tierFeatures.writerMode && !isAnalyzing;
 
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
@@ -642,15 +689,21 @@ export const ChapterCheckerV2: React.FC = () => {
           {chapterData ? (
             <DocumentEditor
               key={fileName} // Force new component instance when file changes
-              initialText={chapterData.plainText} // Plain text for display
-              searchText={chapterData.plainText} // Same plain text for searching
+              initialText={chapterData.plainText}
+              htmlContent={
+                chapterData.isHybridDocx && viewMode === "analysis"
+                  ? chapterData.html
+                  : null
+              }
+              searchText={chapterData.plainText}
               onTextChange={(text) => {
-                // Check access for Writer Mode editing
-                const features = ACCESS_TIERS[accessLevel];
-                if (viewMode === "writer" && !features.writerMode) {
+                if (viewMode === "writer" && !tierFeatures.writerMode) {
                   setUpgradeFeature("Writer Mode");
                   setUpgradeTarget("professional");
                   setShowUpgradePrompt(true);
+                  return;
+                }
+                if (!canEditChapter) {
                   return;
                 }
                 handleTextChange(text);
@@ -663,7 +716,7 @@ export const ChapterCheckerV2: React.FC = () => {
               onSave={
                 analysis && viewMode === "writer" ? handleExportDocx : undefined
               }
-              readOnly={!analysis || viewMode === "analysis"}
+              readOnly={!canEditChapter}
               onBackToTop={() => {
                 if (documentHeaderRef.current) {
                   documentHeaderRef.current.scrollIntoView({

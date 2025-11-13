@@ -1,8 +1,17 @@
 import React, { useRef } from "react";
 import mammoth from "mammoth";
 
+export interface UploadedDocumentPayload {
+  fileName: string;
+  fileType: string;
+  format: "html" | "text";
+  content: string;
+  plainText: string;
+  imageCount: number;
+}
+
 interface DocumentUploaderProps {
-  onDocumentLoad: (text: string, fileName: string, fileType: string) => void;
+  onDocumentLoad: (payload: UploadedDocumentPayload) => void;
   disabled?: boolean;
 }
 
@@ -20,53 +29,90 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
     const fileType = file.name.split(".").pop()?.toLowerCase() || "";
 
     try {
-      let extractedText = "";
-
       if (fileType === "docx") {
-        // Extract ONLY plain text - no HTML at all
-        const arrayBuffer = await file.arrayBuffer();
+        const sourceBuffer = await file.arrayBuffer();
+        const htmlBuffer = sourceBuffer.slice(0);
+        const textBuffer = sourceBuffer.slice(0);
 
-        // Use mammoth to get plain text directly
-        const textResult = await mammoth.extractRawText({ arrayBuffer });
-        const plainText = textResult.value;
-
-        console.log(
-          `✅ Extracted from DOCX: ${plainText.length} chars plain text`
+        let imageCount = 0;
+        const htmlResult = await mammoth.convertToHtml(
+          { arrayBuffer: htmlBuffer },
+          {
+            convertImage: mammoth.images.imgElement((image) => {
+              imageCount += 1;
+              return image.read("base64").then((imageBuffer) => ({
+                src: `data:${image.contentType};base64,${imageBuffer}`,
+                alt: `Embedded image ${imageCount}`,
+              }));
+            }),
+          }
         );
-        console.log("  Plain text preview:", plainText.substring(0, 200));
 
-        if (plainText.trim()) {
-          // Just pass plain text - no JSON, no HTML
-          onDocumentLoad(plainText, file.name, "docx");
-        } else {
+        const textResult = await mammoth.extractRawText({
+          arrayBuffer: textBuffer,
+        });
+        const rawHtml = htmlResult.value?.trim() ?? "";
+        const plainText = textResult.value?.trim() ?? "";
+        const fallbackPlainText = rawHtml
+          ? rawHtml
+              .replace(
+                /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+                ""
+              )
+              .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
+              .replace(/<[^>]+>/g, " ")
+              .replace(/&nbsp;/g, " ")
+              .replace(/&lt;/g, "<")
+              .replace(/&gt;/g, ">")
+              .replace(/&amp;/g, "&")
+              .replace(/\s+/g, " ")
+              .trim()
+          : "";
+
+        if (!rawHtml && !plainText && !fallbackPlainText) {
           throw new Error("No content extracted from DOCX");
         }
-        return;
-      } else if (
-        fileType === "md" ||
-        fileType === "txt" ||
-        fileType === "html" ||
-        fileType === "htm" ||
-        fileType === "obt"
-      ) {
-        // Read plain text/markdown/HTML/OBT
-        extractedText = await file.text();
-      } else {
-        alert("Please upload a .docx, .md, .txt, .html, or .obt file");
-        return;
-      }
 
-      if (!extractedText.trim()) {
-        alert(
-          "Could not extract text from the document. Please try a different file."
+        const payload: UploadedDocumentPayload = {
+          fileName,
+          fileType,
+          format: rawHtml ? "html" : "text",
+          content: rawHtml || plainText,
+          plainText: plainText || fallbackPlainText,
+          imageCount,
+        };
+
+        console.log(
+          `✅ DOCX extracted: ${plainText.length} characters, ${imageCount} image(s)`
         );
+        onDocumentLoad(payload);
+      } else if (fileType === "obt") {
+        const textContent = await file.text();
+
+        if (!textContent.trim()) {
+          alert(
+            "Could not extract text from the document. Please try a different file."
+          );
+          return;
+        }
+
+        const payload: UploadedDocumentPayload = {
+          fileName,
+          fileType,
+          format: "text",
+          content: textContent,
+          plainText: textContent,
+          imageCount: 0,
+        };
+
+        console.log(
+          `✅ Extracted ${textContent.length} characters from ${fileName}`
+        );
+        onDocumentLoad(payload);
+      } else {
+        alert("Please upload a .docx or .obt file");
         return;
       }
-
-      console.log(
-        `✅ Extracted ${extractedText.length} characters from ${fileName}`
-      );
-      onDocumentLoad(extractedText, fileName, fileType);
     } catch (error) {
       console.error("❌ Error reading document:", error);
       alert("Error reading document. Please try again.");
@@ -83,7 +129,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
       <input
         ref={fileInputRef}
         type="file"
-        accept=".docx,.md,.txt,.html,.htm,.obt"
+        accept=".docx,.obt"
         onChange={handleFileChange}
         disabled={disabled}
         style={{ display: "none" }}
@@ -123,7 +169,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
           color: "#6b7280",
         }}
       >
-        Supported: Word documents, Markdown, Plain text, HTML, Open Library Text
+        Supported: Word documents (.docx) and Open Library Text (.obt)
       </div>
     </div>
   );

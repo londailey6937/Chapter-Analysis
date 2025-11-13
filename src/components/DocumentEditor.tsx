@@ -13,6 +13,7 @@ interface ParagraphSegment {
 
 interface DocumentEditorProps {
   initialText: string;
+  htmlContent?: string | null;
   searchText?: string | null;
   onTextChange: (text: string) => void;
   showSpacingIndicators?: boolean;
@@ -24,6 +25,20 @@ interface DocumentEditorProps {
   readOnly?: boolean;
   onBackToTop?: () => void;
 }
+
+type HtmlSegment =
+  | {
+      kind: "paragraph";
+      html: string;
+      paragraphIndex: number;
+      textLength: number;
+    }
+  | {
+      kind: "other";
+      html: string;
+    };
+
+type ParagraphHtmlSegment = Extract<HtmlSegment, { kind: "paragraph" }>;
 
 const computeParagraphSegments = (input: string): ParagraphSegment[] => {
   const normalized = input.replace(/\r\n/g, "\n");
@@ -79,6 +94,7 @@ const computeParagraphSegments = (input: string): ParagraphSegment[] => {
 
 export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   initialText,
+  htmlContent = null,
   searchText,
   onTextChange,
   showSpacingIndicators = false,
@@ -116,9 +132,62 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   );
 
   const isHtmlContent = useMemo(() => {
-    const trimmed = text.trim();
+    const trimmed = (htmlContent ?? "").trim();
     return trimmed.startsWith("<") && trimmed.includes("</");
-  }, [text]);
+  }, [htmlContent]);
+
+  const htmlRenderingData = useMemo(() => {
+    const sourceHtml = (htmlContent ?? "").trim();
+    if (!sourceHtml) {
+      return {
+        sourceHtml,
+        segments: [] as HtmlSegment[],
+        paragraphSegments: [] as ParagraphHtmlSegment[],
+      };
+    }
+
+    const rawSegments = sourceHtml
+      .split(/(<p[^>]*>.*?<\/p>)/gis)
+      .filter((segment) => segment.trim().length > 0);
+
+    let paragraphCounter = 0;
+    const segments: HtmlSegment[] = rawSegments.map((segment) => {
+      const trimmed = segment.trim();
+      const isParagraph = /^<p[^>]*>/i.test(trimmed);
+
+      if (!isParagraph) {
+        return {
+          kind: "other",
+          html: segment,
+        } as HtmlSegment;
+      }
+
+      const textLength = trimmed
+        .replace(/<[^>]+>/g, " ")
+        .replace(/&nbsp;/g, " ")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&amp;/g, "&")
+        .replace(/\s+/g, " ")
+        .trim().length;
+
+      const segmentData: HtmlSegment = {
+        kind: "paragraph",
+        html: segment,
+        paragraphIndex: paragraphCounter,
+        textLength,
+      };
+
+      paragraphCounter += 1;
+      return segmentData;
+    });
+
+    const paragraphSegments = segments.filter(
+      (segment): segment is ParagraphHtmlSegment => segment.kind === "paragraph"
+    );
+
+    return { sourceHtml, segments, paragraphSegments };
+  }, [htmlContent]);
 
   useEffect(() => {
     if (!showVisualSuggestions) {
@@ -429,35 +498,14 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
 
   // Render HTML content with images (with spacing and dual coding overlays)
   const renderHtmlContent = () => {
-    // Extract plain text from HTML for analysis
-    const plainText = text
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-      .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "")
-      .replace(/<[^>]+>/g, "")
-      .replace(/&nbsp;/g, " ")
-      .replace(/&lt;/g, "<")
-      .replace(/&gt;/g, ">")
-      .replace(/&amp;/g, "&")
-      .trim();
+    const {
+      sourceHtml,
+      segments: htmlSegments,
+      paragraphSegments,
+    } = htmlRenderingData;
 
-    // Parse HTML into paragraphs for spacing analysis
-    const htmlParagraphs: { html: string; textLength: number }[] = [];
-    if (showSpacingIndicators) {
-      // Match paragraph tags and extract content
-      const paragraphMatches = text.match(/<p[^>]*>.*?<\/p>/gi) || [];
-      paragraphMatches.forEach((paraHtml) => {
-        // Extract text length for spacing calculation
-        const paraText = paraHtml
-          .replace(/<[^>]+>/g, "")
-          .replace(/&nbsp;/g, " ")
-          .replace(/&lt;/g, "<")
-          .replace(/&gt;/g, ">")
-          .replace(/&amp;/g, "&")
-          .trim();
-        if (paraText.length > 0) {
-          htmlParagraphs.push({ html: paraHtml, textLength: paraText.length });
-        }
-      });
+    if (!sourceHtml) {
+      return renderTextWithSpacing();
     }
 
     return (
@@ -535,91 +583,106 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
         )}
 
         {/* Render HTML content with spacing indicators */}
-        {showSpacingIndicators &&
-        htmlParagraphs.length > 0 &&
-        !text.includes("<img") ? (
+        {htmlSegments.length > 0 ? (
           <div>
-            {htmlParagraphs.map((para, index) => {
-              const nextPara = htmlParagraphs[index + 1];
-              const currentLength = para.textLength;
-              const needsMoreSpacing = currentLength > 800; // Long paragraph needs more spacing
+            {htmlSegments.map((segment, segmentIndex) => {
+              if (segment.kind === "paragraph") {
+                const nextParagraph = paragraphSegments.find(
+                  (candidate) =>
+                    candidate.paragraphIndex === segment.paragraphIndex + 1
+                );
+
+                const currentLength = segment.textLength;
+                const needsMoreSpacing = showSpacingIndicators
+                  ? currentLength > 800
+                  : false;
+
+                return (
+                  <div
+                    key={`paragraph-${segment.paragraphIndex}`}
+                    id={`para-${segment.paragraphIndex}`}
+                    data-paragraph-text="true"
+                    style={{
+                      marginBottom: needsMoreSpacing ? "32px" : "16px",
+                    }}
+                  >
+                    {showSpacingIndicators && segment.paragraphIndex > 0 && (
+                      <div
+                        style={{
+                          width: "100%",
+                          height: "2px",
+                          backgroundColor: "#d1d5db",
+                          marginBottom: "16px",
+                          position: "relative",
+                        }}
+                      >
+                        <span
+                          style={{
+                            position: "absolute",
+                            left: "0",
+                            top: "-10px",
+                            fontSize: "11px",
+                            color: "#6b7280",
+                            backgroundColor: "white",
+                            padding: "2px 8px",
+                            borderRadius: "4px",
+                            fontWeight: "500",
+                          }}
+                        >
+                          ━━━ {currentLength} chars ━━━
+                        </span>
+                      </div>
+                    )}
+
+                    <div
+                      dangerouslySetInnerHTML={{ __html: segment.html }}
+                      style={{
+                        fontFamily: "ui-sans-serif, system-ui, sans-serif",
+                        lineHeight: "1.8",
+                        color: "#1f2937",
+                      }}
+                      className="prose-content"
+                    />
+
+                    {showSpacingIndicators && nextParagraph && (
+                      <div
+                        style={{
+                          width: "100%",
+                          marginTop: "12px",
+                          paddingTop: "8px",
+                          borderTop: needsMoreSpacing
+                            ? "2px dashed #fbbf24"
+                            : "1px solid #e5e7eb",
+                        }}
+                      >
+                        {needsMoreSpacing && (
+                          <div
+                            style={{
+                              fontSize: "11px",
+                              color: "#f59e0b",
+                              fontWeight: "600",
+                              marginTop: "4px",
+                              padding: "4px 8px",
+                              backgroundColor: "#fef3c7",
+                              borderRadius: "4px",
+                              display: "inline-block",
+                            }}
+                          >
+                            ⚠️ Consider more spacing here (topic/section break)
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
 
               return (
                 <div
-                  key={index}
-                  style={{ marginBottom: needsMoreSpacing ? "32px" : "16px" }}
-                >
-                  {/* Top spacing indicator */}
-                  {index > 0 && (
-                    <div
-                      style={{
-                        width: "100%",
-                        height: "2px",
-                        backgroundColor: "#d1d5db",
-                        marginBottom: "16px",
-                        position: "relative",
-                      }}
-                    >
-                      <span
-                        style={{
-                          position: "absolute",
-                          left: "0",
-                          top: "-10px",
-                          fontSize: "11px",
-                          color: "#6b7280",
-                          backgroundColor: "white",
-                          padding: "2px 8px",
-                          borderRadius: "4px",
-                          fontWeight: "500",
-                        }}
-                      >
-                        ━━━ {currentLength} chars ━━━
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Paragraph content */}
-                  <div
-                    dangerouslySetInnerHTML={{ __html: para.html }}
-                    style={{
-                      fontFamily: "ui-sans-serif, system-ui, sans-serif",
-                      lineHeight: "1.8",
-                      color: "#1f2937",
-                    }}
-                    className="prose-content"
-                  />
-
-                  {/* Bottom spacing indicator */}
-                  {nextPara && (
-                    <div
-                      style={{
-                        width: "100%",
-                        marginTop: "12px",
-                        paddingTop: "8px",
-                        borderTop: needsMoreSpacing
-                          ? "2px dashed #fbbf24"
-                          : "1px solid #e5e7eb",
-                      }}
-                    >
-                      {needsMoreSpacing && (
-                        <div
-                          style={{
-                            fontSize: "11px",
-                            color: "#f59e0b",
-                            fontWeight: "600",
-                            marginTop: "4px",
-                            padding: "4px 8px",
-                            backgroundColor: "#fef3c7",
-                            borderRadius: "4px",
-                            display: "inline-block",
-                          }}
-                        >
-                          ⚠️ Consider more spacing here (topic/section break)
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                  key={`html-segment-${segmentIndex}`}
+                  dangerouslySetInnerHTML={{ __html: segment.html }}
+                  style={{ margin: "16px 0" }}
+                />
               );
             })}
           </div>
@@ -628,17 +691,18 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
           <>
             {(() => {
               console.log("🖼️ Rendering HTML content");
-              console.log("  Text length:", text.length);
-              console.log("  Has <img tags:", text.includes("<img"));
+              console.log("  HTML length:", sourceHtml.length);
               console.log(
                 "  Number of <img tags:",
-                (text.match(/<img/g) || []).length
+                (sourceHtml.match(/<img/gi) || []).length
               );
-              console.log("  First 500 chars:", text.substring(0, 500));
+              console.log("  First 500 chars:", sourceHtml.substring(0, 500));
               return null;
             })()}
             <div
-              dangerouslySetInnerHTML={{ __html: text }}
+              id="para-0"
+              data-paragraph-text="true"
+              dangerouslySetInnerHTML={{ __html: sourceHtml }}
               style={{
                 fontFamily: "ui-sans-serif, system-ui, sans-serif",
                 lineHeight: "1.8",

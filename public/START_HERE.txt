@@ -39,7 +39,7 @@ OPTION 1: USE COMPLETE APP (5 minutes)
   2. Import ChapterChecker from ChapterChecker.tsx
   3. Add <ChapterChecker /> to your React app
   4. Done! Users can analyze chapters immediately
-  
+
   See: QUICK_START.md - Example 1
 
 OPTION 2: CUSTOM INTEGRATION (15 minutes)
@@ -47,14 +47,14 @@ OPTION 2: CUSTOM INTEGRATION (15 minutes)
   2. Import AnalysisEngine from AnalysisEngine.ts
   3. Call AnalysisEngine.analyzeChapter(chapter, config)
   4. Build your own UI with results
-  
+
   See: QUICK_START.md - Example 2
 
 OPTION 3: SPECIFIC COMPONENTS (30 minutes)
   1. Import individual files as needed
   2. Use only what you need
   3. Build custom workflows
-  
+
   See: QUICK_START.md - Examples 3-5
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -276,7 +276,7 @@ Need integration examples?     → QUICK_START.md (API integration example)
 
 🎁 BONUS FEATURES INCLUDED:
 
-✓ File upload support (paste or upload .txt/.md files)
+✓ File upload support (paste text or upload .docx/.obt files)
 ✓ Real-time progress indicators during analysis
 ✓ Comprehensive error handling
 ✓ JSON export functionality

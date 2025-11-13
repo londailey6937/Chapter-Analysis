@@ -21,7 +21,7 @@ npm run dev
 ### 3️⃣ Open Your Browser
 
 - Automatically opens at `http://localhost:3000`
-- Paste a chapter or upload a .txt/.md file
+- Paste a chapter or upload a .docx or .obt file
 - Click "Analyze Chapter" to see results
 
 ---
@@ -247,6 +247,8 @@ function TextAreaInput({
 ```css
 /* In src/styles/globals.css */
 .btn-primary       /* Primary button */
+/* Primary button */
+/* Primary button */
 /* Primary button */
 .btn-secondary     /* Secondary button */
 .card              /* Card component */

@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import mammoth from "mammoth";
 import { ChapterAnalysis } from "@/types";
 // import { AnalysisEngine } from "./AnalysisEngine"; // Removed unused import
 import TextAreaInput from "./TextAreaInput";
@@ -163,22 +164,41 @@ function ChapterInput({
    *
    * @param {React.ChangeEvent<HTMLInputElement>} event - File input change event
    */
-  const handleFileUpload = (
+  const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
-  ): void => {
+  ): Promise<void> => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const content = e.target?.result as string;
-      setChapterText(content);
+    const extension = file.name.split(".").pop()?.toLowerCase();
+
+    try {
+      let extractedText = "";
+
+      if (extension === "docx") {
+        const arrayBuffer = await file.arrayBuffer();
+        const textResult = await mammoth.extractRawText({ arrayBuffer });
+        extractedText = textResult.value;
+      } else if (extension === "obt") {
+        extractedText = await file.text();
+      } else {
+        setError("Please upload a .docx or .obt file");
+        return;
+      }
+
+      if (!extractedText.trim()) {
+        setError("Uploaded file does not contain readable text.");
+        return;
+      }
+
+      setChapterText(extractedText);
       setError(null);
-    };
-    reader.onerror = () => {
+    } catch (readError) {
+      console.error("File upload failed:", readError);
       setError("Failed to read file. Please try again.");
-    };
-    reader.readAsText(file);
+    } finally {
+      event.target.value = "";
+    }
   };
 
   /**
