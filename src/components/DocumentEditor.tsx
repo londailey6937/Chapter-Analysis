@@ -22,6 +22,7 @@ interface DocumentEditorProps {
   searchOccurrence: number;
   onSave?: () => void;
   readOnly?: boolean;
+  onBackToTop?: () => void;
 }
 
 const computeParagraphSegments = (input: string): ParagraphSegment[] => {
@@ -87,6 +88,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   searchOccurrence,
   onSave,
   readOnly = false,
+  onBackToTop,
 }) => {
   const [text, setText] = useState(() => initialText);
   const [history, setHistory] = useState<string[]>([initialText]);
@@ -1073,14 +1075,22 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       {showBackToTop && readOnly && (
         <button
           onClick={() => {
-            if (containerRef.current) {
-              containerRef.current.scrollTo({
+            const container = containerRef.current;
+            if (container) {
+              container.scrollTo({
                 top: 0,
                 behavior: "smooth",
               });
-              setShowBackToTop(false);
-              console.log("🔝 Scrolling to top, hiding button");
             }
+
+            if (typeof window !== "undefined") {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+            if (onBackToTop) {
+              onBackToTop();
+            }
+            setShowBackToTop(false);
+            console.log("🔝 Scrolling to top, hiding button");
           }}
           style={{
             position: "fixed",

@@ -73,6 +73,7 @@ export const ChapterCheckerV2: React.FC = () => {
 
   // Ref for analysis panel
   const analysisPanelRef = useRef<HTMLDivElement>(null);
+  const documentHeaderRef = useRef<HTMLDivElement>(null);
 
   // Detect document domain based on keywords from concept libraries
   const detectDomain = (text: string): Domain | null => {
@@ -575,6 +576,7 @@ export const ChapterCheckerV2: React.FC = () => {
           }}
         >
           <div
+            ref={documentHeaderRef}
             style={{
               padding: "16px",
               borderBottom: "1px solid #e5e7eb",
@@ -662,6 +664,14 @@ export const ChapterCheckerV2: React.FC = () => {
                 analysis && viewMode === "writer" ? handleExportDocx : undefined
               }
               readOnly={!analysis || viewMode === "analysis"}
+              onBackToTop={() => {
+                if (documentHeaderRef.current) {
+                  documentHeaderRef.current.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  });
+                }
+              }}
             />
           ) : (
             <div

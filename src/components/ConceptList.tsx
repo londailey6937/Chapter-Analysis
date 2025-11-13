@@ -47,6 +47,7 @@ export const ConceptList: React.FC<ConceptListProps> = ({
     const { mentions } = concept;
     const hasCanonical = mentions.some((mention) => mention.isAlias !== true);
     let index = startIndex + direction;
+    let aliasFallback: number | null = null;
 
     while (index >= 0 && index < mentions.length) {
       const mention = mentions[index];
@@ -63,10 +64,14 @@ export const ConceptList: React.FC<ConceptListProps> = ({
         return index;
       }
 
+      if (aliasFallback === null) {
+        aliasFallback = index;
+      }
+
       index += direction;
     }
 
-    return null;
+    return aliasFallback;
   };
 
   // Sort concepts alphabetically (all are core concepts now)
