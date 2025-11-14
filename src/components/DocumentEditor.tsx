@@ -243,9 +243,9 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
           )}
 
           {htmlContent && htmlContent.trim().length > 0 && (
-            <details style={PANEL_STYLE}>
+            <details style={PANEL_STYLE} open>
               <summary style={{ cursor: "pointer", fontWeight: 600 }}>
-                Original formatting
+                Original formatting with images
               </summary>
               <div
                 className="prose-content"
