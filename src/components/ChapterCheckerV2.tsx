@@ -43,6 +43,7 @@ export const ChapterCheckerV2: React.FC = () => {
     plainText: string;
     isHybridDocx: boolean;
     imageCount: number;
+    editorHtml?: string;
   } | null>(null); // Single source of truth - extracted at upload
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
@@ -248,12 +249,36 @@ export const ChapterCheckerV2: React.FC = () => {
             plainText: newText,
             isHybridDocx: false,
             imageCount: 0,
+            editorHtml: newText,
           }
         : {
             html: newText,
             plainText: newText,
             isHybridDocx: false,
             imageCount: 0,
+            editorHtml: newText,
+          }
+    );
+  };
+
+  const handleEditorContentChange = (content: {
+    plainText: string;
+    html: string;
+  }) => {
+    setChapterText(content.plainText);
+    setChapterData((prev) =>
+      prev
+        ? {
+            ...prev,
+            plainText: content.plainText,
+            editorHtml: content.html,
+          }
+        : {
+            html: content.html,
+            plainText: content.plainText,
+            isHybridDocx: true,
+            imageCount: 0,
+            editorHtml: content.html,
           }
     );
   };
@@ -912,7 +937,9 @@ export const ChapterCheckerV2: React.FC = () => {
               key={fileName} // Force new component instance when file changes
               initialText={chapterData.plainText}
               htmlContent={
-                chapterData.isHybridDocx && viewMode === "analysis"
+                chapterData.editorHtml
+                  ? chapterData.editorHtml
+                  : chapterData.isHybridDocx
                   ? chapterData.html
                   : null
               }
@@ -928,6 +955,18 @@ export const ChapterCheckerV2: React.FC = () => {
                   return;
                 }
                 handleTextChange(text);
+              }}
+              onContentChange={(content) => {
+                if (viewMode === "writer" && !tierFeatures.writerMode) {
+                  setUpgradeFeature("Writer Mode");
+                  setUpgradeTarget("professional");
+                  setShowUpgradePrompt(true);
+                  return;
+                }
+                if (!canEditChapter) {
+                  return;
+                }
+                handleEditorContentChange(content);
               }}
               showSpacingIndicators={true}
               showVisualSuggestions={true}

@@ -1,5 +1,5 @@
 import React, {
-  ChangeEvent,
+  ClipboardEvent,
   useEffect,
   useMemo,
   useRef,
@@ -15,6 +15,7 @@ interface DocumentEditorProps {
   htmlContent?: string | null;
   searchText?: string | null;
   onTextChange: (text: string) => void;
+  onContentChange?: (content: { plainText: string; html: string }) => void;
   showSpacingIndicators?: boolean;
   showVisualSuggestions?: boolean;
   highlightPosition: number | null;
@@ -65,6 +66,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   searchText,
   searchWord,
   onTextChange,
+  onContentChange,
   showSpacingIndicators = false,
   showVisualSuggestions = false,
   highlightPosition,
@@ -78,12 +80,46 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     VisualSuggestion[]
   >([]);
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
   const highlightRef = useRef<HTMLSpanElement>(null);
+  const isEditing = !readOnly;
+  const skipNextPropSyncRef = useRef(false);
+  const initialHtmlRef = useRef(
+    htmlContent && htmlContent.trim().length
+      ? sanitizeHtml(htmlContent)
+      : convertTextToHtml(initialText)
+  );
 
   useEffect(() => {
-    setText(initialText);
-  }, [initialText]);
+    if (editorRef.current) {
+      editorRef.current.innerHTML = initialHtmlRef.current;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isEditing && editorRef.current) {
+      editorRef.current.innerHTML = initialHtmlRef.current;
+    }
+  }, [isEditing]);
+
+  useEffect(() => {
+    if (skipNextPropSyncRef.current) {
+      skipNextPropSyncRef.current = false;
+      return;
+    }
+
+    if (initialText !== text) {
+      setText(initialText);
+      const nextHtml =
+        htmlContent && htmlContent.trim().length
+          ? sanitizeHtml(htmlContent)
+          : convertTextToHtml(initialText);
+      initialHtmlRef.current = nextHtml;
+      if (editorRef.current) {
+        editorRef.current.innerHTML = nextHtml;
+      }
+    }
+  }, [htmlContent, initialText, text]);
 
   const highlightRange = useMemo(
     () =>
@@ -96,6 +132,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       }),
     [text, searchText, searchWord, searchOccurrence, highlightPosition]
   );
+
   useEffect(() => {
     if (!showVisualSuggestions) {
       setVisualSuggestions([]);
@@ -128,12 +165,12 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       return;
     }
 
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.focus();
-      textarea.setSelectionRange(
+    const editor = editorRef.current;
+    if (editor) {
+      scrollEditableToRange(
+        editor,
         highlightRange.start,
-        highlightRange.start + highlightRange.length
+        highlightRange.length
       );
       setShowBackToTop(false);
     }
@@ -148,10 +185,72 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     return buildParagraphSuggestionMap(paragraphs, visualSuggestions);
   }, [paragraphs, visualSuggestions, showVisualSuggestions]);
 
-  const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    const value = event.target.value;
-    setText(value);
-    onTextChange(value);
+  const syncEditorState = () => {
+    const currentHtml = editorRef.current?.innerHTML ?? "";
+    const plain = htmlToPlainText(currentHtml);
+    setText(plain);
+    initialHtmlRef.current = currentHtml;
+    skipNextPropSyncRef.current = true;
+    if (onContentChange) {
+      onContentChange({ plainText: plain, html: currentHtml });
+    } else {
+      onTextChange(plain);
+    }
+  };
+
+  const handleEditorInput = () => {
+    syncEditorState();
+  };
+
+  const handlePaste = (event: ClipboardEvent<HTMLDivElement>) => {
+    if (readOnly) {
+      return;
+    }
+
+    const clipboard = event.clipboardData;
+    if (!clipboard) {
+      requestAnimationFrame(syncEditorState);
+      return;
+    }
+
+    const pastedText =
+      clipboard.getData("text/plain")?.toString() ||
+      clipboard.getData("text")?.toString() ||
+      "";
+
+    const imageItem = Array.from(clipboard.items || []).find((item) =>
+      item.type.startsWith("image/")
+    );
+
+    if (imageItem) {
+      const file = imageItem.getAsFile();
+      if (file) {
+        event.preventDefault();
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result as string;
+          insertHtmlWithUndoSupport(
+            `<img src="${dataUrl}" alt="Pasted image" style="max-width:100%;height:auto;" />`
+          );
+          syncEditorState();
+        };
+        reader.readAsDataURL(file);
+      }
+      return;
+    }
+
+    const htmlData = clipboard.getData("text/html");
+    if (htmlData) {
+      event.preventDefault();
+      insertHtmlWithUndoSupport(htmlData);
+      syncEditorState();
+      return;
+    }
+
+    // Allow default text insertion for undo stack, then sync state
+    if (pastedText.length) {
+      requestAnimationFrame(syncEditorState);
+    }
   };
 
   const handleSave = () => {
@@ -176,14 +275,37 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
         style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: "flex-start",
           gap: "12px",
+          flexWrap: "wrap",
         }}
       >
-        <div style={{ fontSize: "14px", color: "#6b7280" }}>
-          {readOnly ? "Read-only view" : "Editable view"}
+        <div style={{ flex: 1, minWidth: "240px" }}>
+          <div
+            style={{
+              fontSize: "15px",
+              fontWeight: 600,
+              color: "#111827",
+            }}
+          >
+            {isEditing
+              ? "Author workspace with live spacing guidance"
+              : "Live preview with spacing + dual coding"}
+          </div>
+          <p
+            style={{
+              margin: "4px 0 0",
+              fontSize: "13px",
+              color: "#6b7280",
+              lineHeight: 1.5,
+            }}
+          >
+            {isEditing
+              ? "Scroll the preview on the left to see spacing targets and dual-coding callouts update as you edit on the right."
+              : "Spacing targets and dual-coding callouts render inline below for accurate placement."}
+          </p>
         </div>
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           {showBackToTop && (
             <button onClick={handleBackToTop} style={buttonStyle("#3b82f6")}>
               Back to top
@@ -214,47 +336,74 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       >
         <div
           style={{
-            flex: 1,
+            flex: isEditing ? 0.55 : 1,
             minHeight: 0,
             display: "flex",
             flexDirection: "column",
-            gap: "16px",
+            gap: "12px",
           }}
         >
-          {readOnly ? (
-            <ReadOnlyView
-              paragraphs={paragraphs}
-              highlightRange={highlightRange}
-              highlightRef={highlightRef}
-              showSpacingIndicators={showSpacingIndicators}
-              showVisualSuggestions={showVisualSuggestions}
-              suggestionsByParagraph={suggestionsByParagraph}
-            />
-          ) : (
-            <EditableView
-              textareaRef={textareaRef}
-              text={text}
-              onChange={handleChange}
-              showSpacingIndicators={showSpacingIndicators}
-              showVisualSuggestions={showVisualSuggestions}
-              paragraphs={paragraphs}
-              visualSuggestions={visualSuggestions}
-            />
-          )}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              color: "#111827",
+              fontWeight: 600,
+              fontSize: "14px",
+            }}
+          >
+            <span>Document Preview</span>
+            <span style={{ fontSize: "12px", color: "#6b7280" }}>
+              Spacing indicators + dual coding
+            </span>
+          </div>
 
-          {htmlContent && htmlContent.trim().length > 0 && (
-            <details style={PANEL_STYLE} open>
-              <summary style={{ cursor: "pointer", fontWeight: 600 }}>
-                Original formatting with images
-              </summary>
-              <div
-                className="prose-content"
-                style={{ marginTop: "12px", lineHeight: 1.5 }}
-                dangerouslySetInnerHTML={{ __html: htmlContent }}
-              />
-            </details>
-          )}
+          <ReadOnlyView
+            paragraphs={paragraphs}
+            highlightRange={highlightRange}
+            highlightRef={highlightRef}
+            showSpacingIndicators={showSpacingIndicators}
+            showVisualSuggestions={showVisualSuggestions}
+            suggestionsByParagraph={suggestionsByParagraph}
+          />
         </div>
+
+        {isEditing && (
+          <div
+            style={{
+              flex: 0.45,
+              minHeight: 0,
+              display: "flex",
+              flexDirection: "column",
+              gap: "12px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                color: "#111827",
+                fontWeight: 600,
+                fontSize: "14px",
+              }}
+            >
+              <span>Editable document</span>
+              <span
+                style={{ fontSize: "12px", color: "#6b7280", fontWeight: 500 }}
+              >
+                {text.split(/\s+/).filter(Boolean).length.toLocaleString()}{" "}
+                words
+              </span>
+            </div>
+            <EditableView
+              editorRef={editorRef}
+              onInput={handleEditorInput}
+              onPaste={handlePaste}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -303,7 +452,7 @@ const GuidanceLegend: React.FC<GuidanceLegendProps> = ({
             while green badges suggest adding detail if the point feels rushed.
             <br />
             <em style={{ fontSize: "11px", color: "#6b7280" }}>
-              Note: Indicators appear inline in read-only mode for accurate
+              Note: Indicators appear inside the preview panel for accurate
               positioning.
             </em>
           </div>
@@ -334,7 +483,7 @@ const GuidanceLegend: React.FC<GuidanceLegendProps> = ({
             reinforce the concept.
             <br />
             <em style={{ fontSize: "11px", color: "#6b7280" }}>
-              Note: Callouts appear inline in read-only mode for accurate
+              Note: Callouts appear inside the preview panel for accurate
               positioning.
             </em>
           </div>
@@ -521,46 +670,38 @@ const ReadOnlyView: React.FC<ReadOnlyViewProps> = ({
 };
 
 type EditableViewProps = {
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
-  text: string;
-  onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void;
-  showSpacingIndicators: boolean;
-  showVisualSuggestions: boolean;
-  paragraphs: ParagraphSummary[];
-  visualSuggestions: VisualSuggestion[];
+  editorRef: React.RefObject<HTMLDivElement>;
+  onInput: () => void;
+  onPaste: (event: ClipboardEvent<HTMLDivElement>) => void;
 };
 
 const EditableView: React.FC<EditableViewProps> = ({
-  textareaRef,
-  text,
-  onChange,
-  showSpacingIndicators,
-  showVisualSuggestions,
-  paragraphs,
-  visualSuggestions,
+  editorRef,
+  onInput,
+  onPaste,
 }) => {
-  const textLength = Math.max(text.length, 1);
-
   return (
-    <div style={{ position: "relative", flex: 1 }}>
-      <textarea
-        ref={textareaRef}
-        value={text}
-        onChange={onChange}
-        style={{
-          flex: 1,
-          resize: "none",
-          padding: "16px",
-          border: "1px solid #e5e7eb",
-          borderRadius: "8px",
-          fontFamily: "inherit",
-          fontSize: "15px",
-          lineHeight: 1.5,
-          width: "100%",
-          height: "100%",
-        }}
-      />
-    </div>
+    <div
+      ref={editorRef}
+      contentEditable
+      suppressContentEditableWarning
+      onInput={onInput}
+      onPaste={onPaste}
+      style={{
+        flex: 1,
+        minHeight: "400px",
+        padding: "16px",
+        border: "1px solid #e5e7eb",
+        borderRadius: "8px",
+        fontFamily: "ui-sans-serif, system-ui, sans-serif",
+        fontSize: "16px",
+        lineHeight: 1.6,
+        width: "100%",
+        height: "100%",
+        overflowY: "auto",
+      }}
+      data-placeholder="Start writing here..."
+    />
   );
 };
 
@@ -1030,6 +1171,117 @@ function buttonStyle(backgroundColor: string): React.CSSProperties {
     cursor: "pointer",
     backgroundColor,
   };
+}
+
+function convertTextToHtml(value: string): string {
+  if (!value.trim().length) {
+    return "";
+  }
+  const escaped = escapeHtml(value);
+  return escaped
+    .split(/\n{2,}/)
+    .map((paragraph) => `<p>${paragraph.replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
+
+function htmlToPlainText(html: string): string {
+  if (!html.trim().length) {
+    return "";
+  }
+  if (typeof window === "undefined") {
+    return html
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+  const temp = document.createElement("div");
+  temp.innerHTML = html;
+  return temp.textContent?.replace(/\u00A0/g, " ") ?? "";
+}
+
+function sanitizeHtml(html: string): string {
+  return html.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function insertHtmlAtCursor(html: string): boolean {
+  if (typeof document === "undefined") {
+    return false;
+  }
+  const selection = document.getSelection();
+  if (!selection || selection.rangeCount === 0) {
+    return false;
+  }
+  const range = selection.getRangeAt(0);
+  range.deleteContents();
+  const temp = document.createElement("div");
+  temp.innerHTML = html;
+  const fragment = document.createDocumentFragment();
+  let node: ChildNode | null;
+  while ((node = temp.firstChild)) {
+    fragment.appendChild(node);
+  }
+  range.insertNode(fragment);
+  range.collapse(false);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  return true;
+}
+
+function insertHtmlWithUndoSupport(html: string): boolean {
+  if (typeof document === "undefined") {
+    return false;
+  }
+  const canExecCommand = typeof document.execCommand === "function";
+  if (canExecCommand) {
+    try {
+      const inserted = document.execCommand("insertHTML", false, html);
+      if (inserted) {
+        return true;
+      }
+    } catch {
+      // Fall back to manual insertion if execCommand fails
+    }
+  }
+  return insertHtmlAtCursor(html);
+}
+
+function scrollEditableToRange(
+  container: HTMLElement,
+  start: number,
+  length: number
+): void {
+  const walker = document.createTreeWalker(
+    container,
+    NodeFilter.SHOW_TEXT,
+    null
+  );
+  let currentNode: Node | null = walker.nextNode();
+  let currentIndex = 0;
+  const targetStart = start;
+  const targetEnd = start + length;
+
+  while (currentNode) {
+    const nodeLength = currentNode.textContent?.length ?? 0;
+    const nextIndex = currentIndex + nodeLength;
+    if (targetStart >= currentIndex && targetStart <= nextIndex) {
+      (currentNode.parentElement as HTMLElement)?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      break;
+    }
+    currentIndex = nextIndex;
+    currentNode = walker.nextNode();
+  }
 }
 
 export default DocumentEditor;
