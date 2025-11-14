@@ -726,11 +726,14 @@ export const ChapterCheckerV2: React.FC = () => {
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       {/* Header */}
       <header
+        role="banner"
         style={{
           padding: "1rem 2rem",
           backgroundColor: "#667eea",
           color: "white",
           boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+          position: "relative",
+          zIndex: 50,
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -749,13 +752,32 @@ export const ChapterCheckerV2: React.FC = () => {
             ☰
           </button>
 
-          <img src="/TomeIQ.png" alt="TomeIQ" style={{ height: "96px" }} />
+          <img
+            src="/TomeIQ.png"
+            alt="TomeIQ"
+            style={{ height: "96px", display: "block", objectFit: "contain" }}
+          />
           <div>
-            <h1 style={{ margin: 0, fontSize: "1.5rem" }}>
+            <h1
+              style={{
+                margin: 0,
+                fontSize: "1.5rem",
+                color: "white",
+                fontWeight: "700",
+                lineHeight: "1.2",
+              }}
+            >
               Tome
               <span style={{ fontStyle: "italic", fontWeight: "700" }}>IQ</span>
             </h1>
-            <p style={{ margin: 0, fontSize: "0.875rem", opacity: 0.9 }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: "0.875rem",
+                opacity: 0.9,
+                color: "white",
+              }}
+            >
               AI-Powered Textbook Analysis
             </p>
           </div>

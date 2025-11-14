@@ -248,6 +248,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
                 Original formatting
               </summary>
               <div
+                className="prose-content"
                 style={{ marginTop: "12px", lineHeight: 1.5 }}
                 dangerouslySetInnerHTML={{ __html: htmlContent }}
               />
