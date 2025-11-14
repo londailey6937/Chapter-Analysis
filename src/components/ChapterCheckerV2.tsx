@@ -955,102 +955,321 @@ export const ChapterCheckerV2: React.FC = () => {
             backgroundColor: "#f9fafb",
           }}
         >
-          <div style={{ padding: "16px", borderBottom: "1px solid #e5e7eb" }}>
-            <h2 style={{ margin: "0 0 12px 0", fontSize: "18px" }}>
-              Analysis Controls
-            </h2>
-
-            <div style={{ marginBottom: "12px" }}>
-              <label
+          {!tierFeatures.fullAnalysis ? (
+            <div
+              style={{
+                flex: 1,
+                padding: "32px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "16px",
+                justifyContent: chapterData ? "flex-start" : "center",
+              }}
+            >
+              <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>
+                Tier 1 - Document Insights
+              </h2>
+              <p style={{ margin: 0, fontSize: "14px", color: "#374151" }}>
+                Upload a DOCX or OBT chapter to unlock live spacing metrics and
+                dual-coding suggestions directly inside the editor on the left.
+                Highlights update instantly as you revise.
+              </p>
+              <ul
                 style={{
-                  display: "block",
-                  fontSize: "12px",
-                  fontWeight: "600",
-                  marginBottom: "4px",
-                  color: "#6b7280",
+                  margin: 0,
+                  paddingLeft: "20px",
+                  color: "#4b5563",
+                  fontSize: "13px",
+                  lineHeight: 1.6,
                 }}
               >
-                Detected Domain:
-              </label>
-
-              {!showDomainSelector ? (
+                <li>
+                  Spacing overview shows paragraph word counts and density
+                  trends.
+                </li>
+                <li>
+                  Dual-coding panel recommends visuals for sequences, spatial
+                  descriptions, and quantitative passages.
+                </li>
+                <li>
+                  Use the search and highlight controls to jump to key concept
+                  mentions.
+                </li>
+              </ul>
+              {!chapterData && (
                 <div
                   style={{
-                    width: "100%",
+                    fontSize: "13px",
+                    color: "#1f2937",
+                    backgroundColor: "#e5e7eb",
                     padding: "12px",
-                    border: selectedDomain
-                      ? "2px solid #10b981"
-                      : "2px solid #f59e0b",
-                    borderRadius: "6px",
-                    fontSize: "14px",
-                    backgroundColor: selectedDomain ? "#f0fdf4" : "#fef3c7",
-                    color: selectedDomain ? "#166534" : "#92400e",
-                    fontWeight: "600",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: "8px",
+                    borderRadius: "8px",
                   }}
                 >
-                  {selectedDomain ? (
-                    <>
-                      <span>
-                        {selectedDomain === "custom" ? (
-                          <>🎨 {customDomainName || "Custom Domain"}</>
-                        ) : (
-                          <>
-                            {
-                              sortedDomains.find((d) => d.id === selectedDomain)
-                                ?.icon
-                            }{" "}
-                            {sortedDomains.find((d) => d.id === selectedDomain)
-                              ?.label || selectedDomain}
-                          </>
-                        )}
-                      </span>
-                      <div
+                  Upload a chapter to generate spacing summaries and dual-coding
+                  insights.
+                </div>
+              )}
+              <div
+                style={{
+                  marginTop: "auto",
+                  paddingTop: "12px",
+                  borderTop: "1px solid #e5e7eb",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px",
+                }}
+              >
+                <strong style={{ fontSize: "14px", color: "#111827" }}>
+                  Ready for more?
+                </strong>
+                <p style={{ margin: 0, fontSize: "13px", color: "#4b5563" }}>
+                  Switch to Tier 2 to run the full 10-principle analyzer with
+                  concept graphs, recommendations, and exportable reports.
+                </p>
+                <button
+                  onClick={() => {
+                    setUpgradeFeature("Full 10-Principle Analysis");
+                    setUpgradeTarget("premium");
+                    setShowUpgradePrompt(true);
+                  }}
+                  style={{
+                    alignSelf: "flex-start",
+                    padding: "10px 20px",
+                    backgroundColor: "#3b82f6",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                  }}
+                >
+                  Preview Tier 2 Features
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div
+                style={{ padding: "16px", borderBottom: "1px solid #e5e7eb" }}
+              >
+                <h2 style={{ margin: "0 0 12px 0", fontSize: "18px" }}>
+                  Analysis Controls
+                </h2>
+
+                <div style={{ marginBottom: "12px" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      marginBottom: "4px",
+                      color: "#6b7280",
+                    }}
+                  >
+                    Detected Domain:
+                  </label>
+
+                  {!showDomainSelector ? (
+                    <div
+                      style={{
+                        width: "100%",
+                        padding: "12px",
+                        border: selectedDomain
+                          ? "2px solid #10b981"
+                          : "2px solid #f59e0b",
+                        borderRadius: "6px",
+                        fontSize: "14px",
+                        backgroundColor: selectedDomain ? "#f0fdf4" : "#fef3c7",
+                        color: selectedDomain ? "#166534" : "#92400e",
+                        fontWeight: "600",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: "8px",
+                      }}
+                    >
+                      {selectedDomain ? (
+                        <>
+                          <span>
+                            {selectedDomain === "custom" ? (
+                              <>🎨 {customDomainName || "Custom Domain"}</>
+                            ) : (
+                              <>
+                                {
+                                  sortedDomains.find(
+                                    (d) => d.id === selectedDomain
+                                  )?.icon
+                                }{" "}
+                                {sortedDomains.find(
+                                  (d) => d.id === selectedDomain
+                                )?.label || selectedDomain}
+                              </>
+                            )}
+                          </span>
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: "6px",
+                              alignItems: "center",
+                            }}
+                          >
+                            <span
+                              style={{ fontSize: "12px", fontWeight: "normal" }}
+                            >
+                              {selectedDomain === "custom"
+                                ? "✓ Custom"
+                                : "✓ Auto-detected"}
+                            </span>
+                            <button
+                              onClick={() => setShowDomainSelector(true)}
+                              disabled={isAnalyzing}
+                              style={{
+                                padding: "4px 10px",
+                                backgroundColor: "#3b82f6",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "4px",
+                                fontSize: "11px",
+                                fontWeight: "600",
+                                cursor: isAnalyzing ? "not-allowed" : "pointer",
+                                opacity: isAnalyzing ? 0.5 : 1,
+                              }}
+                            >
+                              Change
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <span>⚠️ Domain not detected: upload document</span>
+                          <div style={{ display: "flex", gap: "6px" }}>
+                            <button
+                              onClick={() => setShowDomainSelector(true)}
+                              style={{
+                                padding: "4px 12px",
+                                backgroundColor: "#3b82f6",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "4px",
+                                fontSize: "12px",
+                                fontWeight: "600",
+                                cursor: "pointer",
+                              }}
+                            >
+                              Select Domain
+                            </button>
+                            <button
+                              onClick={() => {
+                                // Check access level for custom domains
+                                const features = ACCESS_TIERS[accessLevel];
+                                if (!features.customDomains) {
+                                  setUpgradeFeature("Custom Domains");
+                                  setUpgradeTarget("premium");
+                                  setShowUpgradePrompt(true);
+                                  return;
+                                }
+                                setShowCustomDomainDialog(true);
+                              }}
+                              style={{
+                                padding: "4px 12px",
+                                backgroundColor: ACCESS_TIERS[accessLevel]
+                                  .customDomains
+                                  ? "#8b5cf6"
+                                  : "#9ca3af",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "4px",
+                                fontSize: "12px",
+                                fontWeight: "600",
+                                cursor: ACCESS_TIERS[accessLevel].customDomains
+                                  ? "pointer"
+                                  : "not-allowed",
+                              }}
+                            >
+                              Create Custom{" "}
+                              {!ACCESS_TIERS[accessLevel].customDomains && "🔒"}
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "8px",
+                      }}
+                    >
+                      <select
+                        value={selectedDomain || ""}
+                        onChange={(e) => {
+                          const value = e.target.value;
+
+                          // Check if it's a saved custom domain
+                          if (value.startsWith("custom:")) {
+                            const domainName = value.substring(7); // Remove "custom:" prefix
+                            const savedDomain = getCustomDomain(domainName);
+                            if (savedDomain) {
+                              setCustomDomainName(savedDomain.name);
+                              setCustomConcepts(
+                                convertToConceptDefinitions(savedDomain)
+                              );
+                              setSelectedDomain("custom");
+                              localStorage.setItem(
+                                "tomeiq_last_custom_domain",
+                                savedDomain.name
+                              );
+                            }
+                          } else {
+                            setSelectedDomain(value as Domain);
+                          }
+                          setShowDomainSelector(false);
+                        }}
+                        disabled={isAnalyzing}
                         style={{
-                          display: "flex",
-                          gap: "6px",
-                          alignItems: "center",
+                          width: "100%",
+                          padding: "10px",
+                          border: "2px solid #3b82f6",
+                          borderRadius: "6px",
+                          fontSize: "14px",
+                          outline: "none",
                         }}
                       >
-                        <span
-                          style={{ fontSize: "12px", fontWeight: "normal" }}
-                        >
-                          {selectedDomain === "custom"
-                            ? "✓ Custom"
-                            : "✓ Auto-detected"}
-                        </span>
-                        <button
-                          onClick={() => setShowDomainSelector(true)}
-                          disabled={isAnalyzing}
-                          style={{
-                            padding: "4px 10px",
-                            backgroundColor: "#3b82f6",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "4px",
-                            fontSize: "11px",
-                            fontWeight: "600",
-                            cursor: isAnalyzing ? "not-allowed" : "pointer",
-                            opacity: isAnalyzing ? 0.5 : 1,
-                          }}
-                        >
-                          Change
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <span>⚠️ Domain not detected: upload document</span>
+                        <option value="">-- Select a domain --</option>
+                        {sortedDomains.map((domain) => (
+                          <option key={domain.id} value={domain.id}>
+                            {domain.icon} {domain.label}
+                          </option>
+                        ))}
+                        {/* Show saved custom domains if user has access */}
+                        {ACCESS_TIERS[accessLevel].customDomains &&
+                          loadCustomDomains().length > 0 && (
+                            <>
+                              <option disabled>──────────</option>
+                              <optgroup label="📁 Your Custom Domains">
+                                {loadCustomDomains().map((domain) => (
+                                  <option
+                                    key={`custom:${domain.name}`}
+                                    value={`custom:${domain.name}`}
+                                  >
+                                    🎨 {domain.name}
+                                  </option>
+                                ))}
+                              </optgroup>
+                            </>
+                          )}
+                      </select>
                       <div style={{ display: "flex", gap: "6px" }}>
                         <button
-                          onClick={() => setShowDomainSelector(true)}
+                          onClick={() => setShowDomainSelector(false)}
                           style={{
-                            padding: "4px 12px",
-                            backgroundColor: "#3b82f6",
-                            color: "white",
+                            flex: 1,
+                            padding: "6px",
+                            backgroundColor: "#f3f4f6",
+                            color: "#374151",
                             border: "none",
                             borderRadius: "4px",
                             fontSize: "12px",
@@ -1058,7 +1277,7 @@ export const ChapterCheckerV2: React.FC = () => {
                             cursor: "pointer",
                           }}
                         >
-                          Select Domain
+                          Cancel
                         </button>
                         <button
                           onClick={() => {
@@ -1068,12 +1287,14 @@ export const ChapterCheckerV2: React.FC = () => {
                               setUpgradeFeature("Custom Domains");
                               setUpgradeTarget("premium");
                               setShowUpgradePrompt(true);
+                              setShowDomainSelector(false);
                               return;
                             }
                             setShowCustomDomainDialog(true);
                           }}
                           style={{
-                            padding: "4px 12px",
+                            flex: 1,
+                            padding: "6px",
                             backgroundColor: ACCESS_TIERS[accessLevel]
                               .customDomains
                               ? "#8b5cf6"
@@ -1092,514 +1313,413 @@ export const ChapterCheckerV2: React.FC = () => {
                           {!ACCESS_TIERS[accessLevel].customDomains && "🔒"}
                         </button>
                       </div>
-                    </>
+                    </div>
                   )}
                 </div>
-              ) : (
-                <div
+
+                <button
+                  onClick={handleAnalyzeChapter}
+                  disabled={
+                    !chapterText.trim() || isAnalyzing || !selectedDomain
+                  }
                   style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "8px",
+                    width: "100%",
+                    padding: "12px",
+                    backgroundColor:
+                      chapterText.trim() && !isAnalyzing && selectedDomain
+                        ? "#10b981"
+                        : "#d1d5db",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    fontSize: "16px",
+                    fontWeight: "600",
+                    cursor:
+                      chapterText.trim() && !isAnalyzing && selectedDomain
+                        ? "pointer"
+                        : "not-allowed",
                   }}
                 >
-                  <select
-                    value={selectedDomain || ""}
-                    onChange={(e) => {
-                      const value = e.target.value;
+                  {isAnalyzing ? "⏳ Analyzing..." : "🔍 Analyze Chapter"}
+                </button>
 
-                      // Check if it's a saved custom domain
-                      if (value.startsWith("custom:")) {
-                        const domainName = value.substring(7); // Remove "custom:" prefix
-                        const savedDomain = getCustomDomain(domainName);
-                        if (savedDomain) {
-                          setCustomDomainName(savedDomain.name);
-                          setCustomConcepts(
-                            convertToConceptDefinitions(savedDomain)
-                          );
-                          setSelectedDomain("custom");
-                          localStorage.setItem(
-                            "tomeiq_last_custom_domain",
-                            savedDomain.name
-                          );
-                        }
-                      } else {
-                        setSelectedDomain(value as Domain);
-                      }
-                      setShowDomainSelector(false);
-                    }}
-                    disabled={isAnalyzing}
+                {/* Free tier info */}
+                {accessLevel === "free" && chapterText && !isAnalyzing && (
+                  <div
                     style={{
-                      width: "100%",
-                      padding: "10px",
-                      border: "2px solid #3b82f6",
+                      marginTop: "12px",
+                      padding: "12px",
+                      backgroundColor: "#e0f2fe",
+                      borderLeft: "4px solid #3b82f6",
                       borderRadius: "6px",
-                      fontSize: "14px",
-                      outline: "none",
+                      fontSize: "13px",
+                      lineHeight: "1.6",
                     }}
                   >
-                    <option value="">-- Select a domain --</option>
-                    {sortedDomains.map((domain) => (
-                      <option key={domain.id} value={domain.id}>
-                        {domain.icon} {domain.label}
-                      </option>
-                    ))}
-                    {/* Show saved custom domains if user has access */}
-                    {ACCESS_TIERS[accessLevel].customDomains &&
-                      loadCustomDomains().length > 0 && (
-                        <>
-                          <option disabled>──────────</option>
-                          <optgroup label="📁 Your Custom Domains">
-                            {loadCustomDomains().map((domain) => (
-                              <option
-                                key={`custom:${domain.name}`}
-                                value={`custom:${domain.name}`}
-                              >
-                                🎨 {domain.name}
-                              </option>
-                            ))}
-                          </optgroup>
-                        </>
-                      )}
-                  </select>
-                  <div style={{ display: "flex", gap: "6px" }}>
-                    <button
-                      onClick={() => setShowDomainSelector(false)}
+                    <div
                       style={{
-                        flex: 1,
-                        padding: "6px",
-                        backgroundColor: "#f3f4f6",
-                        color: "#374151",
-                        border: "none",
-                        borderRadius: "4px",
-                        fontSize: "12px",
                         fontWeight: "600",
-                        cursor: "pointer",
+                        marginBottom: "6px",
+                        color: "#1e40af",
                       }}
                     >
-                      Cancel
+                      🎁 Free Preview Available
+                    </div>
+                    <div style={{ color: "#1e3a8a" }}>
+                      <strong>Spacing Analysis:</strong> See optimal concept
+                      repetition patterns for better retention.
+                      <br />
+                      <strong>Dual Coding:</strong> Get AI suggestions for where
+                      to add visuals, diagrams, and illustrations.
+                      <br />
+                      <br />
+                      <span style={{ fontSize: "12px", opacity: 0.9 }}>
+                        💡 Upgrade to Premium for full 10-principle analysis
+                        with concept graphs, pattern recognition, and detailed
+                        recommendations.
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {error && (
+                  <div
+                    style={{
+                      marginTop: "12px",
+                      padding: "12px",
+                      backgroundColor: "#fee2e2",
+                      color: "#991b1b",
+                      borderRadius: "6px",
+                      fontSize: "14px",
+                    }}
+                  >
+                    ⚠️ {error}
+                  </div>
+                )}
+
+                {progress && (
+                  <div
+                    style={{
+                      marginTop: "12px",
+                      padding: "12px",
+                      backgroundColor: "#dbeafe",
+                      color: "#1e40af",
+                      borderRadius: "6px",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {progress}
+                  </div>
+                )}
+              </div>
+
+              {/* Analysis Results */}
+              {analysis && (
+                <div
+                  ref={analysisPanelRef}
+                  style={{ flex: 1, overflow: "auto", padding: "16px" }}
+                >
+                  <div
+                    style={{
+                      marginBottom: "16px",
+                      display: "flex",
+                      gap: "8px",
+                    }}
+                  >
+                    <button
+                      onClick={() => {
+                        setViewMode("analysis");
+                        setTimeout(() => {
+                          if (analysisPanelRef.current) {
+                            analysisPanelRef.current.scrollTop = 0;
+                          }
+                        }, 50);
+                      }}
+                      style={{
+                        flex: 1,
+                        padding: "8px",
+                        backgroundColor:
+                          viewMode === "analysis" ? "#3b82f6" : "#e5e7eb",
+                        color: viewMode === "analysis" ? "white" : "#6b7280",
+                        border: "none",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                        fontWeight: "600",
+                      }}
+                    >
+                      📊 Analysis
                     </button>
                     <button
                       onClick={() => {
-                        // Check access level for custom domains
+                        // Check access for Writer Mode
                         const features = ACCESS_TIERS[accessLevel];
-                        if (!features.customDomains) {
-                          setUpgradeFeature("Custom Domains");
-                          setUpgradeTarget("premium");
+                        if (!features.writerMode) {
+                          setUpgradeFeature("Writer Mode");
+                          setUpgradeTarget("professional");
                           setShowUpgradePrompt(true);
-                          setShowDomainSelector(false);
                           return;
                         }
-                        setShowCustomDomainDialog(true);
+                        setViewMode("writer");
+                        setTimeout(() => {
+                          if (analysisPanelRef.current) {
+                            analysisPanelRef.current.scrollTop = 0;
+                          }
+                        }, 50);
                       }}
                       style={{
                         flex: 1,
-                        padding: "6px",
-                        backgroundColor: ACCESS_TIERS[accessLevel].customDomains
-                          ? "#8b5cf6"
-                          : "#9ca3af",
-                        color: "white",
+                        padding: "8px",
+                        backgroundColor:
+                          viewMode === "writer" ? "#3b82f6" : "#e5e7eb",
+                        color: viewMode === "writer" ? "white" : "#6b7280",
                         border: "none",
-                        borderRadius: "4px",
-                        fontSize: "12px",
-                        fontWeight: "600",
-                        cursor: ACCESS_TIERS[accessLevel].customDomains
-                          ? "pointer"
-                          : "not-allowed",
-                      }}
-                    >
-                      Create Custom{" "}
-                      {!ACCESS_TIERS[accessLevel].customDomains && "🔒"}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <button
-              onClick={handleAnalyzeChapter}
-              disabled={!chapterText.trim() || isAnalyzing || !selectedDomain}
-              style={{
-                width: "100%",
-                padding: "12px",
-                backgroundColor:
-                  chapterText.trim() && !isAnalyzing && selectedDomain
-                    ? "#10b981"
-                    : "#d1d5db",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                fontSize: "16px",
-                fontWeight: "600",
-                cursor:
-                  chapterText.trim() && !isAnalyzing && selectedDomain
-                    ? "pointer"
-                    : "not-allowed",
-              }}
-            >
-              {isAnalyzing ? "⏳ Analyzing..." : "🔍 Analyze Chapter"}
-            </button>
-
-            {/* Free tier info */}
-            {accessLevel === "free" && chapterText && !isAnalyzing && (
-              <div
-                style={{
-                  marginTop: "12px",
-                  padding: "12px",
-                  backgroundColor: "#e0f2fe",
-                  borderLeft: "4px solid #3b82f6",
-                  borderRadius: "6px",
-                  fontSize: "13px",
-                  lineHeight: "1.6",
-                }}
-              >
-                <div
-                  style={{
-                    fontWeight: "600",
-                    marginBottom: "6px",
-                    color: "#1e40af",
-                  }}
-                >
-                  🎁 Free Preview Available
-                </div>
-                <div style={{ color: "#1e3a8a" }}>
-                  <strong>Spacing Analysis:</strong> See optimal concept
-                  repetition patterns for better retention.
-                  <br />
-                  <strong>Dual Coding:</strong> Get AI suggestions for where to
-                  add visuals, diagrams, and illustrations.
-                  <br />
-                  <br />
-                  <span style={{ fontSize: "12px", opacity: 0.9 }}>
-                    💡 Upgrade to Premium for full 10-principle analysis with
-                    concept graphs, pattern recognition, and detailed
-                    recommendations.
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {error && (
-              <div
-                style={{
-                  marginTop: "12px",
-                  padding: "12px",
-                  backgroundColor: "#fee2e2",
-                  color: "#991b1b",
-                  borderRadius: "6px",
-                  fontSize: "14px",
-                }}
-              >
-                ⚠️ {error}
-              </div>
-            )}
-
-            {progress && (
-              <div
-                style={{
-                  marginTop: "12px",
-                  padding: "12px",
-                  backgroundColor: "#dbeafe",
-                  color: "#1e40af",
-                  borderRadius: "6px",
-                  fontSize: "14px",
-                }}
-              >
-                {progress}
-              </div>
-            )}
-          </div>
-
-          {/* Analysis Results */}
-          {analysis && (
-            <div
-              ref={analysisPanelRef}
-              style={{ flex: 1, overflow: "auto", padding: "16px" }}
-            >
-              <div
-                style={{ marginBottom: "16px", display: "flex", gap: "8px" }}
-              >
-                <button
-                  onClick={() => {
-                    setViewMode("analysis");
-                    setTimeout(() => {
-                      if (analysisPanelRef.current) {
-                        analysisPanelRef.current.scrollTop = 0;
-                      }
-                    }, 50);
-                  }}
-                  style={{
-                    flex: 1,
-                    padding: "8px",
-                    backgroundColor:
-                      viewMode === "analysis" ? "#3b82f6" : "#e5e7eb",
-                    color: viewMode === "analysis" ? "white" : "#6b7280",
-                    border: "none",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    fontWeight: "600",
-                  }}
-                >
-                  📊 Analysis
-                </button>
-                <button
-                  onClick={() => {
-                    // Check access for Writer Mode
-                    const features = ACCESS_TIERS[accessLevel];
-                    if (!features.writerMode) {
-                      setUpgradeFeature("Writer Mode");
-                      setUpgradeTarget("professional");
-                      setShowUpgradePrompt(true);
-                      return;
-                    }
-                    setViewMode("writer");
-                    setTimeout(() => {
-                      if (analysisPanelRef.current) {
-                        analysisPanelRef.current.scrollTop = 0;
-                      }
-                    }, 50);
-                  }}
-                  style={{
-                    flex: 1,
-                    padding: "8px",
-                    backgroundColor:
-                      viewMode === "writer" ? "#3b82f6" : "#e5e7eb",
-                    color: viewMode === "writer" ? "white" : "#6b7280",
-                    border: "none",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    fontWeight: "600",
-                  }}
-                >
-                  ✍️ Writer {!ACCESS_TIERS[accessLevel].writerMode && "👑"}
-                </button>
-              </div>
-
-              <button
-                onClick={handleExport}
-                disabled={!ACCESS_TIERS[accessLevel].exportResults}
-                style={{
-                  width: "100%",
-                  padding: "8px",
-                  backgroundColor: ACCESS_TIERS[accessLevel].exportResults
-                    ? "#8b5cf6"
-                    : "#d1d5db",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "6px",
-                  cursor: ACCESS_TIERS[accessLevel].exportResults
-                    ? "pointer"
-                    : "not-allowed",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  marginBottom: "16px",
-                }}
-              >
-                📥 Export JSON{" "}
-                {!ACCESS_TIERS[accessLevel].exportResults && "🔒"}
-              </button>
-
-              {viewMode === "analysis" ? (
-                <>
-                  {!ACCESS_TIERS[accessLevel].fullAnalysis && (
-                    <InlineUpgradePrompt
-                      targetLevel="premium"
-                      feature="Full Analysis - 10 Learning Principles"
-                      description="Unlock comprehensive analysis with all 10 evidence-based learning principles, concept graphs, pattern recognition, and detailed recommendations."
-                      onUpgrade={() => {
-                        setUpgradeFeature("Full Analysis");
-                        setUpgradeTarget("premium");
-                        setShowUpgradePrompt(true);
-                      }}
-                    />
-                  )}
-                  {console.log(
-                    "[ChapterCheckerV2] Passing accessLevel to dashboard:",
-                    accessLevel
-                  )}
-                  <ChapterAnalysisDashboard
-                    analysis={analysis}
-                    concepts={analysis.conceptGraph?.concepts || []}
-                    onConceptClick={handleConceptClick}
-                    highlightedConceptId={highlightedConceptId}
-                    currentMentionIndex={currentMentionIndex}
-                    accessLevel={accessLevel}
-                  />
-                </>
-              ) : (
-                <div
-                  style={{ padding: "20px", overflow: "auto", height: "100%" }}
-                >
-                  <h3
-                    style={{
-                      margin: "0 0 16px 0",
-                      fontSize: "18px",
-                      fontWeight: "600",
-                    }}
-                  >
-                    ✍️ Writing Suggestions
-                  </h3>
-
-                  {/* Principle Scores */}
-                  <div style={{ marginBottom: "24px" }}>
-                    <h4
-                      style={{
+                        borderRadius: "6px",
+                        cursor: "pointer",
                         fontSize: "14px",
                         fontWeight: "600",
-                        marginBottom: "12px",
-                        color: "#6b7280",
                       }}
                     >
-                      Learning Principles
-                    </h4>
-                    {analysis.principles?.slice(0, 5).map((principle: any) => (
-                      <div
-                        key={principle.principle}
+                      ✍️ Writer {!ACCESS_TIERS[accessLevel].writerMode && "👑"}
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={handleExport}
+                    disabled={!ACCESS_TIERS[accessLevel].exportResults}
+                    style={{
+                      width: "100%",
+                      padding: "8px",
+                      backgroundColor: ACCESS_TIERS[accessLevel].exportResults
+                        ? "#8b5cf6"
+                        : "#d1d5db",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "6px",
+                      cursor: ACCESS_TIERS[accessLevel].exportResults
+                        ? "pointer"
+                        : "not-allowed",
+                      fontSize: "14px",
+                      fontWeight: "600",
+                      marginBottom: "16px",
+                    }}
+                  >
+                    📥 Export JSON{" "}
+                    {!ACCESS_TIERS[accessLevel].exportResults && "🔒"}
+                  </button>
+
+                  {viewMode === "analysis" ? (
+                    <>
+                      {!ACCESS_TIERS[accessLevel].fullAnalysis && (
+                        <InlineUpgradePrompt
+                          targetLevel="premium"
+                          feature="Full Analysis - 10 Learning Principles"
+                          description="Unlock comprehensive analysis with all 10 evidence-based learning principles, concept graphs, pattern recognition, and detailed recommendations."
+                          onUpgrade={() => {
+                            setUpgradeFeature("Full Analysis");
+                            setUpgradeTarget("premium");
+                            setShowUpgradePrompt(true);
+                          }}
+                        />
+                      )}
+                      {console.log(
+                        "[ChapterCheckerV2] Passing accessLevel to dashboard:",
+                        accessLevel
+                      )}
+                      <ChapterAnalysisDashboard
+                        analysis={analysis}
+                        concepts={analysis.conceptGraph?.concepts || []}
+                        onConceptClick={handleConceptClick}
+                        highlightedConceptId={highlightedConceptId}
+                        currentMentionIndex={currentMentionIndex}
+                        accessLevel={accessLevel}
+                      />
+                    </>
+                  ) : (
+                    <div
+                      style={{
+                        padding: "20px",
+                        overflow: "auto",
+                        height: "100%",
+                      }}
+                    >
+                      <h3
                         style={{
-                          marginBottom: "8px",
-                          padding: "8px 12px",
-                          backgroundColor: "#f9fafb",
-                          borderRadius: "6px",
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
+                          margin: "0 0 16px 0",
+                          fontSize: "18px",
+                          fontWeight: "600",
                         }}
                       >
-                        <span style={{ fontSize: "13px", fontWeight: "500" }}>
-                          {principle.principle
-                            .replace(/([A-Z])/g, " $1")
-                            .trim()}
-                        </span>
-                        <span
+                        ✍️ Writing Suggestions
+                      </h3>
+
+                      {/* Principle Scores */}
+                      <div style={{ marginBottom: "24px" }}>
+                        <h4
                           style={{
                             fontSize: "14px",
                             fontWeight: "600",
-                            color:
-                              principle.score > 70
-                                ? "#10b981"
-                                : principle.score > 50
-                                ? "#f59e0b"
-                                : "#ef4444",
-                          }}
-                        >
-                          {Math.round(principle.score)}/100
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Recommendations */}
-                  <div>
-                    <h4
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: "600",
-                        marginBottom: "12px",
-                        color: "#6b7280",
-                      }}
-                    >
-                      Top Recommendations
-                    </h4>
-                    {analysis.recommendations?.slice(0, 8).map((rec: any) => (
-                      <div
-                        key={rec.id}
-                        style={{
-                          marginBottom: "12px",
-                          padding: "12px",
-                          backgroundColor: "#fff",
-                          border: `2px solid ${
-                            rec.priority === "high"
-                              ? "#ef4444"
-                              : rec.priority === "medium"
-                              ? "#f59e0b"
-                              : "#d1d5db"
-                          }`,
-                          borderRadius: "8px",
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "start",
-                            gap: "8px",
-                            marginBottom: "6px",
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontSize: "10px",
-                              fontWeight: "600",
-                              padding: "2px 6px",
-                              borderRadius: "4px",
-                              backgroundColor:
-                                rec.priority === "high"
-                                  ? "#fee2e2"
-                                  : rec.priority === "medium"
-                                  ? "#fef3c7"
-                                  : "#f3f4f6",
-                              color:
-                                rec.priority === "high"
-                                  ? "#991b1b"
-                                  : rec.priority === "medium"
-                                  ? "#92400e"
-                                  : "#6b7280",
-                              textTransform: "uppercase",
-                            }}
-                          >
-                            {rec.priority}
-                          </span>
-                          <h5
-                            style={{
-                              margin: 0,
-                              fontSize: "13px",
-                              fontWeight: "600",
-                              flex: 1,
-                            }}
-                          >
-                            {rec.title}
-                          </h5>
-                        </div>
-                        <p
-                          style={{
-                            margin: "0",
-                            fontSize: "12px",
+                            marginBottom: "12px",
                             color: "#6b7280",
-                            lineHeight: "1.5",
                           }}
                         >
-                          {rec.description}
-                        </p>
+                          Learning Principles
+                        </h4>
+                        {analysis.principles
+                          ?.slice(0, 5)
+                          .map((principle: any) => (
+                            <div
+                              key={principle.principle}
+                              style={{
+                                marginBottom: "8px",
+                                padding: "8px 12px",
+                                backgroundColor: "#f9fafb",
+                                borderRadius: "6px",
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                              }}
+                            >
+                              <span
+                                style={{ fontSize: "13px", fontWeight: "500" }}
+                              >
+                                {principle.principle
+                                  .replace(/([A-Z])/g, " $1")
+                                  .trim()}
+                              </span>
+                              <span
+                                style={{
+                                  fontSize: "14px",
+                                  fontWeight: "600",
+                                  color:
+                                    principle.score > 70
+                                      ? "#10b981"
+                                      : principle.score > 50
+                                      ? "#f59e0b"
+                                      : "#ef4444",
+                                }}
+                              >
+                                {Math.round(principle.score)}/100
+                              </span>
+                            </div>
+                          ))}
                       </div>
-                    ))}
-                  </div>
 
-                  {/* Missing Concepts - Professional Tier Feature */}
-                  {ACCESS_TIERS[accessLevel].writerMode &&
-                    selectedDomain &&
-                    CONCEPT_LIBRARIES[selectedDomain] && (
-                      <div style={{ marginTop: "24px" }}>
-                        <MissingConceptSuggestions
-                          domain={
-                            getAvailableDomains().find(
-                              (d) => d.id === selectedDomain
-                            )?.label || selectedDomain
-                          }
-                          libraryConcepts={
-                            CONCEPT_LIBRARIES[selectedDomain]?.concepts || []
-                          }
-                          identifiedConcepts={
-                            analysis.conceptGraph?.concepts || []
-                          }
-                          chapterText={chapterText}
-                          onAcceptSuggestion={handleAcceptMissingConcept}
-                        />
+                      {/* Recommendations */}
+                      <div>
+                        <h4
+                          style={{
+                            fontSize: "14px",
+                            fontWeight: "600",
+                            marginBottom: "12px",
+                            color: "#6b7280",
+                          }}
+                        >
+                          Top Recommendations
+                        </h4>
+                        {analysis.recommendations
+                          ?.slice(0, 8)
+                          .map((rec: any) => (
+                            <div
+                              key={rec.id}
+                              style={{
+                                marginBottom: "12px",
+                                padding: "12px",
+                                backgroundColor: "#fff",
+                                border: `2px solid ${
+                                  rec.priority === "high"
+                                    ? "#ef4444"
+                                    : rec.priority === "medium"
+                                    ? "#f59e0b"
+                                    : "#d1d5db"
+                                }`,
+                                borderRadius: "8px",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "start",
+                                  gap: "8px",
+                                  marginBottom: "6px",
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    fontSize: "10px",
+                                    fontWeight: "600",
+                                    padding: "2px 6px",
+                                    borderRadius: "4px",
+                                    backgroundColor:
+                                      rec.priority === "high"
+                                        ? "#fee2e2"
+                                        : rec.priority === "medium"
+                                        ? "#fef3c7"
+                                        : "#f3f4f6",
+                                    color:
+                                      rec.priority === "high"
+                                        ? "#991b1b"
+                                        : rec.priority === "medium"
+                                        ? "#92400e"
+                                        : "#6b7280",
+                                    textTransform: "uppercase",
+                                  }}
+                                >
+                                  {rec.priority}
+                                </span>
+                                <h5
+                                  style={{
+                                    margin: 0,
+                                    fontSize: "13px",
+                                    fontWeight: "600",
+                                    flex: 1,
+                                  }}
+                                >
+                                  {rec.title}
+                                </h5>
+                              </div>
+                              <p
+                                style={{
+                                  margin: "0",
+                                  fontSize: "12px",
+                                  color: "#6b7280",
+                                  lineHeight: "1.5",
+                                }}
+                              >
+                                {rec.description}
+                              </p>
+                            </div>
+                          ))}
                       </div>
-                    )}
+
+                      {/* Missing Concepts - Professional Tier Feature */}
+                      {ACCESS_TIERS[accessLevel].writerMode &&
+                        selectedDomain &&
+                        CONCEPT_LIBRARIES[selectedDomain] && (
+                          <div style={{ marginTop: "24px" }}>
+                            <MissingConceptSuggestions
+                              domain={
+                                getAvailableDomains().find(
+                                  (d) => d.id === selectedDomain
+                                )?.label || selectedDomain
+                              }
+                              libraryConcepts={
+                                CONCEPT_LIBRARIES[selectedDomain]?.concepts ||
+                                []
+                              }
+                              identifiedConcepts={
+                                analysis.conceptGraph?.concepts || []
+                              }
+                              chapterText={chapterText}
+                              onAcceptSuggestion={handleAcceptMissingConcept}
+                            />
+                          </div>
+                        )}
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
+            </>
           )}
         </div>
       </div>

@@ -35,8 +35,11 @@ type HighlightSegment = {
   highlighted: boolean;
 };
 
-type SpacingSummary = {
+type ParagraphSummary = {
   id: number;
+  text: string;
+  startIndex: number;
+  endIndex: number;
   charCount: number;
   wordCount: number;
 };
@@ -60,11 +63,11 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   initialText,
   htmlContent = null,
   searchText,
+  searchWord,
   onTextChange,
   showSpacingIndicators = false,
   showVisualSuggestions = false,
   highlightPosition,
-  searchWord,
   searchOccurrence,
   onSave,
   readOnly = false,
@@ -75,7 +78,6 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     VisualSuggestion[]
   >([]);
   const [showBackToTop, setShowBackToTop] = useState(false);
-
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const highlightRef = useRef<HTMLSpanElement>(null);
 
@@ -94,7 +96,6 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       }),
     [text, searchText, searchWord, searchOccurrence, highlightPosition]
   );
-
   useEffect(() => {
     if (!showVisualSuggestions) {
       setVisualSuggestions([]);
@@ -138,15 +139,14 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     }
   }, [highlightRange, readOnly]);
 
-  const segments = useMemo(
-    () => buildHighlightSegments(text, highlightRange),
-    [text, highlightRange]
-  );
+  const paragraphs = useMemo(() => extractParagraphs(text), [text]);
 
-  const spacingSummaries = useMemo(
-    () => (showSpacingIndicators ? summarizeParagraphSpacing(text) : []),
-    [text, showSpacingIndicators]
-  );
+  const suggestionsByParagraph = useMemo(() => {
+    if (!showVisualSuggestions) {
+      return new Map<number, VisualSuggestion[]>();
+    }
+    return buildParagraphSuggestionMap(paragraphs, visualSuggestions);
+  }, [paragraphs, visualSuggestions, showVisualSuggestions]);
 
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const value = event.target.value;
@@ -162,10 +162,6 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     onBackToTop?.();
     setShowBackToTop(false);
   };
-
-  const hasSidePanel =
-    (showSpacingIndicators && spacingSummaries.length > 0) ||
-    (showVisualSuggestions && visualSuggestions.length > 0);
 
   return (
     <div
@@ -201,6 +197,13 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
         </div>
       </div>
 
+      {(showSpacingIndicators || showVisualSuggestions) && (
+        <GuidanceLegend
+          showSpacing={showSpacingIndicators}
+          showVisual={showVisualSuggestions}
+        />
+      )}
+
       <div
         style={{
           display: "flex",
@@ -211,56 +214,31 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       >
         <div
           style={{
-            flex: hasSidePanel ? 2 : 1,
+            flex: 1,
             minHeight: 0,
             display: "flex",
             flexDirection: "column",
+            gap: "16px",
           }}
         >
           {readOnly ? (
-            <div
-              style={{
-                flex: 1,
-                overflowY: "auto",
-                padding: "16px",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-                whiteSpace: "pre-wrap",
-                lineHeight: 1.5,
-                fontSize: "15px",
-                backgroundColor: "white",
-              }}
-            >
-              {segments.map((segment, index) => {
-                if (segment.highlighted) {
-                  return (
-                    <mark
-                      key={index}
-                      ref={highlightRef}
-                      style={HIGHLIGHT_STYLE}
-                    >
-                      {segment.text}
-                    </mark>
-                  );
-                }
-                return <span key={index}>{segment.text}</span>;
-              })}
-            </div>
+            <ReadOnlyView
+              paragraphs={paragraphs}
+              highlightRange={highlightRange}
+              highlightRef={highlightRef}
+              showSpacingIndicators={showSpacingIndicators}
+              showVisualSuggestions={showVisualSuggestions}
+              suggestionsByParagraph={suggestionsByParagraph}
+            />
           ) : (
-            <textarea
-              ref={textareaRef}
-              value={text}
+            <EditableView
+              textareaRef={textareaRef}
+              text={text}
               onChange={handleChange}
-              style={{
-                flex: 1,
-                resize: "none",
-                padding: "16px",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-                fontFamily: "inherit",
-                fontSize: "15px",
-                lineHeight: 1.5,
-              }}
+              showSpacingIndicators={showSpacingIndicators}
+              showVisualSuggestions={showVisualSuggestions}
+              paragraphs={paragraphs}
+              visualSuggestions={visualSuggestions}
             />
           )}
 
@@ -276,77 +254,549 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
             </details>
           )}
         </div>
+      </div>
+    </div>
+  );
+};
 
-        {hasSidePanel && (
-          <aside
+type GuidanceLegendProps = {
+  showSpacing: boolean;
+  showVisual: boolean;
+};
+
+const GuidanceLegend: React.FC<GuidanceLegendProps> = ({
+  showSpacing,
+  showVisual,
+}) => {
+  return (
+    <div
+      style={{
+        ...PANEL_STYLE,
+        marginTop: 0,
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+      }}
+    >
+      {showSpacing && (
+        <div>
+          <div
             style={{
-              flex: 1,
-              minWidth: "260px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "16px",
-              overflowY: "auto",
+              fontWeight: 600,
+              fontSize: "13px",
+              color: "#1d4ed8",
             }}
           >
-            {showSpacingIndicators && spacingSummaries.length > 0 && (
-              <section style={PANEL_STYLE}>
-                <h3 style={{ margin: "0 0 8px 0", fontSize: "14px" }}>
-                  Paragraph spacing overview
-                </h3>
-                <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                  {spacingSummaries.map((summary) => (
-                    <li key={summary.id} style={{ marginBottom: "6px" }}>
-                      <span style={{ fontWeight: 600 }}>
-                        Paragraph {summary.id + 1}
-                      </span>
-                      <span style={{ color: "#6b7280", marginLeft: "6px" }}>
-                        {summary.wordCount} words / {summary.charCount} chars
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
+            Spacing targets
+          </div>
+          <div
+            style={{
+              marginTop: "4px",
+              fontSize: "12px",
+              color: "#374151",
+              lineHeight: 1.5,
+            }}
+          >
+            Dashed lines show where each new paragraph begins. Aim for 60-160
+            words between targets—amber badges ask you to split long paragraphs,
+            while green badges suggest adding detail if the point feels rushed.
+          </div>
+        </div>
+      )}
 
-            {showVisualSuggestions && visualSuggestions.length > 0 && (
-              <section style={PANEL_STYLE}>
-                <h3 style={{ margin: "0 0 8px 0", fontSize: "14px" }}>
-                  Visual suggestions
-                </h3>
-                <ul
-                  style={{ listStyle: "disc", paddingLeft: "18px", margin: 0 }}
+      {showVisual && (
+        <div>
+          <div
+            style={{
+              fontWeight: 600,
+              fontSize: "13px",
+              color: "#b45309",
+            }}
+          >
+            Dual-coding callouts
+          </div>
+          <div
+            style={{
+              marginTop: "4px",
+              fontSize: "12px",
+              color: "#4b5563",
+              lineHeight: 1.5,
+            }}
+          >
+            Gold markers highlight high-impact visuals to add. Check the preview
+            panel below for the reason and follow the suggested action to
+            reinforce the concept.
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+type ReadOnlyViewProps = {
+  paragraphs: ParagraphSummary[];
+  highlightRange: HighlightRange | null;
+  highlightRef: React.RefObject<HTMLSpanElement>;
+  showSpacingIndicators: boolean;
+  showVisualSuggestions: boolean;
+  suggestionsByParagraph: Map<number, VisualSuggestion[]>;
+};
+
+const ReadOnlyView: React.FC<ReadOnlyViewProps> = ({
+  paragraphs,
+  highlightRange,
+  highlightRef,
+  showSpacingIndicators,
+  showVisualSuggestions,
+  suggestionsByParagraph,
+}) => {
+  let highlightAnchorAssigned = false;
+
+  return (
+    <div
+      style={{
+        flex: 1,
+        overflowY: "auto",
+        padding: "16px",
+        border: "1px solid #e5e7eb",
+        borderRadius: "8px",
+        backgroundColor: "white",
+        lineHeight: 1.6,
+        fontSize: "15px",
+      }}
+    >
+      {paragraphs.length === 0 ? (
+        <span style={{ color: "#9ca3af" }}>
+          Start writing to see spacing guidance and dual-coding suggestions.
+        </span>
+      ) : (
+        paragraphs.map((paragraph, index) => {
+          const callouts = suggestionsByParagraph.get(paragraph.id) || [];
+          const segments = buildParagraphHighlightSegments(
+            paragraph,
+            highlightRange
+          );
+          const spacingInfo = analyzeParagraphSpacing(paragraph.wordCount);
+          const spacingBadgeStyle = getSpacingBadgeStyle(spacingInfo.tone);
+
+          return (
+            <div
+              key={paragraph.id}
+              style={{
+                padding: "12px 0",
+                borderTop:
+                  index === 0 ? "none" : "1px dashed rgba(59,130,246,0.45)",
+                position: "relative",
+              }}
+            >
+              {index > 0 && showSpacingIndicators && (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "-10px",
+                    left: 0,
+                    fontSize: "11px",
+                    color: "#1d4ed8",
+                    backgroundColor: "rgba(219,234,254,0.9)",
+                    padding: "2px 8px",
+                    borderRadius: "999px",
+                    fontWeight: 600,
+                    boxShadow: "0 1px 2px rgba(17, 24, 39, 0.08)",
+                    ...spacingBadgeStyle,
+                  }}
+                  title={spacingInfo.message}
                 >
-                  {visualSuggestions.map((suggestion, index) => (
-                    <li
-                      key={`${suggestion.position}-${index}`}
-                      style={{ marginBottom: "8px" }}
+                  Spacing target · Paragraph {paragraph.id + 1}
+                  <span style={{ color: "#2563eb", fontWeight: 500 }}>
+                    {` · ${paragraph.wordCount} words · ${spacingInfo.shortLabel}`}
+                  </span>
+                </span>
+              )}
+
+              <div style={{ whiteSpace: "pre-wrap" }}>
+                {segments.map((segment, segmentIndex) => {
+                  if (!segment.text.length) {
+                    return null;
+                  }
+
+                  if (segment.highlighted) {
+                    const ref = !highlightAnchorAssigned
+                      ? highlightRef
+                      : undefined;
+                    if (!highlightAnchorAssigned) {
+                      highlightAnchorAssigned = true;
+                    }
+                    return (
+                      <mark
+                        key={`${paragraph.id}-segment-${segmentIndex}`}
+                        ref={ref}
+                        style={HIGHLIGHT_STYLE}
+                      >
+                        {segment.text}
+                      </mark>
+                    );
+                  }
+
+                  return (
+                    <span key={`${paragraph.id}-segment-${segmentIndex}`}>
+                      {segment.text}
+                    </span>
+                  );
+                })}
+              </div>
+
+              {showVisualSuggestions && callouts.length > 0 && (
+                <div
+                  style={{
+                    marginTop: "10px",
+                    borderLeft: "4px solid #facc15",
+                    backgroundColor: "#fefce8",
+                    padding: "10px 12px",
+                    borderRadius: "8px",
+                    color: "#78350f",
+                    boxShadow: "0 2px 4px rgba(31, 41, 55, 0.08)",
+                  }}
+                >
+                  {callouts.map((suggestion, suggestionIndex) => (
+                    <div
+                      key={`${suggestion.position}-${suggestionIndex}`}
+                      style={{
+                        marginBottom:
+                          suggestionIndex === callouts.length - 1 ? 0 : "10px",
+                      }}
                     >
-                      <div style={{ fontWeight: 600 }}>
+                      <div style={{ fontWeight: 600, fontSize: "13px" }}>
+                        {getVisualIcon(suggestion.visualType)}{" "}
                         {formatVisualSuggestionTitle(suggestion)}
                       </div>
-                      <div style={{ color: "#4b5563", fontSize: "13px" }}>
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          color: "#92400e",
+                          marginTop: "4px",
+                        }}
+                      >
                         {suggestion.reason}
                       </div>
                       <div
                         style={{
-                          color: "#6b7280",
                           fontSize: "12px",
+                          color: "#6b7280",
                           marginTop: "4px",
                         }}
                       >
                         {suggestion.paragraph}
                       </div>
-                    </li>
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          color: "#c2410c",
+                          marginTop: "6px",
+                          fontWeight: 500,
+                        }}
+                      >
+                        Suggested action: {formatVisualAction(suggestion)}
+                      </div>
+                    </div>
                   ))}
-                </ul>
-              </section>
-            )}
-          </aside>
-        )}
-      </div>
+                </div>
+              )}
+            </div>
+          );
+        })
+      )}
     </div>
   );
 };
+
+type EditableViewProps = {
+  textareaRef: React.RefObject<HTMLTextAreaElement>;
+  text: string;
+  onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void;
+  showSpacingIndicators: boolean;
+  showVisualSuggestions: boolean;
+  paragraphs: ParagraphSummary[];
+  visualSuggestions: VisualSuggestion[];
+};
+
+const EditableView: React.FC<EditableViewProps> = ({
+  textareaRef,
+  text,
+  onChange,
+  showSpacingIndicators,
+  showVisualSuggestions,
+  paragraphs,
+  visualSuggestions,
+}) => {
+  const textLength = Math.max(text.length, 1);
+
+  return (
+    <div style={{ position: "relative", flex: 1 }}>
+      <textarea
+        ref={textareaRef}
+        value={text}
+        onChange={onChange}
+        style={{
+          flex: 1,
+          resize: "none",
+          padding: "16px",
+          border: "1px solid #e5e7eb",
+          borderRadius: "8px",
+          fontFamily: "inherit",
+          fontSize: "15px",
+          lineHeight: 1.5,
+          width: "100%",
+          height: "100%",
+        }}
+      />
+
+      {showSpacingIndicators && paragraphs.length > 1 && (
+        <SpacingOverlay paragraphs={paragraphs} textLength={textLength} />
+      )}
+
+      {showVisualSuggestions && visualSuggestions.length > 0 && (
+        <VisualOverlay
+          suggestions={visualSuggestions}
+          textLength={textLength}
+        />
+      )}
+    </div>
+  );
+};
+
+function buildParagraphSuggestionMap(
+  paragraphs: ParagraphSummary[],
+  suggestions: VisualSuggestion[]
+): Map<number, VisualSuggestion[]> {
+  const map = new Map<number, VisualSuggestion[]>();
+
+  if (!paragraphs.length || !suggestions.length) {
+    return map;
+  }
+
+  suggestions.forEach((suggestion) => {
+    const target =
+      paragraphs.find(
+        (paragraph) =>
+          suggestion.position >= paragraph.startIndex &&
+          suggestion.position <= paragraph.endIndex
+      ) || paragraphs[paragraphs.length - 1];
+
+    if (!target) {
+      return;
+    }
+
+    const current = map.get(target.id) || [];
+    current.push(suggestion);
+    map.set(target.id, current);
+  });
+
+  return map;
+}
+
+type SpacingOverlayProps = {
+  paragraphs: ParagraphSummary[];
+  textLength: number;
+};
+
+const SpacingOverlay: React.FC<SpacingOverlayProps> = ({
+  paragraphs,
+  textLength,
+}) => {
+  if (textLength === 0 || paragraphs.length <= 1) {
+    return null;
+  }
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: "16px",
+        pointerEvents: "none",
+        zIndex: 2,
+      }}
+    >
+      {paragraphs.slice(1).map((paragraph) => {
+        const topPercent = clamp(
+          (paragraph.startIndex / textLength) * 100,
+          4,
+          96
+        );
+        const spacingInfo = analyzeParagraphSpacing(paragraph.wordCount);
+        const spacingBadgeStyle = getSpacingBadgeStyle(spacingInfo.tone);
+
+        return (
+          <div
+            key={`spacing-line-${paragraph.id}`}
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: `${topPercent}%`,
+            }}
+          >
+            <div
+              style={{
+                borderTop: "1px dashed rgba(59,130,246,0.45)",
+                position: "relative",
+              }}
+            >
+              <span
+                style={{
+                  position: "absolute",
+                  top: "-9px",
+                  left: 0,
+                  fontSize: "10px",
+                  fontWeight: 600,
+                  color: "#1d4ed8",
+                  backgroundColor: "rgba(191,219,254,0.9)",
+                  padding: "2px 6px",
+                  borderRadius: "999px",
+                  ...spacingBadgeStyle,
+                }}
+                title={spacingInfo.message}
+              >
+                Spacing target · P{paragraph.id + 1}
+                {` · ${paragraph.wordCount} words · ${spacingInfo.shortLabel}`}
+              </span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+type VisualOverlayProps = {
+  suggestions: VisualSuggestion[];
+  textLength: number;
+};
+
+const VisualOverlay: React.FC<VisualOverlayProps> = ({
+  suggestions,
+  textLength,
+}) => {
+  if (!suggestions.length || textLength === 0) {
+    return null;
+  }
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: "16px",
+        pointerEvents: "none",
+        zIndex: 3,
+      }}
+    >
+      {suggestions.map((suggestion, index) => {
+        const topPercent = clamp(
+          (suggestion.position / textLength) * 100,
+          5,
+          95
+        );
+        const actionText = formatVisualAction(suggestion);
+
+        return (
+          <div
+            key={`${suggestion.position}-${index}`}
+            style={{
+              position: "absolute",
+              right: "-12px",
+              top: `${topPercent}%`,
+              transform: "translateY(-50%)",
+              maxWidth: "200px",
+              pointerEvents: "auto",
+            }}
+            onMouseDown={(event) => event.preventDefault()}
+          >
+            <div
+              style={{
+                backgroundColor: "rgba(250,204,21,0.92)",
+                color: "#78350f",
+                padding: "6px 10px",
+                borderRadius: "12px",
+                fontSize: "11px",
+                fontWeight: 600,
+                boxShadow: "0 2px 8px rgba(17, 24, 39, 0.18)",
+                cursor: "help",
+              }}
+              title={`${formatVisualSuggestionTitle(
+                suggestion
+              )} - ${actionText}`}
+            >
+              {getVisualIcon(suggestion.visualType)}{" "}
+              {formatVisualSuggestionTitle(suggestion)}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+function buildParagraphHighlightSegments(
+  paragraph: ParagraphSummary,
+  highlightRange: HighlightRange | null
+): HighlightSegment[] {
+  if (!highlightRange) {
+    return [{ text: paragraph.text, highlighted: false }];
+  }
+
+  const rangeStart = highlightRange.start;
+  const rangeEnd = highlightRange.start + highlightRange.length;
+  const paragraphStart = paragraph.startIndex;
+  const paragraphEnd = paragraph.endIndex;
+
+  const overlaps = rangeStart < paragraphEnd && rangeEnd > paragraphStart;
+
+  if (!overlaps) {
+    return [{ text: paragraph.text, highlighted: false }];
+  }
+
+  const relativeStart = Math.max(0, rangeStart - paragraphStart);
+  const relativeEnd = Math.min(
+    paragraph.text.length,
+    rangeEnd - paragraphStart
+  );
+
+  const before = paragraph.text.slice(0, relativeStart);
+  const target = paragraph.text.slice(relativeStart, relativeEnd);
+  const after = paragraph.text.slice(relativeEnd);
+
+  const results: HighlightSegment[] = [];
+  if (before.length) {
+    results.push({ text: before, highlighted: false });
+  }
+  if (target.length) {
+    results.push({ text: target, highlighted: true });
+  }
+  if (after.length) {
+    results.push({ text: after, highlighted: false });
+  }
+
+  if (results.length === 0) {
+    results.push({ text: paragraph.text, highlighted: false });
+  }
+
+  return results;
+}
+
+const VISUAL_TYPE_ICON: Record<string, string> = {
+  diagram: "📊",
+  flowchart: "🧭",
+  graph: "📈",
+  illustration: "🎨",
+  "concept-map": "🧠",
+};
+
+function getVisualIcon(type: string): string {
+  return VISUAL_TYPE_ICON[type] || "✨";
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, value));
+}
 
 function computeHighlightRange({
   text,
@@ -428,56 +878,46 @@ function determineMatchLength(
   return Math.max(searchWord.length, 1);
 }
 
-function buildHighlightSegments(
-  text: string,
-  range: HighlightRange | null
-): HighlightSegment[] {
-  if (!range) {
-    return [{ text, highlighted: false }];
-  }
-
-  const start = Math.max(0, Math.min(range.start, text.length));
-  const end = Math.max(start, Math.min(start + range.length, text.length));
-
-  const before = text.slice(0, start);
-  const target = text.slice(start, end);
-  const after = text.slice(end);
-
-  const segments: HighlightSegment[] = [];
-  if (before.length > 0) {
-    segments.push({ text: before, highlighted: false });
-  }
-  if (target.length > 0) {
-    segments.push({ text: target, highlighted: true });
-  }
-  if (after.length > 0) {
-    segments.push({ text: after, highlighted: false });
-  }
-
-  if (segments.length === 0) {
-    return [{ text, highlighted: false }];
-  }
-
-  return segments;
-}
-
-function summarizeParagraphSpacing(text: string): SpacingSummary[] {
+function extractParagraphs(text: string): ParagraphSummary[] {
   const normalized = text.replace(/\r\n/g, "\n");
-  const rawParagraphs = normalized.split(/\n\s*\n+/);
+  if (!normalized.trim().length) {
+    return [];
+  }
 
-  const summaries: SpacingSummary[] = [];
+  const rawParagraphs = normalized.split(/\n\s*\n+/);
+  const summaries: ParagraphSummary[] = [];
+  let searchIndex = 0;
 
   rawParagraphs.forEach((raw) => {
     const trimmed = raw.trim();
     if (!trimmed.length) {
+      searchIndex += raw.length;
       return;
     }
 
+    const start = normalized.indexOf(trimmed, searchIndex);
+    if (start === -1) {
+      return;
+    }
+
+    const end = start + trimmed.length;
+
     summaries.push({
       id: summaries.length,
+      text: trimmed,
+      startIndex: start,
+      endIndex: end,
       charCount: trimmed.length,
       wordCount: countWords(trimmed),
     });
+
+    searchIndex = end;
+    while (
+      searchIndex < normalized.length &&
+      /\s/.test(normalized.charAt(searchIndex))
+    ) {
+      searchIndex += 1;
+    }
   });
 
   return summaries;
@@ -486,6 +926,80 @@ function summarizeParagraphSpacing(text: string): SpacingSummary[] {
 function countWords(text: string): number {
   const matches = text.match(/[A-Za-z0-9']+/g);
   return matches ? matches.length : 0;
+}
+
+type SpacingTone = "compact" | "balanced" | "extended";
+
+type SpacingAnalysis = {
+  tone: SpacingTone;
+  shortLabel: string;
+  message: string;
+};
+
+function analyzeParagraphSpacing(wordCount: number): SpacingAnalysis {
+  if (wordCount < 60) {
+    return {
+      tone: "compact",
+      shortLabel: "Expand detail",
+      message:
+        "This paragraph is compact—consider adding examples or explanation if the idea feels rushed.",
+    };
+  }
+
+  if (wordCount > 160) {
+    return {
+      tone: "extended",
+      shortLabel: "Consider splitting",
+      message:
+        "This paragraph is long—split it or add a subheading so readers can process the concept in steps.",
+    };
+  }
+
+  return {
+    tone: "balanced",
+    shortLabel: "On target",
+    message: "This paragraph sits in the target range—keep the current pacing.",
+  };
+}
+
+function getSpacingBadgeStyle(tone: SpacingTone): React.CSSProperties {
+  switch (tone) {
+    case "compact":
+      return {
+        color: "#065f46",
+        backgroundColor: "rgba(209,250,229,0.95)",
+        border: "1px solid rgba(16,185,129,0.25)",
+      };
+    case "extended":
+      return {
+        color: "#92400e",
+        backgroundColor: "rgba(254,243,199,0.95)",
+        border: "1px solid rgba(217,119,6,0.25)",
+      };
+    default:
+      return {
+        color: "#1d4ed8",
+        backgroundColor: "rgba(219,234,254,0.9)",
+        border: "1px solid rgba(59,130,246,0.2)",
+      };
+  }
+}
+
+function formatVisualAction(suggestion: VisualSuggestion): string {
+  switch (suggestion.visualType) {
+    case "diagram":
+      return "Create a diagram that maps the structure or spatial relationships described.";
+    case "flowchart":
+      return "Lay out the steps as a flowchart so learners can follow the process visually.";
+    case "graph":
+      return "Plot the data in a graph to expose the comparison or trend you mention.";
+    case "concept-map":
+      return "Draft a concept map linking the key ideas to show how they interrelate.";
+    case "illustration":
+      return "Provide a labeled illustration to anchor the dense terminology in a visual reference.";
+    default:
+      return "Add the recommended visual aid to reinforce this explanation.";
+  }
 }
 
 function formatVisualSuggestionTitle(suggestion: VisualSuggestion): string {
