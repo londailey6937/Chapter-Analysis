@@ -301,6 +301,11 @@ const GuidanceLegend: React.FC<GuidanceLegendProps> = ({
             Dashed lines show where each new paragraph begins. Aim for 60-160
             words between targets—amber badges ask you to split long paragraphs,
             while green badges suggest adding detail if the point feels rushed.
+            <br />
+            <em style={{ fontSize: "11px", color: "#6b7280" }}>
+              Note: Indicators appear inline in read-only mode for accurate
+              positioning.
+            </em>
           </div>
         </div>
       )}
@@ -327,6 +332,11 @@ const GuidanceLegend: React.FC<GuidanceLegendProps> = ({
             Gold markers highlight high-impact visuals to add. Check the preview
             panel below for the reason and follow the suggested action to
             reinforce the concept.
+            <br />
+            <em style={{ fontSize: "11px", color: "#6b7280" }}>
+              Note: Callouts appear inline in read-only mode for accurate
+              positioning.
+            </em>
           </div>
         </div>
       )}
@@ -550,17 +560,6 @@ const EditableView: React.FC<EditableViewProps> = ({
           height: "100%",
         }}
       />
-
-      {showSpacingIndicators && paragraphs.length > 1 && (
-        <SpacingOverlay paragraphs={paragraphs} textLength={textLength} />
-      )}
-
-      {showVisualSuggestions && visualSuggestions.length > 0 && (
-        <VisualOverlay
-          suggestions={visualSuggestions}
-          textLength={textLength}
-        />
-      )}
     </div>
   );
 };
