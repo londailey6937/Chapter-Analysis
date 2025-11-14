@@ -85,6 +85,11 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
         console.log(
           `✅ DOCX extracted: ${plainText.length} characters, ${imageCount} image(s)`
         );
+        if (imageCount > 0) {
+          console.log("📸 HTML content includes images (base64 encoded)");
+          // Log first 500 chars of HTML to verify images are embedded
+          console.log("HTML preview:", rawHtml.substring(0, 500));
+        }
         onDocumentLoad(payload);
       } else if (fileType === "obt") {
         const textContent = await file.text();
