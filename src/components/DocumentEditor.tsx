@@ -80,6 +80,9 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     VisualSuggestion[]
   >([]);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [editorWordCount, setEditorWordCount] = useState(() =>
+    countWords(initialText)
+  );
   const editorRef = useRef<HTMLDivElement>(null);
   const highlightRef = useRef<HTMLSpanElement>(null);
   const isEditing = !readOnly;
@@ -95,6 +98,10 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       editorRef.current.innerHTML = initialHtmlRef.current;
     }
   }, []);
+
+  useEffect(() => {
+    setEditorWordCount(countWords(initialText));
+  }, [initialText]);
 
   useEffect(() => {
     if (isEditing && editorRef.current) {
@@ -188,8 +195,8 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   const syncEditorState = () => {
     const currentHtml = editorRef.current?.innerHTML ?? "";
     const plain = htmlToPlainText(currentHtml);
-    setText(plain);
     initialHtmlRef.current = currentHtml;
+    setEditorWordCount(countWords(plain));
     skipNextPropSyncRef.current = true;
     if (onContentChange) {
       onContentChange({ plainText: plain, html: currentHtml });

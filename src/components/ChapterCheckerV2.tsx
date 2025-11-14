@@ -41,6 +41,7 @@ export const ChapterCheckerV2: React.FC = () => {
   const [chapterData, setChapterData] = useState<{
     html: string;
     plainText: string;
+    originalPlainText: string;
     isHybridDocx: boolean;
     imageCount: number;
     editorHtml?: string;
@@ -231,8 +232,10 @@ export const ChapterCheckerV2: React.FC = () => {
     setChapterData({
       html: hasHtmlContent ? content : normalizedPlainText,
       plainText: normalizedPlainText,
+      originalPlainText: normalizedPlainText,
       isHybridDocx: hasHtmlContent,
       imageCount,
+      editorHtml: hasHtmlContent ? content : undefined,
     });
 
     const detected = detectDomain(normalizedPlainText);
@@ -245,18 +248,19 @@ export const ChapterCheckerV2: React.FC = () => {
     setChapterData((prev) =>
       prev
         ? {
-            html: newText,
+            ...prev,
             plainText: newText,
+            editorHtml: undefined,
             isHybridDocx: false,
-            imageCount: 0,
-            editorHtml: newText,
+            html: prev.html ?? newText,
           }
         : {
             html: newText,
             plainText: newText,
+            originalPlainText: newText,
             isHybridDocx: false,
             imageCount: 0,
-            editorHtml: newText,
+            editorHtml: undefined,
           }
     );
   };
@@ -276,6 +280,7 @@ export const ChapterCheckerV2: React.FC = () => {
         : {
             html: content.html,
             plainText: content.plainText,
+            originalPlainText: content.plainText,
             isHybridDocx: true,
             imageCount: 0,
             editorHtml: content.html,
@@ -935,7 +940,9 @@ export const ChapterCheckerV2: React.FC = () => {
           {chapterData ? (
             <DocumentEditor
               key={fileName} // Force new component instance when file changes
-              initialText={chapterData.plainText}
+              initialText={
+                chapterData.originalPlainText ?? chapterData.plainText
+              }
               htmlContent={
                 chapterData.editorHtml
                   ? chapterData.editorHtml
@@ -943,7 +950,9 @@ export const ChapterCheckerV2: React.FC = () => {
                   ? chapterData.html
                   : null
               }
-              searchText={chapterData.plainText}
+              searchText={
+                chapterData.originalPlainText ?? chapterData.plainText
+              }
               onTextChange={(text) => {
                 if (viewMode === "writer" && !tierFeatures.writerMode) {
                   setUpgradeFeature("Writer Mode");
