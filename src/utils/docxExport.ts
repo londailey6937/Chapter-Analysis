@@ -6,9 +6,21 @@ import {
   AlignmentType,
   UnderlineType,
   ImageRun,
+  ShadingType,
 } from "docx";
 import { saveAs } from "file-saver";
-import { ChapterAnalysis, Recommendation } from "@/types";
+import { ChapterAnalysis, PrincipleEvaluation, Recommendation } from "@/types";
+import {
+  analyzeParagraphSpacing,
+  extractParagraphs,
+  ParagraphSpacingAssessment,
+  ParagraphSummary,
+  SpacingTone,
+} from "@/utils/spacingInsights";
+import {
+  DualCodingAnalyzer,
+  VisualSuggestion,
+} from "@/utils/dualCodingAnalyzer";
 
 interface ExportDocxOptions {
   text: string;
@@ -52,7 +64,9 @@ export const exportToDocx = async ({
       new Paragraph({
         children: [
           new TextRun({
-            text: sanitizeText(`Overall Score: ${analysis.overallScore}/100`),
+            text: sanitizeText(
+              `Overall Score: ${Math.round(analysis.overallScore)}/100`
+            ),
             bold: true,
             size: 24,
           }),
@@ -64,6 +78,12 @@ export const exportToDocx = async ({
     // Add Spacing and Dual Coding principle details
     const principleScores = (analysis as any).principleScores || [];
     const principles = analysis.principles || [];
+    const spacingEvaluation = principles.find(
+      (p) => p.principle === "spacedRepetition"
+    );
+    const dualCodingEvaluation = principles.find(
+      (p) => p.principle === "dualCoding"
+    );
 
     const spacingPrinciple =
       principleScores.find(
@@ -156,6 +176,16 @@ export const exportToDocx = async ({
           }
         });
       }
+
+      addContextSection(
+        paragraphs,
+        "Spacing context from original text",
+        collectFindingContexts(spacingEvaluation),
+        {
+          fill: "DBEAFE",
+          accent: "1D4ED8",
+        }
+      );
     }
 
     if (dualCodingPrinciple) {
@@ -236,6 +266,16 @@ export const exportToDocx = async ({
           }
         });
       }
+
+      addContextSection(
+        paragraphs,
+        "Dual-coding context from original text",
+        collectFindingContexts(dualCodingEvaluation),
+        {
+          fill: "FEF9C3",
+          accent: "92400E",
+        }
+      );
     }
 
     // Add high-priority recommendations
@@ -284,9 +324,20 @@ export const exportToDocx = async ({
     );
   }
 
-  const contentParagraphs = html?.trim()
-    ? await convertHtmlToParagraphs(html.trim())
-    : buildPlainTextParagraphs(text, includeHighlights);
+  const trimmedText = text?.trim() ?? "";
+  let contentParagraphs: Paragraph[] = [];
+
+  if (includeHighlights && trimmedText) {
+    contentParagraphs = await buildDocumentViewParagraphs({
+      text: trimmedText,
+      html: html?.trim() ?? null,
+      includeSpacingOverlays: false,
+    });
+  } else if (html?.trim()) {
+    contentParagraphs = await convertHtmlToParagraphs(html.trim());
+  } else {
+    contentParagraphs = buildPlainTextParagraphs(trimmedText, false);
+  }
 
   paragraphs.push(...contentParagraphs);
 
@@ -308,6 +359,328 @@ export const exportToDocx = async ({
 
 // For importing Packager
 import { Packer as Packager } from "docx";
+
+type FindingContext = {
+  message: string;
+  evidence: string;
+};
+
+function collectFindingContexts(
+  evaluation?: PrincipleEvaluation | null
+): FindingContext[] {
+  if (!evaluation || !evaluation.findings?.length) {
+    return [];
+  }
+
+  return evaluation.findings
+    .map((finding) => {
+      const evidence = normalizeEvidence(finding.evidence);
+      if (!evidence) {
+        return null;
+      }
+
+      return {
+        message: finding.message || "Context",
+        evidence,
+      };
+    })
+    .filter(Boolean) as FindingContext[];
+}
+
+function normalizeEvidence(value: unknown): string {
+  if (typeof value === "string") {
+    return value.trim();
+  }
+  if (typeof value === "number") {
+    return value.toString();
+  }
+  if (Array.isArray(value)) {
+    return value.join(", ");
+  }
+  if (value && typeof value === "object") {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return "";
+    }
+  }
+  return "";
+}
+
+function addContextSection(
+  target: Paragraph[],
+  title: string,
+  contexts: FindingContext[],
+  options: { fill: string; accent: string }
+) {
+  if (!contexts.length) {
+    return;
+  }
+
+  target.push(
+    new Paragraph({
+      children: [
+        new TextRun({
+          text: sanitizeText(title),
+          bold: true,
+          color: options.accent,
+        }),
+      ],
+      shading: {
+        type: ShadingType.CLEAR,
+        fill: options.fill,
+        color: "auto",
+      },
+      spacing: { before: 160, after: 60 },
+    })
+  );
+
+  contexts.slice(0, 4).forEach((context) => {
+    target.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: sanitizeText(context.message),
+            bold: true,
+            color: options.accent,
+          }),
+        ],
+        spacing: { before: 40, after: 20 },
+      })
+    );
+
+    target.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: sanitizeText(context.evidence),
+            italics: true,
+            color: "111827",
+          }),
+        ],
+        shading: {
+          type: ShadingType.CLEAR,
+          fill: options.fill,
+          color: "auto",
+        },
+        spacing: { after: 100 },
+        indent: { left: 400 },
+      })
+    );
+  });
+}
+
+type DocumentViewOptions = {
+  text: string;
+  html?: string | null;
+  includeSpacingOverlays?: boolean;
+};
+
+async function buildDocumentViewParagraphs({
+  text,
+  html,
+  includeSpacingOverlays = false,
+}: DocumentViewOptions): Promise<Paragraph[]> {
+  const summaries = extractParagraphs(text);
+  if (!summaries.length) {
+    if (html?.trim()) {
+      return convertHtmlToParagraphs(html.trim());
+    }
+    return buildPlainTextParagraphs(text, false);
+  }
+
+  const visualSource = html?.trim()?.length ? html : text;
+  const visualSuggestions = visualSource
+    ? DualCodingAnalyzer.analyzeForVisuals(visualSource)
+    : [];
+  const suggestionMap = mapSuggestionsToParagraphs(
+    summaries,
+    visualSuggestions
+  );
+
+  const paragraphs: Paragraph[] = [];
+  summaries.forEach((summary) => {
+    if (includeSpacingOverlays) {
+      const spacingAssessment = analyzeParagraphSpacing(summary.wordCount);
+      paragraphs.push(
+        createSpacingIndicatorParagraph(summary, spacingAssessment)
+      );
+    }
+
+    paragraphs.push(createTextParagraph(summary.text));
+
+    const suggestions = suggestionMap.get(summary.id) || [];
+    suggestions.forEach((suggestion) => {
+      paragraphs.push(...buildDualCodingCalloutParagraphs(suggestion));
+    });
+  });
+
+  return paragraphs;
+}
+
+function mapSuggestionsToParagraphs(
+  paragraphs: ParagraphSummary[],
+  suggestions: VisualSuggestion[]
+): Map<number, VisualSuggestion[]> {
+  const map = new Map<number, VisualSuggestion[]>();
+  if (!paragraphs.length || !suggestions.length) {
+    return map;
+  }
+
+  suggestions.forEach((suggestion) => {
+    const target =
+      paragraphs.find(
+        (paragraph) =>
+          suggestion.position >= paragraph.startIndex &&
+          suggestion.position <= paragraph.endIndex
+      ) || paragraphs[paragraphs.length - 1];
+
+    if (!target) {
+      return;
+    }
+
+    const bucket = map.get(target.id) || [];
+    bucket.push(suggestion);
+    map.set(target.id, bucket);
+  });
+
+  return map;
+}
+
+type SpacingPalette = {
+  fill: string;
+  text: string;
+  accent: string;
+};
+
+function createSpacingIndicatorParagraph(
+  summary: ParagraphSummary,
+  assessment: ParagraphSpacingAssessment
+): Paragraph {
+  const palette = getSpacingPalette(assessment.tone);
+  return new Paragraph({
+    children: [
+      new TextRun({
+        text: `Spacing target · Paragraph ${summary.id + 1}`,
+        bold: true,
+        color: palette.text,
+        size: 20,
+      }),
+      new TextRun({
+        text: ` · ${summary.wordCount} words · ${assessment.shortLabel}`,
+        color: palette.text,
+        size: 20,
+      }),
+      new TextRun({ break: 1 }),
+      new TextRun({
+        text: assessment.message,
+        italics: true,
+        color: palette.accent,
+        size: 18,
+      }),
+    ],
+    shading: {
+      type: ShadingType.CLEAR,
+      fill: palette.fill,
+      color: "auto",
+    },
+    spacing: { before: 160, after: 100 },
+  });
+}
+
+function getSpacingPalette(tone: SpacingTone): SpacingPalette {
+  switch (tone) {
+    case "compact":
+      return { fill: "D1FAE5", text: "065F46", accent: "047857" };
+    case "extended":
+      return { fill: "FEF3C7", text: "92400E", accent: "B45309" };
+    default:
+      return { fill: "DBEAFE", text: "1D4ED8", accent: "2563EB" };
+  }
+}
+
+function buildDualCodingCalloutParagraphs(
+  suggestion: VisualSuggestion
+): Paragraph[] {
+  const fill = "FEF9C3";
+  const text = "92400E";
+  const accent = "B45309";
+
+  const header = new Paragraph({
+    children: [
+      new TextRun({
+        text: formatVisualSuggestionTitle(suggestion),
+        bold: true,
+        color: text,
+      }),
+      new TextRun({
+        text: ` · Priority: ${suggestion.priority.toUpperCase()}`,
+        color: accent,
+        italics: true,
+        size: 20,
+      }),
+    ],
+    shading: { type: ShadingType.CLEAR, fill, color: "auto" },
+    spacing: { before: 160, after: 60 },
+  });
+
+  const body = new Paragraph({
+    children: [
+      new TextRun({ text: suggestion.reason, color: text, size: 20 }),
+      new TextRun({ break: 1 }),
+      new TextRun({
+        text: suggestion.paragraph,
+        color: text,
+        size: 20,
+      }),
+      new TextRun({ break: 1 }),
+      new TextRun({
+        text: formatVisualActionDocx(suggestion),
+        italics: true,
+        color: accent,
+        size: 18,
+      }),
+    ],
+    shading: { type: ShadingType.CLEAR, fill, color: "auto" },
+    spacing: { after: 120 },
+  });
+
+  return [header, body];
+}
+
+function formatVisualSuggestionTitle(suggestion: VisualSuggestion): string {
+  const typeLabel = suggestion.visualType
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+  const priorityLabel =
+    suggestion.priority === "high"
+      ? "High priority"
+      : suggestion.priority === "medium"
+      ? "Medium priority"
+      : "Low priority";
+
+  return `${typeLabel} - ${priorityLabel}`;
+}
+
+function formatVisualActionDocx(suggestion: VisualSuggestion): string {
+  switch (suggestion.visualType) {
+    case "diagram":
+      return "Create a diagram that maps the structure or spatial relationships described.";
+    case "flowchart":
+      return "Lay out the steps as a flowchart so learners can follow the process visually.";
+    case "graph":
+      return "Plot the data in a graph to expose the comparison or trend you mention.";
+    case "concept-map":
+      return "Draft a concept map linking the key ideas to show how they interrelate.";
+    case "illustration":
+      return "Provide a labeled illustration to anchor the dense terminology in a visual reference.";
+    default:
+      return "Add the recommended visual aid to reinforce this explanation.";
+  }
+}
 
 function buildPlainTextParagraphs(
   text: string,
@@ -365,6 +738,48 @@ function buildPlainTextParagraphs(
   return results;
 }
 
+function createTextParagraph(text: string): Paragraph {
+  const safeText = sanitizeText(text);
+  if (!safeText) {
+    return new Paragraph({ text: "", spacing: { after: 200, line: 360 } });
+  }
+  return new Paragraph({
+    children: [
+      new TextRun({
+        text: safeText,
+        size: 24,
+      }),
+    ],
+    spacing: { after: 200, line: 360 },
+  });
+}
+
+type HeadingLevelValue = (typeof HeadingLevel)[keyof typeof HeadingLevel];
+type AlignmentTypeValue = (typeof AlignmentType)[keyof typeof AlignmentType];
+type UnderlineTypeValue = (typeof UnderlineType)[keyof typeof UnderlineType];
+
+type ParagraphBuildOptions = {
+  heading?: HeadingLevelValue;
+  spacing?: {
+    before?: number;
+    after?: number;
+    line?: number;
+  };
+  alignment?: AlignmentTypeValue;
+  indent?: { left?: number; hanging?: number };
+};
+
+type InlineStyleFlags = {
+  bold?: boolean;
+  italics?: boolean;
+  underline?: UnderlineTypeValue;
+  strike?: boolean;
+  color?: string;
+  font?: string;
+  superScript?: boolean;
+  subScript?: boolean;
+};
+
 async function convertHtmlToParagraphs(html: string): Promise<Paragraph[]> {
   if (typeof window === "undefined" || typeof DOMParser === "undefined") {
     return buildPlainTextParagraphs(html, false);
@@ -385,10 +800,21 @@ async function convertHtmlToParagraphs(html: string): Promise<Paragraph[]> {
     : buildPlainTextParagraphs(doc.body.textContent || "", false);
 }
 
-async function convertNodeToParagraphs(node: ChildNode): Promise<Paragraph[]> {
+async function convertNodeToParagraphs(
+  node: ChildNode,
+  inheritedStyle: InlineStyleFlags = {}
+): Promise<Paragraph[]> {
   if (node.nodeType === Node.TEXT_NODE) {
-    const text = collapseWhitespace(node.textContent || "");
-    return text ? [createTextParagraph(text)] : [];
+    const textRun = createTextRun(node.textContent || "", inheritedStyle);
+    if (!textRun) {
+      return [];
+    }
+    return [
+      new Paragraph({
+        children: [textRun],
+        spacing: { after: 200, line: 360 },
+      }),
+    ];
   }
 
   if (node.nodeType !== Node.ELEMENT_NODE) {
@@ -397,6 +823,7 @@ async function convertNodeToParagraphs(node: ChildNode): Promise<Paragraph[]> {
 
   const element = node as HTMLElement;
   const tag = element.tagName.toLowerCase();
+  const combinedStyle = deriveStyleForElement(element, inheritedStyle);
 
   if (tag === "img") {
     const imageParagraph = await createImageParagraph(element);
@@ -404,105 +831,537 @@ async function convertNodeToParagraphs(node: ChildNode): Promise<Paragraph[]> {
   }
 
   if (tag === "br") {
-    return [];
+    return [
+      new Paragraph({
+        children: [new TextRun({ text: "", break: 1 })],
+        spacing: { after: 0 },
+      }),
+    ];
   }
 
   if (tag === "ul" || tag === "ol") {
-    const items = Array.from(element.children).filter(
-      (child) => child.tagName.toLowerCase() === "li"
-    );
-    const paragraphs: Paragraph[] = [];
-    for (let index = 0; index < items.length; index += 1) {
-      const li = items[index] as HTMLElement;
-      const text = collapseWhitespace(li.textContent || "");
-      if (text) {
-        paragraphs.push(
-          createTextParagraph(`${tag === "ol" ? `${index + 1}.` : "•"} ${text}`)
-        );
-      }
-      const images = Array.from(li.querySelectorAll("img"));
-      for (const img of images) {
-        const imageParagraph = await createImageParagraph(img as HTMLElement);
-        if (imageParagraph) {
-          paragraphs.push(imageParagraph);
-        }
-      }
-    }
-    return paragraphs;
+    return convertListElementToParagraphs(element, tag === "ol", combinedStyle);
   }
 
-  const paragraphs: Paragraph[] = [];
-  let buffer = "";
+  if (tag === "table") {
+    return convertTableElementToParagraphs(element, combinedStyle);
+  }
 
-  const flushBuffer = () => {
-    const text = collapseWhitespace(buffer);
-    if (text) {
-      paragraphs.push(createTextParagraph(text));
+  const heading = headingTagToLevel(tag);
+  const spacing = getSpacingForTag(tag);
+  const paragraphOptions: ParagraphBuildOptions = {
+    heading,
+    spacing,
+    alignment: inferParagraphAlignment(element),
+    indent: tag === "blockquote" ? { left: 720 } : undefined,
+  };
+
+  if (heading || isBlockElement(tag) || tag === "blockquote") {
+    return convertBlockElementToParagraphs(
+      element,
+      paragraphOptions,
+      combinedStyle
+    );
+  }
+
+  if (isInlineTag(tag)) {
+    const runs = buildRunsFromInlineElement(element, combinedStyle);
+    if (!runs.length) {
+      return [];
     }
-    buffer = "";
+    return [
+      new Paragraph({
+        children: runs,
+        spacing: { after: 200, line: 360 },
+      }),
+    ];
+  }
+
+  const fallback: Paragraph[] = [];
+  for (const child of Array.from(element.childNodes)) {
+    const nested = await convertNodeToParagraphs(child, combinedStyle);
+    fallback.push(...nested);
+  }
+  return fallback;
+}
+
+async function convertBlockElementToParagraphs(
+  element: HTMLElement,
+  options: ParagraphBuildOptions = {},
+  inheritedStyle: InlineStyleFlags = {}
+): Promise<Paragraph[]> {
+  const paragraphs: Paragraph[] = [];
+  let currentRuns: TextRun[] = [];
+
+  const flushRuns = () => {
+    if (!currentRuns.length) {
+      return;
+    }
+    paragraphs.push(
+      new Paragraph({
+        children: currentRuns,
+        spacing: options.spacing ?? { after: 200, line: 360 },
+        heading: options.heading,
+        alignment: options.alignment ?? inferParagraphAlignment(element),
+        indent: options.indent,
+      })
+    );
+    currentRuns = [];
   };
 
   for (const child of Array.from(element.childNodes)) {
     if (child.nodeType === Node.TEXT_NODE) {
-      buffer += child.textContent || "";
+      const run = createTextRun(child.textContent || "", inheritedStyle);
+      if (run) {
+        currentRuns.push(run);
+      }
       continue;
     }
 
-    if (child.nodeType === Node.ELEMENT_NODE) {
-      const childElement = child as HTMLElement;
-      const childTag = childElement.tagName.toLowerCase();
-
-      if (childTag === "img") {
-        flushBuffer();
-        const imageParagraph = await createImageParagraph(childElement);
-        if (imageParagraph) {
-          paragraphs.push(imageParagraph);
-        }
-        continue;
-      }
-
-      if (childTag === "br") {
-        buffer += "\n";
-        continue;
-      }
-
-      if (isBlockElement(childTag)) {
-        flushBuffer();
-        const nested = await convertNodeToParagraphs(childElement);
-        paragraphs.push(...nested);
-        continue;
-      }
-
-      const inlineText = collapseWhitespace(childElement.textContent || "");
-      if (inlineText) {
-        buffer += `${inlineText} `;
-      }
+    if (child.nodeType !== Node.ELEMENT_NODE) {
+      continue;
     }
+
+    const childElement = child as HTMLElement;
+    const childTag = childElement.tagName.toLowerCase();
+    const nextStyle = deriveStyleForElement(childElement, inheritedStyle);
+
+    if (childTag === "br") {
+      currentRuns.push(new TextRun({ text: "", break: 1 }));
+      continue;
+    }
+
+    if (childTag === "img") {
+      flushRuns();
+      const imageParagraph = await createImageParagraph(childElement);
+      if (imageParagraph) {
+        paragraphs.push(imageParagraph);
+      }
+      continue;
+    }
+
+    if (isInlineTag(childTag)) {
+      const inlineRuns = buildRunsFromInlineElement(childElement, nextStyle);
+      currentRuns.push(...inlineRuns);
+      continue;
+    }
+
+    flushRuns();
+    const nested = await convertNodeToParagraphs(childElement, nextStyle);
+    paragraphs.push(...nested);
   }
 
-  flushBuffer();
+  flushRuns();
 
   if (!paragraphs.length) {
     const fallbackText = collapseWhitespace(element.textContent || "");
-    if (fallbackText) {
-      paragraphs.push(createTextParagraph(fallbackText));
+    const fallbackRun = createTextRun(fallbackText, inheritedStyle);
+    if (fallbackRun) {
+      paragraphs.push(
+        new Paragraph({
+          children: [fallbackRun],
+          spacing: options.spacing ?? { after: 200, line: 360 },
+          heading: options.heading,
+          alignment: options.alignment ?? inferParagraphAlignment(element),
+          indent: options.indent,
+        })
+      );
     }
   }
 
   return paragraphs;
 }
 
-function createTextParagraph(text: string): Paragraph {
-  const safeText = sanitizeText(text);
-  return new Paragraph({
-    children: [
-      new TextRun({
-        text: safeText,
-        size: 24,
-      }),
-    ],
-    spacing: { after: 200, line: 360 },
+async function convertListElementToParagraphs(
+  element: HTMLElement,
+  ordered: boolean,
+  inheritedStyle: InlineStyleFlags
+): Promise<Paragraph[]> {
+  const items = Array.from(element.children).filter(
+    (child) => child.tagName.toLowerCase() === "li"
+  );
+  const paragraphs: Paragraph[] = [];
+
+  for (let index = 0; index < items.length; index += 1) {
+    const li = items[index] as HTMLElement;
+    let contentRuns = extractListItemRuns(li, inheritedStyle);
+
+    if (!contentRuns.length) {
+      const fallback = collapseWhitespace(li.textContent || "");
+      const fallbackRun = createTextRun(fallback, inheritedStyle);
+      if (!fallbackRun) {
+        continue;
+      }
+      contentRuns = [fallbackRun];
+    }
+
+    const prefix = ordered ? `${index + 1}. ` : "• ";
+    const prefixRun = new TextRun({
+      text: prefix,
+      bold: ordered,
+      size: 24,
+    });
+
+    paragraphs.push(
+      new Paragraph({
+        children: [prefixRun, ...contentRuns],
+        spacing: { after: 120, line: 360 },
+        indent: { left: 360 },
+        alignment: inferParagraphAlignment(li),
+      })
+    );
+  }
+
+  return paragraphs;
+}
+
+async function convertTableElementToParagraphs(
+  table: HTMLElement,
+  inheritedStyle: InlineStyleFlags
+): Promise<Paragraph[]> {
+  const rows = Array.from(table.querySelectorAll("tr"));
+  const paragraphs: Paragraph[] = [];
+
+  rows.forEach((row) => {
+    const cells = Array.from(row.querySelectorAll("th,td"));
+    if (!cells.length) {
+      return;
+    }
+    const rowText = cells
+      .map((cell) => collapseWhitespace(cell.textContent || ""))
+      .filter(Boolean)
+      .join(" | ");
+    if (!rowText) {
+      return;
+    }
+    const run = createTextRun(rowText, inheritedStyle);
+    if (run) {
+      paragraphs.push(
+        new Paragraph({
+          children: [run],
+          spacing: { after: 120, line: 360 },
+          alignment: inferParagraphAlignment(row as HTMLElement),
+        })
+      );
+    }
   });
+
+  return paragraphs;
+}
+
+function extractListItemRuns(
+  li: HTMLElement,
+  inheritedStyle: InlineStyleFlags
+): TextRun[] {
+  const runs: TextRun[] = [];
+
+  const visit = (node: ChildNode, style: InlineStyleFlags) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const run = createTextRun(node.textContent || "", style);
+      if (run) {
+        runs.push(run);
+      }
+      return;
+    }
+
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return;
+    }
+
+    const el = node as HTMLElement;
+    const tag = el.tagName.toLowerCase();
+    const nextStyle = deriveStyleForElement(el, style);
+
+    if (tag === "br") {
+      runs.push(new TextRun({ text: "", break: 1 }));
+      return;
+    }
+
+    if (tag === "img") {
+      runs.push(
+        new TextRun({
+          text: "[image]",
+          italics: true,
+          size: 24,
+        })
+      );
+      return;
+    }
+
+    if (isInlineTag(tag)) {
+      Array.from(el.childNodes).forEach((child) => visit(child, nextStyle));
+      return;
+    }
+
+    runs.push(new TextRun({ text: "", break: 1 }));
+    Array.from(el.childNodes).forEach((child) => visit(child, nextStyle));
+  };
+
+  Array.from(li.childNodes).forEach((child) => visit(child, inheritedStyle));
+  return runs;
+}
+
+function buildRunsFromInlineElement(
+  element: HTMLElement,
+  inheritedStyle: InlineStyleFlags
+): TextRun[] {
+  const runs: TextRun[] = [];
+  const style = deriveStyleForElement(element, inheritedStyle);
+
+  for (const child of Array.from(element.childNodes)) {
+    if (child.nodeType === Node.TEXT_NODE) {
+      const run = createTextRun(child.textContent || "", style);
+      if (run) {
+        runs.push(run);
+      }
+      continue;
+    }
+
+    if (child.nodeType !== Node.ELEMENT_NODE) {
+      continue;
+    }
+
+    const childElement = child as HTMLElement;
+    const childTag = childElement.tagName.toLowerCase();
+
+    if (childTag === "br") {
+      runs.push(new TextRun({ text: "", break: 1 }));
+      continue;
+    }
+
+    if (isInlineTag(childTag)) {
+      runs.push(...buildRunsFromInlineElement(childElement, style));
+      continue;
+    }
+
+    const fallback = collapseWhitespace(childElement.textContent || "");
+    const fallbackRun = createTextRun(fallback, style);
+    if (fallbackRun) {
+      runs.push(fallbackRun);
+    }
+  }
+
+  return runs;
+}
+
+function deriveStyleForElement(
+  element: HTMLElement,
+  base: InlineStyleFlags = {}
+): InlineStyleFlags {
+  const tag = element.tagName.toLowerCase();
+  const next: InlineStyleFlags = { ...base };
+
+  if (tag === "strong" || tag === "b") {
+    next.bold = true;
+  }
+  if (tag === "em" || tag === "i") {
+    next.italics = true;
+  }
+  if (tag === "u" || tag === "ins") {
+    next.underline = UnderlineType.SINGLE;
+  }
+  if (tag === "del") {
+    next.strike = true;
+  }
+  if (tag === "code" || tag === "pre") {
+    next.font = "Courier New";
+  }
+  if (tag === "sup") {
+    next.superScript = true;
+    delete next.subScript;
+  }
+  if (tag === "sub") {
+    next.subScript = true;
+    delete next.superScript;
+  }
+  if (tag === "a") {
+    next.underline = UnderlineType.SINGLE;
+    next.color = next.color ?? "1155CC";
+  }
+
+  const styleAttr = element.getAttribute("style");
+  if (styleAttr) {
+    const declarations = parseStyleAttribute(styleAttr);
+    const fontWeight = declarations["font-weight"];
+    if (fontWeight) {
+      const numericWeight = parseInt(fontWeight, 10);
+      if (fontWeight.includes("bold") || numericWeight >= 600) {
+        next.bold = true;
+      }
+    }
+
+    const fontStyle = declarations["font-style"];
+    if (fontStyle?.includes("italic")) {
+      next.italics = true;
+    }
+
+    const textDecoration = declarations["text-decoration"];
+    if (textDecoration) {
+      if (textDecoration.includes("underline")) {
+        next.underline = UnderlineType.SINGLE;
+      }
+      if (textDecoration.includes("line-through")) {
+        next.strike = true;
+      }
+    }
+
+    const color = declarations["color"];
+    if (color) {
+      const normalized = cssColorToHex(color);
+      if (normalized) {
+        next.color = normalized;
+      }
+    }
+  }
+
+  return next;
+}
+
+function parseStyleAttribute(value: string): Record<string, string> {
+  return value
+    .split(";")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .reduce<Record<string, string>>((acc, part) => {
+      const [prop, val] = part.split(":");
+      if (prop && val) {
+        acc[prop.trim().toLowerCase()] = val.trim().toLowerCase();
+      }
+      return acc;
+    }, {});
+}
+
+function cssColorToHex(value: string): string | undefined {
+  const hexMatch = value.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (hexMatch) {
+    const hex = hexMatch[1];
+    if (hex.length === 3) {
+      return hex
+        .split("")
+        .map((c) => c + c)
+        .join("")
+        .toUpperCase();
+    }
+    return hex.toUpperCase();
+  }
+
+  const rgbMatch = value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+  if (rgbMatch) {
+    const [r, g, b] = rgbMatch
+      .slice(1, 4)
+      .map((n) => Number.parseInt(n ?? "0", 10));
+    return [r, g, b]
+      .map((channel) => channel.toString(16).padStart(2, "0"))
+      .join("")
+      .toUpperCase();
+  }
+  return undefined;
+}
+
+function createTextRun(
+  value: string,
+  style: InlineStyleFlags = {}
+): TextRun | null {
+  if (!value) {
+    return null;
+  }
+  const normalized = value.replace(/\s+/g, " ");
+  if (!normalized.trim()) {
+    return null;
+  }
+  const safeText = sanitizeText(normalized);
+  if (!safeText) {
+    return null;
+  }
+  return new TextRun({
+    text: safeText,
+    size: 24,
+    bold: style.bold,
+    italics: style.italics,
+    underline: style.underline ? { type: style.underline } : undefined,
+    strike: style.strike,
+    color: style.color,
+    font: style.font,
+    superScript: style.superScript,
+    subScript: style.subScript,
+  });
+}
+
+function headingTagToLevel(tag: string): HeadingLevelValue | undefined {
+  switch (tag) {
+    case "h1":
+      return HeadingLevel.HEADING_1;
+    case "h2":
+      return HeadingLevel.HEADING_2;
+    case "h3":
+      return HeadingLevel.HEADING_3;
+    case "h4":
+      return HeadingLevel.HEADING_4;
+    case "h5":
+      return HeadingLevel.HEADING_5;
+    case "h6":
+      return HeadingLevel.HEADING_6;
+    default:
+      return undefined;
+  }
+}
+
+function inferParagraphAlignment(
+  element?: HTMLElement | null
+): AlignmentTypeValue | undefined {
+  if (!element) {
+    return undefined;
+  }
+  const alignAttr = element.getAttribute("align")?.toLowerCase();
+  if (alignAttr) {
+    if (alignAttr.includes("center")) return AlignmentType.CENTER;
+    if (alignAttr.includes("right")) return AlignmentType.RIGHT;
+    if (alignAttr.includes("justify")) return AlignmentType.JUSTIFIED;
+  }
+  const styleAttr = element.getAttribute("style")?.toLowerCase() ?? "";
+  const match = styleAttr.match(/text-align\s*:\s*(left|right|center|justify)/);
+  if (match) {
+    const value = match[1];
+    if (value === "center") return AlignmentType.CENTER;
+    if (value === "right") return AlignmentType.RIGHT;
+    if (value === "justify") return AlignmentType.JUSTIFIED;
+    return AlignmentType.LEFT;
+  }
+  return undefined;
+}
+
+function getSpacingForTag(tag: string): { before?: number; after?: number } {
+  switch (tag) {
+    case "h1":
+      return { before: 240, after: 120 };
+    case "h2":
+      return { before: 200, after: 100 };
+    case "h3":
+      return { before: 160, after: 80 };
+    case "blockquote":
+      return { before: 160, after: 160 };
+    default:
+      return { after: 200 };
+  }
+}
+
+function isInlineTag(tag: string): boolean {
+  return [
+    "span",
+    "strong",
+    "b",
+    "em",
+    "i",
+    "u",
+    "a",
+    "code",
+    "mark",
+    "small",
+    "sup",
+    "sub",
+    "del",
+    "ins",
+  ].includes(tag);
 }
 
 // eslint-disable-next-line no-control-regex -- strip non-printable control characters Word rejects

@@ -26,11 +26,36 @@ import {
   convertToConceptDefinitions,
 } from "@/utils/customDomainStorage";
 import AnalysisWorker from "@/workers/analysisWorker?worker";
+import { buildTierOneAnalysisSummary } from "@/utils/tierOneAnalysis";
 import tomeIqLogo from "@/assets/tomeiq-logo.png";
 
 const HEADING_LENGTH_LIMIT = 120;
 const MAX_FALLBACK_SECTIONS = 8;
 const STICKY_HEADER_OFFSET = 140;
+
+const countWordsQuick = (value: string): number => {
+  if (!value.trim()) {
+    return 0;
+  }
+  const matches = value.trim().match(/[A-Za-z0-9'’]+/g);
+  return matches ? matches.length : 0;
+};
+
+const normalizeHeadingLabel = (
+  value: string | null | undefined,
+  fallback: string
+): string => {
+  const raw = (value || "")
+    .replace(/\\[A-Za-z]+/g, " ")
+    .replace(/[_*#]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!raw) {
+    return fallback;
+  }
+  const limited = raw.slice(0, HEADING_LENGTH_LIMIT).trim();
+  return /[A-Za-z0-9]/.test(limited) ? limited : fallback;
+};
 
 type SectionCandidate = {
   heading: string;
@@ -86,9 +111,10 @@ const buildSectionsFromCandidates = (
       return;
     }
 
+    const sectionId = sections.length + 1;
     sections.push({
-      id: `section-${sections.length + 1}`,
-      heading: candidate.heading || `Section ${idx + 1}`,
+      id: `section-${sectionId}`,
+      heading: normalizeHeadingLabel(candidate.heading, `Section ${sectionId}`),
       content,
       startPosition: candidate.start,
       endPosition: nextStart,
@@ -121,9 +147,13 @@ const buildFallbackSections = (text: string): Section[] => {
     const content = text.slice(start, end).trim();
     if (!content) continue;
 
+    const sectionId = sections.length + 1;
     sections.push({
-      id: `auto-section-${sections.length + 1}`,
-      heading: `Segment ${sections.length + 1}`,
+      id: `auto-section-${sectionId}`,
+      heading: normalizeHeadingLabel(
+        `Segment ${sectionId}`,
+        `Segment ${sectionId}`
+      ),
       content,
       startPosition: start,
       endPosition: end,
@@ -137,7 +167,7 @@ const buildFallbackSections = (text: string): Section[] => {
   if (sections.length === 0) {
     sections.push({
       id: "auto-section-1",
-      heading: "Full Chapter",
+      heading: normalizeHeadingLabel("Full Chapter", "Full Chapter"),
       content: trimmed,
       startPosition: 0,
       endPosition: text.length,
@@ -286,6 +316,17 @@ export const ChapterCheckerV2: React.FC = () => {
   const [scrollToTopSignal, setScrollToTopSignal] = useState(0);
   const [windowScrolled, setWindowScrolled] = useState(false);
   const [contentScrolled, setContentScrolled] = useState(false);
+
+  const statisticsText =
+    chapterData?.originalPlainText ??
+    chapterData?.plainText ??
+    chapterText ??
+    "";
+  const wordCount = useMemo(
+    () => countWordsQuick(statisticsText),
+    [statisticsText]
+  );
+  const charCount = statisticsText.length;
 
   // Ref for analysis panel
   const analysisPanelRef = useRef<HTMLDivElement>(null);
@@ -444,18 +485,16 @@ export const ChapterCheckerV2: React.FC = () => {
   };
 
   const handleBackToTop = () => {
-    const features = ACCESS_TIERS[accessLevel];
-    const hasFullAnalysisView = features.fullAnalysis && Boolean(analysis);
-
     scrollWindowToElement(documentHeaderRef.current);
 
-    if (hasFullAnalysisView && analysisPanelRef.current) {
+    if (analysisPanelRef.current) {
       analysisPanelRef.current.scrollTo({ top: 0, behavior: "smooth" });
-      analysisControlsRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
     }
+
+    analysisControlsRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
 
     setScrollToTopSignal(Date.now());
   };
@@ -996,17 +1035,30 @@ export const ChapterCheckerV2: React.FC = () => {
   };
 
   const handleExportDocx = async () => {
+    if (!chapterData) {
+      alert("No document to export");
+      return;
+    }
+
     try {
       const { exportToDocx } = await import("@/utils/docxExport");
       const richHtmlContent =
-        chapterData?.editorHtml ??
-        (chapterData?.isHybridDocx ? chapterData?.html : null) ??
+        chapterData.editorHtml ??
+        (chapterData.isHybridDocx ? chapterData.html : null) ??
         null;
+
+      const fallbackAnalysis =
+        analysis ??
+        buildTierOneAnalysisSummary({
+          plainText: chapterData.plainText || chapterText,
+          htmlContent: richHtmlContent,
+        });
+
       await exportToDocx({
         text: chapterText,
         html: richHtmlContent,
         fileName: fileName || "edited-chapter",
-        analysis,
+        analysis: fallbackAnalysis,
         includeHighlights: true,
       });
     } catch (err) {
@@ -1051,8 +1103,8 @@ export const ChapterCheckerV2: React.FC = () => {
           zIndex: 60,
           padding: "16px",
           paddingBottom: 0,
-          background:
-            "linear-gradient(180deg, #f3f4f6 70%, rgba(243,244,246,0))",
+          backgroundColor: "#f9fafb",
+          marginBottom: 0,
         }}
       >
         <header
@@ -1211,8 +1263,27 @@ export const ChapterCheckerV2: React.FC = () => {
                 />
 
                 {fileName && (
-                  <div style={{ fontSize: "14px", color: "#6b7280" }}>
-                    📄 {fileName}
+                  <div
+                    style={{
+                      fontSize: "14px",
+                      color: "#6b7280",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "2px",
+                      minWidth: "180px",
+                    }}
+                  >
+                    <span>📄 {fileName}</span>
+                    <span
+                      style={{
+                        fontSize: "12px",
+                        color: "#4b5563",
+                        fontWeight: 500,
+                      }}
+                    >
+                      {wordCount.toLocaleString()} words &middot;{" "}
+                      {charCount.toLocaleString()} characters
+                    </span>
                   </div>
                 )}
 
@@ -1371,6 +1442,7 @@ export const ChapterCheckerV2: React.FC = () => {
         >
           {!tierFeatures.fullAnalysis ? (
             <div
+              ref={analysisControlsRef}
               style={{
                 flex: 1,
                 padding: "32px",

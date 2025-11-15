@@ -511,13 +511,49 @@ export const PrincipleScoresRadar: React.FC<{ analysis: ChapterAnalysis }> = ({
 export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
   analysis,
 }) => {
+  const sanitizeHeadingForAxis = (
+    value: string | undefined,
+    fallback: string
+  ): string => {
+    const raw = (value || "")
+      .replace(/\\[A-Za-z]+/g, " ")
+      .replace(/[_*#]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!raw) {
+      return fallback;
+    }
+    return /[A-Za-z0-9]/.test(raw) ? raw : fallback;
+  };
+
+  const truncateLabel = (value: string): string => {
+    if (!value) return "";
+    const trimmed = value.trim();
+    if (trimmed.length <= 18) {
+      return trimmed;
+    }
+    const words = trimmed.split(/\s+/);
+    if (words.length === 1) {
+      return trimmed.slice(0, 18) + "…";
+    }
+    const rebuilt: string[] = [];
+    for (const word of words) {
+      const next = [...rebuilt, word].join(" ");
+      if (next.length > 18) break;
+      rebuilt.push(word);
+    }
+    return rebuilt.join(" ") + "…";
+  };
+
   const points = analysis.visualizations.cognitiveLoadCurve || [];
   const hasData = points.length > 0;
   const data = points.map((point, idx) => ({
-    section:
-      (point.heading || point.sectionId || `S${idx + 1}`).length > 28
-        ? (point.heading || point.sectionId || `S${idx + 1}`).slice(0, 25) + "…"
-        : point.heading || point.sectionId || `S${idx + 1}`,
+    section: truncateLabel(
+      sanitizeHeadingForAxis(
+        point.heading || point.sectionId,
+        `Section ${idx + 1}`
+      )
+    ),
     load: Math.round(point.load * 100),
     novelConcepts: point.factors.novelConcepts,
     complexity: point.factors.sentenceComplexity,
@@ -530,10 +566,10 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
         Lower is better; peaks indicate challenging sections
       </p>
       {hasData ? (
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={320}>
           <LineChart
             data={data}
-            margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
+            margin={{ top: 5, right: 30, left: 0, bottom: 30 }}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis
@@ -566,7 +602,11 @@ export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
               }}
               labelFormatter={(label: any) => `Heading: ${label}`}
             />
-            <Legend />
+            <Legend
+              verticalAlign="bottom"
+              height={40}
+              wrapperStyle={{ paddingTop: 12 }}
+            />
             <Line
               type="monotone"
               dataKey="load"
