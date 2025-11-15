@@ -355,665 +355,632 @@ function QuickStartSection() {
 
 function OverviewSection() {
   return (
-    <div>
-      <h3 style={{ marginTop: 0 }}>📖 Overview</h3>
-      <p>
-        This guide explains every section of the analysis results, what the
-        metrics mean, and how to interpret the findings for improving
-        educational materials.
-      </p>
+    <div className="quickstart-shell">
+      <div className="quickstart-content">
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>Guide Purpose</h4>
+          <p>
+            This reference explains every section of the analysis results, what
+            each metric means, and how to interpret the findings when improving
+            educational materials.
+          </p>
+        </section>
 
-      <h4>What Gets Analyzed</h4>
-      <ul>
-        <li>
-          <strong>Content Quality:</strong> 10 evidence-based learning
-          principles
-        </li>
-        <li>
-          <strong>Concepts:</strong> Key ideas identified and their
-          relationships
-        </li>
-        <li>
-          <strong>Patterns:</strong> Universal and domain-specific learning
-          patterns
-        </li>
-        <li>
-          <strong>Structure:</strong> How content is organized and connected
-        </li>
-      </ul>
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>What Gets Analyzed</h4>
+          <ul className="quickstart-list">
+            <li>
+              <strong>Content Quality:</strong> Ten evidence-based learning
+              principles scored individually
+            </li>
+            <li>
+              <strong>Concepts:</strong> Key ideas that appear in the chapter
+              and their relationships
+            </li>
+            <li>
+              <strong>Patterns:</strong> Universal and domain-specific learning
+              structures that aid comprehension
+            </li>
+            <li>
+              <strong>Structure:</strong> Organization, sequencing, and cohesion
+              across sections
+            </li>
+          </ul>
+        </section>
 
-      <h4>How to Use This Guide</h4>
-      <p>Navigate through sections using the sidebar to learn about:</p>
-      <ul>
-        <li>What each score means</li>
-        <li>How metrics are calculated</li>
-        <li>Common findings and what they indicate</li>
-        <li>Actionable recommendations for improvement</li>
-      </ul>
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>How to Use This Guide</h4>
+          <p>Use the sidebar navigation to quickly jump to details on:</p>
+          <ul className="quickstart-list">
+            <li>Interpreting each score and understanding the scale</li>
+            <li>How metrics are calculated and weighted</li>
+            <li>Common findings and what they signal about the content</li>
+            <li>Recommended actions tied to the learning principles</li>
+          </ul>
+        </section>
+      </div>
     </div>
   );
 }
 
 function OverallScoreSection() {
   return (
-    <div>
-      <h3 style={{ marginTop: 0 }}>🎯 Overall Score</h3>
+    <div className="quickstart-shell">
+      <div className="quickstart-content">
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>Overall Score Overview</h4>
+          <p>
+            The overall score is a weighted average of the ten learning
+            principles, producing a single quality metric for the chapter. It
+            reflects both the presence and the strength of each principle.
+          </p>
+        </section>
 
-      <h4>What It Shows</h4>
-      <p>
-        The Overall Score displays a weighted average of all 10 learning
-        principle scores, providing a single quality metric for the chapter.
-      </p>
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>Score Interpretation</h4>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+            }}
+          >
+            <thead>
+              <tr style={{ backgroundColor: "#f3f4f6" }}>
+                <th
+                  style={{
+                    padding: "0.75rem",
+                    textAlign: "left",
+                    borderBottom: "2px solid #e5e7eb",
+                  }}
+                >
+                  Score Range
+                </th>
+                <th
+                  style={{
+                    padding: "0.75rem",
+                    textAlign: "left",
+                    borderBottom: "2px solid #e5e7eb",
+                  }}
+                >
+                  Quality Level
+                </th>
+                <th
+                  style={{
+                    padding: "0.75rem",
+                    textAlign: "left",
+                    borderBottom: "2px solid #e5e7eb",
+                  }}
+                >
+                  Interpretation
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                {
+                  range: "90-100",
+                  level: "Excellent",
+                  interpretation: "Exemplifies evidence-based learning design",
+                },
+                {
+                  range: "80-89",
+                  level: "Good",
+                  interpretation:
+                    "Strong foundation with room for minor refinements",
+                },
+                {
+                  range: "70-79",
+                  level: "Adequate",
+                  interpretation: "Meets basic standards but has clear gaps",
+                },
+                {
+                  range: "60-69",
+                  level: "Needs Improvement",
+                  interpretation: "Missing multiple key principles",
+                },
+                {
+                  range: "Below 60",
+                  level: "Critical",
+                  interpretation: "Requires a pedagogical redesign",
+                },
+              ].map((row) => (
+                <tr key={row.range}>
+                  <td
+                    style={{
+                      padding: "0.75rem",
+                      borderBottom: "1px solid #e5e7eb",
+                    }}
+                  >
+                    {row.range}
+                  </td>
+                  <td
+                    style={{
+                      padding: "0.75rem",
+                      borderBottom: "1px solid #e5e7eb",
+                    }}
+                  >
+                    <strong>{row.level}</strong>
+                  </td>
+                  <td
+                    style={{
+                      padding: "0.75rem",
+                      borderBottom: "1px solid #e5e7eb",
+                    }}
+                  >
+                    {row.interpretation}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
 
-      <h4>Score Interpretation</h4>
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          marginBottom: "1rem",
-        }}
-      >
-        <thead>
-          <tr style={{ backgroundColor: "#f3f4f6" }}>
-            <th
-              style={{
-                padding: "0.75rem",
-                textAlign: "left",
-                borderBottom: "2px solid #e5e7eb",
-              }}
-            >
-              Score Range
-            </th>
-            <th
-              style={{
-                padding: "0.75rem",
-                textAlign: "left",
-                borderBottom: "2px solid #e5e7eb",
-              }}
-            >
-              Quality Level
-            </th>
-            <th
-              style={{
-                padding: "0.75rem",
-                textAlign: "left",
-                borderBottom: "2px solid #e5e7eb",
-              }}
-            >
-              Interpretation
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td
-              style={{ padding: "0.75rem", borderBottom: "1px solid #e5e7eb" }}
-            >
-              90-100
-            </td>
-            <td
-              style={{ padding: "0.75rem", borderBottom: "1px solid #e5e7eb" }}
-            >
-              <strong>Excellent</strong>
-            </td>
-            <td
-              style={{ padding: "0.75rem", borderBottom: "1px solid #e5e7eb" }}
-            >
-              Exemplifies evidence-based learning design
-            </td>
-          </tr>
-          <tr>
-            <td
-              style={{ padding: "0.75rem", borderBottom: "1px solid #e5e7eb" }}
-            >
-              80-89
-            </td>
-            <td
-              style={{ padding: "0.75rem", borderBottom: "1px solid #e5e7eb" }}
-            >
-              <strong>Good</strong>
-            </td>
-            <td
-              style={{ padding: "0.75rem", borderBottom: "1px solid #e5e7eb" }}
-            >
-              Strong foundation, minor improvements possible
-            </td>
-          </tr>
-          <tr>
-            <td
-              style={{ padding: "0.75rem", borderBottom: "1px solid #e5e7eb" }}
-            >
-              70-79
-            </td>
-            <td
-              style={{ padding: "0.75rem", borderBottom: "1px solid #e5e7eb" }}
-            >
-              <strong>Adequate</strong>
-            </td>
-            <td
-              style={{ padding: "0.75rem", borderBottom: "1px solid #e5e7eb" }}
-            >
-              Meets basic standards but has clear gaps
-            </td>
-          </tr>
-          <tr>
-            <td
-              style={{ padding: "0.75rem", borderBottom: "1px solid #e5e7eb" }}
-            >
-              60-69
-            </td>
-            <td
-              style={{ padding: "0.75rem", borderBottom: "1px solid #e5e7eb" }}
-            >
-              <strong>Needs Improvement</strong>
-            </td>
-            <td
-              style={{ padding: "0.75rem", borderBottom: "1px solid #e5e7eb" }}
-            >
-              Missing multiple key principles
-            </td>
-          </tr>
-          <tr>
-            <td style={{ padding: "0.75rem" }}>Below 60</td>
-            <td style={{ padding: "0.75rem" }}>
-              <strong>Critical</strong>
-            </td>
-            <td style={{ padding: "0.75rem" }}>
-              Significant pedagogical redesign needed
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h4>How It's Calculated</h4>
-      <div
-        style={{
-          backgroundColor: "#f3f4f6",
-          padding: "1rem",
-          borderRadius: "6px",
-          marginBottom: "1rem",
-        }}
-      >
-        <code>Overall Score = Σ(Principle Score × Weight) / Σ(Weights)</code>
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>How It's Calculated</h4>
+          <div
+            style={{
+              backgroundColor: "#f3f4f6",
+              padding: "1rem",
+              borderRadius: "0.75rem",
+              marginBottom: "1rem",
+              fontFamily:
+                "'SFMono-Regular', Consolas, 'Liberation Mono', monospace",
+            }}
+          >
+            Overall Score = sum(Principle Score * Weight) / sum(Weights)
+          </div>
+          <ul className="quickstart-list">
+            <li>
+              <strong>Deep Processing:</strong> 0.95
+            </li>
+            <li>
+              <strong>Retrieval Practice:</strong> 0.90
+            </li>
+            <li>
+              <strong>Schema Building:</strong> 0.90
+            </li>
+            <li>
+              <strong>Dual Coding:</strong> 0.85
+            </li>
+            <li>
+              <strong>Generative Learning:</strong> 0.85
+            </li>
+            <li>
+              <strong>Spaced Repetition:</strong> 0.80
+            </li>
+            <li>
+              <strong>Interleaving:</strong> 0.75
+            </li>
+            <li>
+              <strong>Worked Examples:</strong> 0.70
+            </li>
+            <li>
+              <strong>Self-Explanation:</strong> 0.65
+            </li>
+            <li>
+              <strong>Elaboration:</strong> 0.60
+            </li>
+          </ul>
+        </section>
       </div>
-
-      <h4>Principle Weights</h4>
-      <ul>
-        <li>
-          <strong>Deep Processing:</strong> 0.95 (highest - fundamental to
-          learning)
-        </li>
-        <li>
-          <strong>Retrieval Practice:</strong> 0.90 (critical for retention)
-        </li>
-        <li>
-          <strong>Schema Building:</strong> 0.90 (essential for organized
-          knowledge)
-        </li>
-        <li>
-          <strong>Dual Coding:</strong> 0.85 (important for comprehension)
-        </li>
-        <li>
-          <strong>Generative Learning:</strong> 0.85 (promotes engagement)
-        </li>
-        <li>
-          <strong>Spaced Repetition:</strong> 0.80 (time-dependent)
-        </li>
-        <li>
-          <strong>Interleaving:</strong> 0.75 (context-specific)
-        </li>
-        <li>
-          <strong>Worked Examples:</strong> 0.70 (procedural domains)
-        </li>
-        <li>
-          <strong>Self-Explanation:</strong> 0.65 (metacognitive skill)
-        </li>
-        <li>
-          <strong>Elaboration:</strong> 0.60 (supports other principles)
-        </li>
-      </ul>
     </div>
   );
 }
 
 function ConceptsSection() {
   return (
-    <div>
-      <h3 style={{ marginTop: 0 }}>💡 Concept Analysis</h3>
+    <div className="quickstart-shell">
+      <div className="quickstart-content">
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>Concept Analysis Overview</h4>
+          <p>
+            The analysis identifies fundamental ideas, terms, and theories that
+            are essential to understanding the chapter. Only core-level concepts
+            appear to keep the focus on knowledge students must master.
+          </p>
+        </section>
 
-      <h4>What It Shows</h4>
-      <p>
-        Identifies the fundamental concepts (ideas, terms, theories) present in
-        the chapter. All concepts are core-level - essential for understanding.
-      </p>
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>Core Concept Highlights</h4>
+          <p>
+            Core concepts are foundational to the topic - for example: function,
+            variable, loop, or array in a programming chapter.
+          </p>
+          <ul className="quickstart-list">
+            <li>Signal what must be explained thoroughly</li>
+            <li>Appear in headings, callouts, and key paragraphs</li>
+            <li>Create anchors for examples, visuals, and practice</li>
+          </ul>
+        </section>
 
-      <h4>Core Concepts</h4>
-      <div style={{ marginBottom: "1rem" }}>
-        <div
-          style={{
-            padding: "0.5rem",
-            marginBottom: "0.5rem",
-            backgroundColor: "#fef3c7",
-            borderLeft: "4px solid #f59e0b",
-            borderRadius: "4px",
-          }}
-        >
-          <strong>🔥 Core:</strong> Fundamental concepts essential to
-          understanding the chapter (e.g., function, variable, loop, array)
-        </div>
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>How Importance Is Determined</h4>
+          <ul className="quickstart-list">
+            <li>
+              <strong>Frequency:</strong> Concepts that occur throughout the
+              document
+            </li>
+            <li>
+              <strong>Context:</strong> Appearances in definitions, headings, or
+              assessment items
+            </li>
+            <li>
+              <strong>Relationships:</strong> The number and strength of
+              connections to other concepts
+            </li>
+            <li>
+              <strong>Patterns:</strong> Participation in learning patterns and
+              pedagogical structures
+            </li>
+          </ul>
+        </section>
+
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>Domain-Specific Metadata</h4>
+          <p>
+            Specialized domains include extra tagging to help authors tune the
+            level of rigor and support:
+          </p>
+          <ul className="quickstart-list">
+            <li>Reaction types or mechanisms</li>
+            <li>Physical states or classifications (solid, liquid, gas)</li>
+            <li>Compound categories such as acid, base, or salt</li>
+            <li>Difficulty ratings for scaffolding</li>
+          </ul>
+        </section>
       </div>
-
-      <h4>How Importance Is Determined</h4>
-      <ul>
-        <li>
-          <strong>Frequency:</strong> How often the concept appears
-        </li>
-        <li>
-          <strong>Context:</strong> Where it appears (headings, definitions,
-          examples)
-        </li>
-        <li>
-          <strong>Relationships:</strong> How many other concepts it connects to
-        </li>
-        <li>
-          <strong>Patterns:</strong> Involvement in learning patterns
-        </li>
-      </ul>
-
-      <h4>Domain-Specific Concepts</h4>
-      <p>
-        For specialized domains like chemistry, concepts may include additional
-        metadata:
-      </p>
-      <ul>
-        <li>Reaction types (synthesis, decomposition, etc.)</li>
-        <li>Physical states (solid, liquid, gas)</li>
-        <li>Compound classifications (acid, base, salt)</li>
-        <li>Difficulty ratings</li>
-      </ul>
     </div>
   );
 }
 
 function RelationshipsSection() {
   return (
-    <div>
-      <h3 style={{ marginTop: 0 }}>🔗 Concept Relationships</h3>
+    <div className="quickstart-shell">
+      <div className="quickstart-content">
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>Concept Relationships</h4>
+          <p>
+            This view maps how concepts connect to each other, revealing the
+            knowledge structure of the chapter and exposing prerequisite chains,
+            conceptual clusters, and contrasting ideas.
+          </p>
+        </section>
 
-      <h4>What It Shows</h4>
-      <p>
-        Maps how concepts connect to each other, revealing the knowledge
-        structure of the chapter.
-      </p>
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>Relationship Types</h4>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+          >
+            {conceptRelationshipTypes.map((type) => (
+              <div
+                key={type.name}
+                style={{
+                  border: "1px solid rgba(15, 23, 42, 0.08)",
+                  borderRadius: "0.75rem",
+                  padding: "0.75rem",
+                  backgroundColor: "#f8fafc",
+                }}
+              >
+                <strong>{type.name}</strong>
+                <p style={{ margin: "0.35rem 0" }}>
+                  <strong>Meaning:</strong> {type.meaning}
+                </p>
+                <p style={{ margin: "0.35rem 0" }}>
+                  <strong>Example:</strong> {type.example}
+                </p>
+                <p style={{ margin: "0.35rem 0" }}>
+                  <strong>Why it matters:</strong> {type.importance}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      <h4>Relationship Types</h4>
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>What Strong Relationships Indicate</h4>
+          <ul className="quickstart-list">
+            <li>Well-integrated content with clear conceptual connections</li>
+            <li>Logical progressions that build prerequisite knowledge</li>
+            <li>Dense networks that support schema building</li>
+          </ul>
+        </section>
 
-      <div style={{ marginBottom: "1.5rem" }}>
-        <h5 style={{ color: "#2563eb" }}>🔵 Prerequisites (requires)</h5>
-        <p>
-          <strong>Meaning:</strong> Concept A must be understood before Concept
-          B
-        </p>
-        <p>
-          <strong>Example:</strong> "atomic structure" → "chemical bonding"
-        </p>
-        <p>
-          <strong>Why It Matters:</strong> Shows logical learning sequence
-        </p>
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>What Weak Relationships Indicate</h4>
+          <ul className="quickstart-list">
+            <li>Isolated concepts that may confuse learners</li>
+            <li>Missing prerequisite explanations or bridges</li>
+            <li>Opportunities to add comparisons, contrasts, or examples</li>
+          </ul>
+        </section>
       </div>
-
-      <div style={{ marginBottom: "1.5rem" }}>
-        <h5 style={{ color: "#059669" }}>🟢 Related (relates-to)</h5>
-        <p>
-          <strong>Meaning:</strong> Concepts share common features or appear
-          together
-        </p>
-        <p>
-          <strong>Example:</strong> "acids" ↔ "bases" (opposite but related)
-        </p>
-        <p>
-          <strong>Why It Matters:</strong> Identifies conceptual clusters
-        </p>
-      </div>
-
-      <div style={{ marginBottom: "1.5rem" }}>
-        <h5 style={{ color: "#7c3aed" }}>🟣 Examples (example-of)</h5>
-        <p>
-          <strong>Meaning:</strong> Concrete instance of an abstract concept
-        </p>
-        <p>
-          <strong>Example:</strong> "HCl" → example of → "acid"
-        </p>
-        <p>
-          <strong>Why It Matters:</strong> Shows concrete-to-abstract
-          connections
-        </p>
-      </div>
-
-      <div style={{ marginBottom: "1.5rem" }}>
-        <h5 style={{ color: "#dc2626" }}>🔴 Contrasts (contrasts-with)</h5>
-        <p>
-          <strong>Meaning:</strong> Concepts are compared or contrasted
-        </p>
-        <p>
-          <strong>Example:</strong> "ionic bonds" vs "covalent bonds"
-        </p>
-        <p>
-          <strong>Why It Matters:</strong> Highlights distinctions and
-          comparisons
-        </p>
-      </div>
-
-      <h4>What Strong Relationships Indicate</h4>
-      <ul>
-        <li>✅ Well-integrated content with clear connections</li>
-        <li>✅ Logical concept progression</li>
-        <li>✅ Rich conceptual networks for schema building</li>
-      </ul>
-
-      <h4>What Weak Relationships Indicate</h4>
-      <ul>
-        <li>⚠️ Isolated concepts that may confuse learners</li>
-        <li>⚠️ Missing prerequisite explanations</li>
-        <li>⚠️ Opportunities to add examples or contrasts</li>
-      </ul>
     </div>
   );
 }
 
 function PatternsSection() {
   return (
-    <div>
-      <h3 style={{ marginTop: 0 }}>🔍 Pattern Recognition</h3>
+    <div className="quickstart-shell">
+      <div className="quickstart-content">
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>Pattern Recognition Overview</h4>
+          <p>
+            Pattern detection highlights instructional structures that make
+            content easier to process, remember, and apply. Results are grouped
+            into universal patterns that appear across disciplines and
+            domain-specific patterns tailored for chemistry.
+          </p>
+        </section>
 
-      <h4>What It Shows</h4>
-      <p>
-        Detects specific pedagogical patterns that enhance learning
-        effectiveness. Patterns are divided into universal (all domains) and
-        domain-specific.
-      </p>
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>Universal Patterns</h4>
+          <ul className="quickstart-list">
+            {universalPatterns.map((pattern) => (
+              <li key={pattern.name}>
+                <strong>{pattern.name}:</strong> {pattern.description}
+              </li>
+            ))}
+          </ul>
+        </section>
 
-      <h4>Universal Patterns</h4>
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>Chemistry-Specific Patterns</h4>
+          <ul className="quickstart-list">
+            {chemistryPatterns.map((pattern) => (
+              <li key={pattern.name}>
+                <strong>{pattern.name}:</strong> {pattern.description}
+              </li>
+            ))}
+          </ul>
+        </section>
 
-      <div
-        style={{
-          marginBottom: "1rem",
-          padding: "0.75rem",
-          backgroundColor: "#f0f9ff",
-          borderRadius: "6px",
-        }}
-      >
-        <strong>📝 Definition-Example Pattern</strong>
-        <p style={{ marginBottom: 0, marginTop: "0.5rem" }}>
-          Concept defined, then illustrated with examples
-        </p>
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>Why Patterns Matter</h4>
+          <ul className="quickstart-list">
+            <li>Provide structure and predictability for learners</li>
+            <li>Support schema development and transfer</li>
+            <li>Reduce cognitive load by signaling important moves</li>
+            <li>
+              Reveal opportunities to add examples, contrasts, or practice
+            </li>
+          </ul>
+        </section>
       </div>
-
-      <div
-        style={{
-          marginBottom: "1rem",
-          padding: "0.75rem",
-          backgroundColor: "#f0fdf4",
-          borderRadius: "6px",
-        }}
-      >
-        <strong>🔄 Compare-Contrast Pattern</strong>
-        <p style={{ marginBottom: 0, marginTop: "0.5rem" }}>
-          Two+ concepts explicitly compared
-        </p>
-      </div>
-
-      <div
-        style={{
-          marginBottom: "1rem",
-          padding: "0.75rem",
-          backgroundColor: "#fef3c7",
-          borderRadius: "6px",
-        }}
-      >
-        <strong>📊 Problem-Solution Pattern</strong>
-        <p style={{ marginBottom: 0, marginTop: "0.5rem" }}>
-          Problem posed, solution demonstrated
-        </p>
-      </div>
-
-      <div
-        style={{
-          marginBottom: "1rem",
-          padding: "0.75rem",
-          backgroundColor: "#fce7f3",
-          borderRadius: "6px",
-        }}
-      >
-        <strong>📚 Elaboration Pattern</strong>
-        <p style={{ marginBottom: 0, marginTop: "0.5rem" }}>
-          Concept explained in increasing detail
-        </p>
-      </div>
-
-      <h4>Chemistry-Specific Patterns</h4>
-
-      <div
-        style={{
-          marginBottom: "1rem",
-          padding: "0.75rem",
-          backgroundColor: "#ede9fe",
-          borderRadius: "6px",
-        }}
-      >
-        <strong>⚗️ Reaction Mechanism</strong>
-        <p style={{ marginBottom: 0, marginTop: "0.5rem" }}>
-          Step-by-step chemical reactions with equations
-        </p>
-      </div>
-
-      <div
-        style={{
-          marginBottom: "1rem",
-          padding: "0.75rem",
-          backgroundColor: "#dbeafe",
-          borderRadius: "6px",
-        }}
-      >
-        <strong>🔬 Lab Procedure</strong>
-        <p style={{ marginBottom: 0, marginTop: "0.5rem" }}>
-          Experimental methods with safety and materials
-        </p>
-      </div>
-
-      <div
-        style={{
-          marginBottom: "1rem",
-          padding: "0.75rem",
-          backgroundColor: "#fed7aa",
-          borderRadius: "6px",
-        }}
-      >
-        <strong>🧮 Stoichiometry Problem</strong>
-        <p style={{ marginBottom: 0, marginTop: "0.5rem" }}>
-          Quantitative calculations with units
-        </p>
-      </div>
-
-      <h4>Why Patterns Matter</h4>
-      <ul>
-        <li>Provide structure and predictability</li>
-        <li>Support schema development</li>
-        <li>Make content easier to process and remember</li>
-        <li>Signal important pedagogical moves</li>
-      </ul>
     </div>
   );
 }
 
 function PrinciplesSection() {
   return (
-    <div>
-      <h3 style={{ marginTop: 0 }}>🎓 Learning Principles</h3>
-
-      <p>
-        The analysis evaluates 10 evidence-based learning principles from
-        cognitive science research. Each principle is scored 0-100 based on
-        presence and quality in the content.
-      </p>
-
-      <h4>The 10 Principles</h4>
-
-      {principlesData.map((principle, idx) => (
-        <div
-          key={idx}
-          style={{
-            marginBottom: "2rem",
-            paddingBottom: "1.5rem",
-            borderBottom: "1px solid #e5e7eb",
-          }}
-        >
-          <h5 style={{ color: "#667eea", marginBottom: "0.5rem" }}>
-            {principle.name}
-          </h5>
-          <p style={{ fontStyle: "italic", color: "#6b7280" }}>
-            {principle.definition}
-          </p>
-
+    <div className="quickstart-shell">
+      <div className="quickstart-content">
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>Learning Principles Overview</h4>
           <p>
-            <strong>Why It Matters:</strong> {principle.why}
+            The analysis scores ten evidence-based learning principles from 0 to
+            100 based on the presence, quality, and depth of each instructional
+            move in the chapter.
           </p>
+        </section>
 
-          <p>
-            <strong>What's Evaluated:</strong>
-          </p>
-          <ul>
-            {principle.evaluated.map((item, i) => (
-              <li key={i}>{item}</li>
-            ))}
-          </ul>
-
-          <p>
-            <strong>Score Ranges:</strong>
-          </p>
-          <ul style={{ listStyle: "none", paddingLeft: 0 }}>
-            <li>
-              🟢 <strong>80-100:</strong> {principle.ranges.high}
-            </li>
-            <li>
-              🟡 <strong>50-79:</strong> {principle.ranges.medium}
-            </li>
-            <li>
-              🔴 <strong>0-49:</strong> {principle.ranges.low}
-            </li>
-          </ul>
-        </div>
-      ))}
+        {principlesData.map((principle) => (
+          <section
+            key={principle.name}
+            className="quickstart-card"
+            style={{ borderRadius: "1rem" }}
+          >
+            <h4>{principle.name}</h4>
+            <p style={{ fontStyle: "italic", color: "#4b5563" }}>
+              {principle.definition}
+            </p>
+            <p>
+              <strong>Why it matters:</strong> {principle.why}
+            </p>
+            <p>
+              <strong>What's evaluated:</strong>
+            </p>
+            <ul className="quickstart-list">
+              {principle.evaluated.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <p>
+              <strong>Score ranges:</strong>
+            </p>
+            <ul className="quickstart-list">
+              <li>
+                <strong>80-100:</strong> {principle.ranges.high}
+              </li>
+              <li>
+                <strong>50-79:</strong> {principle.ranges.medium}
+              </li>
+              <li>
+                <strong>0-49:</strong> {principle.ranges.low}
+              </li>
+            </ul>
+          </section>
+        ))}
+      </div>
     </div>
   );
 }
 
 function RecommendationsSection() {
   return (
-    <div>
-      <h3 style={{ marginTop: 0 }}>💡 Recommendations</h3>
+    <div className="quickstart-shell">
+      <div className="quickstart-content">
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>Recommendation Overview</h4>
+          <p>
+            Recommendations translate analysis findings into specific,
+            actionable steps for improving learning effectiveness. Each
+            suggestion ties back to one or more learning principles.
+          </p>
+        </section>
 
-      <h4>What They Are</h4>
-      <p>
-        Based on the analysis results, the system generates specific, actionable
-        suggestions for improving the chapter's learning effectiveness.
-      </p>
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>Recommendation Priorities</h4>
+          <ul className="quickstart-list">
+            <li>
+              <strong>High priority:</strong> Critical improvements when a
+              principle scores below 50
+            </li>
+            <li>
+              <strong>Medium priority:</strong> Meaningful enhancements for
+              scores between 50 and 79
+            </li>
+            <li>
+              <strong>Low priority:</strong> Fine-tuning opportunities when
+              principles score 80-89
+            </li>
+          </ul>
+        </section>
 
-      <h4>Recommendation Priorities</h4>
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>Types of Recommendations</h4>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+          >
+            {recommendationTypes.map((type) => (
+              <div
+                key={type.title}
+                style={{
+                  border: "1px solid rgba(15, 23, 42, 0.08)",
+                  borderRadius: "0.75rem",
+                  padding: "0.85rem",
+                  backgroundColor: "#f8fafc",
+                }}
+              >
+                <h5 style={{ margin: 0 }}>{type.title}</h5>
+                <p style={{ margin: "0.5rem 0" }}>{type.description}</p>
+                <ul className="quickstart-list">
+                  {type.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
 
-      <div
-        style={{
-          marginBottom: "1rem",
-          padding: "0.75rem",
-          backgroundColor: "#fee2e2",
-          borderLeft: "4px solid #dc2626",
-          borderRadius: "4px",
-        }}
-      >
-        <strong>🔴 High Priority:</strong> Critical improvements - principles
-        scoring below 50
+        <section className="quickstart-card" style={{ borderRadius: "1rem" }}>
+          <h4>How to Use Recommendations</h4>
+          <ol className="quickstart-order">
+            <li>
+              Start with the highest-priority items to address critical gaps
+            </li>
+            <li>
+              Adapt suggestions to your teaching context and student needs
+            </li>
+            <li>Implement in manageable increments to track impact</li>
+            <li>Re-run the analysis after changes to confirm improvements</li>
+          </ol>
+        </section>
       </div>
-
-      <div
-        style={{
-          marginBottom: "1rem",
-          padding: "0.75rem",
-          backgroundColor: "#fef3c7",
-          borderLeft: "4px solid #f59e0b",
-          borderRadius: "4px",
-        }}
-      >
-        <strong>🟡 Medium Priority:</strong> Meaningful enhancements -
-        principles scoring 50-79
-      </div>
-
-      <div
-        style={{
-          marginBottom: "1rem",
-          padding: "0.75rem",
-          backgroundColor: "#dbeafe",
-          borderLeft: "4px solid #3b82f6",
-          borderRadius: "4px",
-        }}
-      >
-        <strong>🔵 Low Priority:</strong> Fine-tuning - principles scoring 80-89
-      </div>
-
-      <h4>Types of Recommendations</h4>
-
-      <div style={{ marginBottom: "1.5rem" }}>
-        <h5>📝 Content Additions</h5>
-        <p>Suggests specific elements to add:</p>
-        <ul>
-          <li>Practice questions for retrieval</li>
-          <li>Visual diagrams for dual coding</li>
-          <li>Worked examples for problem-solving</li>
-          <li>Review sections for spaced repetition</li>
-        </ul>
-      </div>
-
-      <div style={{ marginBottom: "1.5rem" }}>
-        <h5>🔄 Structural Changes</h5>
-        <p>Recommends reorganization:</p>
-        <ul>
-          <li>Interleaving related concepts</li>
-          <li>Adding prerequisite explanations</li>
-          <li>Breaking down complex ideas</li>
-          <li>Creating concept maps</li>
-        </ul>
-      </div>
-
-      <div style={{ marginBottom: "1.5rem" }}>
-        <h5>🎯 Pedagogical Techniques</h5>
-        <p>Suggests instructional strategies:</p>
-        <ul>
-          <li>Prompts for self-explanation</li>
-          <li>Elaboration questions</li>
-          <li>Comparative analysis activities</li>
-          <li>Generative exercises</li>
-        </ul>
-      </div>
-
-      <h4>How to Use Recommendations</h4>
-      <ol>
-        <li>
-          <strong>Start with high-priority items</strong> - biggest impact
-        </li>
-        <li>
-          <strong>Consider your context</strong> - adapt to your teaching
-          situation
-        </li>
-        <li>
-          <strong>Implement incrementally</strong> - don't try everything at
-          once
-        </li>
-        <li>
-          <strong>Re-analyze after changes</strong> - verify improvements
-        </li>
-      </ol>
     </div>
   );
 }
+
+// Section data helpers
+const conceptRelationshipTypes = [
+  {
+    name: "Prerequisites (requires)",
+    meaning: "Concept A must be understood before Concept B",
+    example: "Atomic structure -> chemical bonding",
+    importance: "Shows the logical learning sequence and reveals gaps",
+  },
+  {
+    name: "Related (relates-to)",
+    meaning: "Concepts share features or frequently appear together",
+    example: "Acids and bases appear together for comparisons",
+    importance: "Identifies conceptual clusters that support schema building",
+  },
+  {
+    name: "Examples (example-of)",
+    meaning: "Concrete instances of abstract ideas",
+    example: "HCl is an example of an acid",
+    importance: "Connects abstract ideas to tangible representations",
+  },
+  {
+    name: "Contrasts (contrasts-with)",
+    meaning: "Concepts are compared or contrasted",
+    example: "Ionic bonds versus covalent bonds",
+    importance: "Highlights distinctions that clarify nuanced differences",
+  },
+];
+
+const universalPatterns = [
+  {
+    name: "Definition-Example",
+    description:
+      "Concept introduced formally and reinforced with concrete examples",
+  },
+  {
+    name: "Compare-Contrast",
+    description:
+      "Multiple concepts juxtaposed to emphasize similarities and differences",
+  },
+  {
+    name: "Problem-Solution",
+    description:
+      "A problem is posed and solved step-by-step to model reasoning",
+  },
+  {
+    name: "Elaboration",
+    description: "Concepts explained in increasing depth with layered details",
+  },
+];
+
+const chemistryPatterns = [
+  {
+    name: "Reaction Mechanism",
+    description: "Step-by-step breakdown of chemical reactions with equations",
+  },
+  {
+    name: "Lab Procedure",
+    description:
+      "Experimental methods that include safety, materials, and observations",
+  },
+  {
+    name: "Stoichiometry Problem",
+    description:
+      "Quantitative calculations showing balanced units and reasoning",
+  },
+];
+
+const recommendationTypes = [
+  {
+    title: "Content Additions",
+    description:
+      "Prompt authors to add missing elements that reinforce learning",
+    items: [
+      "Practice questions for retrieval",
+      "Visual diagrams for dual coding",
+      "Worked examples for problem solving",
+      "Review sections for spaced repetition",
+    ],
+  },
+  {
+    title: "Structural Changes",
+    description: "Suggest reorganizing material to improve flow and spacing",
+    items: [
+      "Interleaving related concepts",
+      "Adding prerequisite explanations",
+      "Breaking down complex ideas",
+      "Creating concept maps",
+    ],
+  },
+  {
+    title: "Pedagogical Techniques",
+    description: "Encourage instructional strategies that deepen processing",
+    items: [
+      "Prompts for self-explanation",
+      "Elaboration questions",
+      "Comparative analysis activities",
+      "Generative exercises",
+    ],
+  },
+];
 
 // Principles data
 const principlesData = [
