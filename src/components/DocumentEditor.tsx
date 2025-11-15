@@ -23,7 +23,6 @@ interface DocumentEditorProps {
   searchOccurrence: number;
   onSave?: () => void;
   readOnly?: boolean;
-  onBackToTop?: () => void;
 }
 
 type HighlightRange = {
@@ -73,13 +72,11 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   searchOccurrence,
   onSave,
   readOnly = false,
-  onBackToTop,
 }) => {
   const [text, setText] = useState(() => initialText);
   const [visualSuggestions, setVisualSuggestions] = useState<
     VisualSuggestion[]
   >([]);
-  const [showBackToTop, setShowBackToTop] = useState(false);
   const [editorWordCount, setEditorWordCount] = useState(() =>
     countWords(initialText)
   );
@@ -157,7 +154,6 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
 
   useEffect(() => {
     if (!highlightRange) {
-      setShowBackToTop(false);
       return;
     }
 
@@ -167,7 +163,6 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
           behavior: "smooth",
           block: "center",
         });
-        setShowBackToTop(true);
       }
       return;
     }
@@ -179,7 +174,6 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
         highlightRange.start,
         highlightRange.length
       );
-      setShowBackToTop(false);
     }
   }, [highlightRange, readOnly]);
 
@@ -264,11 +258,6 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     onSave?.();
   };
 
-  const handleBackToTop = () => {
-    onBackToTop?.();
-    setShowBackToTop(false);
-  };
-
   return (
     <div
       style={{
@@ -279,66 +268,73 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       }}
     >
       <div
+        className="app-panel"
         style={{
           display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
+          flexDirection: "column",
           gap: "12px",
-          flexWrap: "wrap",
+          padding: "16px",
         }}
       >
-        <div style={{ flex: 1, minWidth: "240px" }}>
-          <div
-            style={{
-              fontSize: "15px",
-              fontWeight: 600,
-              color: "#111827",
-            }}
-          >
-            {isEditing
-              ? "Author workspace with live spacing guidance"
-              : "Live preview with spacing + dual coding"}
-          </div>
-          <p
-            style={{
-              margin: "4px 0 0",
-              fontSize: "13px",
-              color: "#6b7280",
-              lineHeight: 1.5,
-            }}
-          >
-            {isEditing
-              ? "Scroll the preview on the left to see spacing targets and dual-coding callouts update as you edit on the right."
-              : "Spacing targets and dual-coding callouts render inline below for accurate placement."}
-          </p>
-        </div>
         <div
           style={{
             display: "flex",
-            gap: "8px",
-            alignItems: "center",
-            marginRight: "8px",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            gap: "12px",
+            flexWrap: "wrap",
           }}
         >
-          {showBackToTop && (
-            <button onClick={handleBackToTop} style={buttonStyle("#3b82f6")}>
-              Back to top
-            </button>
-          )}
-          {onSave && (
-            <button onClick={handleSave} style={buttonStyle("#10b981")}>
-              Save changes
-            </button>
-          )}
+          <div style={{ flex: 1, minWidth: "240px" }}>
+            <div
+              style={{
+                fontSize: "15px",
+                fontWeight: 600,
+                color: "#111827",
+              }}
+            >
+              {isEditing
+                ? "Author workspace with live spacing guidance"
+                : "Live preview with spacing + dual coding"}
+            </div>
+            <p
+              style={{
+                margin: "4px 0 0",
+                fontSize: "13px",
+                color: "#6b7280",
+                lineHeight: 1.5,
+              }}
+            >
+              {isEditing
+                ? "Scroll the preview on the left to see spacing targets and dual-coding callouts update as you edit on the right."
+                : "Spacing targets and dual-coding callouts render inline below for accurate placement."}
+            </p>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              alignItems: "center",
+              marginRight: "8px",
+            }}
+          >
+            {onSave && (
+              <button onClick={handleSave} style={buttonStyle("#10b981")}>
+                Save changes
+              </button>
+            )}
+          </div>
         </div>
-      </div>
 
-      {(showSpacingIndicators || showVisualSuggestions) && (
-        <GuidanceLegend
-          showSpacing={showSpacingIndicators}
-          showVisual={showVisualSuggestions}
-        />
-      )}
+        {(showSpacingIndicators || showVisualSuggestions) && (
+          <div style={{ marginTop: "4px" }}>
+            <GuidanceLegend
+              showSpacing={showSpacingIndicators}
+              showVisual={showVisualSuggestions}
+            />
+          </div>
+        )}
+      </div>
 
       <div
         style={{
@@ -707,6 +703,8 @@ const EditableView: React.FC<EditableViewProps> = ({
         padding: "16px",
         border: "1px solid #e5e7eb",
         borderRadius: "8px",
+        backgroundColor: "#ffffff",
+        boxShadow: "inset 0 1px 2px rgba(15,23,42,0.05)",
         fontFamily: "ui-sans-serif, system-ui, sans-serif",
         fontSize: "16px",
         lineHeight: 1.6,

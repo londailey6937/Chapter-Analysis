@@ -758,105 +758,123 @@ export const ChapterCheckerV2: React.FC = () => {
     viewMode === "writer" && tierFeatures.writerMode && !isAnalyzing;
 
   return (
-    <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: "#f3f4f6",
+      }}
+    >
       {/* Header */}
-      <header
-        role="banner"
+      <div
         style={{
-          padding: "1rem 2rem",
-          backgroundColor: "#667eea",
-          color: "white",
-          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-          position: "relative",
-          zIndex: 50,
-          margin: "16px 16px 0 16px",
-          borderRadius: "12px",
+          position: "sticky",
+          top: 0,
+          zIndex: 60,
+          padding: "16px",
+          paddingBottom: 0,
+          background:
+            "linear-gradient(180deg, #f3f4f6 70%, rgba(243,244,246,0))",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <button
-            onClick={() => setIsNavigationOpen(true)}
-            style={{
-              padding: "8px 16px",
-              backgroundColor: "rgba(255,255,255,0.2)",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontSize: "18px",
-            }}
-          >
-            ☰
-          </button>
-
-          <img
-            src="/TomeIQ.png"
-            alt="TomeIQ"
-            style={{ height: "96px", display: "block", objectFit: "contain" }}
-          />
-          <div>
-            <h1
+        <header
+          role="banner"
+          style={{
+            padding: "1rem 2rem",
+            backgroundColor: "#667eea",
+            color: "white",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            borderRadius: "12px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <button
+              onClick={() => setIsNavigationOpen(true)}
               style={{
-                margin: 0,
-                fontSize: "1.5rem",
-                color: "white",
-                fontWeight: "700",
-                lineHeight: "1.2",
-              }}
-            >
-              Tome
-              <span style={{ fontStyle: "italic", fontWeight: "700" }}>IQ</span>
-            </h1>
-            <p
-              style={{
-                margin: 0,
-                fontSize: "0.875rem",
-                opacity: 0.9,
-                color: "white",
-              }}
-            >
-              AI-Powered Textbook Analysis
-            </p>
-          </div>
-
-          {/* Access Level Selector (for demo purposes) */}
-          <div
-            style={{
-              marginLeft: "auto",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-            }}
-          >
-            <span style={{ fontSize: "0.875rem", opacity: 0.9 }}>
-              Demo Mode:
-            </span>
-            <select
-              value={accessLevel}
-              onChange={(e) => setAccessLevel(e.target.value as AccessLevel)}
-              style={{
-                padding: "6px 12px",
+                padding: "8px 16px",
                 backgroundColor: "rgba(255,255,255,0.2)",
                 color: "white",
-                border: "1px solid rgba(255,255,255,0.3)",
+                border: "none",
                 borderRadius: "6px",
                 cursor: "pointer",
-                fontSize: "0.875rem",
+                fontSize: "18px",
               }}
             >
-              <option value="free" style={{ color: "#000" }}>
-                Free (Spacing + Dual Coding)
-              </option>
-              <option value="premium" style={{ color: "#000" }}>
-                Premium (Full Analysis)
-              </option>
-              <option value="professional" style={{ color: "#000" }}>
-                Professional (Writer Mode)
-              </option>
-            </select>
+              ☰
+            </button>
+
+            <img
+              src="/TomeIQ.png"
+              alt="TomeIQ"
+              style={{ height: "96px", display: "block", objectFit: "contain" }}
+            />
+            <div>
+              <h1
+                style={{
+                  margin: 0,
+                  fontSize: "1.5rem",
+                  color: "white",
+                  fontWeight: "700",
+                  lineHeight: "1.2",
+                }}
+              >
+                Tome
+                <span style={{ fontStyle: "italic", fontWeight: "700" }}>
+                  IQ
+                </span>
+              </h1>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "0.875rem",
+                  opacity: 0.9,
+                  color: "white",
+                }}
+              >
+                AI-Powered Textbook Analysis
+              </p>
+            </div>
+
+            {/* Access Level Selector (for demo purposes) */}
+            <div
+              style={{
+                marginLeft: "auto",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.5rem",
+              }}
+            >
+              <span style={{ fontSize: "0.875rem", opacity: 0.9 }}>
+                Demo Mode:
+              </span>
+              <select
+                value={accessLevel}
+                onChange={(e) => setAccessLevel(e.target.value as AccessLevel)}
+                style={{
+                  padding: "6px 12px",
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                  color: "white",
+                  border: "1px solid rgba(255,255,255,0.3)",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontSize: "0.875rem",
+                }}
+              >
+                <option value="free" style={{ color: "#000" }}>
+                  Free (Spacing + Dual Coding)
+                </option>
+                <option value="premium" style={{ color: "#000" }}>
+                  Premium (Full Analysis)
+                </option>
+                <option value="professional" style={{ color: "#000" }}>
+                  Professional (Writer Mode)
+                </option>
+              </select>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
       <NavigationMenu
         isOpen={isNavigationOpen}
@@ -874,176 +892,197 @@ export const ChapterCheckerV2: React.FC = () => {
         style={{
           flex: 1,
           display: "flex",
-          overflow: "hidden",
           padding: "16px",
           boxSizing: "border-box",
           gap: "16px",
           backgroundColor: "#f9fafb",
+          minHeight: 0,
         }}
       >
-        {/* Left: Document Editor */}
+        {/* Left: Document Column */}
         <div
           style={{
             flex: 1,
             display: "flex",
             flexDirection: "column",
-            backgroundColor: "#ffffff",
-            borderRadius: "12px",
-            boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
+            gap: "16px",
           }}
         >
+          <div className="app-panel" style={{ padding: 0 }}>
+            <div
+              ref={documentHeaderRef}
+              style={{
+                padding: "16px",
+                scrollMarginTop: "140px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  gap: "12px",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                }}
+              >
+                <DocumentUploader
+                  onDocumentLoad={handleDocumentLoad}
+                  disabled={isAnalyzing}
+                />
+
+                {fileName && (
+                  <div style={{ fontSize: "14px", color: "#6b7280" }}>
+                    📄 {fileName}
+                  </div>
+                )}
+
+                {chapterData && !isAnalyzing && (
+                  <>
+                    <button
+                      onClick={handleClear}
+                      style={{
+                        padding: "8px 16px",
+                        backgroundColor: "#ef4444",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                      }}
+                    >
+                      🗑️ Clear
+                    </button>
+
+                    <button
+                      onClick={handleExportDocx}
+                      style={{
+                        padding: "8px 16px",
+                        backgroundColor: "#10b981",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                        fontWeight: "600",
+                      }}
+                    >
+                      📥 Export Document
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div
-            ref={documentHeaderRef}
+            className="app-panel"
             style={{
-              padding: "16px",
-              borderBottom: "1px solid #e5e7eb",
-              backgroundColor: "#f9fafb",
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              minHeight: 0,
+              padding: 0,
             }}
           >
             <div
               style={{
+                flex: 1,
                 display: "flex",
-                gap: "12px",
-                alignItems: "center",
-                flexWrap: "wrap",
+                flexDirection: "column",
+                padding: "16px",
+                minHeight: 0,
               }}
             >
-              <DocumentUploader
-                onDocumentLoad={handleDocumentLoad}
-                disabled={isAnalyzing}
-              />
-
-              {fileName && (
-                <div style={{ fontSize: "14px", color: "#6b7280" }}>
-                  📄 {fileName}
+              {chapterData ? (
+                <div
+                  style={{
+                    flex: 1,
+                    display: "flex",
+                    flexDirection: "column",
+                    minHeight: 0,
+                  }}
+                >
+                  <DocumentEditor
+                    key={fileName} // Force new component instance when file changes
+                    initialText={
+                      chapterData.originalPlainText ?? chapterData.plainText
+                    }
+                    htmlContent={
+                      chapterData.editorHtml
+                        ? chapterData.editorHtml
+                        : chapterData.isHybridDocx
+                        ? chapterData.html
+                        : null
+                    }
+                    searchText={
+                      chapterData.originalPlainText ?? chapterData.plainText
+                    }
+                    onTextChange={(text) => {
+                      if (viewMode === "writer" && !tierFeatures.writerMode) {
+                        setUpgradeFeature("Writer Mode");
+                        setUpgradeTarget("professional");
+                        setShowUpgradePrompt(true);
+                        return;
+                      }
+                      if (!canEditChapter) {
+                        return;
+                      }
+                      handleTextChange(text);
+                    }}
+                    onContentChange={(content) => {
+                      if (viewMode === "writer" && !tierFeatures.writerMode) {
+                        setUpgradeFeature("Writer Mode");
+                        setUpgradeTarget("professional");
+                        setShowUpgradePrompt(true);
+                        return;
+                      }
+                      if (!canEditChapter) {
+                        return;
+                      }
+                      handleEditorContentChange(content);
+                    }}
+                    showSpacingIndicators={true}
+                    showVisualSuggestions={true}
+                    highlightPosition={highlightPosition}
+                    searchWord={searchWord}
+                    searchOccurrence={searchOccurrence}
+                    onSave={
+                      analysis && viewMode === "writer"
+                        ? handleExportDocx
+                        : undefined
+                    }
+                    readOnly={!canEditChapter}
+                  />
                 </div>
-              )}
-
-              {chapterData && !isAnalyzing && (
-                <>
-                  <button
-                    onClick={handleClear}
-                    style={{
-                      padding: "8px 16px",
-                      backgroundColor: "#ef4444",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                    }}
-                  >
-                    🗑️ Clear
-                  </button>
-
-                  <button
-                    onClick={handleExportDocx}
-                    style={{
-                      padding: "8px 16px",
-                      backgroundColor: "#10b981",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "6px",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                      fontWeight: "600",
-                    }}
-                  >
-                    📥 Export Document
-                  </button>
-                </>
+              ) : (
+                <div
+                  style={{
+                    flex: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#9ca3af",
+                    flexDirection: "column",
+                    gap: "1rem",
+                  }}
+                >
+                  <div style={{ fontSize: "64px" }}>📄</div>
+                  <div style={{ fontSize: "18px", fontWeight: "600" }}>
+                    Upload a document to get started
+                  </div>
+                </div>
               )}
             </div>
           </div>
-
-          {chapterData ? (
-            <DocumentEditor
-              key={fileName} // Force new component instance when file changes
-              initialText={
-                chapterData.originalPlainText ?? chapterData.plainText
-              }
-              htmlContent={
-                chapterData.editorHtml
-                  ? chapterData.editorHtml
-                  : chapterData.isHybridDocx
-                  ? chapterData.html
-                  : null
-              }
-              searchText={
-                chapterData.originalPlainText ?? chapterData.plainText
-              }
-              onTextChange={(text) => {
-                if (viewMode === "writer" && !tierFeatures.writerMode) {
-                  setUpgradeFeature("Writer Mode");
-                  setUpgradeTarget("professional");
-                  setShowUpgradePrompt(true);
-                  return;
-                }
-                if (!canEditChapter) {
-                  return;
-                }
-                handleTextChange(text);
-              }}
-              onContentChange={(content) => {
-                if (viewMode === "writer" && !tierFeatures.writerMode) {
-                  setUpgradeFeature("Writer Mode");
-                  setUpgradeTarget("professional");
-                  setShowUpgradePrompt(true);
-                  return;
-                }
-                if (!canEditChapter) {
-                  return;
-                }
-                handleEditorContentChange(content);
-              }}
-              showSpacingIndicators={true}
-              showVisualSuggestions={true}
-              highlightPosition={highlightPosition}
-              searchWord={searchWord}
-              searchOccurrence={searchOccurrence}
-              onSave={
-                analysis && viewMode === "writer" ? handleExportDocx : undefined
-              }
-              readOnly={!canEditChapter}
-              onBackToTop={() => {
-                if (documentHeaderRef.current) {
-                  documentHeaderRef.current.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  });
-                }
-              }}
-            />
-          ) : (
-            <div
-              style={{
-                flex: 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#9ca3af",
-                flexDirection: "column",
-                gap: "1rem",
-              }}
-            >
-              <div style={{ fontSize: "64px" }}>📄</div>
-              <div style={{ fontSize: "18px", fontWeight: "600" }}>
-                Upload a document to get started
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Right: Analysis Panel */}
         <div
+          className="app-panel"
           style={{
             width: "50%",
             minWidth: "600px",
             display: "flex",
             flexDirection: "column",
-            backgroundColor: "#ffffff",
-            borderRadius: "12px",
-            boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
           }}
         >
           {!tierFeatures.fullAnalysis ? (
@@ -1060,11 +1099,6 @@ export const ChapterCheckerV2: React.FC = () => {
               <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>
                 Tier 1 - Document Insights
               </h2>
-              <p style={{ margin: 0, fontSize: "14px", color: "#374151" }}>
-                Upload a DOCX or OBT chapter to unlock live spacing metrics and
-                dual-coding suggestions directly inside the editor on the left.
-                Highlights update instantly as you revise.
-              </p>
               <ul
                 style={{
                   margin: 0,
@@ -1072,19 +1106,103 @@ export const ChapterCheckerV2: React.FC = () => {
                   color: "#4b5563",
                   fontSize: "13px",
                   lineHeight: 1.6,
+                  listStyleType: "disc",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "12px",
                 }}
               >
                 <li>
-                  Spacing overview shows paragraph word counts and density
-                  trends.
+                  <strong style={{ color: "#111827" }}>
+                    Tier 1 · Document Insights
+                  </strong>
+                  <p style={{ margin: "4px 0" }}>
+                    Upload any DOCX or OBT chapter to unlock live spacing
+                    metrics and dual-coding suggestions directly inside the
+                    editor. Highlights update instantly as you revise.
+                  </p>
+                  <ul
+                    style={{
+                      margin: 0,
+                      paddingLeft: "18px",
+                      lineHeight: 1.6,
+                      listStyleType: "circle",
+                    }}
+                  >
+                    <li>
+                      Spacing overview shows paragraph word counts and density
+                      trends.
+                    </li>
+                    <li>
+                      Dual-coding panel recommends visuals for sequences,
+                      spatial descriptions, and quantitative passages.
+                    </li>
+                    <li>
+                      Search + highlight controls jump to key concept mentions.
+                    </li>
+                  </ul>
                 </li>
+
                 <li>
-                  Dual-coding panel recommends visuals for sequences, spatial
-                  descriptions, and quantitative passages.
+                  <strong style={{ color: "#111827" }}>
+                    Tier 2 · Full Analysis Suite
+                  </strong>
+                  <p style={{ margin: "4px 0" }}>
+                    Run the complete 10-principle evaluator over your draft for
+                    richer learning-science diagnostics.
+                  </p>
+                  <ul
+                    style={{
+                      margin: 0,
+                      paddingLeft: "18px",
+                      lineHeight: 1.6,
+                      listStyleType: "circle",
+                    }}
+                  >
+                    <li>
+                      Principle-by-principle scoring with severity badges and
+                      supporting evidence.
+                    </li>
+                    <li>
+                      Concept relationship graphs show coverage depth, overlap,
+                      and gaps.
+                    </li>
+                    <li>
+                      Auto-generated recommendations with rationale and
+                      suggested edits.
+                    </li>
+                  </ul>
                 </li>
+
                 <li>
-                  Use the search and highlight controls to jump to key concept
-                  mentions.
+                  <strong style={{ color: "#111827" }}>
+                    Tier 3 · Pro Collaboration Mode
+                  </strong>
+                  <p style={{ margin: "4px 0" }}>
+                    Unlock writer tools and export workflows for teams
+                    finalizing publish-ready chapters.
+                  </p>
+                  <ul
+                    style={{
+                      margin: 0,
+                      paddingLeft: "18px",
+                      lineHeight: 1.6,
+                      listStyleType: "circle",
+                    }}
+                  >
+                    <li>
+                      Real-time writer mode with tracked highlights and
+                      version-safe exports.
+                    </li>
+                    <li>
+                      Custom domain libraries plus bulk concept suggestions for
+                      specialized curricula.
+                    </li>
+                    <li>
+                      Download bundled reports (DOCX + JSON insights) for review
+                      cycles.
+                    </li>
+                  </ul>
                 </li>
               </ul>
               {!chapterData && (
@@ -1632,6 +1750,9 @@ export const ChapterCheckerV2: React.FC = () => {
                         padding: "20px",
                         overflow: "auto",
                         height: "100%",
+                        backgroundColor: "#ffffff",
+                        borderRadius: "12px",
+                        boxShadow: "inset 0 1px 2px rgba(15,23,42,0.05)",
                       }}
                     >
                       <h3

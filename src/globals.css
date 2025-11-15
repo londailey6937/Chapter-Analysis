@@ -222,6 +222,14 @@
     border-radius: 0.75rem;
   }
 
+  .app-panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-soft);
+    border-radius: 1rem;
+    box-shadow: 0 12px 24px rgba(2, 6, 23, 0.06);
+    overflow: hidden;
+  }
+
   .animate-spin-slow {
     animation: spin 2s linear infinite;
   }

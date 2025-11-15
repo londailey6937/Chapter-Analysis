@@ -597,13 +597,15 @@ async function createImageParagraph(
 
   const type = determineImageType({ src, mimeType, byteSignature });
 
+  // Fallback to jpg when the type is missing; docx library expects a concrete literal.
+  const docxImageType: SupportedImageType = type ?? "jpg";
   const imageRun = new ImageRun({
     data,
     transformation: {
       width: finalWidth,
       height: finalHeight,
     },
-    ...(type ? { type } : {}),
+    type: docxImageType,
   });
 
   return new Paragraph({
