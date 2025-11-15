@@ -30,6 +30,7 @@ import tomeIqLogo from "@/assets/tomeiq-logo.png";
 
 const HEADING_LENGTH_LIMIT = 120;
 const MAX_FALLBACK_SECTIONS = 8;
+const STICKY_HEADER_OFFSET = 140;
 
 type SectionCandidate = {
   heading: string;
@@ -219,6 +220,22 @@ const deriveSectionsFromText = (rawText: string): Section[] => {
   return buildFallbackSections(text);
 };
 
+const scrollWindowToElement = (
+  element: HTMLElement | null,
+  offset: number = STICKY_HEADER_OFFSET
+) => {
+  if (typeof window === "undefined" || !element) {
+    return;
+  }
+
+  const rect = element.getBoundingClientRect();
+  const top = rect.top + window.scrollY - offset;
+  window.scrollTo({
+    top: top > 0 ? top : 0,
+    behavior: "smooth",
+  });
+};
+
 export const ChapterCheckerV2: React.FC = () => {
   // Access control state
   const [accessLevel, setAccessLevel] = useState<AccessLevel>("free");
@@ -266,6 +283,9 @@ export const ChapterCheckerV2: React.FC = () => {
   );
   const [searchWord, setSearchWord] = useState<string | null>(null);
   const [searchOccurrence, setSearchOccurrence] = useState<number>(0); // Which occurrence to find
+  const [scrollToTopSignal, setScrollToTopSignal] = useState(0);
+  const [windowScrolled, setWindowScrolled] = useState(false);
+  const [contentScrolled, setContentScrolled] = useState(false);
 
   // Ref for analysis panel
   const analysisPanelRef = useRef<HTMLDivElement>(null);
@@ -335,6 +355,22 @@ export const ChapterCheckerV2: React.FC = () => {
       .sort((a, b) => a.label.localeCompare(b.label));
   }, []);
 
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const handleWindowScroll = () => {
+      setWindowScrolled(window.scrollY > 200);
+    };
+
+    handleWindowScroll();
+    window.addEventListener("scroll", handleWindowScroll);
+    return () => {
+      window.removeEventListener("scroll", handleWindowScroll);
+    };
+  }, []);
+
   // Load saved custom domains on startup
   useEffect(() => {
     try {
@@ -402,6 +438,29 @@ export const ChapterCheckerV2: React.FC = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   };
+
+  const handleDocumentScrollDepthChange = (hasScrolled: boolean) => {
+    setContentScrolled(hasScrolled);
+  };
+
+  const handleBackToTop = () => {
+    const features = ACCESS_TIERS[accessLevel];
+    const hasFullAnalysisView = features.fullAnalysis && Boolean(analysis);
+
+    scrollWindowToElement(documentHeaderRef.current);
+
+    if (hasFullAnalysisView && analysisPanelRef.current) {
+      analysisPanelRef.current.scrollTo({ top: 0, behavior: "smooth" });
+      analysisControlsRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+
+    setScrollToTopSignal(Date.now());
+  };
+
+  const shouldShowBackToTop = windowScrolled || contentScrolled;
 
   const handleDocumentLoad = (payload: UploadedDocumentPayload) => {
     const {
@@ -1273,6 +1332,8 @@ export const ChapterCheckerV2: React.FC = () => {
                         : undefined
                     }
                     readOnly={!canEditChapter}
+                    scrollToTopSignal={scrollToTopSignal}
+                    onScrollDepthChange={handleDocumentScrollDepthChange}
                   />
                 </div>
               ) : (
@@ -2159,6 +2220,36 @@ export const ChapterCheckerV2: React.FC = () => {
           )}
         </div>
       </div>
+
+      {shouldShowBackToTop && (
+        <button
+          type="button"
+          onClick={handleBackToTop}
+          style={{
+            position: "fixed",
+            bottom: "28px",
+            right: "28px",
+            padding: "12px 18px",
+            borderRadius: "999px",
+            border: "none",
+            background:
+              "linear-gradient(135deg, rgba(31,41,55,0.95), rgba(55,65,81,0.95))",
+            color: "white",
+            fontWeight: 600,
+            fontSize: "14px",
+            boxShadow: "0 12px 25px rgba(15,23,42,0.25)",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            zIndex: 1200,
+          }}
+          aria-label="Back to top"
+        >
+          <span style={{ fontSize: "16px" }}>↑</span>
+          Back to top
+        </button>
+      )}
 
       {/* Custom Domain Dialog */}
       {showCustomDomainDialog && (

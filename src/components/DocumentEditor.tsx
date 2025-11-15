@@ -23,6 +23,8 @@ interface DocumentEditorProps {
   searchOccurrence: number;
   onSave?: () => void;
   readOnly?: boolean;
+  scrollToTopSignal?: number;
+  onScrollDepthChange?: (hasScrolled: boolean) => void;
 }
 
 type HighlightRange = {
@@ -72,6 +74,8 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   searchOccurrence,
   onSave,
   readOnly = false,
+  scrollToTopSignal,
+  onScrollDepthChange,
 }) => {
   const [text, setText] = useState(() => initialText);
   const [visualSuggestions, setVisualSuggestions] = useState<
@@ -82,6 +86,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   );
   const editorRef = useRef<HTMLDivElement>(null);
   const highlightRef = useRef<HTMLSpanElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
   const isEditing = !readOnly;
   const skipNextPropSyncRef = useRef(false);
   const initialHtmlRef = useRef(
@@ -89,6 +94,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       ? sanitizeHtml(htmlContent)
       : convertTextToHtml(initialText)
   );
+  const scrollStateRef = useRef({ preview: false, editor: false });
 
   useEffect(() => {
     if (editorRef.current) {
@@ -258,6 +264,40 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     onSave?.();
   };
 
+  const emitScrollDepth = () => {
+    const hasScrolled =
+      scrollStateRef.current.preview || scrollStateRef.current.editor;
+    onScrollDepthChange?.(hasScrolled);
+  };
+
+  const handlePreviewScroll = () => {
+    const scrolled = (previewRef.current?.scrollTop ?? 0) > 160;
+    if (scrollStateRef.current.preview !== scrolled) {
+      scrollStateRef.current.preview = scrolled;
+      emitScrollDepth();
+    }
+  };
+
+  const handleEditorScroll = () => {
+    const scrolled = (editorRef.current?.scrollTop ?? 0) > 160;
+    if (scrollStateRef.current.editor !== scrolled) {
+      scrollStateRef.current.editor = scrolled;
+      emitScrollDepth();
+    }
+  };
+
+  useEffect(() => {
+    if (!scrollToTopSignal) {
+      return;
+    }
+
+    previewRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    editorRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+
+    scrollStateRef.current = { preview: false, editor: false };
+    onScrollDepthChange?.(false);
+  }, [scrollToTopSignal, onScrollDepthChange]);
+
   return (
     <div
       style={{
@@ -376,6 +416,8 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
             showSpacingIndicators={showSpacingIndicators}
             showVisualSuggestions={showVisualSuggestions}
             suggestionsByParagraph={suggestionsByParagraph}
+            containerRef={previewRef}
+            onScroll={handlePreviewScroll}
           />
         </div>
 
@@ -411,6 +453,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
               editorRef={editorRef}
               onInput={handleEditorInput}
               onPaste={handlePaste}
+              onScroll={handleEditorScroll}
             />
           </div>
         )}
@@ -510,6 +553,8 @@ type ReadOnlyViewProps = {
   showSpacingIndicators: boolean;
   showVisualSuggestions: boolean;
   suggestionsByParagraph: Map<number, VisualSuggestion[]>;
+  containerRef?: React.RefObject<HTMLDivElement>;
+  onScroll?: () => void;
 };
 
 const ReadOnlyView: React.FC<ReadOnlyViewProps> = ({
@@ -519,11 +564,15 @@ const ReadOnlyView: React.FC<ReadOnlyViewProps> = ({
   showSpacingIndicators,
   showVisualSuggestions,
   suggestionsByParagraph,
+  containerRef,
+  onScroll,
 }) => {
   let highlightAnchorAssigned = false;
 
   return (
     <div
+      ref={containerRef}
+      onScroll={onScroll}
       style={{
         flex: 1,
         overflowY: "auto",
@@ -683,12 +732,14 @@ type EditableViewProps = {
   editorRef: React.RefObject<HTMLDivElement>;
   onInput: () => void;
   onPaste: (event: ClipboardEvent<HTMLDivElement>) => void;
+  onScroll?: () => void;
 };
 
 const EditableView: React.FC<EditableViewProps> = ({
   editorRef,
   onInput,
   onPaste,
+  onScroll,
 }) => {
   return (
     <div
@@ -697,6 +748,7 @@ const EditableView: React.FC<EditableViewProps> = ({
       suppressContentEditableWarning
       onInput={onInput}
       onPaste={onPaste}
+      onScroll={onScroll}
       style={{
         flex: 1,
         minHeight: "400px",
