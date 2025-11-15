@@ -117,6 +117,15 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
       "A mathematical notation that describes the upper bound of an algorithm's growth rate.",
   },
   {
+    id: "computing-hot-code",
+    name: "hot code",
+    category: "Performance Optimization",
+    subcategory: "Runtime Behavior",
+    importance: "supporting",
+    description:
+      "A high-frequency execution path or code region that dominates runtime costs and therefore benefits most from profiling and optimization efforts.",
+  },
+  {
     id: "computing-class",
     name: "class",
     category: "Object-Oriented Programming",

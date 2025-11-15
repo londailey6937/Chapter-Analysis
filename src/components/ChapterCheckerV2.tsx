@@ -899,10 +899,12 @@ export const ChapterCheckerV2: React.FC = () => {
           minHeight: 0,
         }}
       >
-        {/* Left: Document Column */}
+        {/* Left: Document Column (60%) */}
         <div
           style={{
-            flex: 1,
+            flex: "0 0 60%",
+            maxWidth: "60%",
+            minWidth: "520px",
             display: "flex",
             flexDirection: "column",
             gap: "16px",
@@ -1075,12 +1077,13 @@ export const ChapterCheckerV2: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Analysis Panel */}
+        {/* Right: Analysis Panel (40%) */}
         <div
           className="app-panel"
           style={{
-            width: "50%",
-            minWidth: "600px",
+            flex: "0 0 40%",
+            maxWidth: "40%",
+            minWidth: "420px",
             display: "flex",
             flexDirection: "column",
           }}

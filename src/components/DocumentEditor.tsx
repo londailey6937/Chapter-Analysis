@@ -346,7 +346,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       >
         <div
           style={{
-            flex: isEditing ? 0.55 : 1,
+            flex: isEditing ? 0.5 : 1,
             minHeight: 0,
             display: "flex",
             flexDirection: "column",
@@ -382,7 +382,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
         {isEditing && (
           <div
             style={{
-              flex: 0.45,
+              flex: 0.5,
               minHeight: 0,
               display: "flex",
               flexDirection: "column",
