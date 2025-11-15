@@ -17,7 +17,24 @@ export const WriterMode: React.FC<WriterModeProps> = ({
     null
   );
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isCompactView, setIsCompactView] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Responsive layout detection
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setIsCompactView(width < 1024); // Tablet and below
+      // Auto-collapse sidebar on smaller screens
+      if (width < 768 && isSidebarOpen) {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Update editable text when source changes
   useEffect(() => {
@@ -65,29 +82,37 @@ export const WriterMode: React.FC<WriterModeProps> = ({
       style={{ height: "100vh", width: "100%" }}
     >
       {/* Header */}
-      <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Writer Mode</h2>
-            <p className="text-sm text-gray-600 mt-1">
+      <div className="border-b border-gray-200 bg-gray-50 px-4 md:px-6 py-3 md:py-4">
+        <div className="flex items-start md:items-center justify-between gap-3 flex-wrap">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900">
+              Writer Mode
+            </h2>
+            <p className="text-xs md:text-sm text-gray-600 mt-1">
               Edit your text based on learning principle recommendations
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <button
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium"
+              className="px-3 md:px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium text-sm md:text-base whitespace-nowrap"
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             >
-              {isSidebarOpen ? "◀ Hide Analysis" : "▶ Show Analysis"}
+              {isSidebarOpen
+                ? isCompactView
+                  ? "◀"
+                  : "◀ Hide Analysis"
+                : isCompactView
+                ? "▶"
+                : "▶ Show Analysis"}
             </button>
             <button
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-3 md:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base whitespace-nowrap"
               onClick={() => {
                 // TODO: Export functionality
                 console.log("Export edited text:", editableText);
               }}
             >
-              Export Text
+              {isCompactView ? "Export" : "Export Text"}
             </button>
           </div>
         </div>
@@ -96,19 +121,27 @@ export const WriterMode: React.FC<WriterModeProps> = ({
       {/* Main Content Area */}
       <div
         className="flex-1 flex overflow-hidden"
-        style={{ maxWidth: "100%", width: "100%" }}
+        style={{
+          maxWidth: "100%",
+          width: "100%",
+          flexDirection: isCompactView && isSidebarOpen ? "column" : "row",
+        }}
       >
         {/* Text Editor - Expands to full width when sidebar closed */}
         <div
           className="flex flex-col transition-all duration-300"
           style={{
-            width: isSidebarOpen ? "65%" : "100%",
-            maxWidth: isSidebarOpen ? "65%" : "100%",
+            width: isCompactView ? "100%" : isSidebarOpen ? "65%" : "100%",
+            maxWidth: isCompactView ? "100%" : isSidebarOpen ? "65%" : "100%",
+            minHeight: isCompactView && isSidebarOpen ? "50%" : "auto",
+            flex: isCompactView && isSidebarOpen ? "1 1 50%" : undefined,
           }}
         >
-          <div className="bg-gray-100 px-4 py-2 border-b border-gray-200 flex items-center justify-between">
+          <div className="bg-gray-100 px-3 md:px-4 py-2 border-b border-gray-200 flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-gray-700">Editable Text</h3>
+              <h3 className="font-semibold text-gray-700 text-sm md:text-base">
+                Editable Text
+              </h3>
               <p className="text-xs text-gray-500">
                 {editableText.length.toLocaleString()} characters •{" "}
                 {editableText
@@ -119,18 +152,23 @@ export const WriterMode: React.FC<WriterModeProps> = ({
               </p>
             </div>
           </div>
-          <div className="flex-1 overflow-auto p-8">
+          <div
+            className="flex-1 overflow-auto p-4 md:p-6 lg:p-8"
+            style={{ minHeight: 0 }}
+          >
             <textarea
               ref={textAreaRef}
               value={editableText}
               onChange={handleTextChange}
-              className="w-full h-full min-h-full p-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-base leading-relaxed shadow-sm"
+              className="w-full p-4 md:p-6 lg:p-8 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-base leading-relaxed shadow-sm"
               style={{
                 fontFamily: "ui-sans-serif, system-ui, sans-serif",
-                fontSize: "17px",
+                fontSize: isCompactView ? "16px" : "17px",
                 lineHeight: "1.8",
                 maxWidth: isSidebarOpen ? "100%" : "1200px",
                 margin: isSidebarOpen ? "0" : "0 auto",
+                minHeight: "100%",
+                height: "auto",
               }}
               placeholder="Your text will appear here..."
               spellCheck={true}
@@ -141,23 +179,30 @@ export const WriterMode: React.FC<WriterModeProps> = ({
         {/* Suggestions Panel - Collapsible Right Sidebar */}
         {isSidebarOpen && (
           <div
-            className="flex flex-col bg-gray-50 border-l border-gray-200 transition-all duration-300"
-            style={{ width: "35%", maxWidth: "35%" }}
+            className="flex flex-col bg-gray-50 transition-all duration-300"
+            style={{
+              width: isCompactView ? "100%" : "35%",
+              maxWidth: isCompactView ? "100%" : "35%",
+              borderLeft: isCompactView ? "none" : "1px solid #e5e7eb",
+              borderTop: isCompactView ? "1px solid #e5e7eb" : "none",
+              flex: isCompactView ? "1 1 50%" : undefined,
+              minHeight: isCompactView ? "300px" : "auto",
+            }}
           >
-            <div className="bg-gray-100 px-4 py-2 border-b border-gray-200">
-              <h3 className="font-semibold text-gray-700">
+            <div className="bg-gray-100 px-3 md:px-4 py-2 border-b border-gray-200">
+              <h3 className="font-semibold text-gray-700 text-sm md:text-base">
                 Suggestions & Analysis
               </h3>
             </div>
 
-            <div className="flex-1 overflow-auto p-4 space-y-4">
+            <div className="flex-1 overflow-auto p-3 md:p-4 space-y-3 md:space-y-4">
               {/* Principle Scores Summary */}
               {principleScores.length > 0 && (
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                  <h4 className="font-semibold text-sm text-gray-900 mb-3">
+                <div className="bg-white p-3 md:p-4 rounded-lg shadow-sm border border-gray-200">
+                  <h4 className="font-semibold text-xs md:text-sm text-gray-900 mb-2 md:mb-3">
                     Learning Principle Scores
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-1.5 md:space-y-2">
                     {principleScores.map((ps, idx) => {
                       const roundedScore = Math.round(Number(ps.score));
                       console.log(
@@ -198,13 +243,13 @@ export const WriterMode: React.FC<WriterModeProps> = ({
               {/* Recommendations */}
               {textIssues.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="font-semibold text-sm text-gray-900 mb-2">
+                  <h4 className="font-semibold text-xs md:text-sm text-gray-900 mb-2">
                     Recommendations ({textIssues.length})
                   </h4>
                   {textIssues.map((issue, idx) => (
                     <div
                       key={idx}
-                      className={`p-3 rounded-lg border-l-4 cursor-pointer transition-all ${
+                      className={`p-2.5 md:p-3 rounded-lg border-l-4 cursor-pointer transition-all ${
                         selectedSuggestion === idx
                           ? "bg-blue-50 border-blue-500 shadow-md"
                           : issue.priority === "high"
@@ -239,8 +284,8 @@ export const WriterMode: React.FC<WriterModeProps> = ({
 
               {/* Concept Summary */}
               {concepts.length > 0 && (
-                <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                  <h4 className="font-semibold text-sm text-gray-900 mb-3">
+                <div className="bg-white p-3 md:p-4 rounded-lg shadow-sm border border-gray-200">
+                  <h4 className="font-semibold text-xs md:text-sm text-gray-900 mb-2 md:mb-3">
                     Concepts Identified ({concepts.length})
                   </h4>
                   <div className="flex flex-wrap gap-2">

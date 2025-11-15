@@ -33,6 +33,18 @@ const HEADING_LENGTH_LIMIT = 120;
 const MAX_FALLBACK_SECTIONS = 8;
 const STICKY_HEADER_OFFSET = 140;
 
+type LayoutMode = "desktop" | "laptop" | "tablet";
+
+const resolveLayoutMode = (width: number): LayoutMode => {
+  if (width <= 1024) {
+    return "tablet";
+  }
+  if (width <= 1520) {
+    return "laptop";
+  }
+  return "desktop";
+};
+
 const countWordsQuick = (value: string): number => {
   if (!value.trim()) {
     return 0;
@@ -300,7 +312,12 @@ export const ChapterCheckerV2: React.FC = () => {
   const [scrollToTopSignal, setScrollToTopSignal] = useState(0);
   const [windowScrolled, setWindowScrolled] = useState(false);
   const [contentScrolled, setContentScrolled] = useState(false);
-  const [isNarrowLayout, setIsNarrowLayout] = useState(false);
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>(() => {
+    if (typeof window === "undefined") {
+      return "desktop";
+    }
+    return resolveLayoutMode(window.innerWidth);
+  });
 
   const statisticsText =
     chapterData?.originalPlainText ??
@@ -403,7 +420,7 @@ export const ChapterCheckerV2: React.FC = () => {
     }
 
     const updateLayout = () => {
-      setIsNarrowLayout(window.innerWidth <= 1400);
+      setLayoutMode(resolveLayoutMode(window.innerWidth));
     };
 
     updateLayout();
@@ -480,6 +497,29 @@ export const ChapterCheckerV2: React.FC = () => {
   };
 
   const shouldShowBackToTop = windowScrolled || contentScrolled;
+  const isStackedLayout = layoutMode === "tablet";
+  const layoutGap = layoutMode === "desktop" ? 24 : 16;
+  const documentFlexGrow = isStackedLayout
+    ? 1
+    : layoutMode === "desktop"
+    ? 1.65
+    : 1.45;
+  const analysisFlexGrow = isStackedLayout
+    ? 1
+    : layoutMode === "desktop"
+    ? 1
+    : 1.1;
+  const documentMinWidth = isStackedLayout
+    ? "auto"
+    : layoutMode === "desktop"
+    ? "720px"
+    : "560px";
+  const analysisMinWidth = isStackedLayout
+    ? "auto"
+    : layoutMode === "desktop"
+    ? "420px"
+    : "360px";
+  const isCompactEditorLayout = layoutMode !== "desktop";
 
   const handleDocumentLoad = (payload: UploadedDocumentPayload) => {
     const {
@@ -1228,23 +1268,23 @@ export const ChapterCheckerV2: React.FC = () => {
         style={{
           flex: 1,
           display: "flex",
-          flexDirection: isNarrowLayout ? "column" : "row",
+          flexDirection: isStackedLayout ? "column" : "row",
+          alignItems: "stretch",
           padding: "16px",
           boxSizing: "border-box",
-          gap: "16px",
+          gap: layoutGap,
           backgroundColor: "#f9fafb",
           minHeight: 0,
-          minWidth: isNarrowLayout ? "auto" : "1100px",
-          overflowX: isNarrowLayout ? "visible" : "auto",
+          minWidth: 0,
         }}
       >
         {/* Left: Document Column (60%) */}
         <div
           style={{
-            flex: isNarrowLayout ? "1 1 100%" : "0 0 60%",
-            maxWidth: isNarrowLayout ? "100%" : "60%",
-            minWidth: isNarrowLayout ? "0" : "520px",
-            width: isNarrowLayout ? "100%" : "60%",
+            flex: isStackedLayout ? "1 1 100%" : `${documentFlexGrow} 1 0%`,
+            flexBasis: isStackedLayout ? "auto" : 0,
+            maxWidth: "100%",
+            minWidth: documentMinWidth,
             display: "flex",
             flexDirection: "column",
             gap: "16px",
@@ -1414,6 +1454,7 @@ export const ChapterCheckerV2: React.FC = () => {
                     readOnly={!canEditChapter}
                     scrollToTopSignal={scrollToTopSignal}
                     onScrollDepthChange={handleDocumentScrollDepthChange}
+                    isCompactLayout={isCompactEditorLayout}
                   />
                 </div>
               ) : (
@@ -1442,13 +1483,13 @@ export const ChapterCheckerV2: React.FC = () => {
         <div
           className="app-panel"
           style={{
-            flex: isNarrowLayout ? "1 1 100%" : "0 0 40%",
-            maxWidth: isNarrowLayout ? "100%" : "40%",
-            minWidth: isNarrowLayout ? "0" : "420px",
+            flex: isStackedLayout ? "1 1 100%" : `${analysisFlexGrow} 1 0%`,
+            flexBasis: isStackedLayout ? "auto" : 0,
+            maxWidth: "100%",
+            minWidth: analysisMinWidth,
             display: "flex",
             flexDirection: "column",
-            width: isNarrowLayout ? "100%" : "40%",
-            marginTop: isNarrowLayout ? "16px" : 0,
+            marginTop: isStackedLayout ? "16px" : 0,
           }}
         >
           {!tierFeatures.fullAnalysis ? (

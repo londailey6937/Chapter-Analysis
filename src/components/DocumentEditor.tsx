@@ -32,6 +32,7 @@ interface DocumentEditorProps {
   readOnly?: boolean;
   scrollToTopSignal?: number;
   onScrollDepthChange?: (hasScrolled: boolean) => void;
+  isCompactLayout?: boolean;
 }
 
 type HighlightRange = {
@@ -74,6 +75,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   readOnly = false,
   scrollToTopSignal,
   onScrollDepthChange,
+  isCompactLayout = false,
 }) => {
   const [text, setText] = useState(() => initialText);
   const [visualSuggestions, setVisualSuggestions] = useState<
@@ -302,7 +304,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        gap: "16px",
+        gap: isCompactLayout ? "12px" : "16px",
       }}
     >
       <div
@@ -310,8 +312,8 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "12px",
-          padding: "16px",
+          gap: isCompactLayout ? "8px" : "12px",
+          padding: isCompactLayout ? "12px" : "16px",
         }}
       >
         <div
@@ -323,10 +325,12 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
             flexWrap: "wrap",
           }}
         >
-          <div style={{ flex: 1, minWidth: "240px" }}>
+          <div
+            style={{ flex: 1, minWidth: isCompactLayout ? "200px" : "240px" }}
+          >
             <div
               style={{
-                fontSize: "15px",
+                fontSize: isCompactLayout ? "14px" : "15px",
                 fontWeight: 600,
                 color: "#111827",
               }}
@@ -338,7 +342,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
             <p
               style={{
                 margin: "4px 0 0",
-                fontSize: "13px",
+                fontSize: isCompactLayout ? "12px" : "13px",
                 color: "#6b7280",
                 lineHeight: 1.5,
               }}
@@ -353,12 +357,15 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
               display: "flex",
               gap: "8px",
               alignItems: "center",
-              marginRight: "8px",
+              marginRight: isCompactLayout ? "0" : "8px",
             }}
           >
             {onSave && (
-              <button onClick={handleSave} style={buttonStyle("#10b981")}>
-                Save changes
+              <button
+                onClick={handleSave}
+                style={buttonStyle("#10b981", isCompactLayout)}
+              >
+                {isCompactLayout ? "Save" : "Save changes"}
               </button>
             )}
           </div>
@@ -378,17 +385,19 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
         style={{
           display: "flex",
           flex: 1,
-          gap: "16px",
+          gap: isCompactLayout ? "12px" : "16px",
           minHeight: 0,
+          flexDirection: isCompactLayout ? "column" : "row",
         }}
       >
         <div
           style={{
-            flex: isEditing ? 0.5 : 1,
-            minHeight: 0,
+            flex: !isEditing || isCompactLayout ? 1 : 0.5,
+            minHeight: isCompactLayout ? "300px" : 0,
             display: "flex",
             flexDirection: "column",
-            gap: "12px",
+            gap: isCompactLayout ? "8px" : "12px",
+            width: "100%",
           }}
         >
           <div
@@ -398,11 +407,18 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
               justifyContent: "space-between",
               color: "#111827",
               fontWeight: 600,
-              fontSize: "14px",
+              fontSize: isCompactLayout ? "13px" : "14px",
+              flexWrap: "wrap",
+              gap: "8px",
             }}
           >
             <span>Document Preview</span>
-            <span style={{ fontSize: "12px", color: "#6b7280" }}>
+            <span
+              style={{
+                fontSize: isCompactLayout ? "11px" : "12px",
+                color: "#6b7280",
+              }}
+            >
               Spacing indicators + dual coding
             </span>
           </div>
@@ -422,11 +438,12 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
         {isEditing && (
           <div
             style={{
-              flex: 0.5,
-              minHeight: 0,
+              flex: isCompactLayout ? 1 : 0.5,
+              minHeight: isCompactLayout ? "300px" : 0,
               display: "flex",
               flexDirection: "column",
-              gap: "12px",
+              gap: isCompactLayout ? "8px" : "12px",
+              width: "100%",
             }}
           >
             <div
@@ -436,12 +453,18 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
                 justifyContent: "space-between",
                 color: "#111827",
                 fontWeight: 600,
-                fontSize: "14px",
+                fontSize: isCompactLayout ? "13px" : "14px",
+                flexWrap: "wrap",
+                gap: "8px",
               }}
             >
               <span>Editable document</span>
               <span
-                style={{ fontSize: "12px", color: "#6b7280", fontWeight: 500 }}
+                style={{
+                  fontSize: isCompactLayout ? "11px" : "12px",
+                  color: "#6b7280",
+                  fontWeight: 500,
+                }}
               >
                 {text.split(/\s+/).filter(Boolean).length.toLocaleString()}{" "}
                 words
@@ -574,16 +597,16 @@ const ReadOnlyView: React.FC<ReadOnlyViewProps> = ({
       style={{
         flex: 1,
         overflowY: "auto",
-        padding: "16px",
+        padding: "12px",
         border: "1px solid #e5e7eb",
         borderRadius: "8px",
         backgroundColor: "white",
         lineHeight: 1.6,
-        fontSize: "15px",
+        fontSize: "14px",
       }}
     >
       {paragraphs.length === 0 ? (
-        <span style={{ color: "#9ca3af" }}>
+        <span style={{ color: "#9ca3af", fontSize: "13px" }}>
           Start writing to see spacing guidance and dual-coding suggestions.
         </span>
       ) : (
@@ -749,14 +772,14 @@ const EditableView: React.FC<EditableViewProps> = ({
       onScroll={onScroll}
       style={{
         flex: 1,
-        minHeight: "400px",
-        padding: "16px",
+        minHeight: "300px",
+        padding: "12px",
         border: "1px solid #e5e7eb",
         borderRadius: "8px",
         backgroundColor: "#ffffff",
         boxShadow: "inset 0 1px 2px rgba(15,23,42,0.05)",
         fontFamily: "ui-sans-serif, system-ui, sans-serif",
-        fontSize: "16px",
+        fontSize: "15px",
         lineHeight: 1.6,
         width: "100%",
         height: "100%",
@@ -1138,16 +1161,20 @@ function formatVisualSuggestionTitle(suggestion: VisualSuggestion): string {
   return `${typeLabel} - ${priorityLabel}`;
 }
 
-function buttonStyle(backgroundColor: string): React.CSSProperties {
+function buttonStyle(
+  backgroundColor: string,
+  isCompact?: boolean
+): React.CSSProperties {
   return {
-    padding: "6px 14px",
+    padding: isCompact ? "5px 12px" : "6px 14px",
     borderRadius: "6px",
     border: "none",
-    fontSize: "13px",
+    fontSize: isCompact ? "12px" : "13px",
     fontWeight: 600,
     color: "white",
     cursor: "pointer",
     backgroundColor,
+    whiteSpace: "nowrap",
   };
 }
 
