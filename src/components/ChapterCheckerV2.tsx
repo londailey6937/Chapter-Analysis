@@ -300,6 +300,7 @@ export const ChapterCheckerV2: React.FC = () => {
   const [scrollToTopSignal, setScrollToTopSignal] = useState(0);
   const [windowScrolled, setWindowScrolled] = useState(false);
   const [contentScrolled, setContentScrolled] = useState(false);
+  const [isNarrowLayout, setIsNarrowLayout] = useState(false);
 
   const statisticsText =
     chapterData?.originalPlainText ??
@@ -394,6 +395,20 @@ export const ChapterCheckerV2: React.FC = () => {
     return () => {
       window.removeEventListener("scroll", handleWindowScroll);
     };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const handleResize = () => {
+      setIsNarrowLayout(window.innerWidth <= 1400);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Load saved custom domains on startup
@@ -1082,52 +1097,74 @@ export const ChapterCheckerV2: React.FC = () => {
             borderRadius: "12px",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <button
-              onClick={() => setIsNavigationOpen(true)}
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: "1rem",
+            }}
+          >
+            <div
               style={{
-                padding: "8px 16px",
-                backgroundColor: "rgba(255,255,255,0.2)",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontSize: "18px",
+                display: "flex",
+                alignItems: "center",
+                gap: "1rem",
+                flex: "1 1 360px",
+                minWidth: "280px",
               }}
             >
-              ☰
-            </button>
+              <button
+                onClick={() => setIsNavigationOpen(true)}
+                style={{
+                  padding: "8px 16px",
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontSize: "18px",
+                }}
+              >
+                ☰
+              </button>
 
-            <img
-              src={tomeIqLogo}
-              alt="TomeIQ"
-              style={{ height: "96px", display: "block", objectFit: "contain" }}
-            />
-            <div>
-              <h1
+              <img
+                src={tomeIqLogo}
+                alt="TomeIQ"
                 style={{
-                  margin: 0,
-                  fontSize: "1.5rem",
-                  color: "white",
-                  fontWeight: "700",
-                  lineHeight: "1.2",
+                  height: "96px",
+                  display: "block",
+                  objectFit: "contain",
+                  flexShrink: 0,
                 }}
-              >
-                Tome
-                <span style={{ fontStyle: "italic", fontWeight: "700" }}>
-                  IQ
-                </span>
-              </h1>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "0.875rem",
-                  opacity: 0.9,
-                  color: "white",
-                }}
-              >
-                AI-Powered Textbook Analysis
-              </p>
+              />
+              <div style={{ minWidth: 0 }}>
+                <h1
+                  style={{
+                    margin: 0,
+                    fontSize: "1.5rem",
+                    color: "white",
+                    fontWeight: "700",
+                    lineHeight: "1.2",
+                  }}
+                >
+                  Tome
+                  <span style={{ fontStyle: "italic", fontWeight: "700" }}>
+                    IQ
+                  </span>
+                </h1>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.875rem",
+                    opacity: 0.9,
+                    color: "white",
+                  }}
+                >
+                  AI-Powered Textbook Analysis
+                </p>
+              </div>
             </div>
 
             {/* Access Level Selector (for demo purposes) */}
@@ -1137,6 +1174,9 @@ export const ChapterCheckerV2: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
+                flex: "1 1 220px",
+                justifyContent: "flex-end",
+                minWidth: "200px",
               }}
             >
               <span style={{ fontSize: "0.875rem", opacity: 0.9 }}>
@@ -1188,6 +1228,8 @@ export const ChapterCheckerV2: React.FC = () => {
         style={{
           flex: 1,
           display: "flex",
+          flexDirection: isNarrowLayout ? "column" : "row",
+          alignItems: "stretch",
           padding: "16px",
           boxSizing: "border-box",
           gap: "16px",
@@ -1198,9 +1240,10 @@ export const ChapterCheckerV2: React.FC = () => {
         {/* Left: Document Column (60%) */}
         <div
           style={{
-            flex: "0 0 60%",
-            maxWidth: "60%",
-            minWidth: "520px",
+            flex: isNarrowLayout ? "1 1 100%" : "1 1 620px",
+            maxWidth: isNarrowLayout ? "100%" : "65%",
+            minWidth: "360px",
+            width: "100%",
             display: "flex",
             flexDirection: "column",
             gap: "16px",
@@ -1398,11 +1441,13 @@ export const ChapterCheckerV2: React.FC = () => {
         <div
           className="app-panel"
           style={{
-            flex: "0 0 40%",
-            maxWidth: "40%",
-            minWidth: "420px",
+            flex: isNarrowLayout ? "1 1 100%" : "1 1 380px",
+            maxWidth: isNarrowLayout ? "100%" : "35%",
+            minWidth: "320px",
             display: "flex",
             flexDirection: "column",
+            width: "100%",
+            marginTop: isNarrowLayout ? "16px" : 0,
           }}
         >
           {!tierFeatures.fullAnalysis ? (
