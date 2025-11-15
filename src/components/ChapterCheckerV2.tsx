@@ -769,6 +769,8 @@ export const ChapterCheckerV2: React.FC = () => {
           boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
           position: "relative",
           zIndex: 50,
+          margin: "16px 16px 0 16px",
+          borderRadius: "12px",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -868,14 +870,26 @@ export const ChapterCheckerV2: React.FC = () => {
       />
 
       {/* Main Content */}
-      <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          overflow: "hidden",
+          padding: "16px",
+          boxSizing: "border-box",
+          gap: "16px",
+          backgroundColor: "#f9fafb",
+        }}
+      >
         {/* Left: Document Editor */}
         <div
           style={{
             flex: 1,
             display: "flex",
             flexDirection: "column",
-            borderRight: "1px solid #e5e7eb",
+            backgroundColor: "#ffffff",
+            borderRadius: "12px",
+            boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
           }}
         >
           <div
@@ -1027,7 +1041,9 @@ export const ChapterCheckerV2: React.FC = () => {
             minWidth: "600px",
             display: "flex",
             flexDirection: "column",
-            backgroundColor: "#f9fafb",
+            backgroundColor: "#ffffff",
+            borderRadius: "12px",
+            boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
           }}
         >
           {!tierFeatures.fullAnalysis ? (

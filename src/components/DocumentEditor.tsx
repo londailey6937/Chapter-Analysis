@@ -312,7 +312,14 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
               : "Spacing targets and dual-coding callouts render inline below for accurate placement."}
           </p>
         </div>
-        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: "8px",
+            alignItems: "center",
+            marginRight: "8px",
+          }}
+        >
           {showBackToTop && (
             <button onClick={handleBackToTop} style={buttonStyle("#3b82f6")}>
               Back to top
