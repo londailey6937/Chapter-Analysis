@@ -11,7 +11,7 @@ import { HelpModal } from "./HelpModal";
 import { NavigationMenu } from "./NavigationMenu";
 import { UpgradePrompt, InlineUpgradePrompt } from "./UpgradePrompt";
 import { MissingConceptSuggestions } from "./MissingConceptSuggestions";
-import { ChapterAnalysis } from "@/types";
+import { ChapterAnalysis, Section } from "@/types";
 import { AccessLevel, ACCESS_TIERS } from "../../types";
 import {
   Domain,
@@ -27,6 +27,197 @@ import {
 } from "@/utils/customDomainStorage";
 import AnalysisWorker from "@/workers/analysisWorker?worker";
 import tomeIqLogo from "@/assets/tomeiq-logo.png";
+
+const HEADING_LENGTH_LIMIT = 120;
+const MAX_FALLBACK_SECTIONS = 8;
+
+type SectionCandidate = {
+  heading: string;
+  start: number;
+  contentStart: number;
+  depth: number;
+};
+
+const looksLikeHeading = (
+  line: string,
+  prevBlank: boolean,
+  nextBlank: boolean
+) => {
+  if (!prevBlank) return false;
+  if (line.length > HEADING_LENGTH_LIMIT) return false;
+  const noTerminalPunctuation = !/[.!?]$/.test(line);
+  const uppercaseCount = (line.match(/[A-Z]/g) || []).length;
+  const letterCount = (line.match(/[A-Za-z]/g) || []).length || 1;
+  const uppercaseRatio = uppercaseCount / letterCount;
+  return (
+    uppercaseRatio > 0.6 ||
+    (nextBlank &&
+      /^[A-Z][A-Za-z0-9 ,:'\-]{3,}$/.test(line) &&
+      noTerminalPunctuation)
+  );
+};
+
+const buildSectionsFromCandidates = (
+  text: string,
+  candidates: SectionCandidate[]
+): Section[] => {
+  if (candidates.length === 0) {
+    return [];
+  }
+
+  const normalized = [...candidates];
+
+  if (normalized[0].start > 0) {
+    normalized.unshift({
+      heading: "Introduction",
+      start: 0,
+      contentStart: 0,
+      depth: 1,
+    });
+  }
+
+  const sections: Section[] = [];
+
+  normalized.forEach((candidate, idx) => {
+    const nextStart = normalized[idx + 1]?.start ?? text.length;
+    const content = text.slice(candidate.contentStart, nextStart).trim();
+    if (!content) {
+      return;
+    }
+
+    sections.push({
+      id: `section-${sections.length + 1}`,
+      heading: candidate.heading || `Section ${idx + 1}`,
+      content,
+      startPosition: candidate.start,
+      endPosition: nextStart,
+      wordCount: content.split(/\s+/).filter(Boolean).length,
+      conceptsIntroduced: [],
+      conceptsRevisited: [],
+      depth: candidate.depth,
+    });
+  });
+
+  return sections;
+};
+
+const buildFallbackSections = (text: string): Section[] => {
+  const trimmed = text.trim();
+  if (!trimmed) return [];
+
+  const desiredSections = Math.max(
+    1,
+    Math.min(
+      MAX_FALLBACK_SECTIONS,
+      Math.round(trimmed.split(/\s+/).length / 350)
+    )
+  );
+  const chunkSize = Math.max(1, Math.floor(text.length / desiredSections));
+  const sections: Section[] = [];
+
+  for (let start = 0; start < text.length; start += chunkSize) {
+    const end = Math.min(text.length, start + chunkSize);
+    const content = text.slice(start, end).trim();
+    if (!content) continue;
+
+    sections.push({
+      id: `auto-section-${sections.length + 1}`,
+      heading: `Segment ${sections.length + 1}`,
+      content,
+      startPosition: start,
+      endPosition: end,
+      wordCount: content.split(/\s+/).filter(Boolean).length,
+      conceptsIntroduced: [],
+      conceptsRevisited: [],
+      depth: 1,
+    });
+  }
+
+  if (sections.length === 0) {
+    sections.push({
+      id: "auto-section-1",
+      heading: "Full Chapter",
+      content: trimmed,
+      startPosition: 0,
+      endPosition: text.length,
+      wordCount: trimmed.split(/\s+/).filter(Boolean).length,
+      conceptsIntroduced: [],
+      conceptsRevisited: [],
+      depth: 1,
+    });
+  }
+
+  return sections;
+};
+
+const deriveSectionsFromText = (rawText: string): Section[] => {
+  const text = rawText.replace(/\r\n?/g, "\n");
+  if (!text.trim()) return [];
+
+  const lines = text.split("\n");
+  const candidates: SectionCandidate[] = [];
+  let cursor = 0;
+
+  const pushCandidate = (
+    heading: string,
+    start: number,
+    contentStart: number,
+    depth: number
+  ) => {
+    candidates.push({
+      heading: heading.trim() || `Section ${candidates.length + 1}`,
+      start,
+      contentStart: Math.min(contentStart, text.length),
+      depth,
+    });
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    const lineStart = cursor;
+    const nextStart = Math.min(text.length, cursor + line.length + 1);
+    const prevBlank = i === 0 || !lines[i - 1].trim();
+    const nextBlank = i + 1 >= lines.length || !lines[i + 1].trim();
+
+    let detectedHeading: string | null = null;
+    let depth = 1;
+
+    if (!trimmed) {
+      cursor = nextStart;
+      continue;
+    }
+
+    const markdownMatch = trimmed.match(/^(#{1,6})\s+(.*)$/);
+    if (markdownMatch) {
+      depth = markdownMatch[1].length;
+      detectedHeading = markdownMatch[2];
+    } else {
+      const numberedMatch = trimmed.match(
+        /^(\d+(?:\.\d+){0,3}[).\-]?)\s+(.*)$/
+      );
+      if (numberedMatch) {
+        depth = numberedMatch[1].split(".").length;
+        detectedHeading = numberedMatch[2];
+      } else if (looksLikeHeading(trimmed, prevBlank, nextBlank)) {
+        detectedHeading = trimmed.replace(/[:\-]+$/, "");
+      }
+    }
+
+    if (detectedHeading) {
+      pushCandidate(detectedHeading, lineStart, nextStart, depth);
+    }
+
+    cursor = nextStart;
+  }
+
+  const sections = buildSectionsFromCandidates(text, candidates);
+  if (sections.length > 0) {
+    return sections;
+  }
+
+  return buildFallbackSections(text);
+};
 
 export const ChapterCheckerV2: React.FC = () => {
   // Access control state
@@ -78,6 +269,7 @@ export const ChapterCheckerV2: React.FC = () => {
 
   // Ref for analysis panel
   const analysisPanelRef = useRef<HTMLDivElement>(null);
+  const analysisControlsRef = useRef<HTMLDivElement>(null);
   const documentHeaderRef = useRef<HTMLDivElement>(null);
 
   // Detect document domain based on keywords from concept libraries
@@ -190,6 +382,26 @@ export const ChapterCheckerV2: React.FC = () => {
       );
     };
   }, []);
+
+  const handleAccessLevelChange = (level: AccessLevel) => {
+    setAccessLevel(level);
+
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      if (analysisControlsRef.current) {
+        analysisControlsRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+        return;
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  };
 
   const handleDocumentLoad = (payload: UploadedDocumentPayload) => {
     const {
@@ -563,13 +775,18 @@ export const ChapterCheckerV2: React.FC = () => {
       console.log("📄 Using normalized plain text for analysis");
       console.log("  Text length:", textForAnalysis.length);
 
+      const sections = deriveSectionsFromText(textForAnalysis);
+      console.log(
+        `[ChapterCheckerV2] Derived ${sections.length} sections for analysis`
+      );
+
       // Create Chapter object with plain text
       const chapter = {
         id: `chapter-${Date.now()}`,
         title: fileName || "Untitled Chapter",
         content: textForAnalysis, // Plain text
         wordCount: textForAnalysis.split(/\s+/).length,
-        sections: [],
+        sections,
         conceptGraph: {
           concepts: [],
           relationships: [],
@@ -851,7 +1068,9 @@ export const ChapterCheckerV2: React.FC = () => {
               </span>
               <select
                 value={accessLevel}
-                onChange={(e) => setAccessLevel(e.target.value as AccessLevel)}
+                onChange={(e) =>
+                  handleAccessLevelChange(e.target.value as AccessLevel)
+                }
                 style={{
                   padding: "6px 12px",
                   backgroundColor: "rgba(255,255,255,0.2)",
@@ -1265,6 +1484,7 @@ export const ChapterCheckerV2: React.FC = () => {
           ) : (
             <>
               <div
+                ref={analysisControlsRef}
                 style={{ padding: "16px", borderBottom: "1px solid #e5e7eb" }}
               >
                 <h2 style={{ margin: "0 0 12px 0", fontSize: "18px" }}>

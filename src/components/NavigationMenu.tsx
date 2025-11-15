@@ -30,6 +30,18 @@ export function NavigationMenu({
     setExpandedSection(expandedSection === section ? null : section);
   };
 
+  const openReferenceResources = () => {
+    if (typeof window === "undefined") return;
+    try {
+      window.open("/START_HERE.txt", "_blank", "noopener,noreferrer");
+    } catch (err) {
+      console.error("Unable to open reference file", err);
+      alert(
+        "Reference file could not be opened automatically. You can access START_HERE.txt inside the docs folder."
+      );
+    }
+  };
+
   return (
     <>
       {/* Backdrop */}
@@ -133,54 +145,88 @@ export function NavigationMenu({
         </div>
 
         {/* Quick Actions */}
-        <div style={{ padding: "1.5rem", borderBottom: "1px solid #e5e7eb" }}>
-          <h3
+        <div
+          style={{
+            padding: "1.5rem",
+            borderBottom: "1px solid #e5e7eb",
+          }}
+        >
+          <div
             style={{
-              margin: "0 0 1rem 0",
-              fontSize: "0.875rem",
-              fontWeight: "600",
-              color: "#6b7280",
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-            }}
-          >
-            Quick Actions
-          </h3>
-          <button
-            onClick={() => {
-              onOpenHelp();
-              onClose();
-            }}
-            style={{
-              width: "100%",
-              padding: "0.875rem 1rem",
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "1rem",
-              fontWeight: "600",
-              cursor: "pointer",
               display: "flex",
-              alignItems: "center",
+              flexDirection: "column",
               gap: "0.75rem",
-              transition: "transform 0.2s, box-shadow 0.2s",
-              boxShadow: "0 2px 8px rgba(102, 126, 234, 0.3)",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-2px)";
-              e.currentTarget.style.boxShadow =
-                "0 4px 12px rgba(102, 126, 234, 0.4)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow =
-                "0 2px 8px rgba(102, 126, 234, 0.3)";
             }}
           >
-            <span style={{ fontSize: "1.25rem" }}>📚</span>
-            <span>Quick Start Guide</span>
-          </button>
+            <button
+              onClick={() => {
+                onOpenHelp();
+                onClose();
+              }}
+              style={{
+                width: "100%",
+                padding: "0.875rem 1rem",
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                fontSize: "1rem",
+                fontWeight: "600",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.75rem",
+                transition: "transform 0.2s, box-shadow 0.2s",
+                boxShadow: "0 2px 8px rgba(102, 126, 234, 0.3)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 12px rgba(102, 126, 234, 0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow =
+                  "0 2px 8px rgba(102, 126, 234, 0.3)";
+              }}
+            >
+              <span style={{ fontSize: "1.25rem" }}>📚</span>
+              <span>Quick Start Guide</span>
+            </button>
+
+            <button
+              onClick={() => {
+                openReferenceResources();
+                onClose();
+              }}
+              style={{
+                width: "100%",
+                padding: "0.875rem 1rem",
+                backgroundColor: "#f9fafb",
+                color: "#1f2937",
+                border: "1px solid #e5e7eb",
+                borderRadius: "8px",
+                fontSize: "1rem",
+                fontWeight: "600",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.75rem",
+                transition: "background-color 0.2s, transform 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#f3f4f6";
+                e.currentTarget.style.transform = "translateY(-1px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#f9fafb";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              <span style={{ fontSize: "1.25rem" }}>📖</span>
+              <span>Reference Library</span>
+            </button>
+          </div>
         </div>
 
         {/* Features Section */}
@@ -200,7 +246,7 @@ export function NavigationMenu({
 
           {/* Core Analysis */}
           <FeatureSection
-            title="🎓 Core Analysis"
+            title="Core Analysis"
             icon="🎯"
             isExpanded={expandedSection === "core"}
             onToggle={() => toggleSection("core")}
@@ -230,7 +276,7 @@ export function NavigationMenu({
 
           {/* Domain Intelligence */}
           <FeatureSection
-            title="🧪 Domain Intelligence"
+            title="Domain Intelligence"
             icon="🔬"
             isExpanded={expandedSection === "domain"}
             onToggle={() => toggleSection("domain")}
@@ -271,7 +317,7 @@ export function NavigationMenu({
 
           {/* Pattern Recognition */}
           <FeatureSection
-            title="🔍 Pattern Recognition"
+            title="Pattern Recognition"
             icon="🎨"
             isExpanded={expandedSection === "patterns"}
             onToggle={() => toggleSection("patterns")}
@@ -301,7 +347,7 @@ export function NavigationMenu({
 
           {/* Concept Analysis */}
           <FeatureSection
-            title="💡 Concept Analysis"
+            title="Concept Analysis"
             icon="🗺️"
             isExpanded={expandedSection === "concepts"}
             onToggle={() => toggleSection("concepts")}
@@ -331,7 +377,7 @@ export function NavigationMenu({
 
           {/* Visualization */}
           <FeatureSection
-            title="🎨 Visualization"
+            title="Visualization"
             icon="🎨"
             isExpanded={expandedSection === "visual"}
             onToggle={() => toggleSection("visual")}
@@ -361,7 +407,7 @@ export function NavigationMenu({
 
           {/* Data & Export */}
           <FeatureSection
-            title="💾 Data Management"
+            title="Data Management"
             icon="💼"
             isExpanded={expandedSection === "data"}
             onToggle={() => toggleSection("data")}
