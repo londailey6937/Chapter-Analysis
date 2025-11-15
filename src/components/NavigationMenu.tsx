@@ -1,4 +1,5 @@
 import { useState } from "react";
+import tomeIqLogo from "@/assets/tomeiq-logo.png";
 
 interface NavigationMenuProps {
   isOpen: boolean;
@@ -76,7 +77,7 @@ export function NavigationMenu({
         >
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
             <img
-              src="/TomeIQ.png"
+              src={tomeIqLogo}
               alt="TomeIQ Logo"
               style={{ height: "96px", width: "auto" }}
             />

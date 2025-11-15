@@ -170,7 +170,7 @@ export const MissingConceptSuggestions: React.FC<
         your text. Consider adding them for completeness.
       </p>
 
-      <div className="space-y-2 max-h-96 overflow-y-auto">
+      <div className="space-y-2">
         {missingConcepts.slice(0, 10).map((missing, index) => (
           <div
             key={missing.concept.name}

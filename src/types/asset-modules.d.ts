@@ -13,6 +13,11 @@ declare module "*.worker.js?url" {
   export default url;
 }
 
+declare module "*.png" {
+  const url: string;
+  export default url;
+}
+
 declare module "*?worker" {
   const workerConstructor: {
     new (options?: WorkerOptions): Worker;

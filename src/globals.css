@@ -199,6 +199,84 @@
     @apply badge-base bg-yellow-100 text-yellow-700;
   }
 
+  .quickstart-shell {
+    padding: 1rem;
+    border-radius: 1.25rem;
+    background: linear-gradient(180deg, #f8fafc 0%, #eceffe 100%);
+    border: 1px solid rgba(99, 102, 241, 0.18);
+    box-shadow: 0 20px 35px rgba(15, 23, 42, 0.08);
+  }
+
+  .quickstart-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .quickstart-card {
+    padding: 1.5rem;
+    border-radius: 1rem;
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+  }
+
+  .quickstart-card h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #111827;
+  }
+
+  .quickstart-card p {
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    color: #374151;
+    line-height: 1.6;
+  }
+
+  .quickstart-list,
+  .quickstart-sublist {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    font-size: 0.95rem;
+    color: #374151;
+    line-height: 1.6;
+  }
+
+  .quickstart-list li,
+  .quickstart-sublist li {
+    margin: 0.35rem 0;
+  }
+
+  .quickstart-sublist {
+    margin-top: 0.5rem;
+    border-left: 2px solid #e5e7eb;
+    padding-left: 1rem;
+    color: #4b5563;
+  }
+
+  .quickstart-order {
+    list-style-type: decimal;
+    padding-left: 1.5rem;
+    font-size: 0.95rem;
+    color: #1f2937;
+  }
+  .quickstart-order > li {
+    margin: 0.75rem 0;
+  }
+  .quickstart-order > li > .quickstart-sublist {
+    margin-top: 0.75rem;
+  }
+
+  .quickstart-step-title {
+    display: block;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.25rem;
+  }
+
   .badge-danger {
     @apply badge-base bg-red-100 text-red-700;
   }

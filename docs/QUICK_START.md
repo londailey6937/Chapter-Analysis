@@ -1,8 +1,8 @@
 # Chapter Checker - Quick Start Guide
 
-Get your Chapter Checker running in 10 minutes! 🚀
+Get your Chapter Checker running in 10 minutes!
 
-## 📄 Document Size Support
+## Document Size Support
 
 **Designed for True "Tome" Analysis**
 
@@ -14,7 +14,7 @@ The Chapter Checker can handle large academic documents:
 
 Supported formats: `.docx` and `.obt`
 
-## ⚡ Quick Setup
+## Quick Setup
 
 ### 1. Install Dependencies
 
@@ -45,7 +45,7 @@ Done! Users can now:
 - View interactive visualizations
 - Export results as JSON
 
-## 📖 Usage Examples
+## Usage Examples
 
 ### Example 1: Basic Integration
 

@@ -26,6 +26,7 @@ import {
   convertToConceptDefinitions,
 } from "@/utils/customDomainStorage";
 import AnalysisWorker from "@/workers/analysisWorker?worker";
+import tomeIqLogo from "@/assets/tomeiq-logo.png";
 
 export const ChapterCheckerV2: React.FC = () => {
   // Access control state
@@ -805,7 +806,7 @@ export const ChapterCheckerV2: React.FC = () => {
             </button>
 
             <img
-              src="/TomeIQ.png"
+              src={tomeIqLogo}
               alt="TomeIQ"
               style={{ height: "96px", display: "block", objectFit: "contain" }}
             />
