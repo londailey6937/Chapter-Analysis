@@ -402,13 +402,13 @@ export const ChapterCheckerV2: React.FC = () => {
       return;
     }
 
-    const handleResize = () => {
+    const updateLayout = () => {
       setIsNarrowLayout(window.innerWidth <= 1400);
     };
 
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    updateLayout();
+    window.addEventListener("resize", updateLayout);
+    return () => window.removeEventListener("resize", updateLayout);
   }, []);
 
   // Load saved custom domains on startup
@@ -1229,21 +1229,22 @@ export const ChapterCheckerV2: React.FC = () => {
           flex: 1,
           display: "flex",
           flexDirection: isNarrowLayout ? "column" : "row",
-          alignItems: "stretch",
           padding: "16px",
           boxSizing: "border-box",
           gap: "16px",
           backgroundColor: "#f9fafb",
           minHeight: 0,
+          minWidth: isNarrowLayout ? "auto" : "1100px",
+          overflowX: isNarrowLayout ? "visible" : "auto",
         }}
       >
         {/* Left: Document Column (60%) */}
         <div
           style={{
-            flex: isNarrowLayout ? "1 1 100%" : "1 1 620px",
-            maxWidth: isNarrowLayout ? "100%" : "65%",
-            minWidth: "360px",
-            width: "100%",
+            flex: isNarrowLayout ? "1 1 100%" : "0 0 60%",
+            maxWidth: isNarrowLayout ? "100%" : "60%",
+            minWidth: isNarrowLayout ? "0" : "520px",
+            width: isNarrowLayout ? "100%" : "60%",
             display: "flex",
             flexDirection: "column",
             gap: "16px",
@@ -1441,12 +1442,12 @@ export const ChapterCheckerV2: React.FC = () => {
         <div
           className="app-panel"
           style={{
-            flex: isNarrowLayout ? "1 1 100%" : "1 1 380px",
-            maxWidth: isNarrowLayout ? "100%" : "35%",
-            minWidth: "320px",
+            flex: isNarrowLayout ? "1 1 100%" : "0 0 40%",
+            maxWidth: isNarrowLayout ? "100%" : "40%",
+            minWidth: isNarrowLayout ? "0" : "420px",
             display: "flex",
             flexDirection: "column",
-            width: "100%",
+            width: isNarrowLayout ? "100%" : "40%",
             marginTop: isNarrowLayout ? "16px" : 0,
           }}
         >
