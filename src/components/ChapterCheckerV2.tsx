@@ -721,8 +721,13 @@ export const ChapterCheckerV2: React.FC = () => {
   const handleExportDocx = async () => {
     try {
       const { exportToDocx } = await import("@/utils/docxExport");
+      const richHtmlContent =
+        chapterData?.editorHtml ??
+        (chapterData?.isHybridDocx ? chapterData?.html : null) ??
+        null;
       await exportToDocx({
         text: chapterText,
+        html: richHtmlContent,
         fileName: fileName || "edited-chapter",
         analysis,
         includeHighlights: true,
