@@ -250,22 +250,6 @@ const deriveSectionsFromText = (rawText: string): Section[] => {
   return buildFallbackSections(text);
 };
 
-const scrollWindowToElement = (
-  element: HTMLElement | null,
-  offset: number = STICKY_HEADER_OFFSET
-) => {
-  if (typeof window === "undefined" || !element) {
-    return;
-  }
-
-  const rect = element.getBoundingClientRect();
-  const top = rect.top + window.scrollY - offset;
-  window.scrollTo({
-    top: top > 0 ? top : 0,
-    behavior: "smooth",
-  });
-};
-
 export const ChapterCheckerV2: React.FC = () => {
   // Access control state
   const [accessLevel, setAccessLevel] = useState<AccessLevel>("free");
@@ -462,22 +446,6 @@ export const ChapterCheckerV2: React.FC = () => {
 
   const handleAccessLevelChange = (level: AccessLevel) => {
     setAccessLevel(level);
-
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    window.requestAnimationFrame(() => {
-      if (analysisControlsRef.current) {
-        analysisControlsRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-        return;
-      }
-
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
   };
 
   const handleDocumentScrollDepthChange = (hasScrolled: boolean) => {
@@ -485,16 +453,13 @@ export const ChapterCheckerV2: React.FC = () => {
   };
 
   const handleBackToTop = () => {
-    scrollWindowToElement(documentHeaderRef.current);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
 
     if (analysisPanelRef.current) {
       analysisPanelRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
-
-    analysisControlsRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
 
     setScrollToTopSignal(Date.now());
   };
@@ -1615,16 +1580,40 @@ export const ChapterCheckerV2: React.FC = () => {
               </div>
             </div>
           ) : (
-            <>
+            <div
+              style={{
+                flex: 1,
+                padding: "16px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "16px",
+                minHeight: 0,
+              }}
+            >
               <div
                 ref={analysisControlsRef}
-                style={{ padding: "16px", borderBottom: "1px solid #e5e7eb" }}
+                style={{
+                  padding: "20px",
+                  backgroundColor: "white",
+                  borderRadius: "14px",
+                  border: "1px solid #e5e7eb",
+                  boxShadow: "0 10px 25px rgba(15,23,42,0.08)",
+                }}
               >
-                <h2 style={{ margin: "0 0 12px 0", fontSize: "18px" }}>
+                <h2 style={{ margin: "0 0 6px 0", fontSize: "18px" }}>
                   Analysis Controls
                 </h2>
+                <p
+                  style={{
+                    margin: "0 0 12px 0",
+                    fontSize: "13px",
+                    color: "#4b5563",
+                  }}
+                >
+                  Detected Domain
+                </p>
 
-                <div style={{ marginBottom: "12px" }}>
+                <div style={{ marginBottom: "16px" }}>
                   <label
                     style={{
                       display: "block",
@@ -1897,13 +1886,14 @@ export const ChapterCheckerV2: React.FC = () => {
                         : "#d1d5db",
                     color: "white",
                     border: "none",
-                    borderRadius: "6px",
+                    borderRadius: "8px",
                     fontSize: "16px",
                     fontWeight: "600",
                     cursor:
                       chapterText.trim() && !isAnalyzing && selectedDomain
                         ? "pointer"
                         : "not-allowed",
+                    boxShadow: "0 6px 18px rgba(16,185,129,0.35)",
                   }}
                 >
                   {isAnalyzing ? "⏳ Analyzing..." : "🔍 Analyze Chapter"}
@@ -1983,7 +1973,14 @@ export const ChapterCheckerV2: React.FC = () => {
               {analysis && (
                 <div
                   ref={analysisPanelRef}
-                  style={{ flex: 1, overflow: "auto", padding: "16px" }}
+                  style={{
+                    flex: 1,
+                    overflow: "auto",
+                    padding: "16px",
+                    backgroundColor: "white",
+                    borderRadius: "12px",
+                    border: "1px solid #e5e7eb",
+                  }}
                 >
                   <div
                     style={{
@@ -2288,7 +2285,7 @@ export const ChapterCheckerV2: React.FC = () => {
                   )}
                 </div>
               )}
-            </>
+            </div>
           )}
         </div>
       </div>
