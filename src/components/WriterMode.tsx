@@ -18,6 +18,9 @@ export const WriterMode: React.FC<WriterModeProps> = ({
   );
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isCompactView, setIsCompactView] = useState(false);
+  const [isTemplateMode, setIsTemplateMode] = useState(false);
+  const [generatedTemplate, setGeneratedTemplate] = useState<string>("");
+  const [isGeneratingTemplate, setIsGeneratingTemplate] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   // Responsive layout detection
@@ -76,6 +79,137 @@ export const WriterMode: React.FC<WriterModeProps> = ({
 
   const textIssues = getTextIssues();
 
+  // Generate AI-driven template based on analysis issues
+  const generateAITemplate = () => {
+    setIsGeneratingTemplate(true);
+
+    try {
+      const spacingPrinciple = principleScores.find((p) =>
+        p.principle.toLowerCase().includes("spacing")
+      );
+      const dualCodingPrinciple = principleScores.find(
+        (p) =>
+          p.principle.toLowerCase().includes("dual") ||
+          p.principle.toLowerCase().includes("coding")
+      );
+
+      const hasSpacingIssues = spacingPrinciple && spacingPrinciple.score < 70;
+      const hasDualCodingIssues =
+        dualCodingPrinciple && dualCodingPrinciple.score < 70;
+
+      let template = `# ENHANCED CHAPTER TEMPLATE\n# Generated based on analysis results\n\n`;
+
+      // Add intro section
+      template += `## SECTION 1: INTRODUCTION\n`;
+      template += `[WRITER: Introduce the main topic. Mention 2-3 key concepts that will be covered.]\n\n`;
+      template += `Key Concepts to Introduce:\n`;
+      concepts.slice(0, 3).forEach((c) => {
+        template += `- ${c.name}: [BRIEF DEFINITION]\n`;
+      });
+      template += `\n---\n\n`;
+
+      // Add concept development sections
+      const coreConceptsToAddress = concepts
+        .filter((c) => c.importance === "core")
+        .slice(0, 3);
+      coreConceptsToAddress.forEach((concept, idx) => {
+        template += `## SECTION ${idx + 2}: ${concept.name.toUpperCase()}\n\n`;
+
+        if (hasDualCodingIssues) {
+          template += `### Visual Element Needed\n`;
+          template += `[WRITER: Add a diagram, chart, or visual representation of "${concept.name}"]\n`;
+          template += `[CLAUDE: Suggest what type of visual would work best - flowchart, diagram, table, etc.]\n\n`;
+        }
+
+        template += `### Explanation\n`;
+        template += `[WRITER: Explain "${concept.name}" in clear, concrete terms]\n\n`;
+        template += `[CLAUDE: Provide 2-3 real-world examples that illustrate "${concept.name}"]\n\n`;
+
+        if (hasSpacingIssues) {
+          template += `### Quick Review\n`;
+          template += `[WRITER: Add a brief review question or summary statement about "${concept.name}"]\n\n`;
+        }
+
+        template += `---\n\n`;
+      });
+
+      // Add spacing/reinforcement section
+      if (hasSpacingIssues) {
+        template += `## SECTION ${
+          coreConceptsToAddress.length + 2
+        }: CONCEPT CONNECTIONS\n\n`;
+        template += `[WRITER: Connect the concepts introduced earlier. Show how they relate.]\n\n`;
+        template += `Concepts to Reinforce:\n`;
+        concepts.slice(0, 5).forEach((c) => {
+          template += `- ${c.name}: [MENTION IN NEW CONTEXT]\n`;
+        });
+        template += `\n---\n\n`;
+      }
+
+      // Add application section
+      template += `## SECTION ${
+        hasSpacingIssues
+          ? coreConceptsToAddress.length + 3
+          : coreConceptsToAddress.length + 2
+      }: PRACTICAL APPLICATION\n\n`;
+      template += `[WRITER: Provide a real-world scenario or problem that uses these concepts]\n\n`;
+      template += `[CLAUDE: Generate a worked example showing how to apply the concepts]\n\n`;
+
+      if (hasDualCodingIssues) {
+        template += `[VISUAL: Add a step-by-step diagram or process flow]\n\n`;
+      }
+
+      template += `---\n\n`;
+
+      // Add summary with spaced retrieval
+      template += `## FINAL SECTION: SUMMARY & RETRIEVAL PRACTICE\n\n`;
+      template += `### Key Takeaways\n`;
+      concepts.slice(0, 5).forEach((c) => {
+        template += `- ${c.name}: [ONE-SENTENCE SUMMARY]\n`;
+      });
+      template += `\n`;
+
+      template += `### Self-Check Questions\n`;
+      template += `[WRITER: Create 3-5 questions that require recalling the key concepts]\n\n`;
+      template += `1. [QUESTION ABOUT CORE CONCEPT]\n`;
+      template += `2. [QUESTION CONNECTING TWO CONCEPTS]\n`;
+      template += `3. [APPLICATION QUESTION]\n\n`;
+
+      // Add analysis summary
+      template += `\n---\n\n`;
+      template += `## ANALYSIS INSIGHTS\n\n`;
+      if (hasSpacingIssues) {
+        template += `⚠️ **Spacing Issue Detected**: Score ${Math.round(
+          spacingPrinciple?.score || 0
+        )}/100\n`;
+        template += `   Action: Revisit key concepts multiple times at increasing intervals\n\n`;
+      }
+      if (hasDualCodingIssues) {
+        template += `⚠️ **Dual Coding Issue Detected**: Score ${Math.round(
+          dualCodingPrinciple?.score || 0
+        )}/100\n`;
+        template += `   Action: Add visual elements (diagrams, charts, tables) for complex concepts\n\n`;
+      }
+
+      template += `\n---\n\n`;
+      template += `## NEXT STEPS\n\n`;
+      template += `1. Fill in the [WRITER] sections with your content\n`;
+      template += `2. Use Claude API to generate content for [CLAUDE] sections (if connected)\n`;
+      template += `3. Add visual elements where marked [VISUAL]\n`;
+      template += `4. Review and refine the complete chapter\n`;
+      template += `5. Export when satisfied\n`;
+
+      setGeneratedTemplate(template);
+      setIsTemplateMode(true);
+      setEditableText(template);
+    } catch (error) {
+      console.error("Error generating template:", error);
+      alert("Error generating template. Please try again.");
+    } finally {
+      setIsGeneratingTemplate(false);
+    }
+  };
+
   return (
     <div
       className="writer-mode flex flex-col bg-white"
@@ -105,6 +239,24 @@ export const WriterMode: React.FC<WriterModeProps> = ({
                 ? "▶"
                 : "▶ Show Analysis"}
             </button>
+            {analysisResult && (
+              <button
+                className="px-3 md:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm md:text-base whitespace-nowrap disabled:bg-purple-300 disabled:cursor-not-allowed"
+                onClick={generateAITemplate}
+                disabled={isGeneratingTemplate}
+              >
+                {isGeneratingTemplate ? (
+                  <span className="flex items-center gap-2">
+                    <span className="animate-spin">⚙️</span>
+                    {isCompactView ? "..." : "Generating..."}
+                  </span>
+                ) : (
+                  <span>
+                    {isCompactView ? "🤖 Template" : "🤖 Generate AI Template"}
+                  </span>
+                )}
+              </button>
+            )}
             <button
               className="px-3 md:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base whitespace-nowrap"
               onClick={() => {
@@ -137,6 +289,36 @@ export const WriterMode: React.FC<WriterModeProps> = ({
             flex: isCompactView && isSidebarOpen ? "1 1 50%" : undefined,
           }}
         >
+          {isTemplateMode && (
+            <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🤖</span>
+                <div>
+                  <p className="font-semibold text-sm">
+                    AI Template Mode Active
+                  </p>
+                  <p className="text-xs opacity-90">
+                    Fill in [WRITER] sections manually or connect to Claude API
+                    for [CLAUDE] sections
+                  </p>
+                </div>
+              </div>
+              <button
+                className="px-3 py-1.5 bg-white bg-opacity-20 hover:bg-opacity-30 rounded text-sm font-medium transition-colors"
+                onClick={() => {
+                  if (
+                    confirm(
+                      "Exit template mode? Your template will be preserved in the editor."
+                    )
+                  ) {
+                    setIsTemplateMode(false);
+                  }
+                }}
+              >
+                Exit Template
+              </button>
+            </div>
+          )}
           <div className="bg-gray-100 px-3 md:px-4 py-2 border-b border-gray-200 flex items-center justify-between">
             <div>
               <h3 className="font-semibold text-gray-700 text-sm md:text-base">

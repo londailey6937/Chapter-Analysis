@@ -343,6 +343,61 @@
       </div>
 
       <div class="content">
+        <!-- Why Concepts Matter Section -->
+        <div
+          style="
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 4px solid #f59e0b;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+          "
+        >
+          <h3
+            style="
+              margin-top: 0;
+              color: #92400e;
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              font-size: 1.25rem;
+            "
+          >
+            <span style="font-size: 1.5rem">💡</span>
+            Why Concepts Matter
+          </h3>
+          <p style="color: #78350f; line-height: 1.7; margin-bottom: 1rem">
+            <strong
+              >Concepts are the foundation of all learning and
+              communication.</strong
+            >
+            They are the mental building blocks that let us understand,
+            categorize, and connect information. When you learn
+            "photosynthesis," you're not just memorizing a word—you're building
+            a concept that connects to "sunlight," "chlorophyll," "energy," and
+            hundreds of other concepts.
+          </p>
+          <p style="color: #78350f; line-height: 1.7; margin-bottom: 1rem">
+            <strong>Everything we know is a network of concepts.</strong>
+            Understanding "democracy" requires concepts like "voting,"
+            "representation," and "rights." Mastering "calculus" requires
+            concepts like "function," "limit," and "rate of change." The quality
+            of learning depends entirely on how well these concepts are
+            introduced, explained, spaced, and reinforced.
+          </p>
+          <p style="color: #78350f; line-height: 1.7; margin-bottom: 0">
+            <strong>This app revolves around concepts</strong> because that's
+            what effective learning revolves around. We analyze how your content
+            introduces concepts, spaces their repetition for memory retention,
+            pairs them with visuals for deeper understanding, and builds
+            connections between related ideas.
+            <em
+              >If your content teaches effectively, it's because the concepts
+              are managed well.</em
+            >
+          </p>
+        </div>
+
         <div class="toc">
           <h2>📖 Table of Contents</h2>
           <ol>
@@ -1358,7 +1413,170 @@ Score Impact: Lower scores, missed learning opportunities</code></pre>
             <strong>Search & Highlight:</strong> Find concepts, highlight
             mentions, navigate occurrences
           </li>
+          <li>
+            <strong>🤖 AI Template Generation:</strong> Auto-generate structured
+            templates based on analysis issues (NEW!)
+          </li>
         </ul>
+
+        <h3>🤖 AI-Driven Template Generation</h3>
+        <div
+          class="info-box"
+          style="
+            background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+            color: white;
+            border-left: 4px solid #6b21a8;
+          "
+        >
+          <h4 style="margin-top: 0; color: white">
+            Automatic Content Structure Based on Analysis
+          </h4>
+          <p style="color: #e9d5ff; margin-bottom: 0">
+            When your chapter has spacing or dual coding issues, click
+            <strong>"🤖 Generate AI Template"</strong> to create a structured
+            outline with specific sections addressing the problems.
+          </p>
+        </div>
+
+        <h4>How It Works</h4>
+        <ol>
+          <li>
+            <strong>Run Analysis First:</strong> Upload and analyze your
+            document
+          </li>
+          <li>
+            <strong>Switch to Writer Mode:</strong> Click the ✍️ Writer tab
+          </li>
+          <li>
+            <strong>Generate Template:</strong> Click "🤖 Generate AI Template"
+            button
+          </li>
+          <li>
+            <strong>AI Analyzes Issues:</strong> System examines your spacing
+            and dual coding scores
+          </li>
+          <li>
+            <strong>Template Created:</strong> Structured outline appears with:
+            <ul>
+              <li><strong>[WRITER]</strong> sections - Fill in manually</li>
+              <li>
+                <strong>[CLAUDE]</strong> sections - Connect to Claude API to
+                auto-fill
+              </li>
+              <li>
+                <strong>[VISUAL]</strong> markers - Where diagrams/charts are
+                needed
+              </li>
+            </ul>
+          </li>
+        </ol>
+
+        <h4>What the Template Includes</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Template Section</th>
+              <th>Purpose</th>
+              <th>Addresses Issue</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Introduction</strong></td>
+              <td>Key concepts overview with brief definitions</td>
+              <td>Concept grounding</td>
+            </tr>
+            <tr>
+              <td><strong>Core Concept Sections</strong></td>
+              <td>
+                Dedicated sections for each important concept with visual
+                prompts
+              </td>
+              <td>Dual Coding issues</td>
+            </tr>
+            <tr>
+              <td><strong>Concept Connections</strong></td>
+              <td>Section to revisit earlier concepts in new contexts</td>
+              <td>Spacing issues</td>
+            </tr>
+            <tr>
+              <td><strong>Practical Application</strong></td>
+              <td>Real-world scenarios using the concepts</td>
+              <td>Retention & transfer</td>
+            </tr>
+            <tr>
+              <td><strong>Retrieval Practice</strong></td>
+              <td>Self-check questions to reinforce learning</td>
+              <td>Spacing reinforcement</td>
+            </tr>
+            <tr>
+              <td><strong>Analysis Insights</strong></td>
+              <td>Summary of detected issues and actions needed</td>
+              <td>Writer guidance</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h4>Two Ways to Fill the Template</h4>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <h4>✍️ Manual Writing</h4>
+            <p><strong>Best for:</strong> Complete creative control</p>
+            <ul style="font-size: 0.9rem; margin-top: 0.5rem">
+              <li>Fill in [WRITER] sections yourself</li>
+              <li>Add your own examples and explanations</li>
+              <li>Create custom diagrams for [VISUAL] markers</li>
+              <li>Edit and refine as you go</li>
+            </ul>
+          </div>
+
+          <div class="feature-card">
+            <h4>🤖 Claude API Integration</h4>
+            <p><strong>Best for:</strong> Fast first drafts</p>
+            <ul style="font-size: 0.9rem; margin-top: 0.5rem">
+              <li>Connect your Claude API key (optional)</li>
+              <li>Auto-generate content for [CLAUDE] sections</li>
+              <li>Get visual suggestions for [VISUAL] markers</li>
+              <li>Review and refine AI-generated content</li>
+            </ul>
+            <p
+              style="
+                font-size: 0.85rem;
+                color: #6b7280;
+                margin-top: 0.5rem;
+                font-style: italic;
+              "
+            >
+              Note: Claude API integration is optional and requires your own API
+              key
+            </p>
+          </div>
+        </div>
+
+        <div class="success-box">
+          <p><strong>💡 Template Benefits:</strong></p>
+          <ul style="margin: 0.5rem 0 0 1.5rem">
+            <li>
+              <strong>Issue-Specific:</strong> Addresses YOUR chapter's detected
+              problems
+            </li>
+            <li>
+              <strong>Concept-Focused:</strong> Uses the actual concepts from
+              your content
+            </li>
+            <li>
+              <strong>Structured Guidance:</strong> Clear sections with prompts
+              for what to add
+            </li>
+            <li>
+              <strong>Flexible:</strong> Write manually or use AI assistance
+            </li>
+            <li>
+              <strong>Educational:</strong> Teaches you where spacing and
+              visuals are needed
+            </li>
+          </ul>
+        </div>
 
         <h3>Export from Writer Mode</h3>
         <p>Export options:</p>
