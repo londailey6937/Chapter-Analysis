@@ -27,6 +27,7 @@ import {
 } from "@/utils/customDomainStorage";
 import AnalysisWorker from "@/workers/analysisWorker?worker";
 import { buildTierOneAnalysisSummary } from "@/utils/tierOneAnalysis";
+import { exportToHtml } from "@/utils/htmlExport";
 import tomeIqLogo from "@/assets/tomeiq-logo.png";
 
 const HEADING_LENGTH_LIMIT = 120;
@@ -1089,6 +1090,40 @@ export const ChapterCheckerV2: React.FC = () => {
     }
   };
 
+  const handleExportHtml = () => {
+    if (!chapterData) {
+      alert("No document to export");
+      return;
+    }
+
+    try {
+      const richHtmlContent =
+        chapterData.editorHtml ??
+        (chapterData.isHybridDocx ? chapterData.html : null) ??
+        null;
+
+      const fallbackAnalysis =
+        analysis ??
+        buildTierOneAnalysisSummary({
+          plainText: chapterData.plainText || chapterText,
+          htmlContent: richHtmlContent,
+        });
+
+      exportToHtml({
+        text: chapterText,
+        html: richHtmlContent,
+        fileName: fileName || "edited-chapter",
+        analysis: fallbackAnalysis,
+        includeHighlights: true,
+      });
+    } catch (err) {
+      alert(
+        "Error exporting HTML: " +
+          (err instanceof Error ? err.message : "Unknown error")
+      );
+    }
+  };
+
   const handleExport = () => {
     if (!analysis) return;
 
@@ -1366,7 +1401,24 @@ export const ChapterCheckerV2: React.FC = () => {
                         fontWeight: "600",
                       }}
                     >
-                      📥 Export Document
+                      📥 Export DOCX
+                    </button>
+
+                    <button
+                      onClick={handleExportHtml}
+                      style={{
+                        padding: "8px 16px",
+                        backgroundColor: "#3b82f6",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                        fontWeight: "600",
+                      }}
+                      title="Export as styled HTML document"
+                    >
+                      🌐 Export HTML
                     </button>
                   </>
                 )}

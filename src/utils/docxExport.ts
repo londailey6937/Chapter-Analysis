@@ -7,6 +7,7 @@ import {
   UnderlineType,
   ImageRun,
   ShadingType,
+  BorderStyle,
 } from "docx";
 import { saveAs } from "file-saver";
 import { ChapterAnalysis, PrincipleEvaluation, Recommendation } from "@/types";
@@ -21,6 +22,7 @@ import {
   DualCodingAnalyzer,
   VisualSuggestion,
 } from "@/utils/dualCodingAnalyzer";
+import { buildContentHtml } from "./htmlBuilder";
 
 interface ExportDocxOptions {
   text: string;
@@ -37,6 +39,15 @@ export const exportToDocx = async ({
   analysis,
   includeHighlights = true,
 }: ExportDocxOptions) => {
+  // Build HTML content using shared builder for consistency
+  const htmlContent = buildContentHtml({
+    text,
+    html,
+    analysis,
+    includeHighlights,
+  });
+
+  // Convert HTML to DOCX paragraphs
   const paragraphs: Paragraph[] = [];
 
   // Add title
@@ -49,6 +60,10 @@ export const exportToDocx = async ({
       spacing: { after: 400 },
     })
   );
+
+  // Parse HTML and convert to paragraphs
+  const htmlParagraphs = await convertHtmlToParagraphs(htmlContent);
+  paragraphs.push(...htmlParagraphs);
 
   // Add analysis summary if available
   if (analysis && includeHighlights) {
@@ -325,21 +340,14 @@ export const exportToDocx = async ({
   }
 
   const trimmedText = text?.trim() ?? "";
-  let contentParagraphs: Paragraph[] = [];
 
-  if (includeHighlights && trimmedText) {
-    contentParagraphs = await buildDocumentViewParagraphs({
-      text: trimmedText,
-      html: html?.trim() ?? null,
-      includeSpacingOverlays: false,
-    });
-  } else if (html?.trim()) {
-    contentParagraphs = await convertHtmlToParagraphs(html.trim());
-  } else {
-    contentParagraphs = buildPlainTextParagraphs(trimmedText, false);
-  }
+  // Note: The HTML content from htmlBuilder already includes analysis summary
+  // and highlighting, so we don't need the old manual building logic anymore.
+  // Just parse the generated HTML directly.
+  // The htmlContent variable already contains everything from buildContentHtml()
 
-  paragraphs.push(...contentParagraphs);
+  // Skip building paragraphs manually, use the HTML we already generated
+  // (The convertHtmlToParagraphs call above already added them)
 
   // Create document
   const doc = new Document({
@@ -657,10 +665,10 @@ function formatVisualSuggestionTitle(suggestion: VisualSuggestion): string {
 
   const priorityLabel =
     suggestion.priority === "high"
-      ? "High priority"
+      ? "High Priority"
       : suggestion.priority === "medium"
-      ? "Medium priority"
-      : "Low priority";
+      ? "Medium Priority"
+      : "Low Priority";
 
   return `${typeLabel} - ${priorityLabel}`;
 }
@@ -823,7 +831,17 @@ async function convertNodeToParagraphs(
 
   const element = node as HTMLElement;
   const tag = element.tagName.toLowerCase();
+  const className = element.className || "";
   const combinedStyle = deriveStyleForElement(element, inheritedStyle);
+
+  // Handle special CSS classes for styled sections
+  if (className.includes("spacing-indicator")) {
+    return convertSpacingIndicator(element);
+  }
+
+  if (className.includes("dual-coding-callout")) {
+    return convertDualCodingCallout(element);
+  }
 
   if (tag === "img") {
     const imageParagraph = await createImageParagraph(element);
@@ -1333,11 +1351,11 @@ function inferParagraphAlignment(
 function getSpacingForTag(tag: string): { before?: number; after?: number } {
   switch (tag) {
     case "h1":
-      return { before: 240, after: 120 };
+      return { before: 400, after: 240 };
     case "h2":
-      return { before: 200, after: 100 };
+      return { before: 320, after: 160 };
     case "h3":
-      return { before: 160, after: 80 };
+      return { before: 240, after: 120 };
     case "blockquote":
       return { before: 160, after: 160 };
     default:
@@ -1405,6 +1423,214 @@ function isBlockElement(tag: string): boolean {
     tag === "h5" ||
     tag === "h6"
   );
+}
+
+/**
+ * Convert spacing indicator to styled paragraph
+ */
+function convertSpacingIndicator(element: HTMLElement): Paragraph[] {
+  const className = element.className || "";
+  const isCompact = className.includes("compact");
+  const isExtended = className.includes("extended");
+
+  const labelElement = element.querySelector(".spacing-label");
+  const messageElement = element.querySelector(".spacing-message");
+
+  const labelText = labelElement?.textContent?.trim() || "";
+  const messageText = messageElement?.textContent?.trim() || "";
+
+  // Determine background color based on type
+  let fillColor = "DBEAFE"; // Default blue
+  let textColor = "1E40AF";
+
+  if (isCompact) {
+    fillColor = "FEF3C7"; // Orange/yellow
+    textColor = "92400E";
+  } else if (isExtended) {
+    fillColor = "FEE2E2"; // Red
+    textColor = "991B1B";
+  }
+
+  const paragraphs: Paragraph[] = [];
+
+  // Add spacing indicator with colored background
+  paragraphs.push(
+    new Paragraph({
+      children: [
+        new TextRun({
+          text: labelText,
+          bold: true,
+          size: 22,
+          color: textColor,
+        }),
+      ],
+      spacing: { before: 240, after: 80 },
+      shading: {
+        type: ShadingType.CLEAR,
+        fill: fillColor,
+      },
+      border: {
+        left: {
+          color: textColor,
+          space: 1,
+          style: "single",
+          size: 24,
+        },
+      },
+    })
+  );
+
+  if (messageText) {
+    paragraphs.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: messageText,
+            size: 20,
+            color: textColor,
+          }),
+        ],
+        spacing: { after: 160 },
+        shading: {
+          type: ShadingType.CLEAR,
+          fill: fillColor,
+        },
+        indent: { left: 240 },
+      })
+    );
+  }
+
+  return paragraphs;
+}
+
+/**
+ * Convert dual-coding callout to styled paragraph
+ */
+function convertDualCodingCallout(element: HTMLElement): Paragraph[] {
+  const iconElement = element.querySelector(".callout-icon");
+  const titleElement = element.querySelector(".callout-title");
+  const priorityElement = element.querySelector(".callout-priority");
+  const reasonElement = element.querySelector(".callout-reason");
+  const contextElement = element.querySelector(".callout-context");
+  const actionElement = element.querySelector(".callout-action");
+
+  const icon = iconElement?.textContent?.trim() || "💡";
+  const title = titleElement?.textContent?.trim() || "";
+  const priority = priorityElement?.textContent?.trim() || "";
+  const reason = reasonElement?.textContent?.trim() || "";
+  const context = contextElement?.textContent?.trim() || "";
+  const action = actionElement?.textContent?.trim() || "";
+
+  const paragraphs: Paragraph[] = [];
+
+  // Yellow background for visual suggestion callout
+  const fillColor = "FEF9C3";
+  const borderColor = "F59E0B";
+  const textColor = "92400E";
+
+  // Header with icon and title
+  paragraphs.push(
+    new Paragraph({
+      children: [
+        new TextRun({
+          text: `${icon} ${title}`,
+          bold: true,
+          size: 24,
+          color: textColor,
+        }),
+        new TextRun({
+          text: ` [${priority}]`,
+          bold: true,
+          size: 20,
+          color: priority.toLowerCase().includes("high")
+            ? "DC2626"
+            : priority.toLowerCase().includes("medium")
+            ? "F59E0B"
+            : "6B7280",
+        }),
+      ],
+      spacing: { before: 240, after: 100 },
+      shading: {
+        type: ShadingType.CLEAR,
+        fill: fillColor,
+      },
+      border: {
+        left: {
+          color: borderColor,
+          space: 1,
+          style: "single",
+          size: 24,
+        },
+      },
+    })
+  );
+
+  // Reason
+  if (reason) {
+    paragraphs.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: reason,
+            size: 20,
+            color: textColor,
+          }),
+        ],
+        spacing: { after: 100 },
+        shading: {
+          type: ShadingType.CLEAR,
+          fill: fillColor,
+        },
+        indent: { left: 240 },
+      })
+    );
+  }
+
+  // Context excerpt
+  if (context) {
+    paragraphs.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: `"${context}"`,
+            italics: true,
+            size: 20,
+            color: "78716C",
+          }),
+        ],
+        spacing: { after: 100 },
+        shading: {
+          type: ShadingType.CLEAR,
+          fill: fillColor,
+        },
+        indent: { left: 360 },
+      })
+    );
+  }
+
+  // Action
+  if (action) {
+    paragraphs.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: action,
+            bold: true,
+            size: 20,
+            color: "2563EB",
+          }),
+        ],
+        spacing: { after: 200 },
+        shading: {
+          type: ShadingType.CLEAR,
+          fill: fillColor,
+        },
+        indent: { left: 240 },
+      })
+    );
+  }
+
+  return paragraphs;
 }
 
 async function createImageParagraph(
