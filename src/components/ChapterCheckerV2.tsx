@@ -28,6 +28,11 @@ import {
 import AnalysisWorker from "@/workers/analysisWorker?worker";
 import { buildTierOneAnalysisSummary } from "@/utils/tierOneAnalysis";
 import { exportToHtml } from "@/utils/htmlExport";
+import {
+  TEMPLATE_LIBRARY,
+  getTemplateById,
+  type Template,
+} from "@/utils/templateLibrary";
 import tomeIqLogo from "@/assets/tomeiq-logo.png";
 
 const HEADING_LENGTH_LIMIT = 120;
@@ -285,6 +290,7 @@ export const ChapterCheckerV2: React.FC = () => {
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
   const [isTemplateMode, setIsTemplateMode] = useState(false);
+  const [showTemplateSelector, setShowTemplateSelector] = useState(false);
 
   // Analysis state
   const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
@@ -2423,142 +2429,7 @@ export const ChapterCheckerV2: React.FC = () => {
 
                   {viewMode === "writer" && analysis && (
                     <button
-                      onClick={() => {
-                        // Call the generateAITemplate function with analysis data
-                        if (!analysis) return;
-
-                        const concepts = analysis.conceptGraph?.concepts || [];
-                        const principleScores = analysis.principles || [];
-
-                        const spacingPrinciple = principleScores.find(
-                          (p: any) =>
-                            p.principle.toLowerCase().includes("spacing")
-                        );
-                        const dualCodingPrinciple = principleScores.find(
-                          (p: any) =>
-                            p.principle.toLowerCase().includes("dual") ||
-                            p.principle.toLowerCase().includes("coding")
-                        );
-
-                        const hasSpacingIssues =
-                          spacingPrinciple && spacingPrinciple.score < 70;
-                        const hasDualCodingIssues =
-                          dualCodingPrinciple && dualCodingPrinciple.score < 70;
-
-                        let template = `<h1>ENHANCED CHAPTER TEMPLATE</h1><p><em>Generated based on analysis results</em></p><hr>`;
-
-                        template += `<h2>SECTION 1: INTRODUCTION</h2>`;
-                        template += `<p><strong>[WRITER: Introduce the main topic. Mention 2-3 key concepts that will be covered.]</strong></p>`;
-                        template += `<p><strong>Key Concepts to Introduce:</strong></p><ul>`;
-                        concepts.slice(0, 3).forEach((c: any) => {
-                          template += `<li>${c.name}: <strong>[BRIEF DEFINITION]</strong></li>`;
-                        });
-                        template += `</ul><hr>`;
-
-                        const coreConceptsToAddress = concepts
-                          .filter((c: any) => c.importance === "core")
-                          .slice(0, 3);
-                        coreConceptsToAddress.forEach(
-                          (concept: any, idx: number) => {
-                            template += `<h2>SECTION ${
-                              idx + 2
-                            }: ${concept.name.toUpperCase()}</h2>`;
-
-                            if (hasDualCodingIssues) {
-                              template += `<h3>Visual Element Needed</h3>`;
-                              template += `<p><strong>[WRITER: Add a diagram, chart, or visual representation of "${concept.name}"]</strong></p>`;
-                              template += `<p><em>[CLAUDE: Suggest what type of visual would work best]</em></p>`;
-                            }
-
-                            template += `<h3>Explanation</h3>`;
-                            template += `<p><strong>[WRITER: Explain "${concept.name}" in clear, concrete terms]</strong></p>`;
-                            template += `<p><em>[CLAUDE: Provide 2-3 real-world examples]</em></p>`;
-
-                            if (hasSpacingIssues) {
-                              template += `<h3>Quick Review</h3>`;
-                              template += `<p><strong>[WRITER: Add a brief review question about "${concept.name}"]</strong></p>`;
-                            }
-
-                            template += `<hr>`;
-                          }
-                        );
-
-                        if (hasSpacingIssues) {
-                          template += `<h2>SECTION ${
-                            coreConceptsToAddress.length + 2
-                          }: CONCEPT CONNECTIONS</h2>`;
-                          template += `<p><strong>[WRITER: Connect the concepts introduced earlier]</strong></p>`;
-                          template += `<p><strong>Concepts to Reinforce:</strong></p><ul>`;
-                          concepts.slice(0, 5).forEach((c: any) => {
-                            template += `<li>${c.name}: <strong>[MENTION IN NEW CONTEXT]</strong></li>`;
-                          });
-                          template += `</ul><hr>`;
-                        }
-
-                        template += `<h2>PRACTICAL APPLICATION</h2>`;
-                        template += `<p><strong>[WRITER: Provide a real-world scenario]</strong></p>`;
-                        template += `<p><em>[CLAUDE: Generate a worked example]</em></p>`;
-                        if (hasDualCodingIssues) {
-                          template += `<p><strong>[VISUAL: Add a diagram]</strong></p>`;
-                        }
-                        template += `<hr>`;
-
-                        template += `<h2>SUMMARY & RETRIEVAL PRACTICE</h2>`;
-                        template += `<h3>Key Takeaways</h3><ul>`;
-                        concepts.slice(0, 5).forEach((c: any) => {
-                          template += `<li>${c.name}: <strong>[ONE-SENTENCE SUMMARY]</strong></li>`;
-                        });
-                        template += `</ul>`;
-
-                        template += `<h3>Self-Check Questions</h3><ol>`;
-                        template += `<li><strong>[QUESTION ABOUT CORE CONCEPT]</strong></li>`;
-                        template += `<li><strong>[QUESTION CONNECTING TWO CONCEPTS]</strong></li>`;
-                        template += `<li><strong>[APPLICATION QUESTION]</strong></li>`;
-                        template += `</ol><hr>`;
-
-                        template += `<h2>ANALYSIS INSIGHTS</h2>`;
-                        if (hasSpacingIssues) {
-                          template += `<p>⚠️ <strong>Spacing Issue</strong>: Score ${Math.round(
-                            spacingPrinciple?.score || 0
-                          )}/100<br>Action: Revisit key concepts multiple times</p>`;
-                        }
-                        if (hasDualCodingIssues) {
-                          template += `<p>⚠️ <strong>Dual Coding Issue</strong>: Score ${Math.round(
-                            dualCodingPrinciple?.score || 0
-                          )}/100<br>Action: Add visual elements</p>`;
-                        }
-
-                        // Update chapter data with the template
-                        const plainTextContent = template.replace(
-                          /<[^>]*>/g,
-                          ""
-                        );
-
-                        setChapterText(plainTextContent);
-                        setChapterData((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                plainText: plainTextContent,
-                                editorHtml: template,
-                                originalPlainText: plainTextContent, // Update this too to trigger re-render
-                              }
-                            : {
-                                html: template,
-                                plainText: plainTextContent,
-                                originalPlainText: plainTextContent,
-                                isHybridDocx: true,
-                                imageCount: 0,
-                                editorHtml: template,
-                              }
-                        );
-
-                        setIsTemplateMode(true);
-
-                        alert(
-                          "✅ AI Template Generated! Fill in the [WRITER] sections manually or use Claude API for [CLAUDE] sections."
-                        );
-                      }}
+                      onClick={() => setShowTemplateSelector(true)}
                       style={{
                         width: "100%",
                         padding: "8px",
@@ -3023,6 +2894,187 @@ export const ChapterCheckerV2: React.FC = () => {
                 Create Domain
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Template Selector Dialog */}
+      {showTemplateSelector && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1500,
+            padding: "20px",
+          }}
+          onClick={() => setShowTemplateSelector(false)}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              borderRadius: "16px",
+              padding: "32px",
+              maxWidth: "700px",
+              width: "100%",
+              maxHeight: "90vh",
+              overflow: "auto",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ marginBottom: "24px" }}>
+              <h2
+                style={{
+                  margin: "0 0 8px 0",
+                  fontSize: "24px",
+                  fontWeight: "700",
+                  color: "#1f2937",
+                }}
+              >
+                🤖 Select Template Type
+              </h2>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "14px",
+                  color: "#6b7280",
+                  lineHeight: "1.6",
+                }}
+              >
+                Choose a template that matches your content type. Each template
+                provides structured prompts for AI assistance and manual
+                writing.
+              </p>
+            </div>
+
+            {/* Template Grid */}
+            <div
+              style={{
+                display: "grid",
+                gap: "16px",
+                marginBottom: "24px",
+              }}
+            >
+              {TEMPLATE_LIBRARY.map((template) => (
+                <button
+                  key={template.id}
+                  onClick={() => {
+                    if (!analysis) return;
+
+                    const generatedTemplate = template.generateTemplate(
+                      analysis,
+                      chapterText
+                    );
+
+                    const plainTextContent = generatedTemplate.replace(
+                      /<[^>]*>/g,
+                      ""
+                    );
+
+                    setChapterText(plainTextContent);
+                    setChapterData((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            plainText: plainTextContent,
+                            editorHtml: generatedTemplate,
+                            originalPlainText: plainTextContent,
+                          }
+                        : {
+                            html: generatedTemplate,
+                            plainText: plainTextContent,
+                            originalPlainText: plainTextContent,
+                            isHybridDocx: true,
+                            imageCount: 0,
+                            editorHtml: generatedTemplate,
+                          }
+                    );
+
+                    setIsTemplateMode(true);
+                    setShowTemplateSelector(false);
+
+                    alert(
+                      `✅ ${template.name} Template Generated!\n\nFill in the [WRITER] sections manually or use Claude API for [CLAUDE] sections.`
+                    );
+                  }}
+                  style={{
+                    padding: "20px",
+                    backgroundColor: "#ffffff",
+                    border: "2px solid #e5e7eb",
+                    borderRadius: "12px",
+                    cursor: "pointer",
+                    textAlign: "left",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = "#9333ea";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 12px rgba(147, 51, 234, 0.15)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = "#e5e7eb";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: "16px",
+                    }}
+                  >
+                    <span style={{ fontSize: "32px" }}>{template.icon}</span>
+                    <div style={{ flex: 1 }}>
+                      <h3
+                        style={{
+                          margin: "0 0 6px 0",
+                          fontSize: "18px",
+                          fontWeight: "600",
+                          color: "#1f2937",
+                        }}
+                      >
+                        {template.name}
+                      </h3>
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "14px",
+                          color: "#6b7280",
+                          lineHeight: "1.5",
+                        }}
+                      >
+                        {template.description}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Cancel Button */}
+            <button
+              onClick={() => setShowTemplateSelector(false)}
+              style={{
+                width: "100%",
+                padding: "12px",
+                backgroundColor: "#f3f4f6",
+                color: "#374151",
+                border: "none",
+                borderRadius: "8px",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
