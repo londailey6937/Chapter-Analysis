@@ -459,43 +459,43 @@ export const ChapterCheckerV2: React.FC = () => {
   // Check for auto-saved work on startup
   useEffect(() => {
     try {
-      const autosaved = localStorage.getItem('tomeiq_autosave');
+      const autosaved = localStorage.getItem("tomeiq_autosave");
       if (autosaved && !chapterData) {
         const saved = JSON.parse(autosaved);
         const savedTime = new Date(saved.timestamp).toLocaleString();
-        
+
         // Show restore prompt
         const restore = window.confirm(
           `📝 Found auto-saved work from ${savedTime}\\n\\nFile: ${saved.fileName}\\n\\nWould you like to restore it?`
         );
-        
+
         if (restore && saved.content) {
           setFileName(saved.fileName);
           setChapterData({
-            html: saved.content.editorHtml || '',
-            plainText: saved.content.plainText || '',
-            originalPlainText: saved.content.plainText || '',
+            html: saved.content.editorHtml || "",
+            plainText: saved.content.plainText || "",
+            originalPlainText: saved.content.plainText || "",
             isHybridDocx: true,
             imageCount: 0,
             editorHtml: saved.content.editorHtml,
           });
-          setChapterText(saved.content.plainText || '');
-          
+          setChapterText(saved.content.plainText || "");
+
           // Restore template mode if it was active
           if (saved.isTemplateMode) {
             setIsTemplateMode(true);
           }
-          
+
           // Restore analysis if available
           if (saved.analysis) {
             setAnalysis(saved.analysis);
           }
-          
-          setViewMode('writer');
+
+          setViewMode("writer");
         }
       }
     } catch (error) {
-      console.error('Error loading auto-saved work:', error);
+      console.error("Error loading auto-saved work:", error);
     }
   }, []); // Run only once on mount
 
@@ -651,7 +651,7 @@ export const ChapterCheckerV2: React.FC = () => {
       editorHtml: content.html,
       lastSaved: new Date().toISOString(),
     };
-    
+
     setChapterData((prev) =>
       prev
         ? {
@@ -667,16 +667,19 @@ export const ChapterCheckerV2: React.FC = () => {
             editorHtml: content.html,
           }
     );
-    
+
     // Auto-save to localStorage
     try {
-      localStorage.setItem('tomeiq_autosave', JSON.stringify({
-        content: updatedData,
-        fileName: fileName || 'untitled',
-        timestamp: new Date().toISOString(),
-      }));
+      localStorage.setItem(
+        "tomeiq_autosave",
+        JSON.stringify({
+          content: updatedData,
+          fileName: fileName || "untitled",
+          timestamp: new Date().toISOString(),
+        })
+      );
     } catch (error) {
-      console.error('Failed to auto-save:', error);
+      console.error("Failed to auto-save:", error);
     }
   };
 
@@ -1430,22 +1433,27 @@ export const ChapterCheckerV2: React.FC = () => {
                     <button
                       onClick={() => {
                         try {
-                          const autosaved = localStorage.getItem('tomeiq_autosave');
+                          const autosaved =
+                            localStorage.getItem("tomeiq_autosave");
                           if (autosaved) {
                             const saved = JSON.parse(autosaved);
-                            const savedTime = new Date(saved.timestamp).toLocaleString();
+                            const savedTime = new Date(
+                              saved.timestamp
+                            ).toLocaleString();
                             const clear = window.confirm(
                               `💾 Auto-save Status\n\nLast saved: ${savedTime}\nFile: ${saved.fileName}\n\nClick OK to clear auto-saved data, or Cancel to keep it.`
                             );
                             if (clear) {
-                              localStorage.removeItem('tomeiq_autosave');
-                              alert('🗑️ Auto-saved data cleared!');
+                              localStorage.removeItem("tomeiq_autosave");
+                              alert("🗑️ Auto-saved data cleared!");
                             }
                           } else {
-                            alert('ℹ️ No auto-saved data found.\n\nYour work is automatically saved as you edit in Writer Mode.');
+                            alert(
+                              "ℹ️ No auto-saved data found.\n\nYour work is automatically saved as you edit in Writer Mode."
+                            );
                           }
                         } catch (error) {
-                          alert('⚠️ Error checking auto-save status');
+                          alert("⚠️ Error checking auto-save status");
                         }
                       }}
                       style={{
@@ -1599,19 +1607,24 @@ export const ChapterCheckerV2: React.FC = () => {
                             try {
                               const saveData = {
                                 content: {
-                                  plainText: chapterData?.plainText || '',
-                                  editorHtml: chapterData?.editorHtml || '',
+                                  plainText: chapterData?.plainText || "",
+                                  editorHtml: chapterData?.editorHtml || "",
                                 },
-                                fileName: fileName || 'untitled',
+                                fileName: fileName || "untitled",
                                 timestamp: new Date().toISOString(),
                                 analysis: analysis,
                                 isTemplateMode: isTemplateMode,
                               };
-                              localStorage.setItem('tomeiq_autosave', JSON.stringify(saveData));
+                              localStorage.setItem(
+                                "tomeiq_autosave",
+                                JSON.stringify(saveData)
+                              );
                               const time = new Date().toLocaleTimeString();
-                              alert(`✅ Changes saved locally at ${time}!\n\nYour work will persist across browser sessions.`);
+                              alert(
+                                `✅ Changes saved locally at ${time}!\n\nYour work will persist across browser sessions.`
+                              );
                             } catch (error) {
-                              alert('❌ Failed to save. Storage may be full.');
+                              alert("❌ Failed to save. Storage may be full.");
                             }
                           }
                         : undefined
