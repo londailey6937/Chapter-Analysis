@@ -33,6 +33,12 @@ import {
   getTemplateById,
   type Template,
 } from "@/utils/templateLibrary";
+import {
+  processClaudePrompts,
+  getStoredClaudeKey,
+  storeClaudeKey,
+  validateClaudeKey,
+} from "@/utils/claudeIntegration";
 import tomeIqLogo from "@/assets/tomeiq-logo.png";
 
 const HEADING_LENGTH_LIMIT = 120;
@@ -291,6 +297,15 @@ export const ChapterCheckerV2: React.FC = () => {
   const [fileType, setFileType] = useState("");
   const [isTemplateMode, setIsTemplateMode] = useState(false);
   const [showTemplateSelector, setShowTemplateSelector] = useState(false);
+  const [showClaudeKeyDialog, setShowClaudeKeyDialog] = useState(false);
+  const [claudeApiKey, setClaudeApiKey] = useState("");
+  const [isProcessingClaude, setIsProcessingClaude] = useState(false);
+  const [claudeProgress, setClaudeProgress] = useState({
+    current: 0,
+    total: 0,
+  });
+  const [selectedTemplateForClaude, setSelectedTemplateForClaude] =
+    useState<Template | null>(null);
 
   // Analysis state
   const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
@@ -2963,64 +2978,13 @@ export const ChapterCheckerV2: React.FC = () => {
               }}
             >
               {TEMPLATE_LIBRARY.map((template) => (
-                <button
+                <div
                   key={template.id}
-                  onClick={() => {
-                    if (!analysis) return;
-
-                    const generatedTemplate = template.generateTemplate(
-                      analysis,
-                      chapterText
-                    );
-
-                    const plainTextContent = generatedTemplate.replace(
-                      /<[^>]*>/g,
-                      ""
-                    );
-
-                    setChapterText(plainTextContent);
-                    setChapterData((prev) =>
-                      prev
-                        ? {
-                            ...prev,
-                            plainText: plainTextContent,
-                            editorHtml: generatedTemplate,
-                            originalPlainText: plainTextContent,
-                          }
-                        : {
-                            html: generatedTemplate,
-                            plainText: plainTextContent,
-                            originalPlainText: plainTextContent,
-                            isHybridDocx: true,
-                            imageCount: 0,
-                            editorHtml: generatedTemplate,
-                          }
-                    );
-
-                    setIsTemplateMode(true);
-                    setShowTemplateSelector(false);
-
-                    alert(
-                      `✅ ${template.name} Template Generated!\n\nFill in the [WRITER] sections manually or use Claude API for [CLAUDE] sections.`
-                    );
-                  }}
                   style={{
                     padding: "20px",
                     backgroundColor: "#ffffff",
                     border: "2px solid #e5e7eb",
                     borderRadius: "12px",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    transition: "all 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = "#9333ea";
-                    e.currentTarget.style.boxShadow =
-                      "0 4px 12px rgba(147, 51, 234, 0.15)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "#e5e7eb";
-                    e.currentTarget.style.boxShadow = "none";
                   }}
                 >
                   <div
@@ -3028,6 +2992,7 @@ export const ChapterCheckerV2: React.FC = () => {
                       display: "flex",
                       alignItems: "flex-start",
                       gap: "16px",
+                      marginBottom: "16px",
                     }}
                   >
                     <span style={{ fontSize: "32px" }}>{template.icon}</span>
@@ -3054,7 +3019,98 @@ export const ChapterCheckerV2: React.FC = () => {
                       </p>
                     </div>
                   </div>
-                </button>
+
+                  {/* Action Buttons */}
+                  <div style={{ display: "flex", gap: "8px" }}>
+                    <button
+                      onClick={() => {
+                        if (!analysis) return;
+
+                        const generatedTemplate = template.generateTemplate(
+                          analysis,
+                          chapterText
+                        );
+
+                        const plainTextContent = generatedTemplate.replace(
+                          /<[^>]*>/g,
+                          ""
+                        );
+
+                        setChapterText(plainTextContent);
+                        setChapterData((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                plainText: plainTextContent,
+                                editorHtml: generatedTemplate,
+                                originalPlainText: plainTextContent,
+                              }
+                            : {
+                                html: generatedTemplate,
+                                plainText: plainTextContent,
+                                originalPlainText: plainTextContent,
+                                isHybridDocx: true,
+                                imageCount: 0,
+                                editorHtml: generatedTemplate,
+                              }
+                        );
+
+                        setIsTemplateMode(true);
+                        setShowTemplateSelector(false);
+
+                        alert(
+                          `✅ ${template.name} Template Generated!\n\nFill in the [WRITER] sections manually or use Claude API for [CLAUDE] sections.`
+                        );
+                      }}
+                      style={{
+                        flex: 1,
+                        padding: "10px",
+                        backgroundColor: "#f3f4f6",
+                        color: "#374151",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "8px",
+                        fontSize: "13px",
+                        fontWeight: "600",
+                        cursor: "pointer",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#e5e7eb";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "#f3f4f6";
+                      }}
+                    >
+                      📝 Manual Template
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setSelectedTemplateForClaude(template);
+                        setShowTemplateSelector(false);
+                        setShowClaudeKeyDialog(true);
+                      }}
+                      style={{
+                        flex: 1,
+                        padding: "10px",
+                        backgroundColor: "#9333ea",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "8px",
+                        fontSize: "13px",
+                        fontWeight: "600",
+                        cursor: "pointer",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#7c3aed";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "#9333ea";
+                      }}
+                    >
+                      🤖 Generate with Claude AI
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
 
@@ -3078,6 +3134,309 @@ export const ChapterCheckerV2: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Claude API Key Dialog */}
+      {showClaudeKeyDialog && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1600,
+            padding: "20px",
+          }}
+          onClick={() => {
+            if (!isProcessingClaude) {
+              setShowClaudeKeyDialog(false);
+              setClaudeApiKey("");
+            }
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              borderRadius: "16px",
+              padding: "32px",
+              maxWidth: "500px",
+              width: "100%",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2
+              style={{
+                margin: "0 0 8px 0",
+                fontSize: "24px",
+                fontWeight: "700",
+                color: "#1f2937",
+              }}
+            >
+              🤖 Claude AI Integration
+            </h2>
+            <p
+              style={{
+                margin: "0 0 24px 0",
+                fontSize: "14px",
+                color: "#6b7280",
+                lineHeight: "1.6",
+              }}
+            >
+              Enter your Claude API key to automatically generate content for
+              [CLAUDE] prompts. Your key is stored locally and never sent to our
+              servers.
+            </p>
+
+            <div style={{ marginBottom: "20px" }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "13px",
+                  fontWeight: "600",
+                  marginBottom: "8px",
+                  color: "#374151",
+                }}
+              >
+                Claude API Key:
+              </label>
+              <input
+                type="password"
+                value={claudeApiKey || getStoredClaudeKey() || ""}
+                onChange={(e) => setClaudeApiKey(e.target.value)}
+                placeholder="sk-ant-..."
+                disabled={isProcessingClaude}
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  border: "2px solid #e5e7eb",
+                  borderRadius: "8px",
+                  fontSize: "14px",
+                  fontFamily: "monospace",
+                  outline: "none",
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "#9333ea";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = "#e5e7eb";
+                }}
+              />
+              <p
+                style={{
+                  margin: "8px 0 0 0",
+                  fontSize: "12px",
+                  color: "#6b7280",
+                }}
+              >
+                Get your API key from{" "}
+                <a
+                  href="https://console.anthropic.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "#9333ea", textDecoration: "underline" }}
+                >
+                  console.anthropic.com
+                </a>
+              </p>
+            </div>
+
+            {isProcessingClaude && (
+              <div
+                style={{
+                  marginBottom: "20px",
+                  padding: "16px",
+                  backgroundColor: "#dbeafe",
+                  borderRadius: "8px",
+                }}
+              >
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "12px" }}
+                >
+                  <div
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      border: "3px solid #3b82f6",
+                      borderTopColor: "transparent",
+                      borderRadius: "50%",
+                      animation: "spin 1s linear infinite",
+                    }}
+                  ></div>
+                  <div>
+                    <div
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: "600",
+                        color: "#1e40af",
+                      }}
+                    >
+                      Generating content with Claude AI...
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        color: "#3b82f6",
+                        marginTop: "4px",
+                      }}
+                    >
+                      Processing prompt {claudeProgress.current} of{" "}
+                      {claudeProgress.total}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button
+                onClick={() => {
+                  setShowClaudeKeyDialog(false);
+                  setClaudeApiKey("");
+                }}
+                disabled={isProcessingClaude}
+                style={{
+                  flex: 1,
+                  padding: "12px",
+                  backgroundColor: "#f3f4f6",
+                  color: "#374151",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  cursor: isProcessingClaude ? "not-allowed" : "pointer",
+                  opacity: isProcessingClaude ? 0.5 : 1,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  const apiKey = claudeApiKey || getStoredClaudeKey();
+
+                  if (!apiKey) {
+                    alert("Please enter your Claude API key");
+                    return;
+                  }
+
+                  if (!validateClaudeKey(apiKey)) {
+                    alert(
+                      "Invalid API key format. Claude keys start with 'sk-ant-'"
+                    );
+                    return;
+                  }
+
+                  if (!analysis || !selectedTemplateForClaude) return;
+
+                  try {
+                    setIsProcessingClaude(true);
+
+                    // Store the API key
+                    storeClaudeKey(apiKey);
+
+                    // Generate base template
+                    const generatedTemplate =
+                      selectedTemplateForClaude.generateTemplate(
+                        analysis,
+                        chapterText
+                      );
+
+                    // Process Claude prompts
+                    const processedTemplate = await processClaudePrompts(
+                      generatedTemplate,
+                      chapterText,
+                      { apiKey },
+                      (current, total) => {
+                        setClaudeProgress({ current, total });
+                      }
+                    );
+
+                    const plainTextContent = processedTemplate.replace(
+                      /<[^>]*>/g,
+                      ""
+                    );
+
+                    setChapterText(plainTextContent);
+                    setChapterData((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            plainText: plainTextContent,
+                            editorHtml: processedTemplate,
+                            originalPlainText: plainTextContent,
+                          }
+                        : {
+                            html: processedTemplate,
+                            plainText: plainTextContent,
+                            originalPlainText: plainTextContent,
+                            isHybridDocx: true,
+                            imageCount: 0,
+                            editorHtml: processedTemplate,
+                          }
+                    );
+
+                    setIsTemplateMode(true);
+                    setShowClaudeKeyDialog(false);
+                    setClaudeApiKey("");
+                    setSelectedTemplateForClaude(null);
+
+                    alert(
+                      `✅ ${selectedTemplateForClaude.name} Template Generated with Claude AI!\n\nAI-generated content has been added to [CLAUDE] sections.`
+                    );
+                  } catch (error) {
+                    console.error("Claude processing error:", error);
+                    alert(
+                      `❌ Error: ${
+                        error instanceof Error
+                          ? error.message
+                          : "Failed to process with Claude AI"
+                      }`
+                    );
+                  } finally {
+                    setIsProcessingClaude(false);
+                    setClaudeProgress({ current: 0, total: 0 });
+                  }
+                }}
+                disabled={
+                  isProcessingClaude || (!claudeApiKey && !getStoredClaudeKey())
+                }
+                style={{
+                  flex: 1,
+                  padding: "12px",
+                  backgroundColor:
+                    isProcessingClaude ||
+                    (!claudeApiKey && !getStoredClaudeKey())
+                      ? "#d1d5db"
+                      : "#9333ea",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  cursor:
+                    isProcessingClaude ||
+                    (!claudeApiKey && !getStoredClaudeKey())
+                      ? "not-allowed"
+                      : "pointer",
+                }}
+              >
+                {isProcessingClaude ? "Processing..." : "Generate with AI"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add CSS animation for spinner */}
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
 
       {/* Upgrade Prompt Modal */}
       {showUpgradePrompt && (
