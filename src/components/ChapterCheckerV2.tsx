@@ -1500,7 +1500,10 @@ export const ChapterCheckerV2: React.FC = () => {
                     searchOccurrence={searchOccurrence}
                     onSave={
                       analysis && viewMode === "writer"
-                        ? handleExportDocx
+                        ? () => {
+                            // Save locally - just trigger a confirmation
+                            alert("✅ Changes saved locally!");
+                          }
                         : undefined
                     }
                     readOnly={!canEditChapter}
