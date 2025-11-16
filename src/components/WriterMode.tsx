@@ -55,6 +55,11 @@ export const WriterMode: React.FC<WriterModeProps> = ({
   const concepts = analysisResult?.conceptGraph?.concepts || [];
   const principleScores = analysisResult?.principles || [];
 
+  // Debug logging
+  console.log("[WriterMode] analysisResult exists:", !!analysisResult);
+  console.log("[WriterMode] concepts count:", concepts.length);
+  console.log("[WriterMode] principle scores count:", principleScores.length);
+
   // Helper to highlight text issues based on principles
   const getTextIssues = () => {
     const issues: Array<{

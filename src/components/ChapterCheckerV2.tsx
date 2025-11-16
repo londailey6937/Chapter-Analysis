@@ -265,7 +265,7 @@ const deriveSectionsFromText = (rawText: string): Section[] => {
 
 export const ChapterCheckerV2: React.FC = () => {
   // Access control state
-  const [accessLevel, setAccessLevel] = useState<AccessLevel>("free");
+  const [accessLevel, setAccessLevel] = useState<AccessLevel>("professional");
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const [upgradeTarget, setUpgradeTarget] = useState<
     "premium" | "professional"
@@ -1506,6 +1506,8 @@ export const ChapterCheckerV2: React.FC = () => {
                     scrollToTopSignal={scrollToTopSignal}
                     onScrollDepthChange={handleDocumentScrollDepthChange}
                     isCompactLayout={isCompactEditorLayout}
+                    analysisResult={analysis}
+                    viewMode={viewMode}
                   />
                 </div>
               ) : (
@@ -2207,6 +2209,140 @@ export const ChapterCheckerV2: React.FC = () => {
                     📥 Export JSON{" "}
                     {!ACCESS_TIERS[accessLevel].exportResults && "🔒"}
                   </button>
+
+                  {viewMode === "writer" && analysis && (
+                    <button
+                      onClick={() => {
+                        // Call the generateAITemplate function with analysis data
+                        if (!analysis) return;
+
+                        const concepts = analysis.conceptGraph?.concepts || [];
+                        const principleScores = analysis.principles || [];
+
+                        const spacingPrinciple = principleScores.find(
+                          (p: any) =>
+                            p.principle.toLowerCase().includes("spacing")
+                        );
+                        const dualCodingPrinciple = principleScores.find(
+                          (p: any) =>
+                            p.principle.toLowerCase().includes("dual") ||
+                            p.principle.toLowerCase().includes("coding")
+                        );
+
+                        const hasSpacingIssues =
+                          spacingPrinciple && spacingPrinciple.score < 70;
+                        const hasDualCodingIssues =
+                          dualCodingPrinciple && dualCodingPrinciple.score < 70;
+
+                        let template = `<h1>ENHANCED CHAPTER TEMPLATE</h1><p><em>Generated based on analysis results</em></p><hr>`;
+
+                        template += `<h2>SECTION 1: INTRODUCTION</h2>`;
+                        template += `<p><strong>[WRITER: Introduce the main topic. Mention 2-3 key concepts that will be covered.]</strong></p>`;
+                        template += `<p><strong>Key Concepts to Introduce:</strong></p><ul>`;
+                        concepts.slice(0, 3).forEach((c: any) => {
+                          template += `<li>${c.name}: <strong>[BRIEF DEFINITION]</strong></li>`;
+                        });
+                        template += `</ul><hr>`;
+
+                        const coreConceptsToAddress = concepts
+                          .filter((c: any) => c.importance === "core")
+                          .slice(0, 3);
+                        coreConceptsToAddress.forEach(
+                          (concept: any, idx: number) => {
+                            template += `<h2>SECTION ${
+                              idx + 2
+                            }: ${concept.name.toUpperCase()}</h2>`;
+
+                            if (hasDualCodingIssues) {
+                              template += `<h3>Visual Element Needed</h3>`;
+                              template += `<p><strong>[WRITER: Add a diagram, chart, or visual representation of "${concept.name}"]</strong></p>`;
+                              template += `<p><em>[CLAUDE: Suggest what type of visual would work best]</em></p>`;
+                            }
+
+                            template += `<h3>Explanation</h3>`;
+                            template += `<p><strong>[WRITER: Explain "${concept.name}" in clear, concrete terms]</strong></p>`;
+                            template += `<p><em>[CLAUDE: Provide 2-3 real-world examples]</em></p>`;
+
+                            if (hasSpacingIssues) {
+                              template += `<h3>Quick Review</h3>`;
+                              template += `<p><strong>[WRITER: Add a brief review question about "${concept.name}"]</strong></p>`;
+                            }
+
+                            template += `<hr>`;
+                          }
+                        );
+
+                        if (hasSpacingIssues) {
+                          template += `<h2>SECTION ${
+                            coreConceptsToAddress.length + 2
+                          }: CONCEPT CONNECTIONS</h2>`;
+                          template += `<p><strong>[WRITER: Connect the concepts introduced earlier]</strong></p>`;
+                          template += `<p><strong>Concepts to Reinforce:</strong></p><ul>`;
+                          concepts.slice(0, 5).forEach((c: any) => {
+                            template += `<li>${c.name}: <strong>[MENTION IN NEW CONTEXT]</strong></li>`;
+                          });
+                          template += `</ul><hr>`;
+                        }
+
+                        template += `<h2>PRACTICAL APPLICATION</h2>`;
+                        template += `<p><strong>[WRITER: Provide a real-world scenario]</strong></p>`;
+                        template += `<p><em>[CLAUDE: Generate a worked example]</em></p>`;
+                        if (hasDualCodingIssues) {
+                          template += `<p><strong>[VISUAL: Add a diagram]</strong></p>`;
+                        }
+                        template += `<hr>`;
+
+                        template += `<h2>SUMMARY & RETRIEVAL PRACTICE</h2>`;
+                        template += `<h3>Key Takeaways</h3><ul>`;
+                        concepts.slice(0, 5).forEach((c: any) => {
+                          template += `<li>${c.name}: <strong>[ONE-SENTENCE SUMMARY]</strong></li>`;
+                        });
+                        template += `</ul>`;
+
+                        template += `<h3>Self-Check Questions</h3><ol>`;
+                        template += `<li><strong>[QUESTION ABOUT CORE CONCEPT]</strong></li>`;
+                        template += `<li><strong>[QUESTION CONNECTING TWO CONCEPTS]</strong></li>`;
+                        template += `<li><strong>[APPLICATION QUESTION]</strong></li>`;
+                        template += `</ol><hr>`;
+
+                        template += `<h2>ANALYSIS INSIGHTS</h2>`;
+                        if (hasSpacingIssues) {
+                          template += `<p>⚠️ <strong>Spacing Issue</strong>: Score ${Math.round(
+                            spacingPrinciple?.score || 0
+                          )}/100<br>Action: Revisit key concepts multiple times</p>`;
+                        }
+                        if (hasDualCodingIssues) {
+                          template += `<p>⚠️ <strong>Dual Coding Issue</strong>: Score ${Math.round(
+                            dualCodingPrinciple?.score || 0
+                          )}/100<br>Action: Add visual elements</p>`;
+                        }
+
+                        // Update chapter data with the template
+                        handleEditorContentChange({
+                          plainText: template.replace(/<[^>]*>/g, ""),
+                          html: template,
+                        });
+
+                        alert(
+                          "✅ AI Template Generated! Fill in the [WRITER] sections manually or use Claude API for [CLAUDE] sections."
+                        );
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        backgroundColor: "#9333ea",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                        fontWeight: "600",
+                        marginBottom: "16px",
+                      }}
+                    >
+                      🤖 Generate AI Template
+                    </button>
+                  )}
 
                   {viewMode === "analysis" ? (
                     <>
