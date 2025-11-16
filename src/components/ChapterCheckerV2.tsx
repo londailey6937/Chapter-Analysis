@@ -341,6 +341,7 @@ export const ChapterCheckerV2: React.FC = () => {
   const detectDomain = (text: string): Domain | null => {
     const lowerText = text.toLowerCase();
     const scores: Record<string, number> = {};
+    const uniqueConceptMatches: Record<string, Set<string>> = {};
 
     // Get available domains (excluding custom and cross-domain)
     const domains = getAvailableDomains().filter(
@@ -353,28 +354,45 @@ export const ChapterCheckerV2: React.FC = () => {
       if (!library) continue;
 
       let score = 0;
+      uniqueConceptMatches[domain.id] = new Set<string>();
 
       // Check each concept in the library
       for (const concept of library.concepts) {
-        // Check main concept name
+        let conceptMatched = false;
+
+        // Check main concept name (require at least 4 characters to avoid short common words)
         const conceptName = concept.name.toLowerCase();
-        const regex = new RegExp(`\\b${conceptName}\\b`, "gi");
-        const matches = lowerText.match(regex);
-        if (matches) {
-          // All concepts are core, equal weighting
-          const weight = 3;
-          score += matches.length * weight;
+        if (conceptName.length >= 4) {
+          const regex = new RegExp(`\\b${conceptName}\\b`, "gi");
+          const matches = lowerText.match(regex);
+          if (matches) {
+            // All concepts are core, equal weighting
+            const weight = 3;
+            score += matches.length * weight;
+            conceptMatched = true;
+          }
         }
 
-        // Check aliases
+        // Check aliases (also require 4+ characters)
         if (concept.aliases) {
           for (const alias of concept.aliases) {
-            const aliasRegex = new RegExp(`\\b${alias.toLowerCase()}\\b`, "gi");
-            const aliasMatches = lowerText.match(aliasRegex);
-            if (aliasMatches) {
-              score += aliasMatches.length;
+            if (alias.length >= 4) {
+              const aliasRegex = new RegExp(
+                `\\b${alias.toLowerCase()}\\b`,
+                "gi"
+              );
+              const aliasMatches = lowerText.match(aliasRegex);
+              if (aliasMatches) {
+                score += aliasMatches.length;
+                conceptMatched = true;
+              }
             }
           }
+        }
+
+        // Track unique concepts matched
+        if (conceptMatched) {
+          uniqueConceptMatches[domain.id].add(concept.name);
         }
       }
 
@@ -385,8 +403,15 @@ export const ChapterCheckerV2: React.FC = () => {
     const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
     const topDomain = sortedScores[0];
 
-    // Require at least 10 weighted matches to suggest a domain (increased threshold to reduce false positives)
-    if (topDomain && topDomain[1] >= 10) {
+    // MUCH stricter requirements:
+    // 1. At least 20 weighted matches (doubled from 10)
+    // 2. At least 5 different unique concepts matched
+    // This prevents false positives from common words
+    if (
+      topDomain &&
+      topDomain[1] >= 20 &&
+      uniqueConceptMatches[topDomain[0]]?.size >= 5
+    ) {
       return topDomain[0] as Domain;
     }
 
