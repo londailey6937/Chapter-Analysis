@@ -385,8 +385,8 @@ export const ChapterCheckerV2: React.FC = () => {
     const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
     const topDomain = sortedScores[0];
 
-    // Require at least 5 weighted matches to suggest a domain (stricter threshold)
-    if (topDomain && topDomain[1] >= 5) {
+    // Require at least 10 weighted matches to suggest a domain (increased threshold to reduce false positives)
+    if (topDomain && topDomain[1] >= 10) {
       return topDomain[0] as Domain;
     }
 
@@ -922,12 +922,15 @@ export const ChapterCheckerV2: React.FC = () => {
       return;
     }
 
-    // Check if domain was detected
-    if (!selectedDomain) {
-      setError(
-        "⚠️ Domain not detected. Please create a custom domain or add more domain-specific content to your document."
-      );
-      return;
+    // Check if domain was detected or manually set to "none"
+    if (!selectedDomain || selectedDomain === "none") {
+      // If explicitly set to "none", allow analysis without domain
+      if (selectedDomain !== "none") {
+        setError(
+          "⚠️ Domain not detected. Please select a domain, choose 'None / General', or create a custom domain."
+        );
+        return;
+      }
     }
 
     // Check access level for full analysis
@@ -977,7 +980,7 @@ export const ChapterCheckerV2: React.FC = () => {
         },
         metadata: {
           readingLevel: "college",
-          domain: selectedDomain,
+          domain: selectedDomain === "none" ? null : selectedDomain,
           targetAudience: "adult learners",
           estimatedReadingTime: Math.ceil(
             textForAnalysis.split(/\s+/).length / 200
@@ -993,7 +996,7 @@ export const ChapterCheckerV2: React.FC = () => {
       worker.postMessage({
         chapter,
         options: {
-          domain: selectedDomain,
+          domain: selectedDomain === "none" ? null : selectedDomain,
           includeCrossDomain: false,
           customConcepts,
         },
@@ -1912,7 +1915,41 @@ export const ChapterCheckerV2: React.FC = () => {
                         gap: "8px",
                       }}
                     >
-                      {selectedDomain ? (
+                      {selectedDomain === "none" ? (
+                        <>
+                          <span>📝 None / General Content</span>
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: "6px",
+                              alignItems: "center",
+                            }}
+                          >
+                            <span
+                              style={{ fontSize: "12px", fontWeight: "normal" }}
+                            >
+                              ✓ Manual selection
+                            </span>
+                            <button
+                              onClick={() => setShowDomainSelector(true)}
+                              disabled={isAnalyzing}
+                              style={{
+                                padding: "4px 10px",
+                                backgroundColor: "#3b82f6",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "4px",
+                                fontSize: "11px",
+                                fontWeight: "600",
+                                cursor: isAnalyzing ? "not-allowed" : "pointer",
+                                opacity: isAnalyzing ? 0.5 : 1,
+                              }}
+                            >
+                              Change
+                            </button>
+                          </div>
+                        </>
+                      ) : selectedDomain ? (
                         <>
                           <span>
                             {selectedDomain === "custom" ? (
@@ -2030,6 +2067,14 @@ export const ChapterCheckerV2: React.FC = () => {
                         onChange={(e) => {
                           const value = e.target.value;
 
+                          // Handle "none" selection - clear domain
+                          if (value === "none") {
+                            setSelectedDomain(null);
+                            setDetectedDomain(null);
+                            setShowDomainSelector(false);
+                            return;
+                          }
+
                           // Check if it's a saved custom domain
                           if (value.startsWith("custom:")) {
                             const domainName = value.substring(7); // Remove "custom:" prefix
@@ -2061,6 +2106,7 @@ export const ChapterCheckerV2: React.FC = () => {
                         }}
                       >
                         <option value="">-- Select a domain --</option>
+                        <option value="none">📝 None / General Content</option>
                         {sortedDomains.map((domain) => (
                           <option key={domain.id} value={domain.id}>
                             {domain.icon} {domain.label}
