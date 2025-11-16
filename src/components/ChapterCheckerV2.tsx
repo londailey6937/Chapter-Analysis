@@ -2601,6 +2601,7 @@ export const ChapterCheckerV2: React.FC = () => {
                         highlightedConceptId={highlightedConceptId}
                         currentMentionIndex={currentMentionIndex}
                         accessLevel={accessLevel}
+                        hasDomain={selectedDomain !== "none" && selectedDomain !== null}
                       />
                     </>
                   ) : (

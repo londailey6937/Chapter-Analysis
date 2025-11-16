@@ -2128,6 +2128,7 @@ export const ChapterAnalysisDashboard: React.FC<{
   currentMentionIndex?: number;
   pageOffsets?: number[];
   accessLevel?: "free" | "premium" | "professional";
+  hasDomain?: boolean;
 }> = ({
   analysis,
   concepts,
@@ -2136,6 +2137,7 @@ export const ChapterAnalysisDashboard: React.FC<{
   currentMentionIndex = 0,
   pageOffsets,
   accessLevel = "professional",
+  hasDomain = true,
 }) => {
   // Defensive guards in case analysis shape changes or fields are missing
   const overallScore = analysis.overallScore ?? 0;
@@ -2175,10 +2177,12 @@ export const ChapterAnalysisDashboard: React.FC<{
       <div className="viz-grid">
         <PrincipleScoresRadar analysis={analysis} />
         <CognitiveLoadCurve analysis={analysis} />
-        <ConceptMentionFrequency
-          analysis={analysis}
-          pageOffsets={pageOffsets}
-        />
+        {hasDomain && (
+          <ConceptMentionFrequency
+            analysis={analysis}
+            pageOffsets={pageOffsets}
+          />
+        )}
         <InterleavingPattern analysis={analysis} pageOffsets={pageOffsets} />
       </div>
 
@@ -2194,58 +2198,63 @@ export const ChapterAnalysisDashboard: React.FC<{
         ))}
       </div>
 
-      <div className="recommendations-section">
-        <h3>📋 Recommendations ({recommendations.length})</h3>
-        <p className="section-subtitle">
-          Prioritized suggestions to enhance learning effectiveness
-        </p>
-        {recommendations.slice(0, 10).map((rec) => (
-          <div key={rec.id} className={`recommendation rec-${rec.priority}`}>
-            <h4>{rec.title}</h4>
-            <p>{rec.description}</p>
-            <div className="rec-meta">
-              <span className="rec-priority">{rec.priority}</span>
-              <span className="rec-effort">{rec.estimatedEffort}</span>
+      {hasDomain && (
+        <div className="recommendations-section">
+          <h3>📋 Recommendations ({recommendations.length})</h3>
+          <p className="section-subtitle">
+            Prioritized suggestions to enhance learning effectiveness
+          </p>
+          {recommendations.slice(0, 10).map((rec) => (
+            <div key={rec.id} className={`recommendation rec-${rec.priority}`}>
+              <h4>{rec.title}</h4>
+              <p>{rec.description}</p>
+              <div className="rec-meta">
+                <span className="rec-priority">{rec.priority}</span>
+                <span className="rec-effort">{rec.estimatedEffort}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {hasDomain && (
+        <div className="concepts-section">
+          <h3>📚 Concept Overview</h3>
+          <p className="section-subtitle">
+            Summary metrics for identified concepts
+          </p>
+          <div className="concept-stats">
+            <div className="stat">
+              <strong>{conceptAnalysis.totalConceptsIdentified}</strong>
+              <p>Total Concepts</p>
+            </div>
+            <div className="stat">
+              <strong>{conceptAnalysis.coreConceptCount}</strong>
+              <p>Core Concepts</p>
+              <p className="stat-note">Repeated 3+ times</p>
+            </div>
+            <div className="stat">
+              <strong>{conceptAnalysis.conceptDensity.toFixed(1)}</strong>
+              <p>Concepts per 1K words</p>
+              <p className="stat-note">Target: 2-4</p>
+            </div>
+            <div className="stat">
+              <strong>
+                {(conceptAnalysis.hierarchyBalance * 100).toFixed(0)}%
+              </strong>
+              <p>Hierarchy Balance</p>
+              <p className="stat-note">Target: 60-80%</p>
+              <p className="stat-description">
+                Ratio of core to supporting concepts
+              </p>
             </div>
           </div>
-        ))}
-      </div>
-
-      <div className="concepts-section">
-        <h3>📚 Concept Overview</h3>
-        <p className="section-subtitle">
-          Summary metrics for identified concepts
-        </p>
-        <div className="concept-stats">
-          <div className="stat">
-            <strong>{conceptAnalysis.totalConceptsIdentified}</strong>
-            <p>Total Concepts</p>
-          </div>
-          <div className="stat">
-            <strong>{conceptAnalysis.coreConceptCount}</strong>
-            <p>Core Concepts</p>
-            <p className="stat-note">Repeated 3+ times</p>
-          </div>
-          <div className="stat">
-            <strong>{conceptAnalysis.conceptDensity.toFixed(1)}</strong>
-            <p>Concepts per 1K words</p>
-            <p className="stat-note">Target: 2-4</p>
-          </div>
-          <div className="stat">
-            <strong>
-              {(conceptAnalysis.hierarchyBalance * 100).toFixed(0)}%
-            </strong>
-            <p>Hierarchy Balance</p>
-            <p className="stat-note">Target: 60-80%</p>
-            <p className="stat-description">
-              Ratio of core to supporting concepts
-            </p>
-          </div>
         </div>
-      </div>
+      )}
 
       {/* Learning Patterns Section */}
-      {(analysis as any).patternAnalysis &&
+      {hasDomain &&
+        (analysis as any).patternAnalysis &&
         (analysis as any).patternAnalysis.totalPatterns > 0 && (
           <PatternAnalysisSection
             patternAnalysis={(analysis as any).patternAnalysis}
