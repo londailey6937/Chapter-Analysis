@@ -35,6 +35,7 @@ interface DocumentEditorProps {
   isCompactLayout?: boolean;
   analysisResult?: any;
   viewMode?: string;
+  isTemplateMode?: boolean;
 }
 
 type HighlightRange = {
@@ -80,6 +81,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   isCompactLayout = false,
   analysisResult,
   viewMode,
+  isTemplateMode = false,
 }) => {
   const [text, setText] = useState(() => initialText);
   const [visualSuggestions, setVisualSuggestions] = useState<
@@ -99,156 +101,6 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       : convertTextToHtml(initialText)
   );
   const scrollStateRef = useRef({ preview: false, editor: false });
-  const [isGeneratingTemplate, setIsGeneratingTemplate] = useState(false);
-  const [isTemplateMode, setIsTemplateMode] = useState(false);
-
-  // Generate AI-driven template based on analysis issues
-  const generateAITemplate = () => {
-    if (!analysisResult) return;
-
-    setIsGeneratingTemplate(true);
-
-    try {
-      const concepts = analysisResult?.conceptGraph?.concepts || [];
-      const principleScores = analysisResult?.principles || [];
-
-      const spacingPrinciple = principleScores.find((p: any) =>
-        p.principle.toLowerCase().includes("spacing")
-      );
-      const dualCodingPrinciple = principleScores.find(
-        (p: any) =>
-          p.principle.toLowerCase().includes("dual") ||
-          p.principle.toLowerCase().includes("coding")
-      );
-
-      const hasSpacingIssues = spacingPrinciple && spacingPrinciple.score < 70;
-      const hasDualCodingIssues =
-        dualCodingPrinciple && dualCodingPrinciple.score < 70;
-
-      let template = `<h1>ENHANCED CHAPTER TEMPLATE</h1><p><em>Generated based on analysis results</em></p><hr>`;
-
-      // Add intro section
-      template += `<h2>SECTION 1: INTRODUCTION</h2>`;
-      template += `<p><strong>[WRITER: Introduce the main topic. Mention 2-3 key concepts that will be covered.]</strong></p>`;
-      template += `<p><strong>Key Concepts to Introduce:</strong></p><ul>`;
-      concepts.slice(0, 3).forEach((c: any) => {
-        template += `<li>${c.name}: <strong>[BRIEF DEFINITION]</strong></li>`;
-      });
-      template += `</ul><hr>`;
-
-      // Add concept development sections
-      const coreConceptsToAddress = concepts
-        .filter((c: any) => c.importance === "core")
-        .slice(0, 3);
-      coreConceptsToAddress.forEach((concept: any, idx: number) => {
-        template += `<h2>SECTION ${
-          idx + 2
-        }: ${concept.name.toUpperCase()}</h2>`;
-
-        if (hasDualCodingIssues) {
-          template += `<h3>Visual Element Needed</h3>`;
-          template += `<p><strong>[WRITER: Add a diagram, chart, or visual representation of "${concept.name}"]</strong></p>`;
-          template += `<p><em>[CLAUDE: Suggest what type of visual would work best - flowchart, diagram, table, etc.]</em></p>`;
-        }
-
-        template += `<h3>Explanation</h3>`;
-        template += `<p><strong>[WRITER: Explain "${concept.name}" in clear, concrete terms]</strong></p>`;
-        template += `<p><em>[CLAUDE: Provide 2-3 real-world examples that illustrate "${concept.name}"]</em></p>`;
-
-        if (hasSpacingIssues) {
-          template += `<h3>Quick Review</h3>`;
-          template += `<p><strong>[WRITER: Add a brief review question or summary statement about "${concept.name}"]</strong></p>`;
-        }
-
-        template += `<hr>`;
-      });
-
-      // Add spacing/reinforcement section
-      if (hasSpacingIssues) {
-        template += `<h2>SECTION ${
-          coreConceptsToAddress.length + 2
-        }: CONCEPT CONNECTIONS</h2>`;
-        template += `<p><strong>[WRITER: Connect the concepts introduced earlier. Show how they relate.]</strong></p>`;
-        template += `<p><strong>Concepts to Reinforce:</strong></p><ul>`;
-        concepts.slice(0, 5).forEach((c: any) => {
-          template += `<li>${c.name}: <strong>[MENTION IN NEW CONTEXT]</strong></li>`;
-        });
-        template += `</ul><hr>`;
-      }
-
-      // Add application section
-      template += `<h2>SECTION ${
-        hasSpacingIssues
-          ? coreConceptsToAddress.length + 3
-          : coreConceptsToAddress.length + 2
-      }: PRACTICAL APPLICATION</h2>`;
-      template += `<p><strong>[WRITER: Provide a real-world scenario or problem that uses these concepts]</strong></p>`;
-      template += `<p><em>[CLAUDE: Generate a worked example showing how to apply the concepts]</em></p>`;
-
-      if (hasDualCodingIssues) {
-        template += `<p><strong>[VISUAL: Add a step-by-step diagram or process flow]</strong></p>`;
-      }
-
-      template += `<hr>`;
-
-      // Add summary with spaced retrieval
-      template += `<h2>FINAL SECTION: SUMMARY & RETRIEVAL PRACTICE</h2>`;
-      template += `<h3>Key Takeaways</h3><ul>`;
-      concepts.slice(0, 5).forEach((c: any) => {
-        template += `<li>${c.name}: <strong>[ONE-SENTENCE SUMMARY]</strong></li>`;
-      });
-      template += `</ul>`;
-
-      template += `<h3>Self-Check Questions</h3>`;
-      template += `<p><strong>[WRITER: Create 3-5 questions that require recalling the key concepts]</strong></p>`;
-      template += `<ol>`;
-      template += `<li><strong>[QUESTION ABOUT CORE CONCEPT]</strong></li>`;
-      template += `<li><strong>[QUESTION CONNECTING TWO CONCEPTS]</strong></li>`;
-      template += `<li><strong>[APPLICATION QUESTION]</strong></li>`;
-      template += `</ol>`;
-
-      // Add analysis summary
-      template += `<hr><h2>ANALYSIS INSIGHTS</h2>`;
-      if (hasSpacingIssues) {
-        template += `<p>⚠️ <strong>Spacing Issue Detected</strong>: Score ${Math.round(
-          spacingPrinciple?.score || 0
-        )}/100<br>`;
-        template += `Action: Revisit key concepts multiple times at increasing intervals</p>`;
-      }
-      if (hasDualCodingIssues) {
-        template += `<p>⚠️ <strong>Dual Coding Issue Detected</strong>: Score ${Math.round(
-          dualCodingPrinciple?.score || 0
-        )}/100<br>`;
-        template += `Action: Add visual elements (diagrams, charts, tables) for complex concepts</p>`;
-      }
-
-      template += `<hr><h2>NEXT STEPS</h2><ol>`;
-      template += `<li>Fill in the [WRITER] sections with your content</li>`;
-      template += `<li>Use Claude API to generate content for [CLAUDE] sections (if connected)</li>`;
-      template += `<li>Add visual elements where marked [VISUAL]</li>`;
-      template += `<li>Review and refine the complete chapter</li>`;
-      template += `<li>Export when satisfied</li>`;
-      template += `</ol>`;
-
-      // Set the template in the editor
-      if (editorRef.current) {
-        editorRef.current.innerHTML = template;
-        const plainText = editorRef.current.innerText;
-        setText(plainText);
-        onTextChange(plainText);
-        if (onContentChange) {
-          onContentChange({ plainText, html: template });
-        }
-      }
-
-      setIsTemplateMode(true);
-    } catch (error) {
-      console.error("Error generating template:", error);
-      alert("Error generating template. Please try again.");
-    } finally {
-      setIsGeneratingTemplate(false);
-    }
-  };
 
   useEffect(() => {
     if (editorRef.current) {
@@ -544,55 +396,57 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
           flexDirection: isCompactLayout ? "column" : "row",
         }}
       >
-        <div
-          style={{
-            flex: !isEditing || isCompactLayout ? 1 : 0.5,
-            minHeight: isCompactLayout ? "300px" : 0,
-            display: "flex",
-            flexDirection: "column",
-            gap: isCompactLayout ? "8px" : "12px",
-            width: "100%",
-          }}
-        >
+        {!isTemplateMode && (
           <div
             style={{
+              flex: !isEditing || isCompactLayout ? 1 : 0.5,
+              minHeight: isCompactLayout ? "300px" : 0,
               display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              color: "#111827",
-              fontWeight: 600,
-              fontSize: isCompactLayout ? "13px" : "14px",
-              flexWrap: "wrap",
-              gap: "8px",
+              flexDirection: "column",
+              gap: isCompactLayout ? "8px" : "12px",
+              width: "100%",
             }}
           >
-            <span>Document Preview</span>
-            <span
+            <div
               style={{
-                fontSize: isCompactLayout ? "11px" : "12px",
-                color: "#6b7280",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                color: "#111827",
+                fontWeight: 600,
+                fontSize: isCompactLayout ? "13px" : "14px",
+                flexWrap: "wrap",
+                gap: "8px",
               }}
             >
-              Spacing indicators + dual coding
-            </span>
-          </div>
+              <span>Document Preview</span>
+              <span
+                style={{
+                  fontSize: isCompactLayout ? "11px" : "12px",
+                  color: "#6b7280",
+                }}
+              >
+                Spacing indicators + dual coding
+              </span>
+            </div>
 
-          <ReadOnlyView
-            paragraphs={paragraphs}
-            highlightRange={highlightRange}
-            highlightRef={highlightRef}
-            showSpacingIndicators={showSpacingIndicators}
-            showVisualSuggestions={showVisualSuggestions}
-            suggestionsByParagraph={suggestionsByParagraph}
-            containerRef={previewRef}
-            onScroll={handlePreviewScroll}
-          />
-        </div>
+            <ReadOnlyView
+              paragraphs={paragraphs}
+              highlightRange={highlightRange}
+              highlightRef={highlightRef}
+              showSpacingIndicators={showSpacingIndicators}
+              showVisualSuggestions={showVisualSuggestions}
+              suggestionsByParagraph={suggestionsByParagraph}
+              containerRef={previewRef}
+              onScroll={handlePreviewScroll}
+            />
+          </div>
+        )}
 
         {isEditing && (
           <div
             style={{
-              flex: isCompactLayout ? 1 : 0.5,
+              flex: isTemplateMode || isCompactLayout ? 1 : 0.5,
               minHeight: isCompactLayout ? "300px" : 0,
               display: "flex",
               flexDirection: "column",

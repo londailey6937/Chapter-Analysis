@@ -284,6 +284,7 @@ export const ChapterCheckerV2: React.FC = () => {
   } | null>(null); // Single source of truth - extracted at upload
   const [fileName, setFileName] = useState("");
   const [fileType, setFileType] = useState("");
+  const [isTemplateMode, setIsTemplateMode] = useState(false);
 
   // Analysis state
   const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
@@ -1508,6 +1509,7 @@ export const ChapterCheckerV2: React.FC = () => {
                     isCompactLayout={isCompactEditorLayout}
                     analysisResult={analysis}
                     viewMode={viewMode}
+                    isTemplateMode={isTemplateMode}
                   />
                 </div>
               ) : (
@@ -2341,6 +2343,8 @@ export const ChapterCheckerV2: React.FC = () => {
                                 editorHtml: template,
                               }
                         );
+
+                        setIsTemplateMode(true);
 
                         alert(
                           "✅ AI Template Generated! Fill in the [WRITER] sections manually or use Claude API for [CLAUDE] sections."
