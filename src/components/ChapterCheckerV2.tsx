@@ -403,14 +403,20 @@ export const ChapterCheckerV2: React.FC = () => {
     const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
     const topDomain = sortedScores[0];
 
-    // MUCH stricter requirements:
-    // 1. At least 20 weighted matches (doubled from 10)
-    // 2. At least 5 different unique concepts matched
-    // This prevents false positives from common words
+    // EXTREMELY strict requirements to prevent false positives:
+    // 1. At least 40 weighted matches (was 20, now doubled again)
+    // 2. At least 8 different unique concepts matched (was 5, now 8)
+    // 3. Score must be 3x higher than second-place domain
+    // This prevents meditation/philosophy docs from matching Physics
+    const secondPlace = sortedScores[1];
+    const hasSignificantLead =
+      !secondPlace || topDomain[1] >= secondPlace[1] * 3;
+
     if (
       topDomain &&
-      topDomain[1] >= 20 &&
-      uniqueConceptMatches[topDomain[0]]?.size >= 5
+      topDomain[1] >= 40 &&
+      uniqueConceptMatches[topDomain[0]]?.size >= 8 &&
+      hasSignificantLead
     ) {
       return topDomain[0] as Domain;
     }
