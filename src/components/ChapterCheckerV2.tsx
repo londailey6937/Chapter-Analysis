@@ -2069,7 +2069,7 @@ export const ChapterCheckerV2: React.FC = () => {
 
                           // Handle "none" selection - clear domain
                           if (value === "none") {
-                            setSelectedDomain(null);
+                            setSelectedDomain("none" as Domain);
                             setDetectedDomain(null);
                             setShowDomainSelector(false);
                             return;
