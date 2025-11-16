@@ -155,43 +155,6 @@ export function NavigationMenu({
           </button>
         </div>
 
-        {/* Why Concepts Matter */}
-        <div
-          style={{
-            padding: "1.5rem",
-            background: "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
-            borderBottom: "2px solid #f59e0b",
-          }}
-        >
-          <h3
-            style={{
-              margin: "0 0 0.75rem 0",
-              fontSize: "1rem",
-              color: "#92400e",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.5rem",
-            }}
-          >
-            <span style={{ fontSize: "1.25rem" }}>💡</span>
-            Why Concepts Matter
-          </h3>
-          <p
-            style={{
-              margin: 0,
-              fontSize: "0.875rem",
-              color: "#78350f",
-              lineHeight: "1.5",
-            }}
-          >
-            <strong>Concepts are how we think and communicate.</strong> Every
-            idea, skill, and understanding you have is built from concepts. This
-            app analyzes how concepts are introduced, spaced, and
-            reinforced—because effective learning isn't just about words on a
-            page, it's about building lasting mental frameworks.
-          </p>
-        </div>
-
         {/* Quick Actions */}
         <div
           style={{

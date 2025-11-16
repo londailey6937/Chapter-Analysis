@@ -111,6 +111,7 @@ const graph = await ConceptExtractor.extractConceptsFromChapter(
 **Dependencies**: Recharts
 
 **Recent additions** (November 2025):
+
 - `hasDomain` prop for conditional section rendering
 - Hides domain-specific sections when domain is "none" or null
 - Lines 2120-2260: Conditional rendering logic
@@ -153,6 +154,7 @@ const graph = await ConceptExtractor.extractConceptsFromChapter(
 - Domain-specific section hiding
 
 **Recent additions** (November 2025):
+
 - Lines 2189-2315: AI template generation
 - Lines 601-635: Auto-save logic
 - Lines 460-507: Auto-restore prompt

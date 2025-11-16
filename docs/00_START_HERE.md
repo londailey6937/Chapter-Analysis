@@ -32,18 +32,21 @@ npm run dev
 Before diving in, check out our latest features:
 
 ### 🤖 AI Template Generation (Writer Mode)
+
 - Generate structured templates with AI prompts
 - [WRITER], [CLAUDE], [VISUAL] prompt types
 - Full-width editing mode
 - **Requires:** Professional tier (Writer Mode)
 
 ### 💾 Auto-Save System
+
 - Never lose your work
 - Saves automatically on every edit
 - Restores on page reload
 - Check save status with "💾 Auto-save info" button
 
 ### 🔍 Domain Detection v3
+
 - Ultra-strict algorithm prevents false positives
 - 40+ concept matches required
 - 8+ unique concepts needed
@@ -51,11 +54,13 @@ Before diving in, check out our latest features:
 - **Much more accurate!**
 
 ### 📝 "None / General Content" Option
+
 - Perfect for meditation, creative writing, essays
 - No domain-specific concept library required
 - Still analyzes cognitive load and learning principles
 
 ### 🎯 Smart Section Hiding
+
 - Domain-specific sections hide for general content
 - Only shows relevant analysis
 - Cleaner, more focused results
@@ -297,6 +302,10 @@ function TextAreaInput({
 ```css
 /* In src/styles/globals.css */
 .btn-primary       /* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
 /* Primary button */
 /* Primary button */
 /* Primary button */
