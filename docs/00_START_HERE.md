@@ -1,4 +1,4 @@
-# 🧠 Chapter Checker - Complete React + Vite + Tailwind Project
+# 🧠 Chapter Analysis Tool - START HERE
 
 **Your complete, production-ready application is ready to use!**
 
@@ -20,9 +20,47 @@ npm run dev
 
 ### 3️⃣ Open Your Browser
 
-- Automatically opens at `http://localhost:3000`
+- Automatically opens at `http://localhost:5178` (or next available port)
 - Paste a chapter or upload a .docx or .obt file
+- Select domain (auto-detected or manual)
 - Click "Analyze Chapter" to see results
+
+---
+
+## 🆕 **NEW! November 2025 Features**
+
+Before diving in, check out our latest features:
+
+### 🤖 AI Template Generation (Writer Mode)
+- Generate structured templates with AI prompts
+- [WRITER], [CLAUDE], [VISUAL] prompt types
+- Full-width editing mode
+- **Requires:** Professional tier (Writer Mode)
+
+### 💾 Auto-Save System
+- Never lose your work
+- Saves automatically on every edit
+- Restores on page reload
+- Check save status with "💾 Auto-save info" button
+
+### 🔍 Domain Detection v3
+- Ultra-strict algorithm prevents false positives
+- 40+ concept matches required
+- 8+ unique concepts needed
+- 3x lead over second-place domain
+- **Much more accurate!**
+
+### 📝 "None / General Content" Option
+- Perfect for meditation, creative writing, essays
+- No domain-specific concept library required
+- Still analyzes cognitive load and learning principles
+
+### 🎯 Smart Section Hiding
+- Domain-specific sections hide for general content
+- Only shows relevant analysis
+- Cleaner, more focused results
+
+**→ See [RECENT_CHANGES.md](./RECENT_CHANGES.md) for complete details**
 
 ---
 
@@ -75,12 +113,16 @@ chapter-checker/
 │
 └── Documentation
     ├── 00_START_HERE.md          ← YOU ARE HERE
+    ├── RECENT_CHANGES.md         ← **NEW!** Latest features (Nov 2025)
     ├── VITE_SETUP.md             ← Full setup guide
     ├── PROJECT_MANIFEST.md       ← File reference
+    ├── FILE_INDEX.md             ← Complete file documentation
     ├── QUICK_START.md            ← Code examples
     ├── README.md                 ← Architecture
     ├── SYSTEM_OVERVIEW.md        ← Deep dive
-    └── SETUP.sh                  ← Setup script
+    ├── ANALYSIS_RESULTS_GUIDE.md ← Interpret results
+    ├── DOMAIN_SPECIFIC_GUIDE.md  ← Domain features
+    └── TECHNICAL_ARCHITECTURE.md ← Implementation details
 ```
 
 ---
@@ -93,32 +135,35 @@ Welcome! This directory contains all documentation for the Chapter Analysis Tool
 
 New to the tool? Start here:
 
-1. **[Quick Start Guide](./QUICK_START.md)** - Get analyzing in 5 minutes
-2. **[System Overview](./SYSTEM_OVERVIEW.md)** - Understand what the tool does
-3. **[Analysis Results Guide](./ANALYSIS_RESULTS_GUIDE.md)** - Comprehensive guide to interpreting results
+1. **[RECENT_CHANGES.md](./RECENT_CHANGES.md)** ⭐ **NEW!** Latest features (Nov 2025)
+2. **[Quick Start Guide](./QUICK_START.md)** - Get analyzing in 5 minutes
+3. **[System Overview](./SYSTEM_OVERVIEW.md)** - Understand what the tool does
+4. **[Analysis Results Guide](./ANALYSIS_RESULTS_GUIDE.md)** - Comprehensive guide to interpreting results
 
 ## 📚 Complete Documentation
 
 ### For Users
 
+- **[RECENT_CHANGES.md](./RECENT_CHANGES.md)** ⭐ **READ FIRST** - November 2025 features
 - **[Quick Start Guide](./QUICK_START.md)** - Step-by-step usage instructions
 - **[System Overview](./SYSTEM_OVERVIEW.md)** - Learning principles explained
 - **[Analysis Results Guide](./ANALYSIS_RESULTS_GUIDE.md)** - In-depth explanation of every metric and section
-- **[Domain-Specific Features](./DOMAIN_SPECIFIC_GUIDE.md)** - Chemistry patterns and future domains
+- **[Domain-Specific Features](./DOMAIN_SPECIFIC_GUIDE.md)** - Chemistry patterns and domain system
 
 ### For Developers
 
+- **[FILE_INDEX.md](./FILE_INDEX.md)** - Complete file-by-file documentation
 - **[Technical Architecture](./TECHNICAL_ARCHITECTURE.md)** - System design, pipeline, and API reference
 - **[Domain-Specific Guide](./DOMAIN_SPECIFIC_GUIDE.md)** - How to add new academic domains
 - **[Project Manifest](./PROJECT_MANIFEST.md)** - Project structure and goals
-- **[File Index](./FILE_INDEX.md)** - Detailed file-by-file documentation
 - **[Vite Setup](./VITE_SETUP.md)** - Development environment setup
 
 **Recommended Reading Order:**
 
 1. This file (you're reading it!) - 5 min
-2. VITE_SETUP.md - 15 min
-3. Start coding! - 10 min
+2. **RECENT_CHANGES.md** ⭐ - 15 min (latest features)
+3. VITE_SETUP.md - 15 min
+4. Start coding! - 10 min
 
 ---
 
@@ -129,13 +174,18 @@ New to the tool? Start here:
 - ✓ React 18.2 with TypeScript
 - ✓ Vite build tool
 - ✓ Tailwind CSS 3.3 with Inter font
-- ✓ 18 React components
+- ✓ 40+ React components
 - ✓ Fully typed with TypeScript
 - ✓ Component hierarchy with props flow
 - ✓ Global CSS with component classes
 - ✓ Responsive design
 - ✓ Error handling
-- ✓ JSON export
+- ✓ JSON, DOCX, HTML export
+- ✓ **AI template generation (Writer Mode)** ⭐ NEW
+- ✓ **Auto-save & restore system** ⭐ NEW
+- ✓ **Domain detection v3** ⭐ NEW
+- ✓ **"None/General" domain option** ⭐ NEW
+- ✓ **Smart section hiding** ⭐ NEW
 
 ### ✅ Code Quality
 

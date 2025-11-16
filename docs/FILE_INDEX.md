@@ -91,58 +91,93 @@ const graph = await ConceptExtractor.extractConceptsFromChapter(
 
 ---
 
-#### `VisualizationComponents.tsx` (24 KB)
+#### `VisualizationComponents.tsx` (2450 lines, 92 KB)
 
 **Purpose**: React components for interactive visualizations
 **Contains**:
 
 - PrincipleScoresRadar (10-axis radar chart)
 - CognitiveLoadCurve (line chart across sections)
-- ConceptMentionFrequency (bar chart)
+- ConceptMentionFrequency (bar chart - conditionally rendered)
 - ConceptMapVisualization (force-directed graph)
 - InterleavingPattern (sequence visualization)
 - ReviewScheduleTimeline (mention gaps)
 - PrincipleFindings (expandable cards)
-- ChapterAnalysisDashboard (complete dashboard)
+- ChapterAnalysisDashboard (complete dashboard with domain-aware sections)
+- PatternAnalysisSection (learning patterns - conditionally rendered)
 
 **When to use**: Display analysis results to users
 **Key exports**: All components are React.FC
 **Dependencies**: Recharts
 
+**Recent additions** (November 2025):
+- `hasDomain` prop for conditional section rendering
+- Hides domain-specific sections when domain is "none" or null
+- Lines 2120-2260: Conditional rendering logic
+
 **Example**:
 
 ```tsx
-<PrincipleScoresRadar analysis={analysis} />
-<CognitiveLoadCurve analysis={analysis} />
+<ChapterAnalysisDashboard
+  analysis={analysis}
+  concepts={concepts}
+  hasDomain={selectedDomain !== "none" && selectedDomain !== null}
+/>
 ```
 
 ---
 
-#### `ChapterChecker.tsx` (17 KB)
+#### `ChapterCheckerV2.tsx` (3044 lines, 115 KB)
 
-**Purpose**: Main React application component
+**Purpose**: Main React application component with advanced features
 **Contains**:
 
-- ChapterChecker component (complete application)
-- Section parsing logic
-- File upload handling
-- Analysis orchestration
-- Error handling
-- Export functionality
-- Responsive styling
+- Complete analysis orchestration
+- Domain detection with auto/manual selection
+- Writer Mode with AI template generation
+- Auto-save and restore system
+- Document editing with full-width template mode
+- Section parsing and file upload handling
+- Export functionality (JSON, DOCX, HTML)
+- Responsive styling and mobile support
 
 **When to use**: Drop-in React component for complete UI
-**Key component**: `<ChapterChecker />`
+**Key component**: `<ChapterCheckerV2 />`
 **Features**:
 
-- Paste/upload chapter text
-- Real-time analysis
-- Export as JSON
-- Mobile responsive
+- Domain auto-detection (v3 algorithm)
+- "None/General Content" option
+- AI template generation with [WRITER], [CLAUDE], [VISUAL] prompts
+- Auto-save to localStorage with restore
+- Full-width editor mode
+- Domain-specific section hiding
+
+**Recent additions** (November 2025):
+- Lines 2189-2315: AI template generation
+- Lines 601-635: Auto-save logic
+- Lines 460-507: Auto-restore prompt
+- Lines 341-420: Domain detection v3
+- Line 2604: hasDomain prop for conditional rendering
 
 ---
 
 ### Documentation Files
+
+#### `RECENT_CHANGES.md` (18 KB)
+
+**Purpose**: Track recent features and updates
+**Contains**:
+
+- November 2025 updates (AI template generation, auto-save, domain detection v3)
+- Breaking changes and migration guide
+- Configuration changes
+- Performance notes
+- API changes
+- Testing recommendations
+- Future enhancements roadmap
+
+**When to use**: Understanding latest features and changes
+**Best for**: Staying current with new functionality
 
 #### `README.md` (13 KB)
 
@@ -437,17 +472,19 @@ To build custom: Import the individual files you need
 **For Quick Implementation** (30 min):
 
 1. This file (5 min)
-2. QUICK_START.md (15 min)
-3. Start coding (10 min)
+2. RECENT_CHANGES.md (10 min) - **NEW! Read first for latest features**
+3. QUICK_START.md (15 min)
+4. Start coding (10 min)
 
 **For Complete Understanding** (2 hours):
 
 1. This file (5 min)
-2. QUICK_START.md (20 min)
-3. README.md (30 min)
-4. TECHNICAL_ARCHITECTURE.md (30 min)
-5. SYSTEM_OVERVIEW.md (20 min)
-6. Code review (15 min)
+2. RECENT_CHANGES.md (15 min) - **NEW! Latest features and changes**
+3. QUICK_START.md (20 min)
+4. README.md (30 min)
+5. TECHNICAL_ARCHITECTURE.md (30 min)
+6. SYSTEM_OVERVIEW.md (20 min)
+7. Code review (15 min)
 
 **For Customization** (2.5 hours):
 
@@ -510,12 +547,27 @@ Start with QUICK_START.md and go from there.
 
 ## 📞 Quick Reference Links
 
+- **Latest Features**: See RECENT_CHANGES.md ⭐ **NEW!**
 - **Getting Started**: See QUICK_START.md
 - **Full Documentation**: See README.md
 - **Architecture Details**: See SYSTEM_OVERVIEW.md
 - **Code Examples**: See QUICK_START.md (Examples 1-5)
 - **Type Definitions**: See types.ts
 - **Principle Details**: See LearningPrincipleEvaluators.ts
+
+---
+
+## 🆕 November 2025 Features
+
+**Must-read for existing users:**
+
+1. **AI Template Generation** - Writer Mode now generates structured templates
+2. **Auto-Save System** - Never lose your work again
+3. **Domain Detection v3** - Ultra-strict to prevent false positives
+4. **"None/General" Option** - Analyze non-academic content
+5. **Smart Section Hiding** - Only shows relevant analysis sections
+
+See RECENT_CHANGES.md for complete details and migration guide.
 
 ---
 
