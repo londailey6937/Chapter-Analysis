@@ -2318,10 +2318,29 @@ export const ChapterCheckerV2: React.FC = () => {
                         }
 
                         // Update chapter data with the template
-                        handleEditorContentChange({
-                          plainText: template.replace(/<[^>]*>/g, ""),
-                          html: template,
-                        });
+                        const plainTextContent = template.replace(
+                          /<[^>]*>/g,
+                          ""
+                        );
+
+                        setChapterText(plainTextContent);
+                        setChapterData((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                plainText: plainTextContent,
+                                editorHtml: template,
+                                originalPlainText: plainTextContent, // Update this too to trigger re-render
+                              }
+                            : {
+                                html: template,
+                                plainText: plainTextContent,
+                                originalPlainText: plainTextContent,
+                                isHybridDocx: true,
+                                imageCount: 0,
+                                editorHtml: template,
+                              }
+                        );
 
                         alert(
                           "✅ AI Template Generated! Fill in the [WRITER] sections manually or use Claude API for [CLAUDE] sections."
