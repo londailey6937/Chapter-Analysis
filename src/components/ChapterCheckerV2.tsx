@@ -2188,13 +2188,17 @@ export const ChapterCheckerV2: React.FC = () => {
                 <button
                   onClick={handleAnalyzeChapter}
                   disabled={
-                    !chapterText.trim() || isAnalyzing || (!selectedDomain && selectedDomain !== "none")
+                    !chapterText.trim() ||
+                    isAnalyzing ||
+                    (!selectedDomain && selectedDomain !== "none")
                   }
                   style={{
                     width: "100%",
                     padding: "12px",
                     backgroundColor:
-                      chapterText.trim() && !isAnalyzing && (selectedDomain || selectedDomain === "none")
+                      chapterText.trim() &&
+                      !isAnalyzing &&
+                      (selectedDomain || selectedDomain === "none")
                         ? "#10b981"
                         : "#d1d5db",
                     color: "white",
@@ -2203,7 +2207,9 @@ export const ChapterCheckerV2: React.FC = () => {
                     fontSize: "16px",
                     fontWeight: "600",
                     cursor:
-                      chapterText.trim() && !isAnalyzing && (selectedDomain || selectedDomain === "none")
+                      chapterText.trim() &&
+                      !isAnalyzing &&
+                      (selectedDomain || selectedDomain === "none")
                         ? "pointer"
                         : "not-allowed",
                     boxShadow: "0 6px 18px rgba(16,185,129,0.35)",
