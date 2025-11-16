@@ -243,6 +243,24 @@ Domain libraries are pre-built concept dictionaries tailored to specific subject
 2. **Use "General"** - For interdisciplinary or non-technical content
 3. **Create Custom Domain** - For specialized fields not covered by built-in libraries
 
+### Auto-Detection Feature
+
+When you upload a document, Chapter Checker analyzes your content and suggests the most likely domain based on:
+
+- **Keyword analysis** - Detecting domain-specific terminology
+- **Concept frequency** - How often domain concepts appear
+- **Confidence scoring** - Accuracy of the detection
+
+**💡 Detected Domain**
+
+After uploading, you'll see a **"Detected Domain"** section showing the auto-detected subject area. You can:
+
+- ✅ Accept the detected domain if it looks correct
+- 🔄 Click "Change Domain" to select a different one
+- 🎯 Use the dropdown to choose from all available domains
+
+**Tip:** Always verify the detected domain matches your chapter's primary subject for best results!
+
 ### How Domains Affect Analysis
 
 **With Correct Domain:**

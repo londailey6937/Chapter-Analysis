@@ -113,7 +113,18 @@ export function NavigationMenu({
                   opacity: 0.9,
                 }}
               >
-                AI-Powered Textbook Analysis
+                AI-Powered Learning Content Analysis
+              </p>
+              <p
+                style={{
+                  margin: "0.5rem 0 0 0",
+                  fontSize: "0.75rem",
+                  opacity: 0.85,
+                  lineHeight: "1.3",
+                }}
+              >
+                For Education • Corporate Training • Research • K-12 • Emerging
+                Fields
               </p>
             </div>
           </div>
@@ -227,6 +238,125 @@ export function NavigationMenu({
               <span>Reference Library</span>
             </button>
           </div>
+        </div>
+
+        {/* Use Cases Highlight */}
+        <div
+          style={{
+            padding: "1.5rem",
+            background: "linear-gradient(135deg, #eff6ff 0%, #f3e8ff 100%)",
+            borderTop: "1px solid #e5e7eb",
+            borderBottom: "1px solid #e5e7eb",
+          }}
+        >
+          <h3
+            style={{
+              margin: "0 0 0.75rem 0",
+              fontSize: "0.875rem",
+              fontWeight: "600",
+              color: "#667eea",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+            }}
+          >
+            🌟 Perfect For
+          </h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                fontSize: "0.85rem",
+                color: "#4b5563",
+              }}
+            >
+              <span style={{ fontSize: "1.1rem" }}>🎓</span>
+              <span>
+                <strong>Education</strong> - Textbooks, Courses, Exam Prep
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                fontSize: "0.85rem",
+                color: "#4b5563",
+              }}
+            >
+              <span style={{ fontSize: "1.1rem" }}>💼</span>
+              <span>
+                <strong>Corporate</strong> - Training, Handbooks, SOPs
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                fontSize: "0.85rem",
+                color: "#4b5563",
+              }}
+            >
+              <span style={{ fontSize: "1.1rem" }}>📖</span>
+              <span>
+                <strong>Documentation</strong> - APIs, Manuals, Guides
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                fontSize: "0.85rem",
+                color: "#4b5563",
+              }}
+            >
+              <span style={{ fontSize: "1.1rem" }}>⚕️</span>
+              <span>
+                <strong>Healthcare</strong> - Clinical Protocols, Training
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                fontSize: "0.85rem",
+                color: "#4b5563",
+              }}
+            >
+              <span style={{ fontSize: "1.1rem" }}>⚖️</span>
+              <span>
+                <strong>Compliance</strong> - Safety, Policy, Regulatory
+              </span>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                fontSize: "0.85rem",
+                color: "#4b5563",
+              }}
+            >
+              <span style={{ fontSize: "1.1rem" }}>🔬</span>
+              <span>
+                <strong>Research</strong> - Academic, Non-Profit, Government
+              </span>
+            </div>
+          </div>
+          <p
+            style={{
+              margin: "0.75rem 0 0 0",
+              fontSize: "0.75rem",
+              color: "#6b7280",
+              fontStyle: "italic",
+            }}
+          >
+            Analyze any learning or reference material
+          </p>
         </div>
 
         {/* Features Section */}

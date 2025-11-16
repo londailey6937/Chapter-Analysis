@@ -1317,7 +1317,6 @@ export const ChapterCheckerV2: React.FC = () => {
         <div
           style={{
             flex: isStackedLayout ? "1 1 100%" : `${documentFlexGrow} 1 0%`,
-            flexBasis: isStackedLayout ? "auto" : 0,
             maxWidth: "100%",
             minWidth: documentMinWidth,
             display: "flex",
@@ -1536,7 +1535,6 @@ export const ChapterCheckerV2: React.FC = () => {
           className="app-panel"
           style={{
             flex: isStackedLayout ? "1 1 100%" : `${analysisFlexGrow} 1 0%`,
-            flexBasis: isStackedLayout ? "auto" : 0,
             maxWidth: "100%",
             minWidth: analysisMinWidth,
             display: "flex",
@@ -1749,7 +1747,8 @@ export const ChapterCheckerV2: React.FC = () => {
                     color: "#4b5563",
                   }}
                 >
-                  Detected Domain
+                  Select the domain that best matches your chapter content for
+                  accurate concept recognition and analysis.
                 </p>
 
                 <div style={{ marginBottom: "16px" }}>
@@ -1763,8 +1762,7 @@ export const ChapterCheckerV2: React.FC = () => {
                     }}
                   >
                     Detected Domain:
-                  </label>
-
+                  </label>{" "}
                   {!showDomainSelector ? (
                     <div
                       style={{
