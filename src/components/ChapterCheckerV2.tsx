@@ -2719,7 +2719,7 @@ export const ChapterCheckerV2: React.FC = () => {
           style={{
             position: "fixed",
             bottom: "28px",
-            right: "28px",
+            left: "28px",
             padding: "12px 18px",
             borderRadius: "999px",
             border: "none",
