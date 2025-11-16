@@ -33,11 +33,11 @@ export function NavigationMenu({
   const openReferenceResources = () => {
     if (typeof window === "undefined") return;
     try {
-      window.open("/START_HERE.txt", "_blank", "noopener,noreferrer");
+      window.open("/REFERENCE_LIBRARY.html", "_blank", "noopener,noreferrer");
     } catch (err) {
       console.error("Unable to open reference file", err);
       alert(
-        "Reference file could not be opened automatically. You can access START_HERE.txt inside the docs folder."
+        "Reference file could not be opened automatically. You can access REFERENCE_LIBRARY.html in the public folder."
       );
     }
   };
