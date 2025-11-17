@@ -12,72 +12,20 @@ interface MissingConceptSuggestionsProps {
   libraryConcepts: ConceptDefinition[];
   identifiedConcepts: Concept[];
   chapterText: string;
-  onAcceptSuggestion: (
-    concept: ConceptDefinition,
-    insertionPoint: number
-  ) => void;
 }
 
 interface MissingConcept {
   concept: ConceptDefinition;
-  suggestedLocation: number;
-  contextSnippet: string;
-  reason: string;
 }
 
 export const MissingConceptSuggestions: React.FC<
   MissingConceptSuggestionsProps
-> = ({
-  domain,
-  libraryConcepts,
-  identifiedConcepts,
-  chapterText,
-  onAcceptSuggestion,
-}) => {
+> = ({ domain, libraryConcepts, identifiedConcepts, chapterText }) => {
   const [expandedConcept, setExpandedConcept] = useState<string | null>(null);
   const [rejectedConcepts, setRejectedConcepts] = useState<Set<string>>(
     new Set()
   );
-
-  // Suggest where to insert a missing concept based on categories
-  const suggestInsertionPoint = (
-    concept: ConceptDefinition,
-    text: string,
-    existing: Concept[]
-  ): { location: number; snippet: string; reason: string } | null => {
-    // Strategy 1: Find keywords from the concept's category in the text
-    const categoryKeywords = concept.category?.toLowerCase().split(" ") || [];
-    for (const keyword of categoryKeywords) {
-      const regex = new RegExp(`\\b${keyword}\\b`, "i");
-      const match = regex.exec(text);
-      if (match) {
-        const location = match.index;
-        const snippet = text.slice(
-          Math.max(0, location - 100),
-          Math.min(text.length, location + 100)
-        );
-
-        return {
-          location,
-          snippet: "..." + snippet.trim() + "...",
-          reason: `Near category keyword: "${keyword}"`,
-        };
-      }
-    }
-
-    // Strategy 2: Suggest in the middle of the document (default)
-    const location = Math.floor(text.length / 2);
-    const snippet = text.slice(
-      Math.max(0, location - 100),
-      Math.min(text.length, location + 100)
-    );
-
-    return {
-      location,
-      snippet: "..." + snippet.trim() + "...",
-      reason: "General content area",
-    };
-  };
+  const [showAll, setShowAll] = useState(false);
 
   // Find concepts that are in the library but not in the writer's text
   const missingConcepts = useMemo(() => {
@@ -101,40 +49,18 @@ export const MissingConceptSuggestions: React.FC<
           ));
 
       if (!isIdentified && !rejectedConcepts.has(libConcept.name)) {
-        // Find a good place to suggest adding this concept
-        const suggestion = suggestInsertionPoint(
-          libConcept,
-          chapterText,
-          identifiedConcepts
-        );
-        if (suggestion) {
-          missing.push({
-            concept: libConcept,
-            suggestedLocation: suggestion.location,
-            contextSnippet: suggestion.snippet,
-            reason: suggestion.reason,
-          });
-        }
+        missing.push({
+          concept: libConcept,
+        });
       }
     }
 
-    // Sort by importance (core first) and then by suggested location
-    return missing.sort((a, b) => {
-      if (a.concept.importance === "core" && b.concept.importance !== "core")
-        return -1;
-      if (a.concept.importance !== "core" && b.concept.importance === "core")
-        return 1;
-      return a.suggestedLocation - b.suggestedLocation;
-    });
-  }, [libraryConcepts, identifiedConcepts, chapterText, rejectedConcepts]);
+    // Sort alphabetically by name
+    return missing.sort((a, b) => a.concept.name.localeCompare(b.concept.name));
+  }, [libraryConcepts, identifiedConcepts, rejectedConcepts]);
 
   const handleReject = (conceptName: string) => {
     setRejectedConcepts((prev) => new Set(prev).add(conceptName));
-    setExpandedConcept(null);
-  };
-
-  const handleAccept = (missing: MissingConcept) => {
-    onAcceptSuggestion(missing.concept, missing.suggestedLocation);
     setExpandedConcept(null);
   };
 
@@ -171,105 +97,105 @@ export const MissingConceptSuggestions: React.FC<
       </p>
 
       <div className="space-y-2">
-        {missingConcepts.slice(0, 10).map((missing, index) => (
-          <div
-            key={missing.concept.name}
-            className="border border-gray-200 rounded-lg bg-white hover:shadow-md transition-shadow"
-          >
-            {/* Collapsed View */}
+        {missingConcepts
+          .slice(0, showAll ? missingConcepts.length : 10)
+          .map((missing, index) => (
             <div
-              className="p-3 cursor-pointer"
-              onClick={() =>
-                setExpandedConcept(
-                  expandedConcept === missing.concept.name
-                    ? null
-                    : missing.concept.name
-                )
-              }
+              key={missing.concept.name}
+              className="border border-gray-200 rounded-lg bg-white hover:shadow-md transition-shadow"
             >
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`text-xs font-semibold px-2 py-0.5 rounded ${"bg-red-100 text-red-700"}`}
-                    >
-                      CORE
-                    </span>
-                    <h4 className="font-semibold text-sm text-gray-900">
-                      {missing.concept.name}
-                    </h4>
+              {/* Collapsed View */}
+              <div
+                className="p-3 cursor-pointer"
+                onClick={() =>
+                  setExpandedConcept(
+                    expandedConcept === missing.concept.name
+                      ? null
+                      : missing.concept.name
+                  )
+                }
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs font-semibold px-2 py-0.5 rounded ${"bg-red-100 text-red-700"}`}
+                      >
+                        CORE
+                      </span>
+                      <h4 className="font-semibold text-sm text-gray-900">
+                        {missing.concept.name}
+                      </h4>
+                    </div>
+                    {missing.concept.category && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        {missing.concept.category}
+                        {missing.concept.subcategory &&
+                          ` • ${missing.concept.subcategory}`}
+                      </p>
+                    )}
                   </div>
-                  {missing.concept.category && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      {missing.concept.category}
-                      {missing.concept.subcategory &&
-                        ` • ${missing.concept.subcategory}`}
-                    </p>
+                  <span
+                    className={`text-gray-400 transition-transform ${
+                      expandedConcept === missing.concept.name
+                        ? "rotate-180"
+                        : ""
+                    }`}
+                  >
+                    ▼
+                  </span>
+                </div>
+              </div>
+
+              {/* Expanded View */}
+              {expandedConcept === missing.concept.name && (
+                <div className="px-3 pb-3 space-y-3 border-t border-gray-100 pt-3">
+                  {/* Description */}
+                  {missing.concept.description && (
+                    <div>
+                      <p className="text-xs text-gray-700 leading-relaxed">
+                        {missing.concept.description}
+                      </p>
+                    </div>
                   )}
-                </div>
-                <span
-                  className={`text-gray-400 transition-transform ${
-                    expandedConcept === missing.concept.name ? "rotate-180" : ""
-                  }`}
-                >
-                  ▼
-                </span>
-              </div>
-            </div>
 
-            {/* Expanded View */}
-            {expandedConcept === missing.concept.name && (
-              <div className="px-3 pb-3 space-y-3 border-t border-gray-100 pt-3">
-                {/* Description */}
-                {missing.concept.description && (
-                  <div>
-                    <p className="text-xs text-gray-700 leading-relaxed">
-                      {missing.concept.description}
-                    </p>
+                  {/* Dismiss Button */}
+                  <div className="flex justify-end">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleReject(missing.concept.name);
+                      }}
+                      className="px-3 py-1.5 text-xs text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                    >
+                      Dismiss
+                    </button>
                   </div>
-                )}
-
-                {/* Suggested Location */}
-                <div className="bg-gray-50 p-2 rounded">
-                  <p className="text-xs font-medium text-gray-700 mb-1">
-                    💡 Suggested location: {missing.reason}
-                  </p>
-                  <p className="text-xs text-gray-600 italic font-mono bg-white p-2 rounded border border-gray-200 overflow-x-auto">
-                    {missing.contextSnippet}
-                  </p>
                 </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleAccept(missing);
-                    }}
-                    className="flex-1 px-3 py-2 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition-colors"
-                  >
-                    ✓ Show Me Where to Add It
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleReject(missing.concept.name);
-                    }}
-                    className="px-3 py-2 bg-gray-200 text-gray-700 text-xs font-medium rounded hover:bg-gray-300 transition-colors"
-                  >
-                    ✗ Reject
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+            </div>
+          ))}
       </div>
 
-      {missingConcepts.length > 10 && (
-        <p className="text-xs text-gray-500 text-center py-2">
-          Showing 10 of {missingConcepts.length} missing concepts
-        </p>
+      {missingConcepts.length > 10 && !showAll && (
+        <div className="text-center py-2">
+          <button
+            onClick={() => setShowAll(true)}
+            className="text-xs text-blue-600 hover:text-blue-700 font-medium px-4 py-2 border border-blue-300 rounded hover:bg-blue-50 transition-colors"
+          >
+            Show All {missingConcepts.length} Missing Concepts
+          </button>
+        </div>
+      )}
+      {showAll && missingConcepts.length > 10 && (
+        <div className="text-center py-2">
+          <button
+            onClick={() => setShowAll(false)}
+            className="text-xs text-gray-600 hover:text-gray-700 font-medium px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+          >
+            Show Less (First 10 Only)
+          </button>
+        </div>
       )}
     </div>
   );

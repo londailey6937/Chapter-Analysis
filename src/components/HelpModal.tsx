@@ -1,5 +1,5 @@
 import { useState } from "react";
-import tomeIqLogo from "@/assets/tomeiq-logo.png";
+import { AnimatedLogo } from "./AnimatedLogo";
 
 interface HelpModalProps {
   isOpen: boolean;
@@ -70,18 +70,15 @@ export function HelpModal({
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            color: "white",
+            background: "white",
+            color: "#1f2937",
+            border: "1px solid #d1d5db",
             borderTopLeftRadius: "12px",
             borderTopRightRadius: "12px",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <img
-              src={tomeIqLogo}
-              alt="TomeIQ Logo"
-              style={{ height: "96px", width: "auto" }}
-            />
+            <AnimatedLogo size={96} animate={true} />
             <span
               style={{
                 fontFamily: "'Georgia', 'Palatino', serif",
@@ -98,7 +95,7 @@ export function HelpModal({
             <span
               style={{
                 fontSize: "1.2rem",
-                color: "#e0e7ff",
+                color: "#6b7280",
                 marginLeft: "0.5rem",
               }}
             >
@@ -108,25 +105,27 @@ export function HelpModal({
           <button
             onClick={onClose}
             style={{
-              background: "rgba(255, 255, 255, 0.2)",
-              border: "none",
-              color: "white",
+              background: "white",
+              border: "1.5px solid #9ca3af",
+              color: "#6b7280",
               fontSize: "1.5rem",
               cursor: "pointer",
               width: "32px",
               height: "32px",
-              borderRadius: "6px",
+              borderRadius: "20px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              transition: "background 0.2s",
+              transition: "background 0.2s, border-color 0.2s",
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.background = "rgba(255, 255, 255, 0.3)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.background = "rgba(255, 255, 255, 0.2)")
-            }
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "#f3f4f6";
+              e.currentTarget.style.borderColor = "#6b7280";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "white";
+              e.currentTarget.style.borderColor = "#9ca3af";
+            }}
           >
             ×
           </button>
@@ -154,14 +153,17 @@ export function HelpModal({
                   textAlign: "left",
                   padding: "0.75rem",
                   marginBottom: "0.5rem",
-                  border: "none",
-                  borderRadius: "6px",
                   cursor: "pointer",
                   fontSize: "0.9rem",
                   fontWeight: activeSection === key ? "600" : "normal",
                   backgroundColor:
-                    activeSection === key ? "#667eea" : "transparent",
-                  color: activeSection === key ? "white" : "#374151",
+                    activeSection === key ? "white" : "transparent",
+                  border:
+                    activeSection === key
+                      ? "1.5px solid #6b7280"
+                      : "1.5px solid transparent",
+                  borderRadius: "20px",
+                  color: activeSection === key ? "#1f2937" : "#6b7280",
                   transition: "all 0.2s",
                 }}
                 onMouseEnter={(e) => {

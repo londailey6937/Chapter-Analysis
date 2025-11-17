@@ -145,9 +145,10 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
         style={{
           display: "inline-block",
           padding: "12px 24px",
-          backgroundColor: disabled ? "#9ca3af" : "#3b82f6",
-          color: "white",
-          borderRadius: "8px",
+          backgroundColor: "white",
+          color: disabled ? "#9ca3af" : "#c16659",
+          border: disabled ? "1.5px solid #d1d5db" : "1.5px solid #c16659",
+          borderRadius: "20px",
           cursor: disabled ? "not-allowed" : "pointer",
           fontWeight: "600",
           fontSize: "14px",
@@ -156,12 +157,12 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
         }}
         onMouseEnter={(e) => {
           if (!disabled) {
-            e.currentTarget.style.backgroundColor = "#2563eb";
+            e.currentTarget.style.borderColor = "#a54d43";
           }
         }}
         onMouseLeave={(e) => {
           if (!disabled) {
-            e.currentTarget.style.backgroundColor = "#3b82f6";
+            e.currentTarget.style.borderColor = "#c16659";
           }
         }}
       >

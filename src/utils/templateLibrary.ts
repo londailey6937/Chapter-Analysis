@@ -35,7 +35,7 @@ const academicTemplate: Template = {
 
     let template = `<div style="font-family: Inter, system-ui, sans-serif; line-height: 1.8; max-width: 800px; margin: 0 auto; padding: 20px;">`;
 
-    template += `<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; margin-bottom: 32px;">
+    template += `<div style="background: linear-gradient(135deg, #4b5563 0%, #374151 100%); color: white; padding: 24px; border-radius: 12px; margin-bottom: 32px;">
       <h1 style="margin: 0 0 8px 0; font-size: 28px;">📚 Academic Content Enhancement Template</h1>
       <p style="margin: 0; opacity: 0.95; font-size: 14px;">This template helps optimize your educational content for better learning outcomes.</p>
     </div>`;
@@ -170,7 +170,7 @@ const employeeManualTemplate: Template = {
     </div>`;
 
     // Quick Reference Section
-    template += `<div style="background: #f3e8ff; border-left: 4px solid #9333ea; padding: 20px; margin-bottom: 24px; border-radius: 8px;">
+    template += `<div style="background: #f3f4f6; border-left: 4px solid #6b7280; padding: 20px; margin-bottom: 24px; border-radius: 8px;">
       <h2 style="margin: 0 0 12px 0; color: #581c87; font-size: 20px;">📌 Quick Reference</h2>
 
       <div style="background: white; padding: 16px; border-radius: 6px; margin: 12px 0;">
@@ -235,7 +235,7 @@ const generalContentTemplate: Template = {
 
     // Main Content Section
     template += `<div style="background: #f3e8ff; border-left: 4px solid #9333ea; padding: 20px; margin-bottom: 24px; border-radius: 8px;">
-      <h2 style="margin: 0 0 12px 0; color: #581c87; font-size: 20px;">📚 Main Content & Key Points</h2>
+      <h2 style="margin: 0 0 12px 0; color: #374151; font-size: 20px;">📚 Main Content & Key Points</h2>
 
       <div style="background: white; padding: 16px; border-radius: 6px; margin: 12px 0;">
         <strong style="color: #7c2d12;">[WRITER - Structure Your Content]</strong>

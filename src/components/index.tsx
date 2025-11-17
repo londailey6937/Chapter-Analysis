@@ -324,3 +324,4 @@ export default ChapterInput;
 export { HelpModal } from "./HelpModal";
 export { NavigationMenu } from "./NavigationMenu";
 export { WriterMode } from "./WriterMode";
+export { AnimatedLogo } from "./AnimatedLogo";

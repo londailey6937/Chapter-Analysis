@@ -41,11 +41,11 @@ export const UpgradePrompt: React.FC<UpgradePromptProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-2xl max-w-md w-full p-6 relative">
+      <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 relative border-2 border-gray-200">
         {onDismiss && (
           <button
             onClick={onDismiss}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl"
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
             aria-label="Close"
           >
             ×
@@ -53,7 +53,7 @@ export const UpgradePrompt: React.FC<UpgradePromptProps> = ({
         )}
 
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-400 to-cyan-400 rounded-full mb-4">
             <svg
               className="w-8 h-8 text-white"
               fill="none"
@@ -76,7 +76,7 @@ export const UpgradePrompt: React.FC<UpgradePromptProps> = ({
           </p>
         </div>
 
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4 mb-6">
+        <div className="bg-white border-2 border-gray-200 rounded-3xl p-4 mb-6">
           <div className="flex items-baseline justify-center mb-4">
             <span className="text-4xl font-bold text-gray-900">{price}</span>
           </div>
@@ -95,14 +95,14 @@ export const UpgradePrompt: React.FC<UpgradePromptProps> = ({
         <div className="space-y-3">
           <button
             onClick={onUpgrade}
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl"
+            className="w-full bg-white text-gray-700 border-2 border-gray-600 py-3 rounded-full font-semibold hover:border-gray-700 hover:text-gray-800 transition-all"
           >
             Upgrade to {tierName}
           </button>
           {onDismiss && (
             <button
               onClick={onDismiss}
-              className="w-full text-gray-600 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+              className="w-full text-gray-600 py-2 rounded-full hover:bg-gray-100 border border-gray-300 transition-colors"
             >
               Maybe Later
             </button>
@@ -134,7 +134,7 @@ export const InlineUpgradePrompt: React.FC<InlineUpgradePromptProps> = ({
   const icon = targetLevel === "premium" ? "🔒" : "👑";
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-lg p-6 my-4">
+    <div className="bg-white border-2 border-gray-300 rounded-3xl p-6 my-4">
       <div className="flex items-start gap-4">
         <div className="text-3xl">{icon}</div>
         <div className="flex-1">
@@ -142,7 +142,7 @@ export const InlineUpgradePrompt: React.FC<InlineUpgradePromptProps> = ({
           <p className="text-gray-700 mb-4">{description}</p>
           <button
             onClick={onUpgrade}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
+            className="bg-white text-gray-700 border-2 border-gray-600 px-6 py-2 rounded-full font-semibold hover:border-gray-700 hover:text-gray-800 transition-all"
           >
             Upgrade to {tierName}
           </button>

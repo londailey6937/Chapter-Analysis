@@ -37,7 +37,7 @@ const PatternAnalysisSection: React.FC<PatternAnalysisSectionProps> = ({
     practiceProblem: {
       icon: "✏️",
       label: "Practice Problems",
-      color: "#8b5cf6", // purple
+      color: "#6b7280", // gray
       description:
         "Exercises for students to solve independently and test understanding",
     },

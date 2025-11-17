@@ -1,5 +1,5 @@
 import { useState } from "react";
-import tomeIqLogo from "@/assets/tomeiq-logo.png";
+import { AnimatedLogo } from "./AnimatedLogo";
 
 interface NavigationMenuProps {
   isOpen: boolean;
@@ -80,19 +80,16 @@ export function NavigationMenu({
         <div
           style={{
             padding: "1.5rem",
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            color: "white",
+            background: "#f7e6d0",
+            color: "#2c3e50",
+            border: "1px solid #ef8432",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-            <img
-              src={tomeIqLogo}
-              alt="TomeIQ Logo"
-              style={{ height: "96px", width: "auto" }}
-            />
+            <AnimatedLogo size={96} animate={true} />
             <div>
               <h2
                 style={{
@@ -110,7 +107,8 @@ export function NavigationMenu({
                 style={{
                   margin: "0.25rem 0 0 0",
                   fontSize: "0.875rem",
-                  opacity: 0.9,
+                  opacity: 1,
+                  color: "#2c3e50",
                 }}
               >
                 AI-Powered Learning Content Analysis
@@ -119,7 +117,8 @@ export function NavigationMenu({
                 style={{
                   margin: "0.5rem 0 0 0",
                   fontSize: "0.75rem",
-                  opacity: 0.85,
+                  opacity: 0.9,
+                  color: "#2c3e50",
                   lineHeight: "1.3",
                 }}
               >
@@ -131,25 +130,21 @@ export function NavigationMenu({
           <button
             onClick={onClose}
             style={{
-              background: "rgba(255, 255, 255, 0.2)",
+              background: "#ef8432",
               border: "none",
               color: "white",
               fontSize: "1.5rem",
               cursor: "pointer",
               width: "36px",
               height: "36px",
-              borderRadius: "8px",
+              borderRadius: "20px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               transition: "background 0.2s",
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.background = "rgba(255, 255, 255, 0.3)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.background = "rgba(255, 255, 255, 0.2)")
-            }
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#c16659")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "#ef8432")}
           >
             ×
           </button>
@@ -177,28 +172,26 @@ export function NavigationMenu({
               style={{
                 width: "100%",
                 padding: "0.875rem 1rem",
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
+                background: "white",
+                color: "#2c3e50",
+                border: "2px solid #2c3e50",
+                borderRadius: "20px",
                 fontSize: "1rem",
                 fontWeight: "600",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 gap: "0.75rem",
-                transition: "transform 0.2s, box-shadow 0.2s",
-                boxShadow: "0 2px 8px rgba(102, 126, 234, 0.3)",
+                transition: "transform 0.2s, border-color 0.2s",
+                boxShadow: "none",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow =
-                  "0 4px 12px rgba(102, 126, 234, 0.4)";
+                e.currentTarget.style.borderColor = "#ef8432";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow =
-                  "0 2px 8px rgba(102, 126, 234, 0.3)";
+                e.currentTarget.style.borderColor = "#2c3e50";
               }}
             >
               <span style={{ fontSize: "1.25rem" }}>📚</span>
@@ -213,10 +206,10 @@ export function NavigationMenu({
               style={{
                 width: "100%",
                 padding: "0.875rem 1rem",
-                backgroundColor: "#f9fafb",
+                backgroundColor: "white",
                 color: "#1f2937",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
+                border: "1.5px solid #9ca3af",
+                borderRadius: "20px",
                 fontSize: "1rem",
                 fontWeight: "600",
                 cursor: "pointer",
@@ -230,7 +223,7 @@ export function NavigationMenu({
                 e.currentTarget.style.transform = "translateY(-1px)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#f9fafb";
+                e.currentTarget.style.backgroundColor = "#f3f4f6";
                 e.currentTarget.style.transform = "translateY(0)";
               }}
             >
@@ -244,7 +237,7 @@ export function NavigationMenu({
         <div
           style={{
             padding: "1.5rem",
-            background: "linear-gradient(135deg, #eff6ff 0%, #f3e8ff 100%)",
+            background: "linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)",
             borderTop: "1px solid #e5e7eb",
             borderBottom: "1px solid #e5e7eb",
           }}
@@ -254,7 +247,7 @@ export function NavigationMenu({
               margin: "0 0 0.75rem 0",
               fontSize: "0.875rem",
               fontWeight: "600",
-              color: "#667eea",
+              color: "#6b7280",
               textTransform: "uppercase",
               letterSpacing: "0.05em",
             }}
@@ -659,7 +652,7 @@ export function NavigationMenu({
         <div
           style={{
             padding: "1.5rem",
-            backgroundColor: "#f9fafb",
+            backgroundColor: "white",
             borderTop: "1px solid #e5e7eb",
           }}
         >
@@ -714,7 +707,7 @@ export function NavigationMenu({
         <div
           style={{
             padding: "1.5rem",
-            backgroundColor: "#fef3c7",
+            backgroundColor: "white",
             borderTop: "1px solid #e5e7eb",
           }}
         >
@@ -818,8 +811,8 @@ function FeatureSection({
           width: "100%",
           padding: "0.875rem 1rem",
           backgroundColor: isExpanded ? "#f3f4f6" : "white",
-          border: "1px solid #e5e7eb",
-          borderRadius: "8px",
+          border: "1.5px solid #9ca3af",
+          borderRadius: "20px",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
@@ -831,7 +824,7 @@ function FeatureSection({
         }}
         onMouseEnter={(e) => {
           if (!isExpanded) {
-            e.currentTarget.style.backgroundColor = "#f9fafb";
+            e.currentTarget.style.backgroundColor = "#f3f4f6";
           }
         }}
         onMouseLeave={(e) => {
@@ -847,7 +840,8 @@ function FeatureSection({
             <span
               style={{
                 padding: "0.125rem 0.5rem",
-                backgroundColor: "#10b981",
+                backgroundColor: "white",
+                border: "1.5px solid #10b981",
                 color: "white",
                 fontSize: "0.625rem",
                 fontWeight: "700",
@@ -875,9 +869,9 @@ function FeatureSection({
           style={{
             marginTop: "0.5rem",
             padding: "0.75rem",
-            backgroundColor: "#f9fafb",
-            borderRadius: "8px",
-            border: "1px solid #e5e7eb",
+            backgroundColor: "white",
+            borderRadius: "20px",
+            border: "1.5px solid #9ca3af",
             animation: "expandIn 0.2s ease-out",
           }}
         >
@@ -953,7 +947,7 @@ function ComingSoonItem({ icon, title, desc }: ComingSoonItemProps) {
         padding: "0.75rem 1rem",
         backgroundColor: "white",
         borderRadius: "6px",
-        border: "1px solid #e5e7eb",
+        border: "1.5px solid #9ca3af",
         display: "flex",
         alignItems: "center",
         gap: "0.75rem",
@@ -996,7 +990,7 @@ function MenuLink({ icon, title, desc, badge, onClick }: MenuLinkProps) {
         marginBottom: "0.5rem",
         backgroundColor: "white",
         borderRadius: "6px",
-        border: "1px solid #e5e7eb",
+        border: "1.5px solid #9ca3af",
         display: "flex",
         alignItems: "center",
         gap: "0.75rem",
@@ -1005,8 +999,8 @@ function MenuLink({ icon, title, desc, badge, onClick }: MenuLinkProps) {
         transition: "all 0.2s",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = "#f9fafb";
-        e.currentTarget.style.borderColor = "#667eea";
+        e.currentTarget.style.backgroundColor = "#f3f4f6";
+        e.currentTarget.style.borderColor = "#6b7280";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.backgroundColor = "white";
@@ -1036,7 +1030,8 @@ function MenuLink({ icon, title, desc, badge, onClick }: MenuLinkProps) {
             <span
               style={{
                 padding: "0.125rem 0.5rem",
-                backgroundColor: "#10b981",
+                backgroundColor: "white",
+                border: "1.5px solid #10b981",
                 color: "white",
                 fontSize: "0.625rem",
                 fontWeight: "700",

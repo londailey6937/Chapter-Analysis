@@ -170,12 +170,21 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     }
 
     if (readOnly) {
-      if (highlightRef.current) {
-        highlightRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-      }
+      // Wait for the highlightRef to be assigned to the DOM element
+      const scrollToHighlight = () => {
+        if (highlightRef.current) {
+          highlightRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        } else {
+          // Ref not ready yet, try again after a short delay
+          setTimeout(scrollToHighlight, 50);
+        }
+      };
+
+      // Small delay to ensure DOM is updated
+      setTimeout(scrollToHighlight, 100);
       return;
     }
 
@@ -320,6 +329,8 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
           flexDirection: "column",
           gap: isCompactLayout ? "8px" : "12px",
           padding: isCompactLayout ? "12px" : "16px",
+          backgroundColor: "#f5ead9",
+          background: "#f5ead9",
         }}
       >
         <div
@@ -369,7 +380,17 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
             {onSave && (
               <button
                 onClick={handleSave}
-                style={buttonStyle("#10b981", isCompactLayout)}
+                style={{
+                  padding: isCompactLayout ? "5px 12px" : "6px 14px",
+                  borderRadius: "20px",
+                  border: "1.5px solid #ef8432",
+                  fontSize: isCompactLayout ? "12px" : "13px",
+                  fontWeight: 600,
+                  color: "#ef8432",
+                  backgroundColor: "white",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
               >
                 {isCompactLayout ? "Save" : "Save changes"}
               </button>
@@ -784,7 +805,7 @@ const EditableView: React.FC<EditableViewProps> = ({
         padding: "12px",
         border: "1px solid #e5e7eb",
         borderRadius: "8px",
-        backgroundColor: "#ffffff",
+        backgroundColor: "#f5ead9",
         boxShadow: "inset 0 1px 2px rgba(15,23,42,0.05)",
         fontFamily: "ui-sans-serif, system-ui, sans-serif",
         fontSize: "15px",
