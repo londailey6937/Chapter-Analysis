@@ -2222,6 +2222,12 @@ export const ChapterAnalysisDashboard: React.FC<{
             ? "Free tier: Spacing and Dual Coding analysis. Upgrade for all 10 principles."
             : "Click each principle to expand findings and actionable suggestions"}
         </p>
+        {filteredPrinciples.length === 0 && (
+          <div style={{ padding: "20px", color: "#666", fontStyle: "italic" }}>
+            No principles found in analysis. This may indicate an issue with the
+            analysis engine.
+          </div>
+        )}
         {filteredPrinciples.map((principle: any) => (
           <PrincipleFindings key={principle.principle} principle={principle} />
         ))}

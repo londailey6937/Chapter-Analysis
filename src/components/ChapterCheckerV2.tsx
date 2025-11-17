@@ -1192,15 +1192,49 @@ export const ChapterCheckerV2: React.FC = () => {
       }
     }
 
-    // Check access level for full analysis
+    // Check access level - free tier runs tier one analysis
     const features = ACCESS_TIERS[accessLevel];
+
+    // Free tier: Run quick spacing + dual coding analysis
     if (!features.fullAnalysis) {
-      setUpgradeFeature("Full 10-Principle Analysis");
-      setUpgradeTarget("premium");
-      setShowUpgradePrompt(true);
+      setIsAnalyzing(true);
+      setError(null);
+      setProgress("Analyzing spacing and dual coding...");
+
+      try {
+        if (!chapterData) {
+          throw new Error("No chapter data loaded");
+        }
+
+        const richHtmlContent =
+          chapterData.editorHtml ??
+          (chapterData.isHybridDocx ? chapterData.html : null) ??
+          null;
+
+        const tierOneAnalysis = buildTierOneAnalysisSummary({
+          plainText: chapterData.plainText || chapterText,
+          htmlContent: richHtmlContent,
+          fileName: fileName || "Untitled Chapter",
+        });
+
+        if (tierOneAnalysis) {
+          setAnalysis(tierOneAnalysis);
+          setProgress("");
+        } else {
+          setError("Failed to generate analysis");
+        }
+      } catch (err) {
+        setError(
+          "Analysis error: " +
+            (err instanceof Error ? err.message : "Unknown error")
+        );
+      } finally {
+        setIsAnalyzing(false);
+      }
       return;
     }
 
+    // Premium/Professional tier: Run full analysis
     setIsAnalyzing(true);
     setError(null);
     setProgress("Analyzing chapter...");
@@ -2845,10 +2879,6 @@ export const ChapterCheckerV2: React.FC = () => {
                             setShowUpgradePrompt(true);
                           }}
                         />
-                      )}
-                      {console.log(
-                        "[ChapterCheckerV2] Passing accessLevel to dashboard:",
-                        accessLevel
                       )}
                       <ChapterAnalysisDashboard
                         analysis={analysis}
