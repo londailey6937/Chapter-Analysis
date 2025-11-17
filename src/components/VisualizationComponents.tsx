@@ -185,6 +185,14 @@ export const ChapterOverviewTimeline: React.FC<{
   const baseWidth = 26;
   const perWidth = Math.max(8, Math.min(60, Math.round(baseWidth * zoom)));
 
+  console.log("📊 Timeline rendering:", {
+    sectionsCount: sections.length,
+    isScrollable,
+    perWidth,
+    zoom,
+    firstSection: sections[0],
+  });
+
   return (
     <div className="viz-container chapter-timeline">
       <h3>Chapter Structure Overview</h3>
@@ -212,6 +220,7 @@ export const ChapterOverviewTimeline: React.FC<{
                   style={{ width: `${perWidth}px`, backgroundColor: color }}
                   title={`${issue.sectionName}: ${label}`}
                   onClick={() => {
+                    console.log("🖱️ Click handler triggered!");
                     const pos =
                       (sec as any).position ?? (sec as any).startPosition ?? 0;
                     console.log("🖱️ Timeline section clicked:", {
@@ -275,8 +284,15 @@ export const ChapterOverviewTimeline: React.FC<{
                 style={{ width, backgroundColor: color }}
                 title={`${issue.sectionName}: ${label}`}
                 onClick={() => {
+                  console.log("🖱️ Click handler triggered (non-scrollable)!");
                   const pos =
                     (sec as any).position ?? (sec as any).startPosition ?? 0;
+                  console.log("🖱️ Timeline section clicked:", {
+                    sectionName: issue.sectionName,
+                    position: pos,
+                    sectionIndex: idx,
+                    sectionId: sec.sectionId,
+                  });
                   window.dispatchEvent(
                     new CustomEvent("jump-to-position", {
                       detail: {
@@ -309,6 +325,7 @@ export const ChapterOverviewTimeline: React.FC<{
                 }}
               >
                 <span className="section-index">{idx + 1}</span>
+                <span className="section-name">{issue.sectionName}</span>
               </div>
             );
           })
@@ -389,6 +406,18 @@ export const ChapterOverviewTimeline: React.FC<{
           font-size: 11px;
           font-weight: 600;
           text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        .section-name {
+          color: white;
+          font-size: 10px;
+          font-weight: 500;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+          display: block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          padding: 0 4px;
+          margin-top: 2px;
         }
         .timeline-legend {
           display: flex;

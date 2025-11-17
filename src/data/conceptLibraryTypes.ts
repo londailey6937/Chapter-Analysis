@@ -15,6 +15,15 @@ export interface ConceptDefinition {
   importance?: "core" | "supporting" | "detail"; // Expected importance level
   description?: string; // Optional explanation for the concept
   misconceptions?: string[]; // Common misconceptions about this concept
+
+  // Enhanced learning fields
+  prerequisites?: string[]; // Concept IDs that should be understood first
+  complexity?: "beginner" | "intermediate" | "advanced"; // Difficulty level
+  keyTerms?: Record<string, string>; // Important terminology with definitions
+  learningPath?: string[]; // Suggested sequence of concept IDs for learning
+  commonMisconceptions?: string[]; // Common misconceptions about this concept
+  mnemonicAid?: string; // Memory aid or mnemonic device
+  practicalApplications?: string[]; // Real-world uses of the concept
 }
 
 export interface ConceptLibrary {

@@ -1,9 +1,19 @@
 /**
- * Computing Concept Library
+ * Computing Concept Library - Enhanced Version
  *
  * General computer science concepts - theoretical foundations,
  * algorithms, data structures, and universal computing principles.
  * Language-specific concepts belong in dedicated libraries (JavaScript, React, etc.)
+ *
+ * Enhanced Fields:
+ * - prerequisites: Concepts that should be understood first
+ * - relatedConcepts: Conceptually linked ideas within computing
+ * - practicalApplications: Real-world examples and use cases
+ * - complexity: Learning difficulty level (beginner/intermediate/advanced)
+ * - keyTerms: Important terminology and definitions
+ * - learningPath: Recommended sequence for studying related concepts
+ * - commonMisconceptions: Typical errors students make
+ * - mnemonicAid: Memory device to help retention
  */
 
 import { ConceptDefinition, ConceptLibrary } from "./conceptLibraryTypes";
@@ -18,6 +28,31 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A step-by-step procedure or formula for solving a problem or completing a task.",
+    prerequisites: [],
+    relatedConcepts: ["computing-data-structure", "computing-time-complexity"],
+    practicalApplications: [
+      "GPS navigation and pathfinding",
+      "Search engine ranking",
+      "Recommendation systems",
+      "Data compression",
+    ],
+    complexity: "beginner",
+    keyTerms: {
+      "step-by-step procedure": "A sequence of actions performed in order",
+      "computational process": "How a computer solves a problem",
+      efficiency: "How well an algorithm performs regarding time and space",
+    },
+    learningPath: [
+      "computing-algorithm",
+      "computing-time-complexity",
+      "computing-big-o-notation",
+      "computing-sorting",
+    ],
+    commonMisconceptions: [
+      "Algorithm and program are the same thing",
+      "The best algorithm is always the simplest one",
+    ],
+    mnemonicAid: "Algorithm = A Logical Grouping Of Rules I Teach to Machines",
   },
   {
     id: "computing-data-structure",
@@ -28,6 +63,40 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A specialized format for organizing, processing, and storing data efficiently.",
+    prerequisites: [],
+    relatedConcepts: [
+      "computing-algorithm",
+      "computing-space-complexity",
+      "computing-linked-list",
+      "computing-tree",
+      "computing-hash-table",
+    ],
+    practicalApplications: [
+      "Database design",
+      "Cache implementation",
+      "Graph representation in social networks",
+      "File system organization",
+    ],
+    complexity: "beginner",
+    keyTerms: {
+      "organization pattern":
+        "How data is arranged in computer memory or storage",
+      "access efficiency": "How quickly elements can be retrieved",
+      "memory overhead": "Extra space needed to manage the structure",
+    },
+    learningPath: [
+      "computing-data-structure",
+      "computing-linked-list",
+      "computing-stack",
+      "computing-queue",
+      "computing-tree",
+    ],
+    commonMisconceptions: [
+      "Array and list are the same",
+      "All data structures are equally efficient",
+    ],
+    mnemonicAid:
+      "Data Structure = Systematic Thoughtful Arrangement of Record Units",
   },
   {
     id: "computing-sorting",
@@ -44,6 +113,31 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "The process of arranging elements in a specific order (ascending or descending).",
+    prerequisites: ["computing-algorithm", "computing-time-complexity"],
+    relatedConcepts: ["computing-searching", "computing-big-o-notation"],
+    practicalApplications: [
+      "Database query optimization",
+      "Ranking results by relevance",
+      "Organizing files by date or name",
+      "Efficient searching after sorting",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "comparison-based": "Sorting algorithms that compare elements",
+      "in-place sorting": "Algorithms that require minimal extra memory",
+      stability: "Preserving order of equal elements",
+    },
+    learningPath: [
+      "computing-algorithm",
+      "computing-time-complexity",
+      "computing-sorting",
+      "computing-big-o-notation",
+    ],
+    commonMisconceptions: [
+      "All sorting algorithms have the same efficiency",
+      "Bubble sort is efficient for large datasets",
+    ],
+    mnemonicAid: "Think of arranging books on a shelf in order",
   },
   {
     id: "computing-searching",
@@ -54,6 +148,31 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "The process of finding a specific element within a collection of data.",
+    prerequisites: ["computing-data-structure"],
+    relatedConcepts: ["computing-sorting", "computing-time-complexity"],
+    practicalApplications: [
+      "Dictionary lookups",
+      "Database queries",
+      "Finding duplicate values",
+      "spell checking",
+    ],
+    complexity: "beginner",
+    keyTerms: {
+      "linear search": "Checking each element sequentially until found",
+      "binary search":
+        "Dividing the search space in half repeatedly (requires sorted data)",
+      "search key": "The value being searched for",
+    },
+    learningPath: [
+      "computing-searching",
+      "computing-time-complexity",
+      "computing-big-o-notation",
+    ],
+    commonMisconceptions: [
+      "Binary search always beats linear search",
+      "Search methods don't depend on data organization",
+    ],
+    mnemonicAid: "Binary search: eliminate Half the options each time",
   },
   {
     id: "computing-recursion",
@@ -64,6 +183,31 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A technique where a function calls itself to solve smaller instances of the same problem.",
+    prerequisites: ["computing-algorithm"],
+    relatedConcepts: ["computing-tree", "computing-traversal"],
+    practicalApplications: [
+      "Tree and graph traversal",
+      "Divide and conquer algorithms",
+      "Parsing and compiler design",
+      "Backtracking in puzzles",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "base case": "Condition that stops the recursion",
+      "recursive case": "When the function calls itself",
+      "call stack": "Where function calls are stored in memory",
+    },
+    learningPath: [
+      "computing-algorithm",
+      "computing-recursion",
+      "computing-tree",
+      "computing-traversal",
+    ],
+    commonMisconceptions: [
+      "Recursion is always more efficient than iteration",
+      "Infinite recursion is hard to avoid",
+    ],
+    mnemonicAid: "Recursion requires: Reduce, Recall, Reach base case",
   },
   {
     id: "computing-traversal",
@@ -74,6 +218,36 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "The process of visiting all nodes in a data structure in a systematic way.",
+    prerequisites: ["computing-data-structure", "computing-tree"],
+    relatedConcepts: [
+      "computing-recursion",
+      "computing-graph",
+      "computing-stack",
+      "computing-queue",
+    ],
+    practicalApplications: [
+      "File system exploration",
+      "Web crawler navigation",
+      "DOM manipulation in web development",
+      "Network route finding",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "depth-first search": "Exploring as far as possible along each branch",
+      "breadth-first search": "Exploring neighbors before moving deeper",
+      visiting: "Processing or examining a node",
+    },
+    learningPath: [
+      "computing-tree",
+      "computing-traversal",
+      "computing-recursion",
+      "computing-graph",
+    ],
+    commonMisconceptions: [
+      "DFS and BFS produce the same results",
+      "Traversal order doesn't matter",
+    ],
+    mnemonicAid: "DFS: Deep dive. BFS: Breadth before depth",
   },
   {
     id: "computing-time-complexity",
@@ -84,6 +258,29 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A measure of the amount of time an algorithm takes to complete as a function of input size.",
+    prerequisites: ["computing-algorithm"],
+    relatedConcepts: ["computing-space-complexity", "computing-big-o-notation"],
+    practicalApplications: [
+      "Choosing efficient algorithms for large datasets",
+      "Performance optimization",
+      "System capacity planning",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "input size": "How much data the algorithm processes",
+      "growth rate": "How runtime increases with input size",
+      "worst case": "Maximum time for any input",
+    },
+    learningPath: [
+      "computing-time-complexity",
+      "computing-big-o-notation",
+      "computing-space-complexity",
+    ],
+    commonMisconceptions: [
+      "Time complexity equals actual runtime",
+      "We only care about best-case performance",
+    ],
+    mnemonicAid: "Time Complexity: Track how long as size Climbs",
   },
   {
     id: "computing-space-complexity",
@@ -94,6 +291,35 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A measure of the amount of memory an algorithm uses as a function of input size.",
+    prerequisites: ["computing-algorithm"],
+    relatedConcepts: [
+      "computing-time-complexity",
+      "computing-big-o-notation",
+      "computing-memory-management",
+    ],
+    practicalApplications: [
+      "Embedded systems programming",
+      "Mobile app optimization",
+      "Large dataset processing",
+      "Cache optimization",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "auxiliary space": "Extra memory beyond input",
+      "in-place algorithm": "Uses O(1) additional space",
+      "memory footprint": "Total memory used during execution",
+    },
+    learningPath: [
+      "computing-time-complexity",
+      "computing-space-complexity",
+      "computing-big-o-notation",
+    ],
+    commonMisconceptions: [
+      "Space and time complexity are equally important",
+      "Reducing space always means slower algorithms",
+    ],
+    mnemonicAid:
+      "Space Complexity: Storing and Preserving Algorithm's data Area",
   },
   {
     id: "computing-big-o-notation",
@@ -104,6 +330,32 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A mathematical notation that describes the upper bound of an algorithm's growth rate.",
+    prerequisites: ["computing-time-complexity"],
+    relatedConcepts: ["computing-space-complexity"],
+    practicalApplications: [
+      "Algorithm selection for performance-critical code",
+      "Scalability analysis",
+      "Interview preparation",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "O(1)": "Constant time - doesn't depend on input size",
+      "O(n)": "Linear time - grows with input size",
+      "O(n²)": "Quadratic time - grows with square of input size",
+      "O(log n)": "Logarithmic time - grows slowly",
+      "asymptotic behavior": "How algorithm behaves for very large inputs",
+    },
+    learningPath: [
+      "computing-time-complexity",
+      "computing-big-o-notation",
+      "computing-sorting",
+      "computing-searching",
+    ],
+    commonMisconceptions: [
+      "Big O gives exact time measurements",
+      "Constant factors are important in Big O",
+    ],
+    mnemonicAid: "Big O: Order of magnitude - how it scales big",
   },
   {
     id: "computing-linked-list",
@@ -114,6 +366,32 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A linear data structure where elements are stored in nodes, each pointing to the next node.",
+    prerequisites: ["computing-data-structure"],
+    relatedConcepts: ["computing-pointer", "computing-memory-management"],
+    practicalApplications: [
+      "Dynamic memory allocation",
+      "Implementing stacks and queues",
+      "Undo/redo functionality",
+      "Music playlist navigation",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      node: "Container holding data and reference to next node",
+      "head pointer": "Reference to the first node",
+      "tail pointer": "Reference to the last node",
+      traversal: "Moving through the list from head to tail",
+    },
+    learningPath: [
+      "computing-data-structure",
+      "computing-linked-list",
+      "computing-stack",
+      "computing-queue",
+    ],
+    commonMisconceptions: [
+      "Linked lists are always better than arrays",
+      "Random access is the main limitation",
+    ],
+    mnemonicAid: "Linked List: Links point Next",
   },
   {
     id: "computing-stack",
@@ -124,6 +402,31 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A last-in-first-out (LIFO) data structure where elements are added and removed from the same end.",
+    prerequisites: ["computing-data-structure"],
+    relatedConcepts: ["computing-queue", "computing-recursion"],
+    practicalApplications: [
+      "Function call management (call stack)",
+      "Undo/redo in applications",
+      "Expression evaluation",
+      "Backtracking algorithms",
+    ],
+    complexity: "beginner",
+    keyTerms: {
+      push: "Adding an element to the top",
+      pop: "Removing the top element",
+      LIFO: "Last-In-First-Out order",
+      peek: "Viewing top element without removing it",
+    },
+    learningPath: [
+      "computing-data-structure",
+      "computing-stack",
+      "computing-queue",
+    ],
+    commonMisconceptions: [
+      "Stack and queue serve the same purpose",
+      "Real-world stacks work like computer stacks",
+    ],
+    mnemonicAid: "Stack: Stacked items - Last on top comes Out first",
   },
   {
     id: "computing-queue",
@@ -134,6 +437,31 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A first-in-first-out (FIFO) data structure where elements are added at one end and removed from the other.",
+    prerequisites: ["computing-data-structure"],
+    relatedConcepts: ["computing-stack", "computing-traversal"],
+    practicalApplications: [
+      "Print job scheduling",
+      "Task scheduling in operating systems",
+      "Breadth-first search",
+      "Customer service lines",
+    ],
+    complexity: "beginner",
+    keyTerms: {
+      enqueue: "Adding to the back of the queue",
+      dequeue: "Removing from the front",
+      FIFO: "First-In-First-Out order",
+      front: "The end where items leave",
+    },
+    learningPath: [
+      "computing-data-structure",
+      "computing-queue",
+      "computing-traversal",
+    ],
+    commonMisconceptions: [
+      "Queue and stack are interchangeable",
+      "FIFO always means better fairness",
+    ],
+    mnemonicAid: "Queue: Queuing in line - First person leaves first",
   },
   {
     id: "computing-tree",
@@ -144,6 +472,38 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A hierarchical data structure consisting of nodes connected by edges, with a root node and child nodes.",
+    prerequisites: ["computing-data-structure", "computing-recursion"],
+    relatedConcepts: [
+      "computing-graph",
+      "computing-traversal",
+      "computing-heap",
+    ],
+    practicalApplications: [
+      "File system directories",
+      "DOM structure in web browsers",
+      "Database indexing",
+      "Parse trees in compilers",
+      "Decision trees in machine learning",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      root: "The topmost node in the tree",
+      leaf: "A node with no children",
+      "parent/child": "Hierarchical relationship between nodes",
+      height: "Distance from root to furthest leaf",
+      balanced: "Left and right subtrees have similar heights",
+    },
+    learningPath: [
+      "computing-tree",
+      "computing-traversal",
+      "computing-heap",
+      "computing-graph",
+    ],
+    commonMisconceptions: [
+      "All trees are binary",
+      "Tree depth and height are the same",
+    ],
+    mnemonicAid: "Tree: Top root, Edges to nodes, branching Everywher",
   },
   {
     id: "computing-graph",
@@ -154,6 +514,34 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A data structure consisting of vertices (nodes) connected by edges, used to represent networks.",
+    prerequisites: ["computing-data-structure", "computing-tree"],
+    relatedConcepts: [
+      "computing-traversal",
+      "computing-tree",
+      "computing-distributed-systems",
+    ],
+    practicalApplications: [
+      "Social networks and connections",
+      "GPS navigation and road networks",
+      "Internet routing protocols",
+      "Recommendation engines",
+      "Game development pathfinding",
+    ],
+    complexity: "advanced",
+    keyTerms: {
+      vertex: "A node in the graph (plural: vertices)",
+      edge: "Connection between two vertices",
+      directed: "Edges have a direction/arrows",
+      weighted: "Edges have associated values/costs",
+      "adjacency list":
+        "Efficient representation listing neighbors of each vertex",
+    },
+    learningPath: ["computing-tree", "computing-graph", "computing-traversal"],
+    commonMisconceptions: [
+      "Graphs and trees are the same",
+      "All graphs are connected",
+    ],
+    mnemonicAid: "Graph: Generalized Relationship And Path representation",
   },
   {
     id: "computing-hash-table",
@@ -164,6 +552,32 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A data structure that maps keys to values using a hash function for fast lookup.",
+    prerequisites: ["computing-data-structure"],
+    relatedConcepts: ["computing-time-complexity"],
+    practicalApplications: [
+      "Caching and memoization",
+      "Database indexing",
+      "Compiler symbol tables",
+      "Password verification",
+      "Duplicate detection",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "hash function": "Function mapping key to array index",
+      collision: "When two keys hash to the same index",
+      "load factor": "Ratio of entries to table size",
+      "chaining/probing": "Methods to resolve collisions",
+    },
+    learningPath: [
+      "computing-data-structure",
+      "computing-hash-table",
+      "computing-time-complexity",
+    ],
+    commonMisconceptions: [
+      "Hash tables always have O(1) lookup",
+      "Hash functions are trivial to design",
+    ],
+    mnemonicAid: "Hash Table: High-speed Access through Seeking Hash index",
   },
   {
     id: "computing-heap",
@@ -174,6 +588,28 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A specialized tree-based data structure that satisfies the heap property.",
+    prerequisites: ["computing-tree", "computing-data-structure"],
+    relatedConcepts: ["computing-sorting", "computing-traversal"],
+    practicalApplications: [
+      "Priority queue implementation",
+      "Heap sort algorithm",
+      "Dijkstra's shortest path algorithm",
+      "Event scheduling systems",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "heap property":
+        "Parent <= children (min heap) or >= children (max heap)",
+      "min heap": "Smallest element at root",
+      "max heap": "Largest element at root",
+      heapify: "Process of restoring heap property",
+    },
+    learningPath: ["computing-tree", "computing-heap", "computing-sorting"],
+    commonMisconceptions: [
+      "Heaps are always binary trees",
+      "Heaps are completely sorted",
+    ],
+    mnemonicAid: "Heap: Hierarchical, with Extreme (min/max) at peak",
   },
   {
     id: "computing-object-oriented",
@@ -184,6 +620,37 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A programming paradigm based on the concept of objects that contain data and code.",
+    prerequisites: [],
+    relatedConcepts: [
+      "computing-encapsulation",
+      "computing-inheritance",
+      "computing-polymorphism",
+      "computing-abstraction",
+    ],
+    practicalApplications: [
+      "Web application frameworks (React, Angular)",
+      "Game development engines",
+      "Enterprise software systems",
+      "Mobile app development",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      object: "Instance of a class with state and behavior",
+      class: "Blueprint defining object structure",
+      method: "Function associated with an object",
+      property: "Data attribute of an object",
+    },
+    learningPath: [
+      "computing-object-oriented",
+      "computing-encapsulation",
+      "computing-inheritance",
+      "computing-polymorphism",
+    ],
+    commonMisconceptions: [
+      "OOP is always better than other paradigms",
+      "More objects means better design",
+    ],
+    mnemonicAid: "OOP: Objects Organize both Properties and procedures",
   },
   {
     id: "computing-encapsulation",
@@ -193,6 +660,29 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "The bundling of data and methods that operate on that data within a single unit, hiding internal details.",
+    prerequisites: ["computing-object-oriented"],
+    relatedConcepts: ["computing-abstraction", "computing-inheritance"],
+    practicalApplications: [
+      "Creating maintainable class libraries",
+      "Protecting internal state from invalid modifications",
+      "API design and interfaces",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "access modifiers": "Public, private, protected keywords",
+      "data hiding": "Restricting direct access to properties",
+      "getter/setter": "Methods to safely access and modify data",
+    },
+    learningPath: [
+      "computing-object-oriented",
+      "computing-encapsulation",
+      "computing-abstraction",
+    ],
+    commonMisconceptions: [
+      "Encapsulation means hiding everything",
+      "Getters/setters are always required",
+    ],
+    mnemonicAid: "Encapsulation: Enclose and protect data in a capsule",
   },
   {
     id: "computing-inheritance",
@@ -202,6 +692,30 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A mechanism where one class acquires properties and methods from another class.",
+    prerequisites: ["computing-object-oriented"],
+    relatedConcepts: ["computing-polymorphism", "computing-abstraction"],
+    practicalApplications: [
+      "Creating class hierarchies",
+      "Code reuse across related classes",
+      "Framework and library design",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "parent class": "Base class that provides common functionality",
+      "child class": "Derived class that inherits from parent",
+      super: "Reference to parent class methods",
+      "method overriding": "Replacing parent method in child class",
+    },
+    learningPath: [
+      "computing-object-oriented",
+      "computing-inheritance",
+      "computing-polymorphism",
+    ],
+    commonMisconceptions: [
+      "Deep inheritance hierarchies are always good",
+      "Composition is never better than inheritance",
+    ],
+    mnemonicAid: "Inheritance: Inherits traits from a parent class",
   },
   {
     id: "computing-polymorphism",
@@ -211,6 +725,31 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "The ability of objects to take multiple forms or respond differently to the same method call.",
+    prerequisites: ["computing-object-oriented", "computing-inheritance"],
+    relatedConcepts: ["computing-abstraction"],
+    practicalApplications: [
+      "Plugin architectures",
+      "Strategy pattern implementation",
+      "Handling different data types uniformly",
+    ],
+    complexity: "advanced",
+    keyTerms: {
+      "method overloading":
+        "Multiple methods with same name but different parameters",
+      "method overriding": "Changing parent method in child class",
+      interface: "Contract defining methods a class must implement",
+      "duck typing": "If it walks and quacks like a duck, treat it as one",
+    },
+    learningPath: [
+      "computing-object-oriented",
+      "computing-inheritance",
+      "computing-polymorphism",
+    ],
+    commonMisconceptions: [
+      "Polymorphism is only about method overriding",
+      "All polymorphism requires inheritance",
+    ],
+    mnemonicAid: "Polymorphism: Many forms from same method name",
   },
   {
     id: "computing-abstraction",
@@ -220,6 +759,30 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "The process of hiding complex implementation details and showing only essential features.",
+    prerequisites: ["computing-object-oriented"],
+    relatedConcepts: ["computing-encapsulation"],
+    practicalApplications: [
+      "Creating user-friendly APIs",
+      "Building libraries and frameworks",
+      "Reducing cognitive complexity",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "abstract class": "Class with methods that subclasses must implement",
+      interface: "Contract specifying what a class must do",
+      "public API": "Methods and properties exposed to users",
+      "implementation detail": "Internal workings hidden from users",
+    },
+    learningPath: [
+      "computing-object-oriented",
+      "computing-encapsulation",
+      "computing-abstraction",
+    ],
+    commonMisconceptions: [
+      "Abstraction means removing all details",
+      "Abstract classes and interfaces are identical",
+    ],
+    mnemonicAid: "Abstraction: Abstract away the unnecessary Complexity",
   },
   {
     id: "computing-functional-programming",
@@ -230,6 +793,27 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A programming paradigm that treats computation as the evaluation of mathematical functions.",
+    prerequisites: [],
+    relatedConcepts: ["computing-recursion", "computing-object-oriented"],
+    practicalApplications: [
+      "Data transformation pipelines",
+      "Concurrent and parallel programming",
+      "Reactive programming",
+      "Mathematical algorithms",
+    ],
+    complexity: "advanced",
+    keyTerms: {
+      "pure function": "Function without side effects, always same output",
+      immutability: "Data that cannot be changed after creation",
+      "higher-order function": "Function that takes or returns functions",
+      "function composition": "Combining functions to create new ones",
+    },
+    learningPath: ["computing-functional-programming", "computing-recursion"],
+    commonMisconceptions: [
+      "Functional programming is only for math",
+      "Imperative code is always less efficient",
+    ],
+    mnemonicAid: "Functional: Functions as First-class, mathematical-minded",
   },
   {
     id: "computing-database",
@@ -240,6 +824,35 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "An organized collection of structured data stored electronically.",
+    prerequisites: [],
+    relatedConcepts: [
+      "computing-relational-database",
+      "computing-nosql",
+      "computing-transaction",
+    ],
+    practicalApplications: [
+      "Web application backends",
+      "Business data management",
+      "Scientific data storage",
+      "Content management systems",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      DBMS: "Database Management System - software managing the database",
+      query: "Request for data retrieval or modification",
+      schema: "Structure defining tables and relationships",
+      backup: "Copy of data for recovery purposes",
+    },
+    learningPath: [
+      "computing-database",
+      "computing-relational-database",
+      "computing-normalization",
+    ],
+    commonMisconceptions: [
+      "Database = spreadsheet",
+      "All databases work the same way",
+    ],
+    mnemonicAid: "Database: Detailed Arranged By A Trusted Software Entity",
   },
   {
     id: "computing-relational-database",
@@ -250,6 +863,36 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A database that organizes data into tables with rows and columns, using relationships between tables.",
+    prerequisites: ["computing-database"],
+    relatedConcepts: [
+      "computing-nosql",
+      "computing-normalization",
+      "computing-transaction",
+    ],
+    practicalApplications: [
+      "Business applications",
+      "Financial systems",
+      "ERP systems",
+      "Most traditional web applications",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      table: "Collection of related data organized in rows and columns",
+      "primary key": "Unique identifier for each row in a table",
+      "foreign key": "Reference to primary key in another table",
+      join: "Combining data from multiple tables",
+    },
+    learningPath: [
+      "computing-database",
+      "computing-relational-database",
+      "computing-normalization",
+      "computing-transaction",
+    ],
+    commonMisconceptions: [
+      "Relational databases are slow for large datasets",
+      "Relationships between tables are just nice-to-have",
+    ],
+    mnemonicAid: "Relational: Rows and columns Related through keys",
   },
   {
     id: "computing-nosql",
@@ -260,6 +903,31 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A database that provides a mechanism for storage and retrieval of data modeled in ways other than tabular relations.",
+    prerequisites: ["computing-database"],
+    relatedConcepts: ["computing-relational-database", "computing-transaction"],
+    practicalApplications: [
+      "High-volume unstructured data",
+      "Real-time web applications",
+      "Content management with flexible schema",
+      "Big data processing",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      document: "NoSQL record storing nested hierarchical data",
+      collection: "Group of documents (like table in SQL)",
+      schema: "Optional/flexible in NoSQL",
+      sharding: "Distributing data across multiple servers",
+    },
+    learningPath: [
+      "computing-database",
+      "computing-relational-database",
+      "computing-nosql",
+    ],
+    commonMisconceptions: [
+      "NoSQL is always better for web applications",
+      "NoSQL means no data consistency",
+    ],
+    mnemonicAid: "NoSQL: Not Only SQL - flexible structure data stores",
   },
   {
     id: "computing-normalization",
@@ -270,6 +938,30 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "The process of organizing database tables to minimize redundancy and dependency.",
+    prerequisites: ["computing-relational-database"],
+    relatedConcepts: ["computing-transaction", "computing-index"],
+    practicalApplications: [
+      "Reducing data anomalies",
+      "Improving database maintainability",
+      "Ensuring data integrity",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "first normal form": "No repeating groups",
+      "second normal form": "Non-key attributes depend on full primary key",
+      "third normal form": "Non-key attributes depend only on primary key",
+      denormalization: "Intentionally breaking normalization for performance",
+    },
+    learningPath: [
+      "computing-relational-database",
+      "computing-normalization",
+      "computing-transaction",
+    ],
+    commonMisconceptions: [
+      "More normalization is always better",
+      "Normalization ruins performance",
+    ],
+    mnemonicAid: "Normalization: No duplication, Neat structure",
   },
   {
     id: "computing-index",
@@ -280,6 +972,30 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A database structure that improves the speed of data retrieval operations.",
+    prerequisites: ["computing-database"],
+    relatedConcepts: ["computing-relational-database", "computing-hash-table"],
+    practicalApplications: [
+      "Speeding up search queries",
+      "Sorting large datasets efficiently",
+      "Enforcing uniqueness constraints",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "B-tree": "Common balanced tree structure for indexing",
+      "primary index": "Index on primary key",
+      "secondary index": "Index on non-key columns for faster searches",
+      "index overhead": "Extra storage and update costs",
+    },
+    learningPath: [
+      "computing-database",
+      "computing-index",
+      "computing-relational-database",
+    ],
+    commonMisconceptions: [
+      "More indexes always improve performance",
+      "Indexes don't have storage costs",
+    ],
+    mnemonicAid: "Index: Instant access - book index helps find pages fast",
   },
   {
     id: "computing-transaction",
@@ -290,6 +1006,33 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A unit of work performed against a database that must be completed entirely or not at all.",
+    prerequisites: ["computing-database"],
+    relatedConcepts: ["computing-relational-database", "computing-concurrency"],
+    practicalApplications: [
+      "Bank transfers and financial transactions",
+      "Inventory management",
+      "Flight booking systems",
+      "Order processing",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      Atomicity: "All or nothing - entire transaction succeeds or fails",
+      Consistency: "Database moves from valid state to valid state",
+      Isolation: "Transactions don't interfere with each other",
+      Durability: "Committed data survives failures",
+      commit: "Finalize a transaction",
+      rollback: "Undo a transaction",
+    },
+    learningPath: [
+      "computing-database",
+      "computing-transaction",
+      "computing-concurrent-programming",
+    ],
+    commonMisconceptions: [
+      "Transactions are only for financial systems",
+      "Transactions prevent all data errors",
+    ],
+    mnemonicAid: "Transaction: Total Action - ACID ensures integrity",
   },
   {
     id: "computing-operating-system",
@@ -300,6 +1043,37 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "System software that manages computer hardware and software resources and provides services for programs.",
+    prerequisites: [],
+    relatedConcepts: [
+      "computing-process",
+      "computing-thread",
+      "computing-memory-management",
+      "computing-file-system",
+    ],
+    practicalApplications: [
+      "Running software applications",
+      "Managing hardware resources",
+      "Providing security and access control",
+      "Facilitating user interaction",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      kernel: "Core of the OS managing system resources",
+      "system call": "Request from program to OS for service",
+      "device driver": "Software controlling hardware devices",
+      "user mode vs kernel mode": "Levels of privilege in execution",
+    },
+    learningPath: [
+      "computing-operating-system",
+      "computing-process",
+      "computing-memory-management",
+      "computing-file-system",
+    ],
+    commonMisconceptions: [
+      "Operating systems are only Windows and Mac",
+      "OS is just a file manager",
+    ],
+    mnemonicAid: "Operating System: Orchestrates all programs and system",
   },
   {
     id: "computing-process",
@@ -310,6 +1084,36 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "An instance of a running program with its own memory space and system resources.",
+    prerequisites: ["computing-operating-system"],
+    relatedConcepts: [
+      "computing-thread",
+      "computing-memory-management",
+      "computing-concurrent-programming",
+    ],
+    practicalApplications: [
+      "Running multiple applications simultaneously",
+      "Process scheduling and management",
+      "Inter-process communication",
+      "Isolation and security",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "process ID": "Unique identifier for a process",
+      "process state": "Running, waiting, ready, blocked, terminated",
+      "context switch": "Switching between processes",
+      "process hierarchy": "Parent and child process relationships",
+    },
+    learningPath: [
+      "computing-operating-system",
+      "computing-process",
+      "computing-thread",
+      "computing-concurrent-programming",
+    ],
+    commonMisconceptions: [
+      "Process and program are the same",
+      "Only one process can run at a time",
+    ],
+    mnemonicAid: "Process: Program executing - owns memory and resources",
   },
   {
     id: "computing-thread",
@@ -320,6 +1124,34 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "The smallest unit of execution within a process that can be scheduled by the operating system.",
+    prerequisites: ["computing-process"],
+    relatedConcepts: [
+      "computing-concurrent-programming",
+      "computing-memory-management",
+    ],
+    practicalApplications: [
+      "Responsive user interfaces",
+      "Parallel computation",
+      "Server handling multiple clients",
+      "Background tasks",
+    ],
+    complexity: "advanced",
+    keyTerms: {
+      "thread state": "Running, waiting, blocked, ready",
+      synchronization: "Coordinating access to shared resources",
+      mutex: "Lock preventing simultaneous access",
+      "race condition": "Bug from unsynchronized concurrent access",
+    },
+    learningPath: [
+      "computing-process",
+      "computing-thread",
+      "computing-concurrent-programming",
+    ],
+    commonMisconceptions: [
+      "Threads are always faster than sequential code",
+      "Multithreading eliminates all concurrency problems",
+    ],
+    mnemonicAid: "Thread: Tiny execution - lighter than process",
   },
   {
     id: "computing-memory-management",
@@ -330,6 +1162,32 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "The process of controlling and coordinating computer memory, allocating and deallocating memory blocks.",
+    prerequisites: ["computing-operating-system"],
+    relatedConcepts: ["computing-process", "computing-file-system"],
+    practicalApplications: [
+      "Enabling programs larger than physical RAM",
+      "Protecting programs from each other",
+      "Garbage collection in managed languages",
+      "Cache optimization",
+    ],
+    complexity: "advanced",
+    keyTerms: {
+      "virtual memory": "Abstraction creating illusion of more RAM",
+      paging: "Dividing memory into fixed-size pages",
+      swapping: "Moving pages between RAM and disk",
+      "memory leak": "Unused memory not returned to the system",
+    },
+    learningPath: [
+      "computing-operating-system",
+      "computing-process",
+      "computing-memory-management",
+      "computing-file-system",
+    ],
+    commonMisconceptions: [
+      "Virtual memory is unlimited",
+      "All memory management is automatic",
+    ],
+    mnemonicAid: "Memory Management: Managing physical and virtual Memory",
   },
   {
     id: "computing-file-system",
@@ -340,6 +1198,32 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A method for storing and organizing files on storage devices.",
+    prerequisites: ["computing-operating-system"],
+    relatedConcepts: ["computing-process", "computing-data-structure"],
+    practicalApplications: [
+      "Organizing files and folders",
+      "Persistent data storage",
+      "Backup and recovery",
+      "Data security through permissions",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      inode: "Data structure storing file metadata",
+      directory: "Special file containing file listings",
+      "file pointer": "Current position in a file being read/written",
+      "access control": "Permissions determining who can access files",
+    },
+    learningPath: [
+      "computing-operating-system",
+      "computing-file-system",
+      "computing-memory-management",
+    ],
+    commonMisconceptions: [
+      "File system just stores files",
+      "File deletion is permanent",
+    ],
+    mnemonicAid:
+      "File System: Fast Information Location through storage Encoding",
   },
   {
     id: "computing-network",
@@ -350,6 +1234,36 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A system of interconnected computers that can share resources and communicate with each other.",
+    prerequisites: [],
+    relatedConcepts: [
+      "computing-protocol",
+      "computing-tcp-ip",
+      "computing-client-server",
+    ],
+    practicalApplications: [
+      "Internet connectivity",
+      "Local area networks (LANs)",
+      "Data sharing between computers",
+      "Distributed systems communication",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      bandwidth: "Maximum data transfer rate",
+      latency: "Time for data to travel between nodes",
+      topology: "Physical or logical layout of a network",
+      node: "Individual device connected to the network",
+    },
+    learningPath: [
+      "computing-network",
+      "computing-protocol",
+      "computing-tcp-ip",
+      "computing-client-server",
+    ],
+    commonMisconceptions: [
+      "All networks work the same way",
+      "Internet and World Wide Web are the same",
+    ],
+    mnemonicAid: "Network: Numerous Electronic Terminals Working",
   },
   {
     id: "computing-protocol",
@@ -360,6 +1274,31 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A set of rules governing data communication between devices on a network.",
+    prerequisites: ["computing-network"],
+    relatedConcepts: ["computing-tcp-ip", "computing-client-server"],
+    practicalApplications: [
+      "Web communication (HTTP/HTTPS)",
+      "Email delivery (SMTP, POP3, IMAP)",
+      "File transfer (FTP, SFTP)",
+      "DNS name resolution",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      handshake: "Initial agreement between devices",
+      acknowledge: "Confirming receipt of data",
+      packet: "Unit of data transmitted",
+      timeout: "Maximum wait time before retrying",
+    },
+    learningPath: [
+      "computing-network",
+      "computing-protocol",
+      "computing-tcp-ip",
+    ],
+    commonMisconceptions: [
+      "All protocols serve the same purpose",
+      "Protocol overhead is always bad",
+    ],
+    mnemonicAid: "Protocol: Plan for communication between computers",
   },
   {
     id: "computing-tcp-ip",
@@ -369,6 +1308,31 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     subcategory: "Protocols",
     importance: "core",
     description: "The fundamental communication protocols of the internet.",
+    prerequisites: ["computing-protocol", "computing-network"],
+    relatedConcepts: ["computing-client-server"],
+    practicalApplications: [
+      "Internet communication",
+      "Email systems",
+      "Web services",
+      "VoIP and video streaming",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "IP address": "Unique identifier for devices on network",
+      TCP: "Transmission Control Protocol - reliable, ordered delivery",
+      UDP: "User Datagram Protocol - fast, unreliable delivery",
+      port: "Endpoint for network communication on a device",
+    },
+    learningPath: [
+      "computing-protocol",
+      "computing-tcp-ip",
+      "computing-client-server",
+    ],
+    commonMisconceptions: [
+      "TCP is always better than UDP",
+      "IP addresses are permanent",
+    ],
+    mnemonicAid: "TCP/IP: Transmission Control Protocol over Internet",
   },
   {
     id: "computing-client-server",
@@ -379,6 +1343,32 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A distributed application structure that partitions tasks between service providers (servers) and requesters (clients).",
+    prerequisites: ["computing-network", "computing-protocol"],
+    relatedConcepts: ["computing-tcp-ip", "computing-distributed-systems"],
+    practicalApplications: [
+      "Web applications",
+      "Email systems",
+      "Database backends",
+      "Online games",
+      "Cloud services",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      client: "Device requesting services or resources",
+      server: "Device providing services or resources",
+      request: "Message from client asking for service",
+      response: "Message from server replying to request",
+    },
+    learningPath: [
+      "computing-network",
+      "computing-client-server",
+      "computing-distributed-systems",
+    ],
+    commonMisconceptions: [
+      "Client always means user computer",
+      "Servers never request from other servers",
+    ],
+    mnemonicAid: "Client-Server: Customer asks Server for service",
   },
   {
     id: "computing-encryption",
@@ -389,6 +1379,34 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "The process of encoding information so only authorized parties can access it.",
+    prerequisites: [],
+    relatedConcepts: ["computing-authentication", "computing-authorization"],
+    practicalApplications: [
+      "HTTPS for secure web communication",
+      "Password storage",
+      "Secure messaging",
+      "Credit card protection",
+      "Data at rest and in transit",
+    ],
+    complexity: "advanced",
+    keyTerms: {
+      plaintext: "Unencrypted, readable message",
+      ciphertext: "Encrypted, unreadable message",
+      key: "Secret value needed to encrypt/decrypt",
+      "symmetric encryption": "Same key for encrypt and decrypt",
+      "asymmetric encryption": "Different keys for encrypt and decrypt",
+    },
+    learningPath: [
+      "computing-encryption",
+      "computing-authentication",
+      "computing-authorization",
+    ],
+    commonMisconceptions: [
+      "Encryption makes all data completely safe",
+      "Complexity of algorithm is the only security",
+    ],
+    mnemonicAid:
+      "Encryption: Encoding - renders message Cryptic to uninvited parties",
   },
   {
     id: "computing-authentication",
@@ -397,6 +1415,32 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     subcategory: "Access Control",
     importance: "core",
     description: "The process of verifying the identity of a user or system.",
+    prerequisites: [],
+    relatedConcepts: ["computing-encryption", "computing-authorization"],
+    practicalApplications: [
+      "Login systems",
+      "Multi-factor authentication",
+      "API key verification",
+      "Biometric security",
+      "Digital signatures",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      credential: "Information proving identity (username, password)",
+      factor: "Type of verification (what you know, have, are)",
+      MFA: "Multi-factor authentication requiring multiple proofs",
+      session: "Authenticated connection maintained over time",
+    },
+    learningPath: [
+      "computing-authentication",
+      "computing-authorization",
+      "computing-encryption",
+    ],
+    commonMisconceptions: [
+      "Authentication and authorization are the same",
+      "Passwords are sufficient security",
+    ],
+    mnemonicAid: "Authentication: Affirm Identity - verify who you are",
   },
   {
     id: "computing-authorization",
@@ -406,6 +1450,28 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "The process of determining what resources an authenticated user is allowed to access.",
+    prerequisites: ["computing-authentication"],
+    relatedConcepts: ["computing-authentication", "computing-encryption"],
+    practicalApplications: [
+      "Permission-based access control",
+      "Role-based access control (RBAC)",
+      "File system permissions",
+      "API endpoint restrictions",
+      "Admin panel access",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      permission: "Right to perform action on resource",
+      role: "Collection of permissions assigned to users",
+      "access control list": "Specification of who can access resource",
+      scope: "Extent of access granted",
+    },
+    learningPath: ["computing-authentication", "computing-authorization"],
+    commonMisconceptions: [
+      "Authorization prevents all unauthorized access",
+      "Complex permissions make systems more secure",
+    ],
+    mnemonicAid: "Authorization: Access rights - Authorize what users can do",
   },
   {
     id: "computing-compiler",
@@ -416,6 +1482,29 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A program that translates source code written in a high-level language into machine code.",
+    prerequisites: [],
+    relatedConcepts: ["computing-interpreter"],
+    practicalApplications: [
+      "Converting C/C++/Java to executable programs",
+      "Optimizing code for performance",
+      "Error checking before execution",
+      "Cross-platform compilation",
+    ],
+    complexity: "advanced",
+    keyTerms: {
+      "lexical analysis": "Breaking code into tokens",
+      parsing: "Analyzing structure of code",
+      "semantic analysis": "Checking meaning correctness",
+      optimization: "Improving performance of generated code",
+      linking: "Combining compiled files into executable",
+    },
+    learningPath: ["computing-compiler", "computing-interpreter"],
+    commonMisconceptions: [
+      "All compilers produce the same results",
+      "Compilation is simple and instant",
+    ],
+    mnemonicAid:
+      "Compiler: Converts Language to machine code - Intermediate transformation",
   },
   {
     id: "computing-interpreter",
@@ -426,6 +1515,28 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A program that executes code line-by-line without compiling it into machine code first.",
+    prerequisites: [],
+    relatedConcepts: ["computing-compiler"],
+    practicalApplications: [
+      "Running Python, JavaScript, Ruby scripts",
+      "Rapid development and testing",
+      "Dynamic language features",
+      "Cross-platform code execution",
+    ],
+    complexity: "advanced",
+    keyTerms: {
+      parsing: "Reading and understanding code structure",
+      evaluation: "Executing the parsed code",
+      "dynamic typing": "Type checking at runtime",
+      JIT: "Just-In-Time compilation for performance",
+    },
+    learningPath: ["computing-interpreter", "computing-compiler"],
+    commonMisconceptions: [
+      "Interpreted code is always slower",
+      "Interpreters never optimize",
+    ],
+    mnemonicAid:
+      "Interpreter: Immediately translates and executes instructions",
   },
   {
     id: "computing-machine-learning",
@@ -436,6 +1547,28 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A field of study that gives computers the ability to learn without being explicitly programmed.",
+    prerequisites: [],
+    relatedConcepts: ["computing-neural-network", "computing-data-structure"],
+    practicalApplications: [
+      "Image and speech recognition",
+      "Recommendation systems",
+      "Spam detection",
+      "Predictive analytics",
+      "Autonomous vehicles",
+    ],
+    complexity: "advanced",
+    keyTerms: {
+      "training data": "Examples used to teach the model",
+      feature: "Input variable used for prediction",
+      model: "Mathematical representation learned from data",
+      overfitting: "Model memorizing noise instead of pattern",
+    },
+    learningPath: ["computing-machine-learning", "computing-neural-network"],
+    commonMisconceptions: [
+      "Machine learning always works",
+      "More data always improves models",
+    ],
+    mnemonicAid: "Machine Learning: Models Learn - systems Enhance",
   },
   {
     id: "computing-neural-network",
@@ -446,6 +1579,30 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A computing system inspired by biological neural networks that learns to perform tasks by considering examples.",
+    prerequisites: ["computing-machine-learning"],
+    relatedConcepts: ["computing-machine-learning"],
+    practicalApplications: [
+      "Image and object recognition",
+      "Natural language processing",
+      "Game playing AI",
+      "Medical diagnosis systems",
+      "Generative AI models",
+    ],
+    complexity: "advanced",
+    keyTerms: {
+      neuron: "Basic computational unit",
+      layer: "Collection of neurons",
+      "activation function": "Non-linear transformation in neurons",
+      backpropagation: "Algorithm for updating weights based on errors",
+      weights: "Parameters controlling neuron behavior",
+    },
+    learningPath: ["computing-machine-learning", "computing-neural-network"],
+    commonMisconceptions: [
+      "Neural networks work like biological brains",
+      "Deep learning solves all AI problems",
+    ],
+    mnemonicAid:
+      "Neural Network: Nodes layered and interconnected - Learn patterns",
   },
   {
     id: "computing-concurrent-programming",
@@ -456,6 +1613,33 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "Programming where multiple computations are executed during overlapping time periods.",
+    prerequisites: ["computing-algorithm", "computing-thread"],
+    relatedConcepts: ["computing-distributed-systems", "computing-thread"],
+    practicalApplications: [
+      "Web servers handling multiple requests",
+      "Real-time systems",
+      "Game engine updates",
+      "Responsive user interfaces",
+      "Data processing pipelines",
+    ],
+    complexity: "advanced",
+    keyTerms: {
+      concurrency: "Interleaving computations",
+      parallelism: "Simultaneous computation on multiple cores",
+      "race condition": "Bug from unsynchronized access",
+      deadlock: "Circular waiting causing system hang",
+      synchronization: "Coordinating concurrent access",
+    },
+    learningPath: [
+      "computing-concurrent-programming",
+      "computing-thread",
+      "computing-process",
+    ],
+    commonMisconceptions: [
+      "Concurrent code is always faster",
+      "Concurrency eliminates all race conditions",
+    ],
+    mnemonicAid: "Concurrent: Computations happen together - Coordination",
   },
   {
     id: "computing-distributed-systems",
@@ -466,6 +1650,38 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A system whose components are located on different networked computers that communicate and coordinate their actions.",
+    prerequisites: ["computing-network", "computing-protocol"],
+    relatedConcepts: [
+      "computing-client-server",
+      "computing-concurrent-programming",
+      "computing-cloud-computing",
+    ],
+    practicalApplications: [
+      "Web applications across multiple servers",
+      "Microservices architecture",
+      "Database replication",
+      "Content delivery networks",
+      "Peer-to-peer systems",
+    ],
+    complexity: "advanced",
+    keyTerms: {
+      node: "Individual computer in the system",
+      consistency: "All nodes having same data",
+      availability: "System remaining operational despite failures",
+      "partition tolerance": "Functioning despite network splits",
+      consensus: "Agreement between nodes on state",
+    },
+    learningPath: [
+      "computing-network",
+      "computing-distributed-systems",
+      "computing-cloud-computing",
+    ],
+    commonMisconceptions: [
+      "Distributed always means geographically distributed",
+      "Distributed systems are always more reliable",
+    ],
+    mnemonicAid:
+      "Distributed: Devices distributed - Deployed across multiple locations",
   },
   {
     id: "computing-cloud-computing",
@@ -476,6 +1692,33 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "The delivery of computing services over the internet including servers, storage, databases, and software.",
+    prerequisites: ["computing-network", "computing-distributed-systems"],
+    relatedConcepts: ["computing-distributed-systems", "computing-database"],
+    practicalApplications: [
+      "Web application hosting",
+      "Data storage and backup",
+      "Machine learning as a service",
+      "Database hosting",
+      "Development and testing environments",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      IaaS: "Infrastructure as a Service - raw computing resources",
+      PaaS: "Platform as a Service - development environments",
+      SaaS: "Software as a Service - applications",
+      scalability: "System growing to handle more load",
+      elasticity: "Automatically scaling resources",
+    },
+    learningPath: [
+      "computing-distributed-systems",
+      "computing-cloud-computing",
+    ],
+    commonMisconceptions: [
+      "Cloud is just someone else's computer",
+      "Cloud computing eliminates all maintenance",
+    ],
+    mnemonicAid:
+      "Cloud Computing: Computer and storage in the Cloud - remote resources",
   },
   {
     id: "computing-version-control",
@@ -486,6 +1729,33 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A system for tracking changes to code over time and managing collaboration.",
+    prerequisites: [],
+    relatedConcepts: ["computing-refactoring"],
+    practicalApplications: [
+      "Team collaboration on code",
+      "Tracking history of changes",
+      "Reverting to previous versions",
+      "Managing branches and releases",
+      "Code review workflows",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      repository: "Central location storing all versions",
+      commit: "Saving changes with a message",
+      branch: "Separate line of development",
+      merge: "Combining changes from two branches",
+      "pull request": "Requesting changes to be merged",
+    },
+    learningPath: [
+      "computing-version-control",
+      "computing-refactoring",
+      "computing-agile",
+    ],
+    commonMisconceptions: [
+      "Version control is only for large teams",
+      "Version control prevents all merge conflicts",
+    ],
+    mnemonicAid: "Version Control: Valid changes tracked, Code organized",
   },
   {
     id: "computing-agile",
@@ -496,6 +1766,32 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "An iterative approach to software development that prioritizes customer collaboration and adaptability.",
+    prerequisites: [],
+    relatedConcepts: ["computing-design-pattern", "computing-refactoring"],
+    practicalApplications: [
+      "Software development team organization",
+      "Project planning and tracking",
+      "Regular feedback incorporation",
+      "Risk management",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      sprint: "Fixed time period of work (usually 2 weeks)",
+      "user story": "Feature described from user perspective",
+      backlog: "Prioritized list of features to build",
+      "daily standup": "Brief team synchronization meeting",
+      retrospective: "Team reflection on process improvement",
+    },
+    learningPath: [
+      "computing-agile",
+      "computing-design-pattern",
+      "computing-version-control",
+    ],
+    commonMisconceptions: [
+      "Agile means no planning",
+      "Agile is the right approach for all projects",
+    ],
+    mnemonicAid: "Agile: Adaptive, Guided, Iterative Learning Execution",
   },
   {
     id: "computing-design-pattern",
@@ -506,6 +1802,33 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "A reusable solution to a commonly occurring problem in software design.",
+    prerequisites: [],
+    relatedConcepts: ["computing-object-oriented", "computing-refactoring"],
+    practicalApplications: [
+      "Creating flexible and maintainable code",
+      "Facilitating team communication",
+      "Framework and library design",
+      "Solving recurring design problems",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "Creational patterns": "Object creation mechanisms",
+      "Structural patterns": "Organizing relationships between objects",
+      "Behavioral patterns": "Object communication and responsibility",
+      Singleton: "Only one instance of a class",
+      Factory: "Creating objects without specifying classes",
+    },
+    learningPath: [
+      "computing-object-oriented",
+      "computing-design-pattern",
+      "computing-refactoring",
+    ],
+    commonMisconceptions: [
+      "Design patterns are always necessary",
+      "All patterns are equally useful",
+    ],
+    mnemonicAid:
+      "Design Pattern: Documented Problem solution Providing reusable Answer",
   },
   {
     id: "computing-refactoring",
@@ -516,6 +1839,32 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "The process of restructuring existing code without changing its external behavior.",
+    prerequisites: ["computing-version-control"],
+    relatedConcepts: ["computing-design-pattern", "computing-technical-debt"],
+    practicalApplications: [
+      "Improving code readability",
+      "Reducing code complexity",
+      "Making code more maintainable",
+      "Preparing code for new features",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "code smell": "Indication of deeper problem in code",
+      "extract method": "Moving code into separate function",
+      rename: "Changing variable/function names for clarity",
+      consolidate: "Combining similar code",
+    },
+    learningPath: [
+      "computing-design-pattern",
+      "computing-refactoring",
+      "computing-technical-debt",
+    ],
+    commonMisconceptions: [
+      "Refactoring changes what code does",
+      "Refactoring is always beneficial",
+    ],
+    mnemonicAid:
+      "Refactoring: Restructure functionality - improve code clarity",
   },
   {
     id: "computing-technical-debt",
@@ -525,12 +1874,37 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     importance: "core",
     description:
       "The implied cost of additional rework caused by choosing an easy solution now instead of a better approach.",
+    prerequisites: ["computing-refactoring"],
+    relatedConcepts: ["computing-design-pattern", "computing-agile"],
+    practicalApplications: [
+      "Project planning and estimation",
+      "Release prioritization",
+      "Quality assurance strategies",
+      "Team velocity management",
+    ],
+    complexity: "intermediate",
+    keyTerms: {
+      "quick fix": "Easy short-term solution with long-term cost",
+      "refactoring debt": "Code needing restructuring",
+      "documentation debt": "Missing documentation",
+      "testing debt": "Insufficient test coverage",
+    },
+    learningPath: [
+      "computing-technical-debt",
+      "computing-refactoring",
+      "computing-agile",
+    ],
+    commonMisconceptions: [
+      "Technical debt is always avoidable",
+      "Technical debt should never be incurred",
+    ],
+    mnemonicAid: "Technical Debt: Temporary shortcut creating future costs",
   },
 ];
 
 export const COMPUTING_CONCEPTS: ConceptLibrary = {
   domain: "computing",
-  version: "2.0.0",
+  version: "3.0.0",
   concepts: CORE_CONCEPTS,
 };
 

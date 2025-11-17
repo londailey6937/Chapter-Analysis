@@ -571,28 +571,38 @@ export const ChapterCheckerV2: React.FC = () => {
         )
     );
 
-    // Balanced requirements to catch real content while avoiding false positives:
-    // 1. At least 20 weighted matches (lowered from 40 for better sensitivity)
-    // 2. At least 5 different unique concepts matched (lowered from 8)
-    // 3. Score must be 1.3x higher than second-place domain (lowered for overlapping domains)
+    // Strict requirements to prevent false positives while catching real content:
+    // Programming languages need stricter thresholds since common English words can match
+    const isProgrammingDomain = ["javascript", "computing", "react"].includes(
+      topDomain?.[0] || ""
+    );
+
+    // 1. Programming domains need higher scores (60) vs general domains (30)
+    const minScore = isProgrammingDomain ? 60 : 30;
+    // 2. Programming domains need more unique concepts (10) vs general domains (6)
+    const minConcepts = isProgrammingDomain ? 10 : 6;
+    // 3. Must have 2x lead over second place for programming, 1.5x for others
+    const minLead = isProgrammingDomain ? 2 : 1.5;
+
     const secondPlace = sortedScores[1];
     const hasSignificantLead =
-      !secondPlace || topDomain[1] >= secondPlace[1] * 1.3;
+      !secondPlace || topDomain[1] >= secondPlace[1] * minLead;
 
-    const meetsThreshold = topDomain && topDomain[1] >= 20;
-    const hasEnoughConcepts = uniqueConceptMatches[topDomain?.[0]]?.size >= 5;
+    const meetsThreshold = topDomain && topDomain[1] >= minScore;
+    const hasEnoughConcepts =
+      uniqueConceptMatches[topDomain?.[0]]?.size >= minConcepts;
 
     console.log(
-      "  Meets threshold (≥20):",
+      `  Meets threshold (≥${minScore}):`,
       meetsThreshold,
       `(score: ${topDomain?.[1] || 0})`
     );
     console.log(
-      "  Has enough concepts (≥5):",
+      `  Has enough concepts (≥${minConcepts}):`,
       hasEnoughConcepts,
       `(count: ${uniqueConceptMatches[topDomain?.[0]]?.size || 0})`
     );
-    console.log("  Has significant lead (1.3x):", hasSignificantLead);
+    console.log(`  Has significant lead (${minLead}x):`, hasSignificantLead);
 
     if (
       topDomain &&
@@ -718,8 +728,12 @@ export const ChapterCheckerV2: React.FC = () => {
   useEffect(() => {
     const handleJumpToPosition = (event: CustomEvent) => {
       const position = event.detail?.position;
+      console.log("🎯 Jump-to-position event received:", event.detail);
       if (typeof position === "number") {
+        console.log("🎯 Setting highlight position to:", position);
         setHighlightPosition(position);
+      } else {
+        console.warn("⚠️ Invalid position in jump event:", position);
       }
     };
 
@@ -1931,7 +1945,7 @@ export const ChapterCheckerV2: React.FC = () => {
         <div
           className="app-panel"
           style={{
-            flex: isStackedLayout ? "1 1 100%" : `${analysisFlexGrow} 1 0%`,
+            flex: isStackedLayout ? "1 1 100%" : "2 1 0",
             maxWidth: "100%",
             minWidth: analysisMinWidth,
             display: "flex",
@@ -2635,11 +2649,6 @@ export const ChapterCheckerV2: React.FC = () => {
                           return;
                         }
                         setViewMode("writer");
-                        setTimeout(() => {
-                          if (analysisPanelRef.current) {
-                            analysisPanelRef.current.scrollTop = 0;
-                          }
-                        }, 50);
                       }}
                       style={{
                         flex: 1,

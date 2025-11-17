@@ -169,17 +169,54 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       return;
     }
 
+    console.log("📍 Scroll to highlight triggered:", {
+      readOnly,
+      highlightRange,
+      hasEditorRef: !!editorRef.current,
+      hasHighlightRef: !!highlightRef.current,
+      highlightRangeStart: highlightRange?.start,
+      highlightRangeLength: highlightRange?.length,
+    });
+
     if (readOnly) {
       // Wait for the highlightRef to be assigned to the DOM element
+      let attempts = 0;
+      const maxAttempts = 20; // Try for up to 1 second
+
       const scrollToHighlight = () => {
+        attempts++;
         if (highlightRef.current) {
+          console.log(
+            "📍 Scrolling preview to highlight (attempt " + attempts + ")"
+          );
           highlightRef.current.scrollIntoView({
             behavior: "smooth",
             block: "center",
           });
-        } else {
+        } else if (attempts < maxAttempts) {
           // Ref not ready yet, try again after a short delay
+          console.log(
+            "📍 Waiting for highlight ref... (attempt " + attempts + ")"
+          );
           setTimeout(scrollToHighlight, 50);
+        } else {
+          console.warn(
+            "⚠️ Highlight ref never became available after " +
+              maxAttempts +
+              " attempts"
+          );
+          // Fallback: try to scroll the preview container to approximate position
+          const previewContainer = document.querySelector(
+            ".preview-pane, .readonly-view"
+          );
+          if (previewContainer && highlightRange) {
+            console.log("📍 Attempting fallback scroll of preview container");
+            const estimatedScroll =
+              (highlightRange.start / text.length) *
+              previewContainer.scrollHeight;
+            previewContainer.scrollTop =
+              estimatedScroll - previewContainer.clientHeight / 2;
+          }
         }
       };
 
@@ -190,11 +227,14 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
 
     const editor = editorRef.current;
     if (editor) {
+      console.log("📍 Scrolling editor to range:", highlightRange);
       scrollEditableToRange(
         editor,
         highlightRange.start,
         highlightRange.length
       );
+    } else {
+      console.warn("⚠️ Editor ref not available for scrolling");
     }
   }, [highlightRange, readOnly]);
 
@@ -713,6 +753,7 @@ const ReadOnlyView: React.FC<ReadOnlyViewProps> = ({
                   }
 
                   if (segment.highlighted) {
+                    // Assign ref only to the first highlighted segment for scrolling
                     const ref = !highlightAnchorAssigned
                       ? highlightRef
                       : undefined;
@@ -1138,7 +1179,35 @@ function determineMatchLength(
   searchWord: string | null
 ): number {
   if (!searchWord || searchWord.trim().length === 0) {
-    return 1;
+    // When no search word (e.g., clicking timeline), highlight a meaningful chunk
+    // Try to find the end of the current paragraph or heading
+    const slice = base.slice(startIndex);
+
+    // Look for paragraph break (double newline) or single newline followed by heading indicator
+    const paragraphMatch = slice.match(/^(.+?)(\n\n|\n#|\n[A-Z])/s);
+    if (paragraphMatch && paragraphMatch[1]) {
+      return paragraphMatch[1].length;
+    }
+
+    // Look for end of sentence
+    const sentenceMatch = slice.match(/^(.+?[.!?])\s/);
+    if (sentenceMatch && sentenceMatch[1]) {
+      return sentenceMatch[1].length;
+    }
+
+    // Look for end of line
+    const lineMatch = slice.match(/^(.+?)$/m);
+    if (lineMatch && lineMatch[1] && lineMatch[1].length > 10) {
+      return lineMatch[1].length;
+    }
+
+    // Fallback: highlight at least 100 characters or until newline
+    const newlineIndex = slice.indexOf("\n");
+    if (newlineIndex > 0 && newlineIndex < 300) {
+      return newlineIndex;
+    }
+
+    return Math.min(100, slice.length);
   }
 
   const escaped = searchWord
@@ -1317,6 +1386,20 @@ function scrollEditableToRange(
   start: number,
   length: number
 ): void {
+  console.log("📍 scrollEditableToRange called:", { start, length });
+
+  // Remove any existing highlights
+  const existingHighlights = container.querySelectorAll(".jump-highlight");
+  existingHighlights.forEach((el) => {
+    const parent = el.parentNode;
+    if (parent) {
+      const textNode = document.createTextNode(el.textContent || "");
+      parent.replaceChild(textNode, el);
+    }
+  });
+  // Normalize to merge adjacent text nodes after removing highlights
+  container.normalize();
+
   const walker = document.createTreeWalker(
     container,
     NodeFilter.SHOW_TEXT,
@@ -1326,19 +1409,118 @@ function scrollEditableToRange(
   let currentIndex = 0;
   const targetStart = start;
   const targetEnd = start + length;
+  let targetNode: Node | null = null;
+  let startOffset = 0;
+  let endNode: Node | null = null;
+  let endOffset = 0;
 
+  console.log("📍 Walking through text nodes...");
+
+  // Find the start and end nodes
   while (currentNode) {
     const nodeLength = currentNode.textContent?.length ?? 0;
     const nextIndex = currentIndex + nodeLength;
-    if (targetStart >= currentIndex && targetStart <= nextIndex) {
-      (currentNode.parentElement as HTMLElement)?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
+
+    if (
+      targetNode === null &&
+      targetStart >= currentIndex &&
+      targetStart < nextIndex
+    ) {
+      targetNode = currentNode;
+      startOffset = targetStart - currentIndex;
+      console.log("📍 Found start node:", {
+        text: currentNode.textContent?.substring(0, 50),
+        startOffset,
+      });
+    }
+
+    if (targetEnd >= currentIndex && targetEnd <= nextIndex) {
+      endNode = currentNode;
+      endOffset = targetEnd - currentIndex;
+      console.log("📍 Found end node:", {
+        text: currentNode.textContent?.substring(0, 50),
+        endOffset,
       });
       break;
     }
+
     currentIndex = nextIndex;
     currentNode = walker.nextNode();
+  }
+
+  if (!targetNode) {
+    console.warn("⚠️ Could not find target text node at position:", start);
+    return;
+  }
+
+  try {
+    // Create range for selection
+    const range = document.createRange();
+    range.setStart(targetNode, startOffset);
+    range.setEnd(
+      endNode || targetNode,
+      endNode ? endOffset : targetNode.textContent?.length ?? 0
+    );
+
+    // Scroll the range into view
+    const rangeRect = range.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+
+    if (
+      rangeRect.top < containerRect.top ||
+      rangeRect.bottom > containerRect.bottom
+    ) {
+      console.log("📍 Scrolling container to range");
+      container.scrollTop +=
+        rangeRect.top -
+        containerRect.top -
+        containerRect.height / 2 +
+        rangeRect.height / 2;
+    }
+
+    // Create a temporary highlight element
+    const highlightSpan = document.createElement("mark");
+    highlightSpan.className = "jump-highlight";
+    highlightSpan.style.backgroundColor = "#fef08a";
+    highlightSpan.style.padding = "2px 4px";
+    highlightSpan.style.borderRadius = "3px";
+    highlightSpan.style.transition = "background-color 1.5s ease";
+    highlightSpan.style.boxShadow = "0 0 0 2px rgba(251, 191, 36, 0.3)";
+
+    // Extract and wrap the content
+    const fragment = range.extractContents();
+    highlightSpan.appendChild(fragment);
+    range.insertNode(highlightSpan);
+
+    console.log("📍 Highlight created:", {
+      text: highlightSpan.textContent?.substring(0, 50),
+      length: highlightSpan.textContent?.length,
+    });
+
+    // Fade out and remove highlight after delay
+    setTimeout(() => {
+      highlightSpan.style.backgroundColor = "transparent";
+      highlightSpan.style.boxShadow = "none";
+
+      setTimeout(() => {
+        const parent = highlightSpan.parentNode;
+        if (parent && highlightSpan.isConnected) {
+          // Move children out of the highlight span
+          while (highlightSpan.firstChild) {
+            parent.insertBefore(highlightSpan.firstChild, highlightSpan);
+          }
+          parent.removeChild(highlightSpan);
+          parent.normalize();
+          console.log("📍 Highlight removed");
+        }
+      }, 1500);
+    }, 2000);
+  } catch (error) {
+    console.error("⚠️ Error highlighting range:", error);
+    // Fallback: just scroll to approximate position
+    const estimatedScroll =
+      (start / (container.textContent?.length || 1)) * container.scrollHeight;
+    container.scrollTop = estimatedScroll - container.clientHeight / 2;
   }
 }
 
