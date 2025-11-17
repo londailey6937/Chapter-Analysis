@@ -1,8 +1,9 @@
 /**
  * Computing Concept Library
  *
- * Core computing concepts modeled with explicit IDs to support
- * ID-based lookups during analysis.
+ * General computer science concepts - theoretical foundations,
+ * algorithms, data structures, and universal computing principles.
+ * Language-specific concepts belong in dedicated libraries (JavaScript, React, etc.)
  */
 
 import { ConceptDefinition, ConceptLibrary } from "./conceptLibraryTypes";
@@ -11,62 +12,35 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
   {
     id: "computing-algorithm",
     name: "algorithm",
-    category: "Programming Fundamentals",
-    subcategory: "Core Concepts",
+    aliases: ["algorithms", "algorithmic"],
+    category: "Algorithms",
+    subcategory: "Fundamentals",
     importance: "core",
     description:
       "A step-by-step procedure or formula for solving a problem or completing a task.",
   },
   {
-    id: "computing-function",
-    name: "function",
-    category: "Programming Fundamentals",
-    subcategory: "Core Concepts",
+    id: "computing-data-structure",
+    name: "data structure",
+    aliases: ["data structures"],
+    category: "Data Structures",
+    subcategory: "Fundamentals",
     importance: "core",
     description:
-      "A reusable block of code that performs a specific task and can accept inputs and return outputs.",
-  },
-  {
-    id: "computing-variable",
-    name: "variable",
-    category: "Programming Fundamentals",
-    subcategory: "Core Concepts",
-    importance: "core",
-    description:
-      "A named storage location in memory that holds a value which can change during program execution.",
-  },
-  {
-    id: "computing-loop",
-    name: "loop",
-    category: "Programming Fundamentals",
-    subcategory: "Core Concepts",
-    importance: "core",
-    description:
-      "A control structure that repeats a block of code multiple times until a condition is met.",
-  },
-  {
-    id: "computing-conditional-statement",
-    name: "conditional statement",
-    category: "Programming Fundamentals",
-    subcategory: "Core Concepts",
-    importance: "core",
-    description:
-      "A programming construct that executes different code blocks based on whether a condition is true or false.",
-  },
-  {
-    id: "computing-recursion",
-    name: "recursion",
-    category: "Programming Fundamentals",
-    subcategory: "Core Concepts",
-    importance: "core",
-    description:
-      "A technique where a function calls itself to solve smaller instances of the same problem.",
+      "A specialized format for organizing, processing, and storing data efficiently.",
   },
   {
     id: "computing-sorting",
     name: "sorting",
+    aliases: [
+      "sort",
+      "quicksort",
+      "mergesort",
+      "bubble sort",
+      "insertion sort",
+    ],
     category: "Algorithms",
-    subcategory: "Core Concepts",
+    subcategory: "Sorting",
     importance: "core",
     description:
       "The process of arranging elements in a specific order (ascending or descending).",
@@ -74,17 +48,29 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
   {
     id: "computing-searching",
     name: "searching",
+    aliases: ["search", "binary search", "linear search"],
     category: "Algorithms",
-    subcategory: "Core Concepts",
+    subcategory: "Searching",
     importance: "core",
     description:
       "The process of finding a specific element within a collection of data.",
   },
   {
+    id: "computing-recursion",
+    name: "recursion",
+    aliases: ["recursive"],
+    category: "Algorithms",
+    subcategory: "Techniques",
+    importance: "core",
+    description:
+      "A technique where a function calls itself to solve smaller instances of the same problem.",
+  },
+  {
     id: "computing-traversal",
     name: "traversal",
+    aliases: ["traverse", "tree traversal", "graph traversal"],
     category: "Algorithms",
-    subcategory: "Core Concepts",
+    subcategory: "Techniques",
     importance: "core",
     description:
       "The process of visiting all nodes in a data structure in a systematic way.",
@@ -92,8 +78,9 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
   {
     id: "computing-time-complexity",
     name: "time complexity",
+    aliases: ["runtime", "computational complexity"],
     category: "Complexity Analysis",
-    subcategory: "Core Concepts",
+    subcategory: "Analysis",
     importance: "core",
     description:
       "A measure of the amount of time an algorithm takes to complete as a function of input size.",
@@ -101,8 +88,9 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
   {
     id: "computing-space-complexity",
     name: "space complexity",
+    aliases: ["memory complexity"],
     category: "Complexity Analysis",
-    subcategory: "Core Concepts",
+    subcategory: "Analysis",
     importance: "core",
     description:
       "A measure of the amount of memory an algorithm uses as a function of input size.",
@@ -110,61 +98,116 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
   {
     id: "computing-big-o-notation",
     name: "big O notation",
+    aliases: ["Big-O", "asymptotic notation"],
     category: "Complexity Analysis",
-    subcategory: "Core Concepts",
+    subcategory: "Analysis",
     importance: "core",
     description:
       "A mathematical notation that describes the upper bound of an algorithm's growth rate.",
   },
   {
-    id: "computing-hot-code",
-    name: "hot code",
-    category: "Performance Optimization",
-    subcategory: "Runtime Behavior",
-    importance: "supporting",
-    description:
-      "A high-frequency execution path or code region that dominates runtime costs and therefore benefits most from profiling and optimization efforts.",
-  },
-  {
-    id: "computing-class",
-    name: "class",
-    category: "Object-Oriented Programming",
-    subcategory: "Core Concepts",
+    id: "computing-linked-list",
+    name: "linked list",
+    aliases: ["linked lists", "singly linked list", "doubly linked list"],
+    category: "Data Structures",
+    subcategory: "Linear",
     importance: "core",
     description:
-      "A blueprint or template for creating objects that defines properties and methods.",
+      "A linear data structure where elements are stored in nodes, each pointing to the next node.",
   },
   {
-    id: "computing-object",
-    name: "object",
-    category: "Object-Oriented Programming",
-    subcategory: "Core Concepts",
-    importance: "core",
-    description: "A specific instance of a class containing data and methods.",
-  },
-  {
-    id: "computing-inheritance",
-    name: "inheritance",
-    category: "Object-Oriented Programming",
-    subcategory: "Core Concepts",
+    id: "computing-stack",
+    name: "stack",
+    aliases: ["stacks", "LIFO"],
+    category: "Data Structures",
+    subcategory: "Linear",
     importance: "core",
     description:
-      "A mechanism where one class acquires properties and methods from another class.",
+      "A last-in-first-out (LIFO) data structure where elements are added and removed from the same end.",
+  },
+  {
+    id: "computing-queue",
+    name: "queue",
+    aliases: ["queues", "FIFO"],
+    category: "Data Structures",
+    subcategory: "Linear",
+    importance: "core",
+    description:
+      "A first-in-first-out (FIFO) data structure where elements are added at one end and removed from the other.",
+  },
+  {
+    id: "computing-tree",
+    name: "tree",
+    aliases: ["trees", "binary tree", "tree structure"],
+    category: "Data Structures",
+    subcategory: "Hierarchical",
+    importance: "core",
+    description:
+      "A hierarchical data structure consisting of nodes connected by edges, with a root node and child nodes.",
+  },
+  {
+    id: "computing-graph",
+    name: "graph",
+    aliases: ["graphs", "directed graph", "undirected graph"],
+    category: "Data Structures",
+    subcategory: "Nonlinear",
+    importance: "core",
+    description:
+      "A data structure consisting of vertices (nodes) connected by edges, used to represent networks.",
+  },
+  {
+    id: "computing-hash-table",
+    name: "hash table",
+    aliases: ["hash map", "hash tables"],
+    category: "Data Structures",
+    subcategory: "Associative",
+    importance: "core",
+    description:
+      "A data structure that maps keys to values using a hash function for fast lookup.",
+  },
+  {
+    id: "computing-heap",
+    name: "heap",
+    aliases: ["heaps", "min heap", "max heap", "priority queue"],
+    category: "Data Structures",
+    subcategory: "Tree-based",
+    importance: "core",
+    description:
+      "A specialized tree-based data structure that satisfies the heap property.",
+  },
+  {
+    id: "computing-object-oriented",
+    name: "object-oriented programming",
+    aliases: ["OOP", "object oriented"],
+    category: "Programming Paradigms",
+    subcategory: "Paradigms",
+    importance: "core",
+    description:
+      "A programming paradigm based on the concept of objects that contain data and code.",
   },
   {
     id: "computing-encapsulation",
     name: "encapsulation",
-    category: "Object-Oriented Programming",
-    subcategory: "Core Concepts",
+    category: "Programming Paradigms",
+    subcategory: "OOP Principles",
     importance: "core",
     description:
       "The bundling of data and methods that operate on that data within a single unit, hiding internal details.",
   },
   {
+    id: "computing-inheritance",
+    name: "inheritance",
+    category: "Programming Paradigms",
+    subcategory: "OOP Principles",
+    importance: "core",
+    description:
+      "A mechanism where one class acquires properties and methods from another class.",
+  },
+  {
     id: "computing-polymorphism",
     name: "polymorphism",
-    category: "Object-Oriented Programming",
-    subcategory: "Core Concepts",
+    category: "Programming Paradigms",
+    subcategory: "OOP Principles",
     importance: "core",
     description:
       "The ability of objects to take multiple forms or respond differently to the same method call.",
@@ -172,160 +215,98 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
   {
     id: "computing-abstraction",
     name: "abstraction",
-    category: "Object-Oriented Programming",
-    subcategory: "Core Concepts",
+    category: "Programming Paradigms",
+    subcategory: "OOP Principles",
     importance: "core",
     description:
       "The process of hiding complex implementation details and showing only essential features.",
   },
   {
-    id: "computing-debugging",
-    name: "debugging",
-    category: "Software Engineering",
-    subcategory: "Core Concepts",
+    id: "computing-functional-programming",
+    name: "functional programming",
+    aliases: ["functional", "FP"],
+    category: "Programming Paradigms",
+    subcategory: "Paradigms",
     importance: "core",
     description:
-      "The process of finding and fixing errors or bugs in software code.",
-  },
-  {
-    id: "computing-testing",
-    name: "testing",
-    category: "Software Engineering",
-    subcategory: "Core Concepts",
-    importance: "core",
-    description:
-      "The process of evaluating software to ensure it works correctly and meets requirements.",
-  },
-  {
-    id: "computing-version-control",
-    name: "version control",
-    category: "Software Engineering",
-    subcategory: "Core Concepts",
-    importance: "core",
-    description:
-      "A system for tracking changes to code over time and managing collaboration.",
+      "A programming paradigm that treats computation as the evaluation of mathematical functions.",
   },
   {
     id: "computing-database",
     name: "database",
+    aliases: ["databases", "DB", "DBMS"],
     category: "Databases",
-    subcategory: "Core Concepts",
+    subcategory: "Fundamentals",
     importance: "core",
     description:
       "An organized collection of structured data stored electronically.",
   },
   {
-    id: "computing-sql",
-    name: "SQL",
+    id: "computing-relational-database",
+    name: "relational database",
+    aliases: ["RDBMS", "SQL database"],
     category: "Databases",
-    subcategory: "Core Concepts",
+    subcategory: "Types",
     importance: "core",
     description:
-      "A standard language for managing and manipulating relational databases.",
+      "A database that organizes data into tables with rows and columns, using relationships between tables.",
   },
   {
-    id: "computing-table",
-    name: "table",
+    id: "computing-nosql",
+    name: "NoSQL",
+    aliases: ["NoSQL database", "non-relational database"],
     category: "Databases",
-    subcategory: "Core Concepts",
+    subcategory: "Types",
     importance: "core",
     description:
-      "A collection of related data organized in rows and columns in a relational database.",
+      "A database that provides a mechanism for storage and retrieval of data modeled in ways other than tabular relations.",
   },
   {
-    id: "computing-primary-key",
-    name: "primary key",
+    id: "computing-normalization",
+    name: "normalization",
+    aliases: ["database normalization"],
     category: "Databases",
-    subcategory: "Core Concepts",
+    subcategory: "Design",
     importance: "core",
-    description: "A unique identifier for each record in a database table.",
+    description:
+      "The process of organizing database tables to minimize redundancy and dependency.",
   },
   {
-    id: "computing-foreign-key",
-    name: "foreign key",
+    id: "computing-index",
+    name: "index",
+    aliases: ["database index", "indexing"],
     category: "Databases",
-    subcategory: "Core Concepts",
+    subcategory: "Optimization",
     importance: "core",
     description:
-      "A field in one table that references the primary key in another table, establishing relationships.",
+      "A database structure that improves the speed of data retrieval operations.",
   },
   {
-    id: "computing-html",
-    name: "HTML",
-    category: "Web Development",
-    subcategory: "Core Concepts",
+    id: "computing-transaction",
+    name: "transaction",
+    aliases: ["database transaction", "ACID"],
+    category: "Databases",
+    subcategory: "Operations",
     importance: "core",
     description:
-      "The standard markup language for creating web pages and web applications.",
+      "A unit of work performed against a database that must be completed entirely or not at all.",
   },
   {
-    id: "computing-css",
-    name: "CSS",
-    category: "Web Development",
-    subcategory: "Core Concepts",
+    id: "computing-operating-system",
+    name: "operating system",
+    aliases: ["OS", "operating systems"],
+    category: "Operating Systems",
+    subcategory: "Fundamentals",
     importance: "core",
     description:
-      "A language used to describe the presentation and styling of HTML documents.",
-  },
-  {
-    id: "computing-javascript",
-    name: "JavaScript",
-    category: "Web Development",
-    subcategory: "Core Concepts",
-    importance: "core",
-    description:
-      "A programming language that enables interactive web pages and dynamic content.",
-  },
-  {
-    id: "computing-http",
-    name: "HTTP",
-    category: "Web Development",
-    subcategory: "Core Concepts",
-    importance: "core",
-    description:
-      "The protocol used for transmitting data over the web between clients and servers.",
-  },
-  {
-    id: "computing-api",
-    name: "API",
-    category: "Web Development",
-    subcategory: "Core Concepts",
-    importance: "core",
-    description:
-      "A set of rules and protocols that allows different software applications to communicate.",
-  },
-  {
-    id: "computing-network",
-    name: "network",
-    category: "Networking",
-    subcategory: "Core Concepts",
-    importance: "core",
-    description:
-      "A system of interconnected computers that can share resources and communicate with each other.",
-  },
-  {
-    id: "computing-protocol",
-    name: "protocol",
-    category: "Networking",
-    subcategory: "Core Concepts",
-    importance: "core",
-    description:
-      "A set of rules governing data communication between devices on a network.",
-  },
-  {
-    id: "computing-ip-address",
-    name: "IP address",
-    category: "Networking",
-    subcategory: "Core Concepts",
-    importance: "core",
-    description:
-      "A unique numerical identifier assigned to each device connected to a network.",
+      "System software that manages computer hardware and software resources and provides services for programs.",
   },
   {
     id: "computing-process",
     name: "process",
+    aliases: ["processes"],
     category: "Operating Systems",
-    subcategory: "Core Concepts",
+    subcategory: "Process Management",
     importance: "core",
     description:
       "An instance of a running program with its own memory space and system resources.",
@@ -333,8 +314,9 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
   {
     id: "computing-thread",
     name: "thread",
+    aliases: ["threads", "multithreading"],
     category: "Operating Systems",
-    subcategory: "Core Concepts",
+    subcategory: "Concurrency",
     importance: "core",
     description:
       "The smallest unit of execution within a process that can be scheduled by the operating system.",
@@ -342,8 +324,9 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
   {
     id: "computing-memory-management",
     name: "memory management",
+    aliases: ["virtual memory", "paging"],
     category: "Operating Systems",
-    subcategory: "Core Concepts",
+    subcategory: "Resource Management",
     importance: "core",
     description:
       "The process of controlling and coordinating computer memory, allocating and deallocating memory blocks.",
@@ -351,17 +334,58 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
   {
     id: "computing-file-system",
     name: "file system",
+    aliases: ["filesystem"],
     category: "Operating Systems",
-    subcategory: "Core Concepts",
+    subcategory: "Storage",
     importance: "core",
     description:
       "A method for storing and organizing files on storage devices.",
   },
   {
+    id: "computing-network",
+    name: "network",
+    aliases: ["networking", "computer network"],
+    category: "Networks",
+    subcategory: "Fundamentals",
+    importance: "core",
+    description:
+      "A system of interconnected computers that can share resources and communicate with each other.",
+  },
+  {
+    id: "computing-protocol",
+    name: "protocol",
+    aliases: ["network protocol", "communication protocol"],
+    category: "Networks",
+    subcategory: "Communication",
+    importance: "core",
+    description:
+      "A set of rules governing data communication between devices on a network.",
+  },
+  {
+    id: "computing-tcp-ip",
+    name: "TCP/IP",
+    aliases: ["TCP", "IP", "internet protocol"],
+    category: "Networks",
+    subcategory: "Protocols",
+    importance: "core",
+    description: "The fundamental communication protocols of the internet.",
+  },
+  {
+    id: "computing-client-server",
+    name: "client-server",
+    aliases: ["client server model"],
+    category: "Networks",
+    subcategory: "Architecture",
+    importance: "core",
+    description:
+      "A distributed application structure that partitions tasks between service providers (servers) and requesters (clients).",
+  },
+  {
     id: "computing-encryption",
     name: "encryption",
+    aliases: ["cryptography", "cipher"],
     category: "Security",
-    subcategory: "Core Concepts",
+    subcategory: "Cryptography",
     importance: "core",
     description:
       "The process of encoding information so only authorized parties can access it.",
@@ -370,7 +394,7 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     id: "computing-authentication",
     name: "authentication",
     category: "Security",
-    subcategory: "Core Concepts",
+    subcategory: "Access Control",
     importance: "core",
     description: "The process of verifying the identity of a user or system.",
   },
@@ -378,7 +402,7 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
     id: "computing-authorization",
     name: "authorization",
     category: "Security",
-    subcategory: "Core Concepts",
+    subcategory: "Access Control",
     importance: "core",
     description:
       "The process of determining what resources an authenticated user is allowed to access.",
@@ -386,8 +410,9 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
   {
     id: "computing-compiler",
     name: "compiler",
+    aliases: ["compilation"],
     category: "Language Processing",
-    subcategory: "Core Concepts",
+    subcategory: "Translators",
     importance: "core",
     description:
       "A program that translates source code written in a high-level language into machine code.",
@@ -395,209 +420,111 @@ const CORE_CONCEPTS: ConceptDefinition[] = [
   {
     id: "computing-interpreter",
     name: "interpreter",
+    aliases: ["interpretation"],
     category: "Language Processing",
-    subcategory: "Core Concepts",
+    subcategory: "Translators",
     importance: "core",
     description:
       "A program that executes code line-by-line without compiling it into machine code first.",
   },
   {
-    id: "computing-rest",
-    name: "REST",
-    category: "Web Development",
-    subcategory: "API Design",
+    id: "computing-machine-learning",
+    name: "machine learning",
+    aliases: ["ML", "artificial intelligence", "AI"],
+    category: "Artificial Intelligence",
+    subcategory: "Fundamentals",
     importance: "core",
     description:
-      "An architectural style for designing networked applications using stateless HTTP requests and standard methods.",
+      "A field of study that gives computers the ability to learn without being explicitly programmed.",
   },
   {
-    id: "computing-endpoint",
-    name: "endpoint",
-    category: "Web Development",
-    subcategory: "API Design",
+    id: "computing-neural-network",
+    name: "neural network",
+    aliases: ["neural networks", "deep learning"],
+    category: "Artificial Intelligence",
+    subcategory: "Machine Learning",
     importance: "core",
     description:
-      "A specific URL or URI where an API can be accessed and performs a specific function.",
+      "A computing system inspired by biological neural networks that learns to perform tasks by considering examples.",
   },
   {
-    id: "computing-json",
-    name: "JSON",
-    category: "Web Development",
-    subcategory: "Data Formats",
-    importance: "core",
-    description:
-      "A lightweight data-interchange format that is easy for humans to read and write and for machines to parse and generate.",
-  },
-  {
-    id: "computing-http-methods",
-    name: "HTTP methods",
-    category: "Web Development",
-    subcategory: "API Design",
-    importance: "core",
-    description:
-      "Standard request methods used in HTTP to indicate the desired action to be performed on a resource.",
-  },
-  {
-    id: "computing-asynchronous-programming",
-    name: "asynchronous programming",
+    id: "computing-concurrent-programming",
+    name: "concurrent programming",
+    aliases: ["concurrency", "parallel programming"],
     category: "Programming Paradigms",
     subcategory: "Concurrency",
     importance: "core",
     description:
-      "A programming paradigm that allows operations to run independently without blocking the execution of other code.",
+      "Programming where multiple computations are executed during overlapping time periods.",
   },
   {
-    id: "computing-promise",
-    name: "promise",
-    category: "Programming Paradigms",
-    subcategory: "Asynchronous",
+    id: "computing-distributed-systems",
+    name: "distributed systems",
+    aliases: ["distributed computing"],
+    category: "Systems",
+    subcategory: "Architecture",
     importance: "core",
     description:
-      "An object representing the eventual completion or failure of an asynchronous operation and its resulting value.",
+      "A system whose components are located on different networked computers that communicate and coordinate their actions.",
   },
   {
-    id: "computing-async-await",
-    name: "async/await",
-    category: "Programming Paradigms",
-    subcategory: "Asynchronous",
+    id: "computing-cloud-computing",
+    name: "cloud computing",
+    aliases: ["cloud", "cloud services"],
+    category: "Systems",
+    subcategory: "Infrastructure",
     importance: "core",
     description:
-      "Modern syntax for handling asynchronous operations that makes asynchronous code look and behave more like synchronous code.",
+      "The delivery of computing services over the internet including servers, storage, databases, and software.",
   },
   {
-    id: "computing-lambda",
-    name: "lambda",
-    category: "Programming Paradigms",
-    subcategory: "Functional Programming",
-    importance: "core",
-    description:
-      "An anonymous function defined without a name, often used for short, throwaway functions passed as arguments.",
-  },
-  {
-    id: "computing-unit-test",
-    name: "unit test",
+    id: "computing-version-control",
+    name: "version control",
+    aliases: ["source control", "revision control"],
     category: "Software Engineering",
-    subcategory: "Testing",
+    subcategory: "Tools",
     importance: "core",
     description:
-      "A type of testing that validates individual units or components of software in isolation.",
+      "A system for tracking changes to code over time and managing collaboration.",
   },
   {
-    id: "computing-git",
-    name: "git",
-    category: "Software Engineering",
-    subcategory: "Development Tools",
-    importance: "core",
-    description:
-      "A distributed version control system for tracking changes in source code during software development.",
-  },
-  {
-    id: "computing-repository",
-    name: "repository",
-    category: "Software Engineering",
-    subcategory: "Development Tools",
-    importance: "core",
-    description:
-      "A central location where code and related files are stored and managed, typically using version control.",
-  },
-  {
-    id: "computing-commit",
-    name: "commit",
-    category: "Software Engineering",
-    subcategory: "Version Control",
-    importance: "core",
-    description:
-      "A snapshot of changes to a repository, recording what was changed and why.",
-  },
-  {
-    id: "computing-package-manager",
-    name: "package manager",
-    category: "Software Engineering",
-    subcategory: "Development Tools",
-    importance: "core",
-    description:
-      "A tool that automates the process of installing, upgrading, configuring, and removing software packages.",
-  },
-  {
-    id: "computing-dependency",
-    name: "dependency",
-    category: "Software Engineering",
-    subcategory: "Package Management",
-    importance: "core",
-    description:
-      "An external library or package that a project requires to function properly.",
-  },
-  {
-    id: "computing-framework",
-    name: "framework",
-    category: "Software Engineering",
-    subcategory: "Core Concepts",
-    importance: "core",
-    description:
-      "A platform providing a foundation and structure for developing software applications, with predefined components and patterns.",
-  },
-  {
-    id: "computing-deployment",
-    name: "deployment",
-    category: "Software Engineering",
-    subcategory: "DevOps",
-    importance: "core",
-    description:
-      "The process of making software available for use, typically by transferring it to a production environment.",
-  },
-  {
-    id: "computing-interface",
-    name: "interface",
-    category: "Object-Oriented Programming",
-    subcategory: "Abstraction",
-    importance: "core",
-    description:
-      "A contract that defines a set of methods and properties that a class must implement, without specifying how.",
-  },
-  {
-    id: "computing-exception-handling",
-    name: "exception handling",
-    category: "Programming Fundamentals",
-    subcategory: "Error Handling",
-    importance: "core",
-    description:
-      "A mechanism for handling runtime errors and exceptional conditions in a controlled manner.",
-  },
-  {
-    id: "computing-agile-methodology",
-    name: "agile methodology",
+    id: "computing-agile",
+    name: "agile",
+    aliases: ["agile methodology", "scrum", "sprint"],
     category: "Software Engineering",
     subcategory: "Methodologies",
     importance: "core",
     description:
-      "An iterative approach to software development that prioritizes customer collaboration, adaptability, and incremental delivery.",
+      "An iterative approach to software development that prioritizes customer collaboration and adaptability.",
   },
   {
-    id: "computing-continuous-integration",
-    name: "continuous integration",
+    id: "computing-design-pattern",
+    name: "design pattern",
+    aliases: ["design patterns", "software pattern"],
     category: "Software Engineering",
-    subcategory: "Automation",
+    subcategory: "Design",
     importance: "core",
     description:
-      "A practice where developers merge code changes frequently and automated builds verify correctness.",
+      "A reusable solution to a commonly occurring problem in software design.",
   },
   {
-    id: "computing-extract-transform-load",
-    name: "extract transform load",
-    category: "Data Engineering",
-    subcategory: "Pipelines",
+    id: "computing-refactoring",
+    name: "refactoring",
+    aliases: ["code refactoring"],
+    category: "Software Engineering",
+    subcategory: "Maintenance",
     importance: "core",
     description:
-      "A process that moves data from source systems into a centralized store through extraction, transformation, and loading.",
+      "The process of restructuring existing code without changing its external behavior.",
   },
   {
-    id: "computing-accessibility-compliance",
-    name: "accessibility compliance",
-    category: "Human-Computer Interaction",
-    subcategory: "Inclusive Design",
+    id: "computing-technical-debt",
+    name: "technical debt",
+    category: "Software Engineering",
+    subcategory: "Management",
     importance: "core",
     description:
-      "Adhering to standards that ensure software is usable by people with diverse abilities.",
+      "The implied cost of additional rework caused by choosing an easy solution now instead of a better approach.",
   },
 ];
 

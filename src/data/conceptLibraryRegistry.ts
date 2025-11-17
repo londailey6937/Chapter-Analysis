@@ -16,6 +16,7 @@ import { ALGEBRA_TRIG_CONCEPTS } from "./algebraTrigConceptLibrary";
 import { financeConceptLibrary } from "./financeConceptLibrary";
 import { COMPUTING_CONCEPTS } from "./computingConceptLibrary";
 import { REACT_CONCEPTS } from "./reactConceptLibrary";
+import { JAVASCRIPT_CONCEPTS } from "./javascriptConceptLibrary";
 
 // Re-export types for convenience
 export type {
@@ -1212,6 +1213,7 @@ const RAW_CONCEPT_LIBRARIES: Record<Domain, ConceptLibrary> = {
   },
   computing: COMPUTING_CONCEPTS,
   react: REACT_CONCEPTS,
+  javascript: JAVASCRIPT_CONCEPTS,
   mathematics: ALGEBRA_TRIG_CONCEPTS,
   custom: {
     domain: "custom",

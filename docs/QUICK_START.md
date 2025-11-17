@@ -1,12 +1,12 @@
-# Chapter Checker - Quick Start Guide
+# Tome IQ - Quick Start Guide
 
-Get your Chapter Checker running in 10 minutes!
+Get your Tome IQ running in 10 minutes!
 
 ## Document Size Support
 
 **Designed for True "Tome" Analysis**
 
-The Chapter Checker can handle large academic documents:
+Tome IQ can handle large academic documents:
 
 - **Tested up to 200 MB** - Approximately 800-1,200 pages
 - A typical **500-page academic textbook** with moderate images is usually 50-80 MB
@@ -530,7 +530,7 @@ describe("DeepProcessingEvaluator", () => {
 
 1. ✅ Clone/copy the files
 2. ✅ Install recharts
-3. ✅ Import ChapterChecker into your app
+3. ✅ Import Tome IQ into your app
 4. ✅ Users can start analyzing!
 
 For advanced usage, see the [full README](./README.md).

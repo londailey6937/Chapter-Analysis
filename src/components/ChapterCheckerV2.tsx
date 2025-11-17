@@ -470,6 +470,10 @@ export const ChapterCheckerV2: React.FC = () => {
 
   // Detect document domain based on keywords from concept libraries
   const detectDomain = (text: string): Domain | null => {
+    console.log("🔍 Starting domain detection...");
+    console.log(`  Text length: ${text.length} characters`);
+    console.log(`  First 200 chars: ${text.substring(0, 200)}...`);
+
     const lowerText = text.toLowerCase();
     const scores: Record<string, number> = {};
     const uniqueConceptMatches: Record<string, Set<string>> = {};
@@ -477,6 +481,11 @@ export const ChapterCheckerV2: React.FC = () => {
     // Get available domains (excluding custom and cross-domain)
     const domains = getAvailableDomains().filter(
       (d) => d.id !== "custom" && d.id !== "cross-domain"
+    );
+
+    console.log(
+      `  Checking ${domains.length} domains:`,
+      domains.map((d) => d.id).join(", ")
     );
 
     // Score each domain based on concept matches from their libraries
@@ -491,10 +500,15 @@ export const ChapterCheckerV2: React.FC = () => {
       for (const concept of library.concepts) {
         let conceptMatched = false;
 
-        // Check main concept name (require at least 4 characters to avoid short common words)
+        // Check main concept name (require at least 3 characters for programming languages)
         const conceptName = concept.name.toLowerCase();
-        if (conceptName.length >= 4) {
-          const regex = new RegExp(`\\b${conceptName}\\b`, "gi");
+        if (conceptName.length >= 3) {
+          // Escape special regex characters in concept name
+          const escapedName = conceptName.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&"
+          );
+          const regex = new RegExp(`\\b${escapedName}\\b`, "gi");
           const matches = lowerText.match(regex);
           if (matches) {
             // All concepts are core, equal weighting
@@ -504,14 +518,14 @@ export const ChapterCheckerV2: React.FC = () => {
           }
         }
 
-        // Check aliases (also require 4+ characters)
+        // Check aliases (also require 3+ characters)
         if (concept.aliases) {
           for (const alias of concept.aliases) {
-            if (alias.length >= 4) {
-              const aliasRegex = new RegExp(
-                `\\b${alias.toLowerCase()}\\b`,
-                "gi"
-              );
+            if (alias.length >= 3) {
+              const escapedAlias = alias
+                .toLowerCase()
+                .replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+              const aliasRegex = new RegExp(`\\b${escapedAlias}\\b`, "gi");
               const aliasMatches = lowerText.match(aliasRegex);
               if (aliasMatches) {
                 score += aliasMatches.length;
@@ -528,30 +542,69 @@ export const ChapterCheckerV2: React.FC = () => {
       }
 
       scores[domain.id] = score;
+
+      // Log the matches for this domain
+      if (score > 0) {
+        console.log(
+          `  ${domain.id}: score=${score}, matched concepts:`,
+          Array.from(uniqueConceptMatches[domain.id]).slice(0, 10).join(", ") +
+            (uniqueConceptMatches[domain.id].size > 10 ? "..." : "")
+        );
+      }
     }
 
     // Find domain with highest score
     const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
     const topDomain = sortedScores[0];
 
-    // EXTREMELY strict requirements to prevent false positives:
-    // 1. At least 40 weighted matches (was 20, now doubled again)
-    // 2. At least 8 different unique concepts matched (was 5, now 8)
-    // 3. Score must be 3x higher than second-place domain
-    // This prevents meditation/philosophy docs from matching Physics
+    // Log detection details for debugging
+    console.log("🔍 Domain Detection Analysis:");
+    console.log(
+      "  Top 3 scores:",
+      sortedScores
+        .slice(0, 3)
+        .map(
+          ([domain, score]) =>
+            `${domain}: ${score} (${
+              uniqueConceptMatches[domain]?.size || 0
+            } unique concepts)`
+        )
+    );
+
+    // Balanced requirements to catch real content while avoiding false positives:
+    // 1. At least 20 weighted matches (lowered from 40 for better sensitivity)
+    // 2. At least 5 different unique concepts matched (lowered from 8)
+    // 3. Score must be 1.3x higher than second-place domain (lowered for overlapping domains)
     const secondPlace = sortedScores[1];
     const hasSignificantLead =
-      !secondPlace || topDomain[1] >= secondPlace[1] * 3;
+      !secondPlace || topDomain[1] >= secondPlace[1] * 1.3;
+
+    const meetsThreshold = topDomain && topDomain[1] >= 20;
+    const hasEnoughConcepts = uniqueConceptMatches[topDomain?.[0]]?.size >= 5;
+
+    console.log(
+      "  Meets threshold (≥20):",
+      meetsThreshold,
+      `(score: ${topDomain?.[1] || 0})`
+    );
+    console.log(
+      "  Has enough concepts (≥5):",
+      hasEnoughConcepts,
+      `(count: ${uniqueConceptMatches[topDomain?.[0]]?.size || 0})`
+    );
+    console.log("  Has significant lead (1.3x):", hasSignificantLead);
 
     if (
       topDomain &&
-      topDomain[1] >= 40 &&
-      uniqueConceptMatches[topDomain[0]]?.size >= 8 &&
+      meetsThreshold &&
+      hasEnoughConcepts &&
       hasSignificantLead
     ) {
+      console.log(`  ✅ Detected: ${topDomain[0]}`);
       return topDomain[0] as Domain;
     }
 
+    console.log("  ❌ No domain detected (thresholds not met)");
     return null;
   };
 
@@ -777,20 +830,22 @@ export const ChapterCheckerV2: React.FC = () => {
     });
 
     const detected = detectDomain(normalizedPlainText);
+    console.log(`🔍 Domain detection result: ${detected || "none"}`);
     setDetectedDomain(detected);
     setSelectedDomain(detected);
   };
 
   const handleTextChange = (newText: string) => {
     setChapterText(newText);
+    // Don't clear HTML content when text changes in plain text mode
+    // This preserves images and formatting from original document
     setChapterData((prev) =>
       prev
         ? {
             ...prev,
             plainText: newText,
-            editorHtml: undefined,
-            isHybridDocx: false,
             html: prev.html ?? newText,
+            // Keep editorHtml, isHybridDocx, and imageCount if they exist
           }
         : {
             html: newText,
@@ -1481,7 +1536,7 @@ export const ChapterCheckerV2: React.FC = () => {
                     lineHeight: "1.2",
                   }}
                 >
-                  Tome
+                  Tome{" "}
                   <span style={{ fontStyle: "italic", fontWeight: "700" }}>
                     IQ
                   </span>

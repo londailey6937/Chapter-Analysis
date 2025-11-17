@@ -460,6 +460,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
               suggestionsByParagraph={suggestionsByParagraph}
               containerRef={previewRef}
               onScroll={handlePreviewScroll}
+              htmlContent={htmlContent}
             />
           </div>
         )}
@@ -605,6 +606,7 @@ type ReadOnlyViewProps = {
   suggestionsByParagraph: Map<number, VisualSuggestion[]>;
   containerRef?: React.RefObject<HTMLDivElement>;
   onScroll?: () => void;
+  htmlContent?: string | null;
 };
 
 const ReadOnlyView: React.FC<ReadOnlyViewProps> = ({
@@ -616,8 +618,30 @@ const ReadOnlyView: React.FC<ReadOnlyViewProps> = ({
   suggestionsByParagraph,
   containerRef,
   onScroll,
+  htmlContent,
 }) => {
   let highlightAnchorAssigned = false;
+
+  // If HTML content with images is available, render it directly
+  if (htmlContent && htmlContent.includes("<img")) {
+    return (
+      <div
+        ref={containerRef}
+        onScroll={onScroll}
+        style={{
+          flex: 1,
+          overflowY: "auto",
+          padding: "12px",
+          border: "1px solid #e5e7eb",
+          borderRadius: "8px",
+          backgroundColor: "white",
+          lineHeight: 1.6,
+          fontSize: "14px",
+        }}
+        dangerouslySetInnerHTML={{ __html: htmlContent }}
+      />
+    );
+  }
 
   return (
     <div

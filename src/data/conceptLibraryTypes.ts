@@ -32,6 +32,7 @@ export type Domain =
   | "biology"
   | "computing"
   | "react"
+  | "javascript"
   | "mathematics"
   | "finance"
   | "custom"
@@ -77,6 +78,13 @@ export const AVAILABLE_DOMAINS: DomainInfo[] = [
     description:
       "React.js concepts (components, hooks, JSX, state, props, etc.)",
     icon: "⚛️",
+  },
+  {
+    id: "javascript",
+    label: "JavaScript",
+    description:
+      "JavaScript concepts (closures, promises, async/await, DOM, etc.)",
+    icon: "🟨",
   },
   {
     id: "custom",

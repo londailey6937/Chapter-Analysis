@@ -98,7 +98,7 @@ export function NavigationMenu({
                   fontWeight: "bold",
                 }}
               >
-                Tome
+                Tome{" "}
                 <span style={{ fontStyle: "italic", fontWeight: "700" }}>
                   IQ
                 </span>
@@ -581,7 +581,7 @@ export function NavigationMenu({
             desc="Learn about our mission and team"
             onClick={() => {
               alert(
-                "About: TomeIQ is an AI-powered tool that helps educators create better learning materials using evidence-based cognitive science principles."
+                "About: Tome IQ is an AI-powered tool that helps educators create better learning materials using evidence-based cognitive science principles."
               );
             }}
           />
@@ -630,7 +630,7 @@ export function NavigationMenu({
             desc="Guides, tutorials, and research"
             onClick={() => {
               alert(
-                "Resources:\n\n📖 User Guide: Built into the app\n🎥 Video Tutorials: Coming soon\n📊 Case Studies: See how educators use TomeIQ\n🔬 Research: Based on peer-reviewed cognitive science\n📝 Blog: Tips for better educational content\n🎓 Webinars: Monthly learning science workshops"
+                "Resources:\n\n📖 User Guide: Built into the app\n🎥 Video Tutorials: Coming soon\n📊 Case Studies: See how educators use Tome IQ\n🔬 Research: Based on peer-reviewed cognitive science\n📝 Blog: Tips for better educational content\n🎓 Webinars: Monthly learning science workshops"
               );
             }}
           />
@@ -642,7 +642,7 @@ export function NavigationMenu({
             desc="Share your ideas and suggestions"
             onClick={() => {
               alert(
-                "We'd love to hear from you!\n\n💡 Feature Requests: What would make TomeIQ better?\n🐛 Bug Reports: Found an issue? Let us know\n⭐ Testimonials: Share your success story\n\n📧 Send feedback to: feedback@tomeiq.ai"
+                "We'd love to hear from you!\n\n💡 Feature Requests: What would make Tome IQ better?\n🐛 Bug Reports: Found an issue? Let us know\n⭐ Testimonials: Share your success story\n\n📧 Send feedback to: feedback@tomeiq.ai"
               );
             }}
           />
