@@ -768,6 +768,10 @@ export const ChapterCheckerV2: React.FC = () => {
     }
 
     setScrollToTopSignal(Date.now());
+
+    // Hide the prev/next concept navigation dialog
+    setHighlightedConceptId(null);
+    setCurrentMentionIndex(0);
   };
 
   const shouldShowBackToTop = windowScrolled || contentScrolled;
@@ -1677,131 +1681,240 @@ export const ChapterCheckerV2: React.FC = () => {
                 style={{
                   display: "flex",
                   gap: "12px",
-                  alignItems: "center",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
                   flexWrap: "wrap",
                 }}
               >
-                <DocumentUploader
-                  onDocumentLoad={handleDocumentLoad}
-                  disabled={isAnalyzing}
-                />
+                {/* Left: Upload button and action buttons */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
+                  }}
+                >
+                  <DocumentUploader
+                    onDocumentLoad={handleDocumentLoad}
+                    disabled={isAnalyzing}
+                  />
 
+                  {/* Action buttons below upload */}
+                  {chapterData && !isAnalyzing && (
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "12px",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <button
+                        onClick={handleClear}
+                        style={{
+                          padding: "10px 18px",
+                          backgroundColor: "#f5ead9",
+                          color: "#2c3e50",
+                          border: "1.5px solid #e0c392",
+                          borderRadius: "12px",
+                          cursor: "pointer",
+                          fontSize: "13px",
+                          fontWeight: "600",
+                          textAlign: "center",
+                        }}
+                      >
+                        🗑️ Clear
+                      </button>
+
+                      <button
+                        onClick={handleExportDocx}
+                        style={{
+                          padding: "10px 18px",
+                          backgroundColor: "#f5ead9",
+                          color: "#2c3e50",
+                          border: "1.5px solid #e0c392",
+                          borderRadius: "12px",
+                          cursor: "pointer",
+                          fontSize: "13px",
+                          fontWeight: "600",
+                          textAlign: "center",
+                        }}
+                      >
+                        📥 Export DOCX
+                      </button>
+
+                      <button
+                        onClick={handleExportHtml}
+                        style={{
+                          padding: "10px 18px",
+                          backgroundColor: "#f5ead9",
+                          color: "#2c3e50",
+                          border: "1.5px solid #e0c392",
+                          borderRadius: "12px",
+                          cursor: "pointer",
+                          fontSize: "13px",
+                          fontWeight: "600",
+                          textAlign: "center",
+                        }}
+                        title="Export as styled HTML document"
+                      >
+                        🌐 Export HTML
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          try {
+                            const autosaved =
+                              localStorage.getItem("tomeiq_autosave");
+                            if (autosaved) {
+                              const saved = JSON.parse(autosaved);
+                              const savedTime = new Date(
+                                saved.timestamp
+                              ).toLocaleString();
+                              const clear = window.confirm(
+                                `💾 Auto-save Status\n\nLast saved: ${savedTime}\nFile: ${saved.fileName}\n\nClick OK to clear auto-saved data, or Cancel to keep it.`
+                              );
+                              if (clear) {
+                                localStorage.removeItem("tomeiq_autosave");
+                                alert("🗑️ Auto-saved data cleared!");
+                              }
+                            } else {
+                              alert(
+                                "ℹ️ No auto-saved data found.\n\nYour work is automatically saved as you edit in Writer Mode."
+                              );
+                            }
+                          } catch (error) {
+                            alert("⚠️ Error checking auto-save status");
+                          }
+                        }}
+                        style={{
+                          padding: "10px 18px",
+                          backgroundColor: "#f5ead9",
+                          color: "#2c3e50",
+                          border: "1.5px solid #e0c392",
+                          borderRadius: "12px",
+                          cursor: "pointer",
+                          fontSize: "13px",
+                          fontWeight: "600",
+                          textAlign: "center",
+                        }}
+                        title="Check auto-save status"
+                      >
+                        💾 Auto-save info
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Right: Document info */}
                 {fileName && (
                   <div
                     style={{
-                      fontSize: "14px",
+                      fontSize: "13px",
                       color: "#2c3e50",
                       display: "flex",
                       flexDirection: "column",
-                      gap: "2px",
-                      minWidth: "180px",
+                      gap: "6px",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      textAlign: "center",
+                      minWidth: "240px",
+                      padding: "10px 18px",
+                      backgroundColor: "#f5ead9",
+                      borderRadius: "12px",
+                      border: "1.5px solid #e0c392",
                     }}
                   >
-                    <span>📄 {fileName}</span>
-                    <span
-                      style={{
-                        fontSize: "12px",
-                        color: "#2c3e50",
-                        fontWeight: 500,
-                      }}
-                    >
-                      {wordCount.toLocaleString()} words &middot;{" "}
-                      {charCount.toLocaleString()} characters
+                    <span style={{ fontWeight: "600", fontSize: "14px" }}>
+                      📄 {fileName}
                     </span>
-                  </div>
-                )}
-
-                {chapterData && !isAnalyzing && (
-                  <>
-                    <button
-                      onClick={handleClear}
+                    <div
                       style={{
-                        padding: "8px 16px",
-                        backgroundColor: "white",
-                        color: "#c16659",
-                        border: "1.5px solid #c16659",
-                        borderRadius: "20px",
-                        cursor: "pointer",
-                        fontSize: "14px",
+                        display: "flex",
+                        gap: "8px",
+                        fontSize: "12px",
+                        flexWrap: "wrap",
+                        justifyContent: "center",
                       }}
                     >
-                      🗑️ Clear
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        try {
-                          const autosaved =
-                            localStorage.getItem("tomeiq_autosave");
-                          if (autosaved) {
-                            const saved = JSON.parse(autosaved);
-                            const savedTime = new Date(
-                              saved.timestamp
-                            ).toLocaleString();
-                            const clear = window.confirm(
-                              `💾 Auto-save Status\n\nLast saved: ${savedTime}\nFile: ${saved.fileName}\n\nClick OK to clear auto-saved data, or Cancel to keep it.`
-                            );
-                            if (clear) {
-                              localStorage.removeItem("tomeiq_autosave");
-                              alert("🗑️ Auto-saved data cleared!");
-                            }
-                          } else {
-                            alert(
-                              "ℹ️ No auto-saved data found.\n\nYour work is automatically saved as you edit in Writer Mode."
-                            );
+                      <span style={{ fontWeight: 500 }}>
+                        {wordCount.toLocaleString()} words
+                      </span>
+                      <span style={{ color: "#9ca3af" }}>•</span>
+                      <span style={{ fontWeight: 500 }}>
+                        {charCount.toLocaleString()} chars
+                      </span>
+                      <span style={{ color: "#9ca3af" }}>•</span>
+                      <span style={{ fontWeight: 500 }}>
+                        {(() => {
+                          const totalMinutes = Math.ceil(wordCount / 200);
+                          const hours = Math.floor(totalMinutes / 60);
+                          const minutes = totalMinutes % 60;
+                          if (hours > 0) {
+                            return `~${hours}h ${minutes}m read`;
                           }
-                        } catch (error) {
-                          alert("⚠️ Error checking auto-save status");
-                        }
-                      }}
-                      style={{
-                        padding: "8px 16px",
-                        backgroundColor: "white",
-                        color: "#2c3e50",
-                        border: "1.5px solid #2c3e50",
-                        borderRadius: "20px",
-                        cursor: "pointer",
-                        fontSize: "14px",
-                        fontWeight: "600",
-                      }}
-                      title="Check auto-save status"
-                    >
-                      💾 Auto-save info
-                    </button>
-
-                    <button
-                      onClick={handleExportDocx}
-                      style={{
-                        padding: "8px 16px",
-                        backgroundColor: "white",
-                        color: "#e0c392",
-                        border: "1.5px solid #e0c392",
-                        borderRadius: "20px",
-                        cursor: "pointer",
-                        fontSize: "14px",
-                        fontWeight: "600",
-                      }}
-                    >
-                      📥 Export DOCX
-                    </button>
-
-                    <button
-                      onClick={handleExportHtml}
-                      style={{
-                        padding: "8px 16px",
-                        backgroundColor: "white",
-                        color: "#e0c392",
-                        border: "1.5px solid #e0c392",
-                        borderRadius: "20px",
-                        cursor: "pointer",
-                        fontSize: "14px",
-                        fontWeight: "600",
-                      }}
-                      title="Export as styled HTML document"
-                    >
-                      🌐 Export HTML
-                    </button>
-                  </>
+                          return `~${minutes}m read`;
+                        })()}
+                      </span>
+                    </div>
+                    {analysis && (
+                      <>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "8px",
+                            fontSize: "12px",
+                            flexWrap: "wrap",
+                            justifyContent: "center",
+                          }}
+                        >
+                          {selectedDomain && selectedDomain !== "none" && (
+                            <>
+                              <span
+                                style={{
+                                  fontWeight: 600,
+                                  color: "#ef8432",
+                                  textTransform: "capitalize",
+                                }}
+                              >
+                                {selectedDomain === "custom"
+                                  ? "Custom"
+                                  : selectedDomain}
+                              </span>
+                              <span style={{ color: "#9ca3af" }}>•</span>
+                            </>
+                          )}
+                          <span style={{ fontWeight: 500 }}>
+                            {analysis.conceptGraph?.concepts?.length || 0}{" "}
+                            concepts
+                          </span>
+                          <span style={{ color: "#9ca3af" }}>•</span>
+                          <span style={{ fontWeight: 500 }}>
+                            {(
+                              (analysis.conceptGraph?.concepts?.length || 0) /
+                              (wordCount / 1000)
+                            ).toFixed(1)}{" "}
+                            per 1k words
+                          </span>
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 600,
+                            color:
+                              analysis.overallScore > 70
+                                ? "#10b981"
+                                : analysis.overallScore > 50
+                                ? "#f59e0b"
+                                : "#ef4444",
+                          }}
+                        >
+                          Overall Score: {Math.round(analysis.overallScore)}
+                          /100
+                        </div>
+                      </>
+                    )}
+                  </div>
                 )}
               </div>
             </div>
@@ -2951,21 +3064,34 @@ export const ChapterCheckerV2: React.FC = () => {
           onClick={handleBackToTop}
           style={{
             position: "fixed",
-            bottom: "28px",
-            left: "28px",
-            padding: "12px 18px",
+            bottom: "24px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            padding: "12px 20px",
             borderRadius: "999px",
-            border: "2px solid #2c3e50",
-            background: "white",
+            border: "2px solid #e0c392",
+            background: "linear-gradient(135deg, #f5ead9 0%, #f5e6d3 100%)",
             color: "#2c3e50",
             fontWeight: 600,
             fontSize: "14px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            boxShadow: "0 4px 16px rgba(44, 62, 80, 0.15)",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
             gap: "8px",
             zIndex: 1200,
+            transition: "all 0.2s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform =
+              "translateX(-50%) translateY(-2px)";
+            e.currentTarget.style.boxShadow =
+              "0 6px 20px rgba(44, 62, 80, 0.2)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateX(-50%)";
+            e.currentTarget.style.boxShadow =
+              "0 4px 16px rgba(44, 62, 80, 0.15)";
           }}
           aria-label="Back to top"
         >
