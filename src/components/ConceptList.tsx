@@ -5,6 +5,7 @@
 
 import React, { useState } from "react";
 import type { Concept } from "@/types";
+import { ConceptPill } from "./ConceptPill";
 
 interface ConceptListProps {
   concepts: Concept[];
@@ -102,8 +103,8 @@ export const ConceptList: React.FC<ConceptListProps> = ({
     <div className="concept-list">
       <div className="card">
         <div className="card-header">
-          <h3 className="text-xl font-bold">📚 Core Concepts Identified</h3>
-          <p className="text-sm text-gray-600 mt-1">
+          <h3 className="section-header">📚 Core Concepts Identified</h3>
+          <p className="section-subtitle">
             Fundamental programming concepts covered - Click to highlight in
             document
           </p>
@@ -112,23 +113,18 @@ export const ConceptList: React.FC<ConceptListProps> = ({
           {sortedConcepts.length > 0 ? (
             <div className="flex flex-wrap gap-2">
               {sortedConcepts.map((concept) => (
-                <button
+                <ConceptPill
                   key={concept.id}
+                  id={concept.id}
+                  label={concept.name}
+                  count={concept.mentions.length}
+                  color="#3b82f6"
+                  isHighlighted={highlightedConceptId === concept.id}
                   onClick={() =>
                     onConceptClick(concept, getPrimaryMentionIndex(concept))
                   }
-                  className={`concept-badge concept-badge-core ${
-                    highlightedConceptId === concept.id
-                      ? "ring-2 ring-offset-2 ring-blue-500 font-bold"
-                      : ""
-                  }`}
                   title={`${concept.name} - ${concept.mentions.length} mentions`}
-                >
-                  {concept.name}
-                  <span className="ml-1 text-xs opacity-75">
-                    ({concept.mentions.length})
-                  </span>
-                </button>
+                />
               ))}
             </div>
           ) : (
@@ -223,50 +219,6 @@ export const ConceptList: React.FC<ConceptListProps> = ({
         .floating-nav-buttons {
           display: flex;
           gap: 8px;
-        }
-
-        .concept-badge {
-          display: inline-flex;
-          align-items: center;
-          padding: 6px 12px;
-          border-radius: 16px;
-          font-size: 14px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          border: 1px solid transparent;
-        }
-
-        .concept-badge:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .concept-badge-core {
-          background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-          color: white;
-        }
-
-        .concept-badge-core:hover {
-          background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-        }
-
-        .concept-badge-supporting {
-          background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-          color: white;
-        }
-
-        .concept-badge-supporting:hover {
-          background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
-        }
-
-        .concept-badge-detail {
-          background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-          color: white;
-        }
-
-        .concept-badge-detail:hover {
-          background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
         }
 
         .nav-button {

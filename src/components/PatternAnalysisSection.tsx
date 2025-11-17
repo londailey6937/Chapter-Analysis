@@ -87,17 +87,8 @@ const PatternAnalysisSection: React.FC<PatternAnalysisSectionProps> = ({
 
   return (
     <div style={{ marginTop: "40px" }}>
-      <h3 style={{ fontSize: "24px", fontWeight: 600, marginBottom: "10px" }}>
-        📚 Learning Patterns Detected
-      </h3>
-      <p
-        style={{
-          color: "#64748b",
-          fontSize: "14px",
-          fontStyle: "italic",
-          marginBottom: "20px",
-        }}
-      >
+      <h3 className="section-header">📚 Learning Patterns Detected</h3>
+      <p className="section-subtitle">
         Pedagogical structures that support effective learning ({totalPatterns}{" "}
         patterns found, {coveragePercent}% chapter coverage)
       </p>
@@ -121,28 +112,25 @@ const PatternAnalysisSection: React.FC<PatternAnalysisSectionProps> = ({
             <div
               key={type}
               onClick={() => toggleExpanded(type)}
-              style={{
-                border: `2px solid ${meta.color}`,
-                borderRadius: "8px",
-                padding: "16px",
-                cursor: "pointer",
-                transition: "all 0.2s",
-                backgroundColor:
-                  expandedType === type ? `${meta.color}15` : "white",
-                boxShadow:
-                  expandedType === type
-                    ? `0 4px 12px ${meta.color}40`
-                    : "0 2px 4px rgba(0,0,0,0.05)",
-              }}
+              className={`pattern-card ${
+                expandedType === type ? "expanded" : ""
+              }`}
+              style={{}}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.boxShadow = `0 4px 12px ${meta.color}40`;
+                if (expandedType !== type) {
+                  e.currentTarget.style.borderColor = "#3b82f6";
+                  e.currentTarget.style.backgroundColor = "#f8fafc";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                  e.currentTarget.style.boxShadow =
+                    "0 2px 8px rgba(59, 130, 246, 0.15)";
+                }
               }}
               onMouseLeave={(e) => {
                 if (expandedType !== type) {
+                  e.currentTarget.style.borderColor = "#cbd5e1";
+                  e.currentTarget.style.backgroundColor = "white";
                   e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow =
-                    "0 2px 4px rgba(0,0,0,0.05)";
+                  e.currentTarget.style.boxShadow = "none";
                 }
               }}
             >

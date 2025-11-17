@@ -27,7 +27,7 @@ npm run dev
 
 ---
 
-## 🆕 **NEW! November 2025 Features**
+## 🆕 **NEW! November-December 2025 Features**
 
 Before diving in, check out our latest features:
 
@@ -64,6 +64,15 @@ Before diving in, check out our latest features:
 - Domain-specific sections hide for general content
 - Only shows relevant analysis
 - Cleaner, more focused results
+
+### 📋 General Concept Generator (December 2024)
+
+- **NEW!** Automatically extracts key concepts from general content
+- Works when domain is "none" (meditation, essays, creative writing)
+- 4 concept categories: Themes 💡, Entities 🏷️, Actions ⚡, Qualities ✨
+- Click any concept to navigate to it in the document
+- Shows frequency counts and positions
+- **Location:** Bottom of Analysis panel
 
 **→ See [RECENT_CHANGES.md](./RECENT_CHANGES.md) for complete details**
 
@@ -302,6 +311,14 @@ function TextAreaInput({
 ```css
 /* In src/styles/globals.css */
 .btn-primary       /* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
 /* Primary button */
 /* Primary button */
 /* Primary button */

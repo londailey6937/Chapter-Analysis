@@ -128,7 +128,7 @@ const graph = await ConceptExtractor.extractConceptsFromChapter(
 
 ---
 
-#### `ChapterCheckerV2.tsx` (3044 lines, 115 KB)
+#### `ChapterCheckerV2.tsx` (3477 lines, 117 KB)
 
 **Purpose**: Main React application component with advanced features
 **Contains**:
@@ -141,6 +141,7 @@ const graph = await ConceptExtractor.extractConceptsFromChapter(
 - Section parsing and file upload handling
 - Export functionality (JSON, DOCX, HTML)
 - Responsive styling and mobile support
+- General concept extraction for non-domain content
 
 **When to use**: Drop-in React component for complete UI
 **Key component**: `<ChapterCheckerV2 />`
@@ -152,14 +153,44 @@ const graph = await ConceptExtractor.extractConceptsFromChapter(
 - Auto-save to localStorage with restore
 - Full-width editor mode
 - Domain-specific section hiding
+- General concept generator (December 2024)
 
-**Recent additions** (November 2025):
+**Recent additions** (November-December 2025):
 
 - Lines 2189-2315: AI template generation
 - Lines 601-635: Auto-save logic
 - Lines 460-507: Auto-restore prompt
 - Lines 341-420: Domain detection v3
 - Line 2604: hasDomain prop for conditional rendering
+- Lines 1063-1076: General concept extraction on analysis complete
+- Lines 2507-2520: GeneralConceptGenerator component integration
+
+---
+
+#### `GeneralConceptGenerator.tsx` (~180 lines)
+
+**Purpose**: Display extracted concepts for general (non-domain) content
+**Contains**:
+
+- Category-grouped concept display (themes, entities, actions, qualities)
+- Interactive concept pills with frequency badges
+- Click-to-navigate functionality
+- Color-coded categories with hover effects
+- Stats footer and helpful tips
+
+**When to use**: Automatically rendered when domain is "none" and concepts exist
+**Props**:
+
+- `concepts: GeneralConcept[]` - Extracted concepts array
+- `onConceptClick: (position: number) => void` - Navigation handler
+
+**Features**:
+
+- 4 concept categories with distinct icons and colors
+- Frequency count badges (e.g., "3×")
+- Hover effects with color transitions
+- Preview navigation on click
+- Responsive pill layout
 
 ---
 
@@ -284,6 +315,59 @@ const graph = await ConceptExtractor.extractConceptsFromChapter(
 
 **When to use**: Implementing or extending visual suggestions
 **Best for**: Understanding dual coding analyzer feature
+
+---
+
+#### `GENERAL_CONCEPT_GENERATOR.md` (12 KB)
+
+**Purpose**: Documentation for general content concept extraction
+**Contains**:
+
+- Feature overview and purpose
+- Extraction algorithms (NLP patterns)
+- 4 concept categories (themes, entities, actions, qualities)
+- UI/UX design specifications
+- Integration guide with code examples
+- Testing scenarios
+- Performance metrics
+- Future enhancement roadmap
+
+**When to use**: Understanding or extending general concept extraction
+**Best for**: Non-domain content analysis (meditation, essays, creative writing)
+
+---
+
+### Utility Files
+
+#### `generalConceptExtractor.ts` (~180 lines)
+
+**Purpose**: Extract key concepts from general (non-academic) content
+**Contains**:
+
+- `extractGeneralConcepts(text)` - Main extraction function
+- `GeneralConcept` interface definition
+- NLP pattern matching (noun phrases, entities, actions, descriptors)
+- Stop word filtering
+- Context extraction
+- Frequency tracking and position mapping
+- Category helpers (`getConceptCategoryInfo`)
+
+**When to use**: Analyzing content without a domain library
+**Key exports**:
+
+- `extractGeneralConcepts(text: string): GeneralConcept[]`
+- `GeneralConcept` interface
+- `getConceptCategoryInfo(category)` helper
+
+**Algorithm**:
+
+1. Extract noun phrases (2-4 words) → Themes 💡
+2. Extract capitalized terms → Entities 🏷️
+3. Extract action verbs → Actions ⚡
+4. Extract quality descriptors → Qualities ✨
+5. Filter stop words and noise
+6. Track frequency and positions
+7. Return top 20 concepts (min 2 occurrences)
 
 ---
 

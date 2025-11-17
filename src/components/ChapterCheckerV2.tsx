@@ -39,6 +39,11 @@ import {
   storeClaudeKey,
   validateClaudeKey,
 } from "@/utils/claudeIntegration";
+import {
+  extractGeneralConcepts,
+  type GeneralConcept,
+} from "@/utils/generalConceptExtractor";
+import { GeneralConceptGenerator } from "./GeneralConceptGenerator";
 import tomeIqLogo from "@/assets/tomeiq-logo.png";
 
 const HEADING_LENGTH_LIMIT = 120;
@@ -309,6 +314,7 @@ export const ChapterCheckerV2: React.FC = () => {
 
   // Analysis state
   const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
+  const [generalConcepts, setGeneralConcepts] = useState<GeneralConcept[]>([]);
   const [detectedDomain, setDetectedDomain] = useState<Domain | null>(null);
   const [customConcepts, setCustomConcepts] = useState<ConceptDefinition[]>([]);
   const [customDomainName, setCustomDomainName] = useState("");
@@ -1057,6 +1063,19 @@ export const ChapterCheckerV2: React.FC = () => {
       worker.onmessage = (e) => {
         if (e.data.type === "complete") {
           setAnalysis(e.data.result);
+
+          // Extract general concepts if domain is "none"
+          if (selectedDomain === "none") {
+            const textToAnalyze =
+              chapterData?.plainText ?? chapterData?.originalPlainText ?? "";
+            const extracted = extractGeneralConcepts(textToAnalyze);
+            setGeneralConcepts(extracted);
+            console.log(
+              `[GeneralConcepts] Extracted ${extracted.length} concepts from general content`
+            );
+          } else {
+            setGeneralConcepts([]); // Clear if domain is selected
+          }
 
           // DEBUG: Show first mention positions for all concepts
           const concepts = e.data.result?.conceptGraph?.concepts || [];
@@ -2491,6 +2510,20 @@ export const ChapterCheckerV2: React.FC = () => {
                           selectedDomain !== "none" && selectedDomain !== null
                         }
                       />
+
+                      {/* General Concept Generator - for non-domain content */}
+                      {selectedDomain === "none" &&
+                        generalConcepts.length > 0 && (
+                          <GeneralConceptGenerator
+                            concepts={generalConcepts}
+                            onConceptClick={(position, term) => {
+                              // Scroll to position in preview panel with full term highlighting
+                              setHighlightPosition(position);
+                              setSearchWord(term);
+                              setSearchOccurrence(0);
+                            }}
+                          />
+                        )}
                     </>
                   ) : (
                     <div
@@ -2503,15 +2536,7 @@ export const ChapterCheckerV2: React.FC = () => {
                         boxShadow: "inset 0 1px 2px rgba(15,23,42,0.05)",
                       }}
                     >
-                      <h3
-                        style={{
-                          margin: "0 0 16px 0",
-                          fontSize: "18px",
-                          fontWeight: "600",
-                        }}
-                      >
-                        ✍️ Writing Suggestions
-                      </h3>
+                      <h3 className="section-header">✍️ Writing Suggestions</h3>
 
                       {/* Principle Scores */}
                       <div style={{ marginBottom: "24px" }}>

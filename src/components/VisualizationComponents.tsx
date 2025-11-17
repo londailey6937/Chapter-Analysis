@@ -2342,18 +2342,18 @@ export const ChapterAnalysisDashboard: React.FC<{
           }
           .principles-section h3 {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--text-main);
-            margin: 0 0 10px 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #0f172a;
+            margin: 0 0 8px 0;
           }
           .recommendations-section h3,
           .concepts-section h3 {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--text-main);
-            margin: 0 0 10px 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #0f172a;
+            margin: 0 0 8px 0;
           }
           .concept-stats {
             display: grid;
