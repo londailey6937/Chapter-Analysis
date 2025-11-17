@@ -189,9 +189,9 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       } else {
         // Fallback: scroll the preview container to approximate position
         console.warn("⚠️ Highlight ref not available, using fallback scroll");
-        const previewContainer = previewRef.current || document.querySelector(
-          ".preview-pane, .readonly-view"
-        );
+        const previewContainer =
+          previewRef.current ||
+          document.querySelector(".preview-pane, .readonly-view");
         if (previewContainer && highlightRange) {
           console.log("📍 Scrolling preview container to position");
           const estimatedScroll =
