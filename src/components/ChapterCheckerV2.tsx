@@ -856,7 +856,7 @@ export const ChapterCheckerV2: React.FC = () => {
     const features = ACCESS_TIERS[accessLevel];
     if (!features.fullAnalysis && normalizedPlainText.trim().length >= 200) {
       console.log("🆓 Free tier: Auto-running spacing + dual coding analysis");
-      
+
       // Run tier one analysis immediately
       const tierOneAnalysis = buildTierOneAnalysisSummary({
         plainText: normalizedPlainText,
@@ -2089,7 +2089,6 @@ export const ChapterCheckerV2: React.FC = () => {
             borderRadius: 0,
             boxShadow: "none",
             padding: 0,
-            margin: 0,
             overflow: "visible",
           }}
         >

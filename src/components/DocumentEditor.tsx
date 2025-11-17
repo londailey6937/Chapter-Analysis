@@ -480,6 +480,8 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
               containerRef={previewRef}
               onScroll={handlePreviewScroll}
               htmlContent={htmlContent}
+              textLength={text.length}
+              visualSuggestions={visualSuggestions}
             />
           </div>
         )}
@@ -626,6 +628,8 @@ type ReadOnlyViewProps = {
   containerRef?: React.RefObject<HTMLDivElement>;
   onScroll?: () => void;
   htmlContent?: string | null;
+  textLength: number;
+  visualSuggestions: VisualSuggestion[];
 };
 
 const ReadOnlyView: React.FC<ReadOnlyViewProps> = ({
@@ -638,29 +642,15 @@ const ReadOnlyView: React.FC<ReadOnlyViewProps> = ({
   containerRef,
   onScroll,
   htmlContent,
+  textLength,
+  visualSuggestions,
 }) => {
   let highlightAnchorAssigned = false;
 
-  // If HTML content with images is available, render it directly
-  if (htmlContent && htmlContent.includes("<img")) {
-    return (
-      <div
-        ref={containerRef}
-        onScroll={onScroll}
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          padding: "12px",
-          border: "1px solid #e5e7eb",
-          borderRadius: "8px",
-          backgroundColor: "white",
-          lineHeight: 1.6,
-          fontSize: "14px",
-        }}
-        dangerouslySetInnerHTML={{ __html: htmlContent }}
-      />
-    );
-  }
+  const hasHtmlWithMedia = Boolean(htmlContent && /<img/i.test(htmlContent));
+  const sanitizedHtml =
+    hasHtmlWithMedia && htmlContent ? sanitizeHtml(htmlContent) : null;
+  const overlayEnabled = hasHtmlWithMedia;
 
   return (
     <div
@@ -675,9 +665,19 @@ const ReadOnlyView: React.FC<ReadOnlyViewProps> = ({
         backgroundColor: "white",
         lineHeight: 1.6,
         fontSize: "14px",
+        position: "relative",
       }}
     >
-      {paragraphs.length === 0 ? (
+      {hasHtmlWithMedia && sanitizedHtml ? (
+        <div
+          style={{
+            whiteSpace: "normal",
+            lineHeight: 1.6,
+            fontSize: "14px",
+          }}
+          dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+        />
+      ) : paragraphs.length === 0 ? (
         <span style={{ color: "#9ca3af", fontSize: "13px" }}>
           Start writing to see spacing guidance and dual-coding suggestions.
         </span>
@@ -701,7 +701,7 @@ const ReadOnlyView: React.FC<ReadOnlyViewProps> = ({
                 position: "relative",
               }}
             >
-              {index > 0 && showSpacingIndicators && (
+              {index > 0 && showSpacingIndicators && !overlayEnabled && (
                 <span
                   style={{
                     position: "absolute",
@@ -818,6 +818,19 @@ const ReadOnlyView: React.FC<ReadOnlyViewProps> = ({
           );
         })
       )}
+
+      {overlayEnabled && showSpacingIndicators && paragraphs.length > 1 && (
+        <SpacingOverlay paragraphs={paragraphs} textLength={textLength} />
+      )}
+
+      {overlayEnabled &&
+        showVisualSuggestions &&
+        visualSuggestions.length > 0 && (
+          <VisualOverlay
+            suggestions={visualSuggestions}
+            textLength={textLength}
+          />
+        )}
     </div>
   );
 };
@@ -906,6 +919,10 @@ const SpacingOverlay: React.FC<SpacingOverlayProps> = ({
     return null;
   }
 
+  const MIN_WORDS_FOR_LABEL = 20;
+  const MIN_LABEL_GAP_PERCENT = 3; // prevent stacked badges
+  let lastLabelTop = -MIN_LABEL_GAP_PERCENT;
+
   return (
     <div
       style={{
@@ -923,6 +940,15 @@ const SpacingOverlay: React.FC<SpacingOverlayProps> = ({
         );
         const spacingInfo = analyzeParagraphSpacing(paragraph.wordCount);
         const spacingBadgeStyle = getSpacingBadgeStyle(spacingInfo.tone);
+        const meetsWordThreshold =
+          paragraph.wordCount >= MIN_WORDS_FOR_LABEL ||
+          spacingInfo.tone === "extended";
+        const hasGap = topPercent - lastLabelTop >= MIN_LABEL_GAP_PERCENT;
+        const showLabel = meetsWordThreshold && hasGap;
+
+        if (showLabel) {
+          lastLabelTop = topPercent;
+        }
 
         return (
           <div
@@ -940,24 +966,45 @@ const SpacingOverlay: React.FC<SpacingOverlayProps> = ({
                 position: "relative",
               }}
             >
-              <span
-                style={{
-                  position: "absolute",
-                  top: "-9px",
-                  left: 0,
-                  fontSize: "10px",
-                  fontWeight: 600,
-                  color: "#1d4ed8",
-                  backgroundColor: "rgba(191,219,254,0.9)",
-                  padding: "2px 6px",
-                  borderRadius: "999px",
-                  ...spacingBadgeStyle,
-                }}
-                title={spacingInfo.message}
-              >
-                Spacing target · P{paragraph.id + 1}
-                {` · ${paragraph.wordCount} words · ${spacingInfo.shortLabel}`}
-              </span>
+              {showLabel && (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "-9px",
+                    left: 0,
+                    fontSize: "10px",
+                    fontWeight: 600,
+                    color: "#1d4ed8",
+                    backgroundColor: "rgba(191,219,254,0.9)",
+                    padding: "2px 6px",
+                    borderRadius: "999px",
+                    ...spacingBadgeStyle,
+                  }}
+                  title={spacingInfo.message}
+                >
+                  Spacing target · P{paragraph.id + 1}
+                  {` · ${paragraph.wordCount} words · ${spacingInfo.shortLabel}`}
+                </span>
+              )}
+
+              {!showLabel && spacingInfo.tone !== "balanced" && (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "-4px",
+                    left: 0,
+                    width: "6px",
+                    height: "6px",
+                    borderRadius: "999px",
+                    backgroundColor:
+                      spacingInfo.tone === "extended" ? "#b45309" : "#047857",
+                    boxShadow: "0 0 4px rgba(0,0,0,0.15)",
+                  }}
+                  title={`Spacing target · Paragraph ${paragraph.id + 1} · ${
+                    spacingInfo.shortLabel
+                  }`}
+                />
+              )}
             </div>
           </div>
         );
