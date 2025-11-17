@@ -2614,6 +2614,9 @@ export const ChapterCheckerV2: React.FC = () => {
                     <button
                       onClick={() => {
                         setViewMode("analysis");
+                        // Clear highlight position when switching to analysis mode
+                        // to prevent unwanted jumps
+                        setHighlightPosition(null);
                         setTimeout(() => {
                           if (analysisPanelRef.current) {
                             analysisPanelRef.current.scrollTop = 0;

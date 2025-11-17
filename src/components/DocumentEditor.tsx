@@ -179,49 +179,28 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     });
 
     if (readOnly) {
-      // Wait for the highlightRef to be assigned to the DOM element
-      let attempts = 0;
-      const maxAttempts = 20; // Try for up to 1 second
-
-      const scrollToHighlight = () => {
-        attempts++;
-        if (highlightRef.current) {
-          console.log(
-            "📍 Scrolling preview to highlight (attempt " + attempts + ")"
-          );
-          highlightRef.current.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-          });
-        } else if (attempts < maxAttempts) {
-          // Ref not ready yet, try again after a short delay
-          console.log(
-            "📍 Waiting for highlight ref... (attempt " + attempts + ")"
-          );
-          setTimeout(scrollToHighlight, 50);
-        } else {
-          console.warn(
-            "⚠️ Highlight ref never became available after " +
-              maxAttempts +
-              " attempts"
-          );
-          // Fallback: try to scroll the preview container to approximate position
-          const previewContainer = document.querySelector(
-            ".preview-pane, .readonly-view"
-          );
-          if (previewContainer && highlightRange) {
-            console.log("📍 Attempting fallback scroll of preview container");
-            const estimatedScroll =
-              (highlightRange.start / text.length) *
-              previewContainer.scrollHeight;
-            previewContainer.scrollTop =
-              estimatedScroll - previewContainer.clientHeight / 2;
-          }
+      // Try using highlightRef first, but fall back quickly if not available
+      if (highlightRef.current) {
+        console.log("📍 Scrolling preview to highlight using ref");
+        highlightRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      } else {
+        // Fallback: scroll the preview container to approximate position
+        console.warn("⚠️ Highlight ref not available, using fallback scroll");
+        const previewContainer = previewRef.current || document.querySelector(
+          ".preview-pane, .readonly-view"
+        );
+        if (previewContainer && highlightRange) {
+          console.log("📍 Scrolling preview container to position");
+          const estimatedScroll =
+            (highlightRange.start / text.length) *
+            previewContainer.scrollHeight;
+          previewContainer.scrollTop =
+            estimatedScroll - previewContainer.clientHeight / 2;
         }
-      };
-
-      // Small delay to ensure DOM is updated
-      setTimeout(scrollToHighlight, 100);
+      }
       return;
     }
 
