@@ -851,6 +851,24 @@ export const ChapterCheckerV2: React.FC = () => {
     console.log(`🔍 Domain detection result: ${detected || "none"}`);
     setDetectedDomain(detected);
     setSelectedDomain(detected);
+
+    // Auto-analyze for free tier (spacing + dual coding only)
+    const features = ACCESS_TIERS[accessLevel];
+    if (!features.fullAnalysis && normalizedPlainText.trim().length >= 200) {
+      console.log("🆓 Free tier: Auto-running spacing + dual coding analysis");
+      
+      // Run tier one analysis immediately
+      const tierOneAnalysis = buildTierOneAnalysisSummary({
+        plainText: normalizedPlainText,
+        htmlContent: hasHtmlContent ? content : null,
+        fileName: incomingName,
+      });
+
+      if (tierOneAnalysis) {
+        setAnalysis(tierOneAnalysis);
+        console.log("✓ Free tier analysis complete");
+      }
+    }
   };
 
   const handleTextChange = (newText: string) => {
@@ -1192,45 +1210,12 @@ export const ChapterCheckerV2: React.FC = () => {
       }
     }
 
-    // Check access level - free tier runs tier one analysis
+    // Check access level - block free tier, redirect to upgrade
     const features = ACCESS_TIERS[accessLevel];
-
-    // Free tier: Run quick spacing + dual coding analysis
     if (!features.fullAnalysis) {
-      setIsAnalyzing(true);
-      setError(null);
-      setProgress("Analyzing spacing and dual coding...");
-
-      try {
-        if (!chapterData) {
-          throw new Error("No chapter data loaded");
-        }
-
-        const richHtmlContent =
-          chapterData.editorHtml ??
-          (chapterData.isHybridDocx ? chapterData.html : null) ??
-          null;
-
-        const tierOneAnalysis = buildTierOneAnalysisSummary({
-          plainText: chapterData.plainText || chapterText,
-          htmlContent: richHtmlContent,
-          fileName: fileName || "Untitled Chapter",
-        });
-
-        if (tierOneAnalysis) {
-          setAnalysis(tierOneAnalysis);
-          setProgress("");
-        } else {
-          setError("Failed to generate analysis");
-        }
-      } catch (err) {
-        setError(
-          "Analysis error: " +
-            (err instanceof Error ? err.message : "Unknown error")
-        );
-      } finally {
-        setIsAnalyzing(false);
-      }
+      setUpgradeFeature("Full 10-Principle Analysis");
+      setUpgradeTarget("premium");
+      setShowUpgradePrompt(true);
       return;
     }
 
