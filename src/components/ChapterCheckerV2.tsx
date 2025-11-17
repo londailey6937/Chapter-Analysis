@@ -44,13 +44,115 @@ import {
   type GeneralConcept,
 } from "@/utils/generalConceptExtractor";
 import { GeneralConceptGenerator } from "./GeneralConceptGenerator";
-import tomeIqLogo from "@/assets/tomeiq-logo.png";
+import { AnimatedLogo } from "./AnimatedLogo";
 
 const HEADING_LENGTH_LIMIT = 120;
 const MAX_FALLBACK_SECTIONS = 8;
 const STICKY_HEADER_OFFSET = 140;
 
+// Custom Dropdown Component
+interface CustomDropdownProps {
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+}
+
+const CustomDropdown: React.FC<CustomDropdownProps> = ({
+  value,
+  onChange,
+  options,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  return (
+    <div ref={dropdownRef} style={{ position: "relative" }}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          padding: "6px 30px 6px 12px",
+          backgroundColor: "#fef5e7",
+          color: "#2c3e50",
+          border: "1.5px solid #2c3e50",
+          borderRadius: "16px",
+          cursor: "pointer",
+          fontSize: "0.875rem",
+          minWidth: "0",
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232c3e50' d='M6 8L2 4h8z'/%3E%3C/svg%3E")`,
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "right 10px center",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {selectedOption?.label}
+      </button>
+      {isOpen && (
+        <div
+          style={{
+            position: "absolute",
+            top: "calc(100% + 4px)",
+            left: 0,
+            right: 0,
+            backgroundColor: "#fef5e7",
+            border: "1.5px solid #ef8432",
+            borderRadius: "16px",
+            overflow: "hidden",
+            zIndex: 1000,
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          {options.map((option) => (
+            <div
+              key={option.value}
+              onClick={() => {
+                onChange(option.value);
+                setIsOpen(false);
+              }}
+              style={{
+                padding: "8px 12px",
+                cursor: "pointer",
+                fontSize: "0.875rem",
+                color: "#2c3e50",
+                backgroundColor: option.value === value ? "#f7e6d0" : "#fef5e7",
+                transition: "background-color 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                if (option.value !== value) {
+                  e.currentTarget.style.backgroundColor = "#f7e6d0";
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor =
+                  option.value === value ? "#f7e6d0" : "#fef5e7";
+              }}
+            >
+              {option.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 type LayoutMode = "desktop" | "laptop" | "tablet";
+type SelectedDomain = Domain | "none";
 
 const resolveLayoutMode = (width: number): LayoutMode => {
   if (width <= 1024) {
@@ -313,7 +415,9 @@ export const ChapterCheckerV2: React.FC = () => {
     useState<Template | null>(null);
 
   // Analysis state
-  const [selectedDomain, setSelectedDomain] = useState<Domain | null>(null);
+  const [selectedDomain, setSelectedDomain] = useState<SelectedDomain | null>(
+    null
+  );
   const [generalConcepts, setGeneralConcepts] = useState<GeneralConcept[]>([]);
   const [detectedDomain, setDetectedDomain] = useState<Domain | null>(null);
   const [customConcepts, setCustomConcepts] = useState<ConceptDefinition[]>([]);
@@ -601,11 +705,11 @@ export const ChapterCheckerV2: React.FC = () => {
 
   const shouldShowBackToTop = windowScrolled || contentScrolled;
   const isStackedLayout = layoutMode === "tablet";
-  const layoutGap = layoutMode === "desktop" ? 24 : 16;
+  const layoutGap = layoutMode === "desktop" ? 16 : 16;
   const documentFlexGrow = isStackedLayout
     ? 1
     : layoutMode === "desktop"
-    ? 1.65
+    ? 1.5
     : 1.45;
   const analysisFlexGrow = isStackedLayout
     ? 1
@@ -615,12 +719,12 @@ export const ChapterCheckerV2: React.FC = () => {
   const documentMinWidth = isStackedLayout
     ? "auto"
     : layoutMode === "desktop"
-    ? "720px"
+    ? "0px"
     : "560px";
   const analysisMinWidth = isStackedLayout
     ? "auto"
     : layoutMode === "desktop"
-    ? "420px"
+    ? "0px"
     : "360px";
   const isCompactEditorLayout = layoutMode !== "desktop";
 
@@ -743,21 +847,45 @@ export const ChapterCheckerV2: React.FC = () => {
 
   const handleAcceptMissingConcept = (
     concept: ConceptDefinition,
-    insertionPoint: number
+    insertionPoint: number,
+    contextSnippet: string,
+    searchKeyword: string
   ) => {
-    // Scroll to and highlight the suggested insertion point
-    setHighlightPosition(insertionPoint);
+    console.log("🔍 handleAcceptMissingConcept called:");
+    console.log("  Concept:", concept.name);
+    console.log("  Position:", insertionPoint);
+    console.log("  Context:", contextSnippet);
+    console.log("  Keyword:", searchKeyword);
+    console.log("  Current viewMode:", viewMode);
 
-    // You could also insert placeholder text for the concept
-    // For now, just scroll to show where it should go
-    console.log(
-      "💡 Suggesting to add concept:",
-      concept.name,
-      "at position:",
-      insertionPoint
-    );
+    // Switch to analysis mode first
+    if (viewMode === "writer") {
+      setViewMode("analysis");
+      console.log("  ✓ Switched to analysis mode");
+
+      // Wait for view mode switch to complete, then set highlight
+      setTimeout(() => {
+        setHighlightPosition(insertionPoint);
+        setSearchWord(searchKeyword || "");
+        console.log(
+          "  ✓ Highlight set - position:",
+          insertionPoint,
+          "keyword:",
+          searchKeyword
+        );
+      }, 200);
+    } else {
+      // Already in analysis mode, set highlight immediately
+      setHighlightPosition(insertionPoint);
+      setSearchWord(searchKeyword || "");
+      console.log(
+        "  ✓ Highlight set - position:",
+        insertionPoint,
+        "keyword:",
+        searchKeyword
+      );
+    }
   };
-
   const handleConceptClick = (concept: any, mentionIndex: number) => {
     console.log(
       "🎯 CONCEPT CLICKED:",
@@ -1284,7 +1412,7 @@ export const ChapterCheckerV2: React.FC = () => {
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: "#f3f4f6",
+        backgroundColor: "white",
       }}
     >
       {/* Header */}
@@ -1294,19 +1422,20 @@ export const ChapterCheckerV2: React.FC = () => {
           top: 0,
           zIndex: 60,
           padding: "16px",
-          paddingBottom: 0,
-          backgroundColor: "#f9fafb",
+          paddingBottom: "16px",
+          backgroundColor: "#dce4ec",
           marginBottom: 0,
         }}
       >
         <header
           role="banner"
           style={{
-            padding: "1rem 2rem",
-            backgroundColor: "#667eea",
-            color: "white",
-            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-            borderRadius: "12px",
+            padding: "1rem",
+            backgroundColor: "#f7e6d0",
+            color: "#2c3e50",
+            border: "1px solid #e0c392",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+            borderRadius: "24px",
           }}
         >
           <div
@@ -1330,10 +1459,10 @@ export const ChapterCheckerV2: React.FC = () => {
                 onClick={() => setIsNavigationOpen(true)}
                 style={{
                   padding: "8px 16px",
-                  backgroundColor: "rgba(255,255,255,0.2)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "6px",
+                  backgroundColor: "#f7e6d0",
+                  color: "#2c3e50",
+                  border: "2px solid #ef8432",
+                  borderRadius: "20px",
                   cursor: "pointer",
                   fontSize: "18px",
                 }}
@@ -1341,22 +1470,13 @@ export const ChapterCheckerV2: React.FC = () => {
                 ☰
               </button>
 
-              <img
-                src={tomeIqLogo}
-                alt="TomeIQ"
-                style={{
-                  height: "96px",
-                  display: "block",
-                  objectFit: "contain",
-                  flexShrink: 0,
-                }}
-              />
+              <AnimatedLogo size={96} animate={true} />
               <div style={{ minWidth: 0 }}>
                 <h1
                   style={{
                     margin: 0,
                     fontSize: "1.5rem",
-                    color: "white",
+                    color: "#2c3e50",
                     fontWeight: "700",
                     lineHeight: "1.2",
                   }}
@@ -1370,11 +1490,22 @@ export const ChapterCheckerV2: React.FC = () => {
                   style={{
                     margin: 0,
                     fontSize: "0.875rem",
-                    opacity: 0.9,
-                    color: "white",
+                    opacity: 1,
+                    color: "#2c3e50",
                   }}
                 >
-                  AI-Powered Textbook Analysis
+                  AI-Powered Learning Content Analysis
+                </p>
+                <p
+                  style={{
+                    margin: "0.25rem 0 0 0",
+                    fontSize: "0.75rem",
+                    opacity: 1,
+                    color: "#2c3e50",
+                  }}
+                >
+                  For Education • Corporate Training • Research • K-12 •
+                  Emerging Fields
                 </p>
               </div>
             </div>
@@ -1386,39 +1517,38 @@ export const ChapterCheckerV2: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
-                flex: "1 1 220px",
+                flex: "0 0 auto",
                 justifyContent: "flex-end",
-                minWidth: "200px",
+                maxWidth: "400px",
+                padding: "8px 12px",
+                border: "2px solid #ef8432",
+                borderRadius: "20px",
+                backgroundColor: "#f7e6d0",
               }}
             >
-              <span style={{ fontSize: "0.875rem", opacity: 0.9 }}>
-                Demo Mode:
-              </span>
-              <select
-                value={accessLevel}
-                onChange={(e) =>
-                  handleAccessLevelChange(e.target.value as AccessLevel)
-                }
+              <span
                 style={{
-                  padding: "6px 12px",
-                  backgroundColor: "rgba(255,255,255,0.2)",
-                  color: "white",
-                  border: "1px solid rgba(255,255,255,0.3)",
-                  borderRadius: "6px",
-                  cursor: "pointer",
                   fontSize: "0.875rem",
+                  opacity: 0.9,
+                  whiteSpace: "nowrap",
                 }}
               >
-                <option value="free" style={{ color: "#000" }}>
-                  Free (Spacing + Dual Coding)
-                </option>
-                <option value="premium" style={{ color: "#000" }}>
-                  Premium (Full Analysis)
-                </option>
-                <option value="professional" style={{ color: "#000" }}>
-                  Professional (Writer Mode)
-                </option>
-              </select>
+                Demo Mode:
+              </span>
+              <CustomDropdown
+                value={accessLevel}
+                onChange={(value) =>
+                  handleAccessLevelChange(value as AccessLevel)
+                }
+                options={[
+                  { value: "free", label: "Free (Spacing + Dual Coding)" },
+                  { value: "premium", label: "Premium (Full Analysis)" },
+                  {
+                    value: "professional",
+                    label: "Professional (Writer Mode)",
+                  },
+                ]}
+              />
             </div>
           </div>
         </header>
@@ -1444,8 +1574,8 @@ export const ChapterCheckerV2: React.FC = () => {
           alignItems: "stretch",
           padding: "16px",
           boxSizing: "border-box",
-          gap: layoutGap,
-          backgroundColor: "#f9fafb",
+          gap: "16px",
+          backgroundColor: "#dce4ec",
           minHeight: 0,
           minWidth: 0,
         }}
@@ -1453,15 +1583,20 @@ export const ChapterCheckerV2: React.FC = () => {
         {/* Left: Document Column (60%) */}
         <div
           style={{
-            flex: isStackedLayout ? "1 1 100%" : `${documentFlexGrow} 1 0%`,
-            maxWidth: "100%",
-            minWidth: documentMinWidth,
+            flex: isStackedLayout ? "1 1 100%" : "3 1 0",
             display: "flex",
             flexDirection: "column",
             gap: "16px",
           }}
         >
-          <div className="app-panel" style={{ padding: 0 }}>
+          <div
+            className="app-panel"
+            style={{
+              padding: 0,
+              backgroundColor: "#f5ead9",
+              background: "#f5ead9",
+            }}
+          >
             <div
               ref={documentHeaderRef}
               style={{
@@ -1486,7 +1621,7 @@ export const ChapterCheckerV2: React.FC = () => {
                   <div
                     style={{
                       fontSize: "14px",
-                      color: "#6b7280",
+                      color: "#2c3e50",
                       display: "flex",
                       flexDirection: "column",
                       gap: "2px",
@@ -1497,13 +1632,33 @@ export const ChapterCheckerV2: React.FC = () => {
                     <span
                       style={{
                         fontSize: "12px",
-                        color: "#4b5563",
+                        color: "#2c3e50",
                         fontWeight: 500,
                       }}
                     >
                       {wordCount.toLocaleString()} words &middot;{" "}
                       {charCount.toLocaleString()} characters
                     </span>
+                  </div>
+                )}
+
+                {chapterData && !isAnalyzing && (
+                  <>
+                    <button
+                      onClick={handleClear}
+                      style={{
+                        padding: "8px 16px",
+                        backgroundColor: "white",
+                        color: "#c16659",
+                        border: "1.5px solid #c16659",
+                        borderRadius: "20px",
+                        cursor: "pointer",
+                        fontSize: "14px",
+                      }}
+                    >
+                      🗑️ Clear
+                    </button>
+
                     <button
                       onClick={() => {
                         try {
@@ -1531,47 +1686,28 @@ export const ChapterCheckerV2: React.FC = () => {
                         }
                       }}
                       style={{
-                        fontSize: "11px",
-                        color: "#9333ea",
-                        background: "none",
-                        border: "none",
-                        padding: "2px 0",
+                        padding: "8px 16px",
+                        backgroundColor: "white",
+                        color: "#2c3e50",
+                        border: "1.5px solid #2c3e50",
+                        borderRadius: "20px",
                         cursor: "pointer",
-                        textAlign: "left",
-                        textDecoration: "underline",
+                        fontSize: "14px",
+                        fontWeight: "600",
                       }}
                       title="Check auto-save status"
                     >
                       💾 Auto-save info
-                    </button>
-                  </div>
-                )}
-
-                {chapterData && !isAnalyzing && (
-                  <>
-                    <button
-                      onClick={handleClear}
-                      style={{
-                        padding: "8px 16px",
-                        backgroundColor: "#ef4444",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "6px",
-                        cursor: "pointer",
-                        fontSize: "14px",
-                      }}
-                    >
-                      🗑️ Clear
                     </button>
 
                     <button
                       onClick={handleExportDocx}
                       style={{
                         padding: "8px 16px",
-                        backgroundColor: "#10b981",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "6px",
+                        backgroundColor: "white",
+                        color: "#e0c392",
+                        border: "1.5px solid #e0c392",
+                        borderRadius: "20px",
                         cursor: "pointer",
                         fontSize: "14px",
                         fontWeight: "600",
@@ -1584,10 +1720,10 @@ export const ChapterCheckerV2: React.FC = () => {
                       onClick={handleExportHtml}
                       style={{
                         padding: "8px 16px",
-                        backgroundColor: "#3b82f6",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "6px",
+                        backgroundColor: "white",
+                        color: "#e0c392",
+                        border: "1.5px solid #e0c392",
+                        borderRadius: "20px",
                         cursor: "pointer",
                         fontSize: "14px",
                         fontWeight: "600",
@@ -1610,6 +1746,8 @@ export const ChapterCheckerV2: React.FC = () => {
               flexDirection: "column",
               minHeight: 0,
               padding: 0,
+              backgroundColor: "#eddcc5",
+              background: "#eddcc5",
             }}
           >
             <div
@@ -1719,7 +1857,7 @@ export const ChapterCheckerV2: React.FC = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    color: "#9ca3af",
+                    color: "#2c3e50",
                     flexDirection: "column",
                     gap: "1rem",
                   }}
@@ -1744,28 +1882,40 @@ export const ChapterCheckerV2: React.FC = () => {
             display: "flex",
             flexDirection: "column",
             marginTop: isStackedLayout ? "16px" : 0,
+            backgroundColor: "transparent",
+            background: "transparent",
+            border: "none",
+            borderRadius: 0,
+            boxShadow: "none",
+            padding: 0,
+            margin: 0,
+            overflow: "visible",
           }}
         >
           {!tierFeatures.fullAnalysis ? (
             <div
               ref={analysisControlsRef}
+              className="app-panel"
               style={{
                 flex: 1,
-                padding: "32px",
+                padding: chapterData ? "18px" : "22px",
                 display: "flex",
                 flexDirection: "column",
                 gap: "16px",
-                justifyContent: chapterData ? "flex-start" : "center",
+                justifyContent: "flex-start",
+                backgroundColor: "#f5e6d3",
+                border: "1.5px solid #ef8432",
+                boxShadow: "0 12px 24px rgba(15,23,42,0.08)",
               }}
             >
               <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>
-                Tier 1 - Document Insights
+                Analysis Controls
               </h2>
               <ul
                 style={{
                   margin: 0,
                   paddingLeft: "20px",
-                  color: "#4b5563",
+                  color: "#2c3e50",
                   fontSize: "13px",
                   lineHeight: 1.6,
                   listStyleType: "disc",
@@ -1871,10 +2021,10 @@ export const ChapterCheckerV2: React.FC = () => {
                 <div
                   style={{
                     fontSize: "13px",
-                    color: "#1f2937",
-                    backgroundColor: "#e5e7eb",
+                    color: "#2c3e50",
+                    backgroundColor: "#e0c392",
                     padding: "12px",
-                    borderRadius: "8px",
+                    borderRadius: "20px",
                   }}
                 >
                   Upload a chapter to generate spacing summaries and dual-coding
@@ -1885,7 +2035,7 @@ export const ChapterCheckerV2: React.FC = () => {
                 style={{
                   marginTop: "auto",
                   paddingTop: "12px",
-                  borderTop: "1px solid #e5e7eb",
+                  borderTop: "1px solid #e0c392",
                   display: "flex",
                   flexDirection: "column",
                   gap: "8px",
@@ -1894,7 +2044,7 @@ export const ChapterCheckerV2: React.FC = () => {
                 <strong style={{ fontSize: "14px", color: "#111827" }}>
                   Ready for more?
                 </strong>
-                <p style={{ margin: 0, fontSize: "13px", color: "#4b5563" }}>
+                <p style={{ margin: 0, fontSize: "13px", color: "#2c3e50" }}>
                   Switch to Tier 2 to run the full 10-principle analyzer with
                   concept graphs, recommendations, and exportable reports.
                 </p>
@@ -1907,10 +2057,10 @@ export const ChapterCheckerV2: React.FC = () => {
                   style={{
                     alignSelf: "flex-start",
                     padding: "10px 20px",
-                    backgroundColor: "#3b82f6",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "6px",
+                    backgroundColor: "white",
+                    color: "#2c3e50",
+                    border: "1.5px solid #2c3e50",
+                    borderRadius: "20px",
                     fontSize: "13px",
                     fontWeight: 600,
                     cursor: "pointer",
@@ -1924,20 +2074,22 @@ export const ChapterCheckerV2: React.FC = () => {
             <div
               style={{
                 flex: 1,
-                padding: "16px",
                 display: "flex",
                 flexDirection: "column",
                 gap: "16px",
                 minHeight: 0,
+                padding: 0,
+                margin: 0,
               }}
             >
               <div
                 ref={analysisControlsRef}
+                className="app-panel"
                 style={{
-                  padding: "20px",
-                  backgroundColor: "white",
-                  borderRadius: "14px",
-                  border: "1px solid #e5e7eb",
+                  padding: "16px",
+                  backgroundColor: "#f5e6d3",
+                  background: "#f5e6d3",
+                  border: "1.5px solid #e0c392",
                   boxShadow: "0 10px 25px rgba(15,23,42,0.08)",
                 }}
               >
@@ -1948,7 +2100,7 @@ export const ChapterCheckerV2: React.FC = () => {
                   style={{
                     margin: "0 0 12px 0",
                     fontSize: "13px",
-                    color: "#4b5563",
+                    color: "#2c3e50",
                   }}
                 >
                   Select the domain that best matches your chapter content for
@@ -1962,7 +2114,7 @@ export const ChapterCheckerV2: React.FC = () => {
                       fontSize: "12px",
                       fontWeight: "600",
                       marginBottom: "4px",
-                      color: "#6b7280",
+                      color: "#2c3e50",
                     }}
                   >
                     Detected Domain:
@@ -1973,12 +2125,12 @@ export const ChapterCheckerV2: React.FC = () => {
                         width: "100%",
                         padding: "12px",
                         border: selectedDomain
-                          ? "2px solid #10b981"
-                          : "2px solid #f59e0b",
-                        borderRadius: "6px",
+                          ? "2px solid #ef8432"
+                          : "2px solid #c16659",
+                        borderRadius: "20px",
                         fontSize: "14px",
-                        backgroundColor: selectedDomain ? "#f0fdf4" : "#fef3c7",
-                        color: selectedDomain ? "#166534" : "#92400e",
+                        backgroundColor: "white",
+                        color: selectedDomain ? "#ef8432" : "#c16659",
                         fontWeight: "600",
                         display: "flex",
                         alignItems: "center",
@@ -2006,10 +2158,10 @@ export const ChapterCheckerV2: React.FC = () => {
                               disabled={isAnalyzing}
                               style={{
                                 padding: "4px 10px",
-                                backgroundColor: "#3b82f6",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "4px",
+                                backgroundColor: "white",
+                                color: "#2c3e50",
+                                border: "1.5px solid #2c3e50",
+                                borderRadius: "16px",
                                 fontSize: "11px",
                                 fontWeight: "600",
                                 cursor: isAnalyzing ? "not-allowed" : "pointer",
@@ -2057,10 +2209,10 @@ export const ChapterCheckerV2: React.FC = () => {
                               disabled={isAnalyzing}
                               style={{
                                 padding: "4px 10px",
-                                backgroundColor: "#3b82f6",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "4px",
+                                backgroundColor: "white",
+                                color: "#2c3e50",
+                                border: "1.5px solid #2c3e50",
+                                borderRadius: "16px",
                                 fontSize: "11px",
                                 fontWeight: "600",
                                 cursor: isAnalyzing ? "not-allowed" : "pointer",
@@ -2079,10 +2231,10 @@ export const ChapterCheckerV2: React.FC = () => {
                               onClick={() => setShowDomainSelector(true)}
                               style={{
                                 padding: "4px 12px",
-                                backgroundColor: "#3b82f6",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "4px",
+                                backgroundColor: "white",
+                                color: "#2c3e50",
+                                border: "1.5px solid #2c3e50",
+                                borderRadius: "16px",
                                 fontSize: "12px",
                                 fontWeight: "600",
                                 cursor: "pointer",
@@ -2104,13 +2256,14 @@ export const ChapterCheckerV2: React.FC = () => {
                               }}
                               style={{
                                 padding: "4px 12px",
-                                backgroundColor: ACCESS_TIERS[accessLevel]
-                                  .customDomains
-                                  ? "#8b5cf6"
-                                  : "#9ca3af",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "4px",
+                                backgroundColor: "white",
+                                color: ACCESS_TIERS[accessLevel].customDomains
+                                  ? "#f7d8a8"
+                                  : "#2c3e50",
+                                border: ACCESS_TIERS[accessLevel].customDomains
+                                  ? "1.5px solid #f7d8a8"
+                                  : "1.5px solid #e0c392",
+                                borderRadius: "16px",
                                 fontSize: "12px",
                                 fontWeight: "600",
                                 cursor: ACCESS_TIERS[accessLevel].customDomains
@@ -2140,7 +2293,7 @@ export const ChapterCheckerV2: React.FC = () => {
 
                           // Handle "none" selection - clear domain
                           if (value === "none") {
-                            setSelectedDomain("none" as Domain);
+                            setSelectedDomain("none");
                             setDetectedDomain(null);
                             setShowDomainSelector(false);
                             return;
@@ -2170,8 +2323,8 @@ export const ChapterCheckerV2: React.FC = () => {
                         style={{
                           width: "100%",
                           padding: "10px",
-                          border: "2px solid #3b82f6",
-                          borderRadius: "6px",
+                          border: "2px solid #2c3e50",
+                          borderRadius: "20px",
                           fontSize: "14px",
                           outline: "none",
                         }}
@@ -2207,10 +2360,10 @@ export const ChapterCheckerV2: React.FC = () => {
                           style={{
                             flex: 1,
                             padding: "6px",
-                            backgroundColor: "#f3f4f6",
-                            color: "#374151",
-                            border: "none",
-                            borderRadius: "4px",
+                            backgroundColor: "white",
+                            color: "#2c3e50",
+                            border: "1.5px solid #2c3e50",
+                            borderRadius: "16px",
                             fontSize: "12px",
                             fontWeight: "600",
                             cursor: "pointer",
@@ -2234,13 +2387,14 @@ export const ChapterCheckerV2: React.FC = () => {
                           style={{
                             flex: 1,
                             padding: "6px",
-                            backgroundColor: ACCESS_TIERS[accessLevel]
-                              .customDomains
-                              ? "#8b5cf6"
-                              : "#9ca3af",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "4px",
+                            backgroundColor: "white",
+                            color: ACCESS_TIERS[accessLevel].customDomains
+                              ? "#f7d8a8"
+                              : "#2c3e50",
+                            border: ACCESS_TIERS[accessLevel].customDomains
+                              ? "1.5px solid #f7d8a8"
+                              : "1.5px solid #e0c392",
+                            borderRadius: "16px",
                             fontSize: "12px",
                             fontWeight: "600",
                             cursor: ACCESS_TIERS[accessLevel].customDomains
@@ -2266,15 +2420,20 @@ export const ChapterCheckerV2: React.FC = () => {
                   style={{
                     width: "100%",
                     padding: "12px",
-                    backgroundColor:
+                    backgroundColor: "white",
+                    color:
                       chapterText.trim() &&
                       !isAnalyzing &&
                       (selectedDomain || selectedDomain === "none")
-                        ? "#10b981"
-                        : "#d1d5db",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "8px",
+                        ? "#ef8432"
+                        : "#2c3e50",
+                    border:
+                      chapterText.trim() &&
+                      !isAnalyzing &&
+                      (selectedDomain || selectedDomain === "none")
+                        ? "2px solid #ef8432"
+                        : "2px solid #e0c392",
+                    borderRadius: "20px",
                     fontSize: "16px",
                     fontWeight: "600",
                     cursor:
@@ -2283,7 +2442,7 @@ export const ChapterCheckerV2: React.FC = () => {
                       (selectedDomain || selectedDomain === "none")
                         ? "pointer"
                         : "not-allowed",
-                    boxShadow: "0 6px 18px rgba(16,185,129,0.35)",
+                    boxShadow: "none",
                   }}
                 >
                   {isAnalyzing ? "⏳ Analyzing..." : "🔍 Analyze Chapter"}
@@ -2295,9 +2454,9 @@ export const ChapterCheckerV2: React.FC = () => {
                     style={{
                       marginTop: "12px",
                       padding: "12px",
-                      backgroundColor: "#e0f2fe",
-                      borderLeft: "4px solid #3b82f6",
-                      borderRadius: "6px",
+                      backgroundColor: "white",
+                      borderLeft: "4px solid #2c3e50",
+                      borderRadius: "20px",
                       fontSize: "13px",
                       lineHeight: "1.6",
                     }}
@@ -2306,7 +2465,7 @@ export const ChapterCheckerV2: React.FC = () => {
                       style={{
                         fontWeight: "600",
                         marginBottom: "6px",
-                        color: "#1e40af",
+                        color: "#2c3e50",
                       }}
                     >
                       🎁 Free Preview Available
@@ -2333,9 +2492,9 @@ export const ChapterCheckerV2: React.FC = () => {
                     style={{
                       marginTop: "12px",
                       padding: "12px",
-                      backgroundColor: "#fee2e2",
+                      backgroundColor: "white",
                       color: "#991b1b",
-                      borderRadius: "6px",
+                      borderRadius: "20px",
                       fontSize: "14px",
                     }}
                   >
@@ -2348,9 +2507,9 @@ export const ChapterCheckerV2: React.FC = () => {
                     style={{
                       marginTop: "12px",
                       padding: "12px",
-                      backgroundColor: "#dbeafe",
-                      color: "#1e40af",
-                      borderRadius: "6px",
+                      backgroundColor: "white",
+                      color: "#2c3e50",
+                      borderRadius: "20px",
                       fontSize: "14px",
                     }}
                   >
@@ -2363,13 +2522,17 @@ export const ChapterCheckerV2: React.FC = () => {
               {analysis && (
                 <div
                   ref={analysisPanelRef}
+                  className="app-panel"
                   style={{
                     flex: 1,
                     overflow: "auto",
                     padding: "16px",
-                    backgroundColor: "white",
-                    borderRadius: "12px",
-                    border: "1px solid #e5e7eb",
+                    backgroundColor:
+                      viewMode === "analysis" ? "#ead6c1" : "#f5e0c4",
+                    border:
+                      viewMode === "analysis"
+                        ? "1.5px solid #e0c392"
+                        : "1.5px solid #f7d8a8",
                   }}
                 >
                   <div
@@ -2392,10 +2555,13 @@ export const ChapterCheckerV2: React.FC = () => {
                         flex: 1,
                         padding: "8px",
                         backgroundColor:
-                          viewMode === "analysis" ? "#3b82f6" : "#e5e7eb",
-                        color: viewMode === "analysis" ? "white" : "#6b7280",
-                        border: "none",
-                        borderRadius: "6px",
+                          viewMode === "analysis" ? "white" : "transparent",
+                        color: viewMode === "analysis" ? "#e0c392" : "#2c3e50",
+                        border:
+                          viewMode === "analysis"
+                            ? "2px solid #e0c392"
+                            : "1.5px solid #e0c392",
+                        borderRadius: "20px",
                         cursor: "pointer",
                         fontSize: "14px",
                         fontWeight: "600",
@@ -2424,10 +2590,13 @@ export const ChapterCheckerV2: React.FC = () => {
                         flex: 1,
                         padding: "8px",
                         backgroundColor:
-                          viewMode === "writer" ? "#3b82f6" : "#e5e7eb",
-                        color: viewMode === "writer" ? "white" : "#6b7280",
-                        border: "none",
-                        borderRadius: "6px",
+                          viewMode === "writer" ? "white" : "transparent",
+                        color: viewMode === "writer" ? "#f7d8a8" : "#2c3e50",
+                        border:
+                          viewMode === "writer"
+                            ? "2px solid #f7d8a8"
+                            : "1.5px solid #e0c392",
+                        borderRadius: "20px",
                         cursor: "pointer",
                         fontSize: "14px",
                         fontWeight: "600",
@@ -2443,12 +2612,14 @@ export const ChapterCheckerV2: React.FC = () => {
                     style={{
                       width: "100%",
                       padding: "8px",
-                      backgroundColor: ACCESS_TIERS[accessLevel].exportResults
-                        ? "#8b5cf6"
-                        : "#d1d5db",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "6px",
+                      backgroundColor: "white",
+                      color: ACCESS_TIERS[accessLevel].exportResults
+                        ? "#2c3e50"
+                        : "#2c3e50",
+                      border: ACCESS_TIERS[accessLevel].exportResults
+                        ? "1.5px solid #2c3e50"
+                        : "1.5px solid #e0c392",
+                      borderRadius: "20px",
                       cursor: ACCESS_TIERS[accessLevel].exportResults
                         ? "pointer"
                         : "not-allowed",
@@ -2467,10 +2638,10 @@ export const ChapterCheckerV2: React.FC = () => {
                       style={{
                         width: "100%",
                         padding: "8px",
-                        backgroundColor: "#9333ea",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "6px",
+                        backgroundColor: "white",
+                        color: "#f7d8a8",
+                        border: "1.5px solid #f7d8a8",
+                        borderRadius: "20px",
                         cursor: "pointer",
                         fontSize: "14px",
                         fontWeight: "600",
@@ -2531,9 +2702,8 @@ export const ChapterCheckerV2: React.FC = () => {
                         padding: "20px",
                         overflow: "auto",
                         height: "100%",
-                        backgroundColor: "#ffffff",
-                        borderRadius: "12px",
-                        boxShadow: "inset 0 1px 2px rgba(15,23,42,0.05)",
+                        backgroundColor: "transparent",
+                        borderRadius: "24px",
                       }}
                     >
                       <h3 className="section-header">✍️ Writing Suggestions</h3>
@@ -2545,7 +2715,7 @@ export const ChapterCheckerV2: React.FC = () => {
                             fontSize: "14px",
                             fontWeight: "600",
                             marginBottom: "12px",
-                            color: "#6b7280",
+                            color: "#2c3e50",
                           }}
                         >
                           Learning Principles
@@ -2558,8 +2728,8 @@ export const ChapterCheckerV2: React.FC = () => {
                               style={{
                                 marginBottom: "8px",
                                 padding: "8px 12px",
-                                backgroundColor: "#f9fafb",
-                                borderRadius: "6px",
+                                backgroundColor: "#fef5e7",
+                                borderRadius: "20px",
                                 display: "flex",
                                 justifyContent: "space-between",
                                 alignItems: "center",
@@ -2597,7 +2767,7 @@ export const ChapterCheckerV2: React.FC = () => {
                             fontSize: "14px",
                             fontWeight: "600",
                             marginBottom: "12px",
-                            color: "#6b7280",
+                            color: "#2c3e50",
                           }}
                         >
                           Top Recommendations
@@ -2616,9 +2786,9 @@ export const ChapterCheckerV2: React.FC = () => {
                                     ? "#ef4444"
                                     : rec.priority === "medium"
                                     ? "#f59e0b"
-                                    : "#d1d5db"
+                                    : "#e0c392"
                                 }`,
-                                borderRadius: "8px",
+                                borderRadius: "20px",
                               }}
                             >
                               <div
@@ -2634,19 +2804,19 @@ export const ChapterCheckerV2: React.FC = () => {
                                     fontSize: "10px",
                                     fontWeight: "600",
                                     padding: "2px 6px",
-                                    borderRadius: "4px",
+                                    borderRadius: "16px",
                                     backgroundColor:
                                       rec.priority === "high"
                                         ? "#fee2e2"
                                         : rec.priority === "medium"
                                         ? "#fef3c7"
-                                        : "#f3f4f6",
+                                        : "#f2ebe3",
                                     color:
                                       rec.priority === "high"
                                         ? "#991b1b"
                                         : rec.priority === "medium"
                                         ? "#92400e"
-                                        : "#6b7280",
+                                        : "#2c3e50",
                                     textTransform: "uppercase",
                                   }}
                                 >
@@ -2667,7 +2837,7 @@ export const ChapterCheckerV2: React.FC = () => {
                                 style={{
                                   margin: "0",
                                   fontSize: "12px",
-                                  color: "#6b7280",
+                                  color: "#2c3e50",
                                   lineHeight: "1.5",
                                 }}
                               >
@@ -2696,7 +2866,6 @@ export const ChapterCheckerV2: React.FC = () => {
                                 analysis.conceptGraph?.concepts || []
                               }
                               chapterText={chapterText}
-                              onAcceptSuggestion={handleAcceptMissingConcept}
                             />
                           </div>
                         )}
@@ -2719,13 +2888,12 @@ export const ChapterCheckerV2: React.FC = () => {
             left: "28px",
             padding: "12px 18px",
             borderRadius: "999px",
-            border: "none",
-            background:
-              "linear-gradient(135deg, rgba(31,41,55,0.95), rgba(55,65,81,0.95))",
-            color: "white",
+            border: "2px solid #2c3e50",
+            background: "white",
+            color: "#2c3e50",
             fontWeight: 600,
             fontSize: "14px",
-            boxShadow: "0 12px 25px rgba(15,23,42,0.25)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
@@ -2759,7 +2927,7 @@ export const ChapterCheckerV2: React.FC = () => {
           <div
             style={{
               backgroundColor: "white",
-              borderRadius: "12px",
+              borderRadius: "24px",
               padding: "32px",
               maxWidth: "600px",
               width: "90%",
@@ -2780,7 +2948,7 @@ export const ChapterCheckerV2: React.FC = () => {
               style={{
                 margin: "0 0 24px 0",
                 fontSize: "14px",
-                color: "#6b7280",
+                color: "#2c3e50",
                 lineHeight: "1.6",
               }}
             >
@@ -2796,7 +2964,7 @@ export const ChapterCheckerV2: React.FC = () => {
                   fontSize: "13px",
                   fontWeight: "600",
                   marginBottom: "8px",
-                  color: "#374151",
+                  color: "#2c3e50",
                 }}
               >
                 Domain Name:
@@ -2809,16 +2977,16 @@ export const ChapterCheckerV2: React.FC = () => {
                 style={{
                   width: "100%",
                   padding: "12px",
-                  border: "2px solid #e5e7eb",
-                  borderRadius: "8px",
+                  border: "2px solid #e0c392",
+                  borderRadius: "20px",
                   fontSize: "14px",
                   outline: "none",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#3b82f6";
+                  e.currentTarget.style.borderColor = "#2c3e50";
                 }}
                 onBlur={(e) => {
-                  e.currentTarget.style.borderColor = "#e5e7eb";
+                  e.currentTarget.style.borderColor = "#e0c392";
                 }}
               />
             </div>
@@ -2830,7 +2998,7 @@ export const ChapterCheckerV2: React.FC = () => {
                   fontSize: "13px",
                   fontWeight: "600",
                   marginBottom: "8px",
-                  color: "#374151",
+                  color: "#2c3e50",
                 }}
               >
                 Key Concepts (optional):
@@ -2841,22 +3009,22 @@ export const ChapterCheckerV2: React.FC = () => {
                   width: "100%",
                   minHeight: "120px",
                   padding: "12px",
-                  border: "2px solid #e5e7eb",
-                  borderRadius: "8px",
+                  border: "2px solid #e0c392",
+                  borderRadius: "20px",
                   fontSize: "14px",
                   fontFamily: "ui-sans-serif, system-ui, sans-serif",
                   outline: "none",
                   resize: "vertical",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#3b82f6";
+                  e.currentTarget.style.borderColor = "#2c3e50";
                 }}
                 onBlur={(e) => {
-                  e.currentTarget.style.borderColor = "#e5e7eb";
+                  e.currentTarget.style.borderColor = "#e0c392";
                 }}
               />
               <div
-                style={{ fontSize: "12px", color: "#6b7280", marginTop: "6px" }}
+                style={{ fontSize: "12px", color: "#2c3e50", marginTop: "6px" }}
               >
                 💡 You can add concepts now or after creating the domain
               </div>
@@ -2876,10 +3044,10 @@ export const ChapterCheckerV2: React.FC = () => {
                 }}
                 style={{
                   padding: "10px 24px",
-                  backgroundColor: "#f3f4f6",
-                  color: "#374151",
-                  border: "none",
-                  borderRadius: "8px",
+                  backgroundColor: "#f2ebe3",
+                  color: "#2c3e50",
+                  border: "1.5px solid #2c3e50",
+                  borderRadius: "20px",
                   fontSize: "14px",
                   fontWeight: "600",
                   cursor: "pointer",
@@ -2922,10 +3090,10 @@ export const ChapterCheckerV2: React.FC = () => {
                   padding: "10px 24px",
                   backgroundColor: customDomainName.trim()
                     ? "#10b981"
-                    : "#d1d5db",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
+                    : "#e0c392",
+                  color: "#2c3e50",
+                  border: "1.5px solid #2c3e50",
+                  borderRadius: "20px",
                   fontSize: "14px",
                   fontWeight: "600",
                   cursor: customDomainName.trim() ? "pointer" : "not-allowed",
@@ -2975,7 +3143,7 @@ export const ChapterCheckerV2: React.FC = () => {
                   margin: "0 0 8px 0",
                   fontSize: "24px",
                   fontWeight: "700",
-                  color: "#1f2937",
+                  color: "#2c3e50",
                 }}
               >
                 🤖 Select Template Type
@@ -2984,7 +3152,7 @@ export const ChapterCheckerV2: React.FC = () => {
                 style={{
                   margin: 0,
                   fontSize: "14px",
-                  color: "#6b7280",
+                  color: "#2c3e50",
                   lineHeight: "1.6",
                 }}
               >
@@ -3008,8 +3176,8 @@ export const ChapterCheckerV2: React.FC = () => {
                   style={{
                     padding: "20px",
                     backgroundColor: "#ffffff",
-                    border: "2px solid #e5e7eb",
-                    borderRadius: "12px",
+                    border: "2px solid #e0c392",
+                    borderRadius: "24px",
                   }}
                 >
                   <div
@@ -3027,7 +3195,7 @@ export const ChapterCheckerV2: React.FC = () => {
                           margin: "0 0 6px 0",
                           fontSize: "18px",
                           fontWeight: "600",
-                          color: "#1f2937",
+                          color: "#2c3e50",
                         }}
                       >
                         {template.name}
@@ -3036,7 +3204,7 @@ export const ChapterCheckerV2: React.FC = () => {
                         style={{
                           margin: 0,
                           fontSize: "14px",
-                          color: "#6b7280",
+                          color: "#2c3e50",
                           lineHeight: "1.5",
                         }}
                       >
@@ -3090,19 +3258,19 @@ export const ChapterCheckerV2: React.FC = () => {
                       style={{
                         flex: 1,
                         padding: "10px",
-                        backgroundColor: "#f3f4f6",
-                        color: "#374151",
-                        border: "1px solid #d1d5db",
-                        borderRadius: "8px",
+                        backgroundColor: "#f2ebe3",
+                        color: "#2c3e50",
+                        border: "1px solid #e0c392",
+                        borderRadius: "20px",
                         fontSize: "13px",
                         fontWeight: "600",
                         cursor: "pointer",
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#e5e7eb";
+                        e.currentTarget.style.backgroundColor = "#e0c392";
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "#f3f4f6";
+                        e.currentTarget.style.backgroundColor = "#f2ebe3";
                       }}
                     >
                       📝 Manual Template
@@ -3117,19 +3285,19 @@ export const ChapterCheckerV2: React.FC = () => {
                       style={{
                         flex: 1,
                         padding: "10px",
-                        backgroundColor: "#9333ea",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "8px",
+                        backgroundColor: "#2c3e50",
+                        color: "#2c3e50",
+                        border: "1.5px solid #2c3e50",
+                        borderRadius: "20px",
                         fontSize: "13px",
                         fontWeight: "600",
                         cursor: "pointer",
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#7c3aed";
+                        e.currentTarget.style.backgroundColor = "#2c3e50";
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "#9333ea";
+                        e.currentTarget.style.backgroundColor = "#2c3e50";
                       }}
                     >
                       🤖 Generate with Claude AI
@@ -3145,10 +3313,10 @@ export const ChapterCheckerV2: React.FC = () => {
               style={{
                 width: "100%",
                 padding: "12px",
-                backgroundColor: "#f3f4f6",
-                color: "#374151",
-                border: "none",
-                borderRadius: "8px",
+                backgroundColor: "#f2ebe3",
+                color: "#2c3e50",
+                border: "1.5px solid #2c3e50",
+                borderRadius: "20px",
                 fontSize: "14px",
                 fontWeight: "600",
                 cursor: "pointer",
@@ -3199,7 +3367,7 @@ export const ChapterCheckerV2: React.FC = () => {
                 margin: "0 0 8px 0",
                 fontSize: "24px",
                 fontWeight: "700",
-                color: "#1f2937",
+                color: "#2c3e50",
               }}
             >
               🤖 Claude AI Integration
@@ -3208,7 +3376,7 @@ export const ChapterCheckerV2: React.FC = () => {
               style={{
                 margin: "0 0 24px 0",
                 fontSize: "14px",
-                color: "#6b7280",
+                color: "#2c3e50",
                 lineHeight: "1.6",
               }}
             >
@@ -3224,7 +3392,7 @@ export const ChapterCheckerV2: React.FC = () => {
                   fontSize: "13px",
                   fontWeight: "600",
                   marginBottom: "8px",
-                  color: "#374151",
+                  color: "#2c3e50",
                 }}
               >
                 Claude API Key:
@@ -3238,24 +3406,24 @@ export const ChapterCheckerV2: React.FC = () => {
                 style={{
                   width: "100%",
                   padding: "12px",
-                  border: "2px solid #e5e7eb",
-                  borderRadius: "8px",
+                  border: "2px solid #e0c392",
+                  borderRadius: "20px",
                   fontSize: "14px",
                   fontFamily: "monospace",
                   outline: "none",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#9333ea";
+                  e.currentTarget.style.borderColor = "#2c3e50";
                 }}
                 onBlur={(e) => {
-                  e.currentTarget.style.borderColor = "#e5e7eb";
+                  e.currentTarget.style.borderColor = "#e0c392";
                 }}
               />
               <p
                 style={{
                   margin: "8px 0 0 0",
                   fontSize: "12px",
-                  color: "#6b7280",
+                  color: "#2c3e50",
                 }}
               >
                 Get your API key from{" "}
@@ -3263,7 +3431,7 @@ export const ChapterCheckerV2: React.FC = () => {
                   href="https://console.anthropic.com/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ color: "#9333ea", textDecoration: "underline" }}
+                  style={{ color: "#2c3e50", textDecoration: "underline" }}
                 >
                   console.anthropic.com
                 </a>
@@ -3275,8 +3443,8 @@ export const ChapterCheckerV2: React.FC = () => {
                 style={{
                   marginBottom: "20px",
                   padding: "16px",
-                  backgroundColor: "#dbeafe",
-                  borderRadius: "8px",
+                  backgroundColor: "white",
+                  borderRadius: "20px",
                 }}
               >
                 <div
@@ -3286,7 +3454,7 @@ export const ChapterCheckerV2: React.FC = () => {
                     style={{
                       width: "20px",
                       height: "20px",
-                      border: "3px solid #3b82f6",
+                      border: "3px solid #2c3e50",
                       borderTopColor: "transparent",
                       borderRadius: "50%",
                       animation: "spin 1s linear infinite",
@@ -3297,7 +3465,7 @@ export const ChapterCheckerV2: React.FC = () => {
                       style={{
                         fontSize: "14px",
                         fontWeight: "600",
-                        color: "#1e40af",
+                        color: "#2c3e50",
                       }}
                     >
                       Generating content with Claude AI...
@@ -3305,7 +3473,7 @@ export const ChapterCheckerV2: React.FC = () => {
                     <div
                       style={{
                         fontSize: "12px",
-                        color: "#3b82f6",
+                        color: "#2c3e50",
                         marginTop: "4px",
                       }}
                     >
@@ -3327,10 +3495,10 @@ export const ChapterCheckerV2: React.FC = () => {
                 style={{
                   flex: 1,
                   padding: "12px",
-                  backgroundColor: "#f3f4f6",
-                  color: "#374151",
-                  border: "none",
-                  borderRadius: "8px",
+                  backgroundColor: "#f2ebe3",
+                  color: "#2c3e50",
+                  border: "1.5px solid #2c3e50",
+                  borderRadius: "20px",
                   fontSize: "14px",
                   fontWeight: "600",
                   cursor: isProcessingClaude ? "not-allowed" : "pointer",
@@ -3435,11 +3603,11 @@ export const ChapterCheckerV2: React.FC = () => {
                   backgroundColor:
                     isProcessingClaude ||
                     (!claudeApiKey && !getStoredClaudeKey())
-                      ? "#d1d5db"
-                      : "#9333ea",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
+                      ? "#e0c392"
+                      : "#2c3e50",
+                  color: "#2c3e50",
+                  border: "1.5px solid #2c3e50",
+                  borderRadius: "20px",
                   fontSize: "14px",
                   fontWeight: "600",
                   cursor:
