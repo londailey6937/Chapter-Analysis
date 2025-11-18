@@ -33,14 +33,14 @@ function detectMimeType(buffer: ArrayBuffer): string {
   }
 }
 
-function arrayBufferToBase64(buffer: ArrayBuffer) {
-  let binary = "";
-  const bytes = new Uint8Array(buffer);
-  const len = bytes.byteLength;
+function base64ToArrayBuffer(base64: string) {
+  const binaryString = window.atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
   for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
+    bytes[i] = binaryString.charCodeAt(i);
   }
-  return window.btoa(binary);
+  return bytes.buffer;
 }
 
 export interface UploadedDocumentPayload {
@@ -82,8 +82,8 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
           {
             convertImage: mammoth.images.imgElement((image) => {
               imageCount += 1;
-              // @ts-ignore - Mammoth types are strict about string return, but arraybuffer works at runtime
-              return image.read("arraybuffer").then((buffer: ArrayBuffer) => {
+              return image.read("base64").then((base64String) => {
+                const buffer = base64ToArrayBuffer(base64String);
                 const detectedType = detectMimeType(buffer);
                 const contentType =
                   detectedType || image.contentType || "image/png";
@@ -127,9 +127,8 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
                 }
 
                 // Standard handling for supported images
-                const base64 = arrayBufferToBase64(buffer);
                 return {
-                  src: `data:${contentType};base64,${base64}`,
+                  src: `data:${contentType};base64,${base64String}`,
                   alt: `Embedded image ${imageCount} (${contentType})`,
                   class: "mammoth-image",
                 };
