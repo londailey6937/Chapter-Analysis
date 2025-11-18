@@ -1679,7 +1679,7 @@ const TAG_SPECIFIC_ATTRS: Record<string, Set<string>> = {
 };
 
 const SAFE_URL_PATTERN =
-  /^(?:https?:|mailto:|tel:|\/?|#|\.\/|\.\.?\/|data:image\/(?:png|jpe?g|gif|webp);base64,)/i;
+  /^(?:https?:|mailto:|tel:|\/?|#|\.\/|\.\.?\/|data:image\/[^;]+;base64,)/i;
 
 function sanitizeHtml(html: string): string {
   if (!html || typeof html !== "string") {
@@ -1727,6 +1727,10 @@ function sanitizeHtml(html: string): string {
 
         if (name === "href" || name === "src") {
           if (!isSafeUrl(value)) {
+            console.warn(
+              `⚠️ Sanitized unsafe URL in ${tag} ${name}:`,
+              value.substring(0, 50) + "..."
+            );
             node.removeAttribute(attribute.name);
             return;
           }

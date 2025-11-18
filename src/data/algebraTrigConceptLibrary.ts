@@ -8,8 +8,8 @@
 import { ConceptLibrary } from "./conceptLibraryTypes";
 
 export const ALGEBRA_TRIG_CONCEPTS: ConceptLibrary = {
-  domain: "Algebra & Trigonometry",
-  version: "1.0.0",
+  domain: "Mathematics",
+  version: "1.1.0",
   concepts: [
     // ========== CORE ALGEBRA CONCEPTS ==========
     {
@@ -527,6 +527,93 @@ export const ALGEBRA_TRIG_CONCEPTS: ConceptLibrary = {
       category: "Problem Solving",
       importance: "supporting",
       aliases: ["rationalize"],
+    },
+
+    // ========== CALCULUS CONCEPTS ==========
+    {
+      name: "limit",
+      category: "Calculus Fundamentals",
+      importance: "core",
+      aliases: ["limit of a function", "lim", "limits"],
+    },
+    {
+      name: "continuity",
+      category: "Calculus Fundamentals",
+      importance: "core",
+      aliases: ["continuous function", "continuous"],
+    },
+    {
+      name: "derivative",
+      category: "Differential Calculus",
+      importance: "core",
+      aliases: ["differentiation", "f'(x)", "dy/dx", "derivatives"],
+    },
+    {
+      name: "tangent line",
+      category: "Differential Calculus",
+      importance: "core",
+      aliases: ["slope of tangent", "tangent lines"],
+    },
+    {
+      name: "secant line",
+      category: "Differential Calculus",
+      importance: "supporting",
+      aliases: ["secant lines"],
+    },
+    {
+      name: "rate of change",
+      category: "Differential Calculus",
+      importance: "core",
+      aliases: ["instantaneous rate of change", "rates of change"],
+    },
+    {
+      name: "chain rule",
+      category: "Differential Calculus",
+      importance: "core",
+    },
+    {
+      name: "product rule",
+      category: "Differential Calculus",
+      importance: "core",
+    },
+    {
+      name: "quotient rule",
+      category: "Differential Calculus",
+      importance: "core",
+    },
+    {
+      name: "integral",
+      category: "Integral Calculus",
+      importance: "core",
+      aliases: [
+        "integration",
+        "antiderivative",
+        "integrals",
+        "antiderivatives",
+      ],
+    },
+    {
+      name: "definite integral",
+      category: "Integral Calculus",
+      importance: "core",
+      aliases: ["area under curve", "definite integrals"],
+    },
+    {
+      name: "indefinite integral",
+      category: "Integral Calculus",
+      importance: "core",
+      aliases: ["indefinite integrals"],
+    },
+    {
+      name: "fundamental theorem of calculus",
+      category: "Integral Calculus",
+      importance: "core",
+    },
+    {
+      name: "differential equation",
+      category: "Advanced Calculus",
+      importance: "core",
+      aliases: ["diff eq", "ODE", "differential equations", "ODEs"],
     },
   ],
 };

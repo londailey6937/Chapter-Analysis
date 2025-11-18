@@ -40,11 +40,14 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
           {
             convertImage: mammoth.images.imgElement((image) => {
               imageCount += 1;
-              return image.read("base64").then((imageBuffer) => ({
-                src: `data:${image.contentType};base64,${imageBuffer}`,
-                alt: `Embedded image ${imageCount}`,
-                class: "mammoth-image",
-              }));
+              return image.read("base64").then((imageBuffer) => {
+                const contentType = image.contentType || "image/png";
+                return {
+                  src: `data:${contentType};base64,${imageBuffer}`,
+                  alt: `Embedded image ${imageCount}`,
+                  class: "mammoth-image",
+                };
+              });
             }),
           }
         );
