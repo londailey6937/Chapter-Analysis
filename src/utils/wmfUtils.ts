@@ -1,4 +1,7 @@
-import * as WMF from "wmf";
+import * as WMFModule from "wmf";
+
+// Handle different import styles (CommonJS vs ESM)
+const WMF = (WMFModule as any).default || WMFModule;
 
 export function wmfToPng(buffer: ArrayBuffer): string | null {
   try {
@@ -6,8 +9,14 @@ export function wmfToPng(buffer: ArrayBuffer): string | null {
       return null; // Server-side not supported for canvas
     }
 
+    console.log("WMF Module:", WMF);
+
+    if (!WMF || !WMF.image_size || !WMF.draw_canvas) {
+      console.error("WMF library not loaded correctly", WMF);
+      return null;
+    }
+
     const data = new Uint8Array(buffer);
-    // @ts-ignore - WMF types might be missing
     const size = WMF.image_size(data);
 
     if (!size || size.length < 2) {
@@ -22,7 +31,6 @@ export function wmfToPng(buffer: ArrayBuffer): string | null {
     canvas.width = width;
     canvas.height = height;
 
-    // @ts-ignore
     WMF.draw_canvas(data, canvas);
 
     return canvas.toDataURL("image/png");

@@ -82,7 +82,8 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
           {
             convertImage: mammoth.images.imgElement((image) => {
               imageCount += 1;
-              return image.read("arraybuffer").then((buffer) => {
+              // @ts-ignore - Mammoth types are strict about string return, but arraybuffer works at runtime
+              return image.read("arraybuffer").then((buffer: ArrayBuffer) => {
                 const detectedType = detectMimeType(buffer);
                 const contentType =
                   detectedType || image.contentType || "image/png";
@@ -98,24 +99,31 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
                   contentType.includes("wmf") ||
                   contentType.includes("emf")
                 ) {
-                  const convertedSrc = wmfToPng(buffer);
-                  if (convertedSrc) {
-                    console.log(`✅ Converted WMF image ${imageCount} to PNG`);
-                    return {
-                      src: convertedSrc,
-                      alt: `Embedded Equation/Image ${imageCount} (Converted from WMF)`,
-                      class: "mammoth-image wmf-converted",
-                    };
-                  } else {
-                    console.warn(
-                      `⚠️ Failed to convert WMF image ${imageCount}`
+                  try {
+                    const convertedSrc = wmfToPng(buffer);
+                    if (convertedSrc) {
+                      console.log(
+                        `✅ Converted WMF image ${imageCount} to PNG`
+                      );
+                      return {
+                        src: convertedSrc,
+                        alt: `Embedded Equation/Image ${imageCount} (Converted from WMF)`,
+                        class: "mammoth-image wmf-converted",
+                      };
+                    }
+                  } catch (err) {
+                    console.error(
+                      `Error converting WMF image ${imageCount}:`,
+                      err
                     );
-                    return {
-                      src: getPlaceholderSvg("WMF/EMF"),
-                      alt: `Embedded Equation/Image ${imageCount} (WMF - Conversion Failed)`,
-                      class: "mammoth-image wmf-failed",
-                    };
                   }
+
+                  console.warn(`⚠️ Failed to convert WMF image ${imageCount}`);
+                  return {
+                    src: getPlaceholderSvg("WMF/EMF"),
+                    alt: `Embedded Equation/Image ${imageCount} (WMF - Conversion Failed)`,
+                    class: "mammoth-image wmf-failed",
+                  };
                 }
 
                 // Standard handling for supported images
