@@ -1046,7 +1046,7 @@ export const InterleavingPattern: React.FC<{
   };
 
   const pattern = analysis.visualizations.interleavingPattern;
-  const sequence = pattern.conceptSequence.slice(0, 50); // Show more for better insight
+  const fullSequence = pattern.conceptSequence || [];
 
   // Build ID -> Name map from conceptMap nodes
   const idToName: Record<string, string> = {};
@@ -1116,7 +1116,7 @@ export const InterleavingPattern: React.FC<{
     .slice(0, 3);
 
   // Generate color map with consistent hashing
-  const uniqueConcepts = Array.from(new Set(sequence));
+  const uniqueConcepts = Array.from(new Set(fullSequence));
   const colorMap: Record<string, string> = {};
   uniqueConcepts.forEach((conceptId, idx) => {
     const hue = (idx / uniqueConcepts.length) * 360;
@@ -1178,35 +1178,43 @@ export const InterleavingPattern: React.FC<{
         {/* Interactive sequence grid */}
         <div
           style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(12px, 1fr))",
-            gap: "3px",
-            marginBottom: "16px",
-            maxWidth: "100%",
+            overflowX: "auto",
+            paddingBottom: "8px",
           }}
         >
-          {sequence.slice(0, 50).map((conceptId, idx) => (
-            <div
-              key={idx}
-              style={{
-                backgroundColor: colorMap[conceptId],
-                height: "60px",
-                borderRadius: "4px",
-                cursor: "pointer",
-                transition: "transform 0.2s, box-shadow 0.2s",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-              }}
-              title={`${idx + 1}. ${idToName[conceptId] || conceptId}`}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.1)";
-                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-              }}
-            />
-          ))}
+          <div
+            style={{
+              display: "flex",
+              gap: "3px",
+              minWidth: `${Math.max(fullSequence.length * 10, 320)}px`,
+            }}
+          >
+            {fullSequence.map((conceptId, idx) => (
+              <div
+                key={idx}
+                style={{
+                  backgroundColor: colorMap[conceptId],
+                  height: "60px",
+                  width: "10px",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  transition: "transform 0.2s, box-shadow 0.2s",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                  flex: "0 0 auto",
+                }}
+                title={`${idx + 1}. ${idToName[conceptId] || conceptId}`}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.15)";
+                  e.currentTarget.style.boxShadow =
+                    "0 4px 12px rgba(0,0,0,0.2)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
+                  e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+                }}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Concept legend with counts */}
@@ -1219,7 +1227,7 @@ export const InterleavingPattern: React.FC<{
           }}
         >
           {uniqueConcepts.slice(0, 8).map((conceptId) => {
-            const count = sequence.filter((id) => id === conceptId).length;
+            const count = fullSequence.filter((id) => id === conceptId).length;
             return (
               <div
                 key={conceptId}
@@ -1300,8 +1308,8 @@ export const InterleavingPattern: React.FC<{
               maxRun = 0,
               curRun = 0,
               curStart = 0;
-            for (let i = 0; i < sequence.length; i++) {
-              if (sequence[i] === group.conceptId) {
+            for (let i = 0; i < fullSequence.length; i++) {
+              if (fullSequence[i] === group.conceptId) {
                 if (curRun === 0) curStart = i;
                 curRun++;
                 if (curRun > maxRun) {
