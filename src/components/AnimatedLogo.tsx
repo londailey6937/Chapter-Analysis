@@ -95,17 +95,19 @@ export function AnimatedLogo({
         }
 
         .hexagon-outer {
-          animation: ${animate ? "rotate 20s linear infinite" : "none"};
+          animation: ${animate ? "rotate 5s linear infinite" : "none"};
           transform-origin: 50px 50px;
         }
 
         .hexagon-inner {
-          animation: ${animate ? "rotate 15s linear infinite reverse" : "none"};
+          animation: ${animate ? "rotate 4s linear infinite reverse" : "none"};
           transform-origin: 50px 50px;
         }
 
         .node {
-          animation: ${animate ? "pulse-node 2s ease-in-out infinite" : "none"};
+          animation: ${
+            animate ? "pulse-node 0.8s ease-in-out infinite" : "none"
+          };
         }
 
         .node-1 { animation-delay: 0s; }
@@ -116,18 +118,20 @@ export function AnimatedLogo({
 
         .connection-flow {
           stroke-dasharray: 5 5;
-          animation: ${animate ? "flow-1 3s linear infinite" : "none"};
+          animation: ${animate ? "flow-1 1s linear infinite" : "none"};
         }
 
         .connection-flow-alt {
           stroke-dasharray: 5 5;
-          animation: ${animate ? "flow-2 3s linear infinite" : "none"};
-          animation-delay: 1.5s;
+          animation: ${animate ? "flow-2 1s linear infinite" : "none"};
+          animation-delay: 0.5s;
         }
 
         .logo-svg:hover {
           animation: ${
-            animate && isHovered ? "glow-pulse 1s ease-in-out infinite" : "none"
+            animate && isHovered
+              ? "glow-pulse 0.4s ease-in-out infinite"
+              : "none"
           };
         }
       `}</style>
