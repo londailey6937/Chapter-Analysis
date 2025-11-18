@@ -1,5 +1,47 @@
 import React, { useRef } from "react";
 import mammoth from "mammoth";
+import { wmfToPng, getPlaceholderSvg } from "../utils/wmfUtils";
+
+// Helper to detect magic numbers
+function detectMimeType(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer).subarray(0, 4);
+  const header = Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+
+  switch (header) {
+    case "89504e47":
+      return "image/png";
+    case "ffd8ffe0":
+    case "ffd8ffe1":
+    case "ffd8ffe2":
+      return "image/jpeg";
+    case "47494638":
+      return "image/gif";
+    case "52494646":
+      return "image/webp"; // RIFF
+    case "49492a00":
+      return "image/tiff"; // Little-endian
+    case "4d4d002a":
+      return "image/tiff"; // Big-endian
+    case "d7cdc69a":
+      return "image/x-wmf"; // WMF
+    case "01000900":
+      return "image/x-wmf"; // WMF (another variant)
+    default:
+      return ""; // Unknown, rely on extension
+  }
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer) {
+  let binary = "";
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
+}
 
 export interface UploadedDocumentPayload {
   fileName: string;
@@ -40,13 +82,46 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
           {
             convertImage: mammoth.images.imgElement((image) => {
               imageCount += 1;
-              return image.read("base64").then((imageBuffer) => {
-                const contentType = image.contentType || "image/png";
+              return image.read("arraybuffer").then((buffer) => {
+                const detectedType = detectMimeType(buffer);
+                const contentType =
+                  detectedType || image.contentType || "image/png";
+
                 console.log(
-                  `📸 Extracted image: ${contentType}, size: ${imageBuffer.length}`
+                  `📸 Extracted image ${imageCount}: Declared=${image.contentType}, Detected=${detectedType}, Final=${contentType}, Size=${buffer.byteLength}`
                 );
+
+                // Handle WMF/EMF (Windows Metafiles - common for equations)
+                if (
+                  contentType === "image/x-wmf" ||
+                  contentType === "image/x-emf" ||
+                  contentType.includes("wmf") ||
+                  contentType.includes("emf")
+                ) {
+                  const convertedSrc = wmfToPng(buffer);
+                  if (convertedSrc) {
+                    console.log(`✅ Converted WMF image ${imageCount} to PNG`);
+                    return {
+                      src: convertedSrc,
+                      alt: `Embedded Equation/Image ${imageCount} (Converted from WMF)`,
+                      class: "mammoth-image wmf-converted",
+                    };
+                  } else {
+                    console.warn(
+                      `⚠️ Failed to convert WMF image ${imageCount}`
+                    );
+                    return {
+                      src: getPlaceholderSvg("WMF/EMF"),
+                      alt: `Embedded Equation/Image ${imageCount} (WMF - Conversion Failed)`,
+                      class: "mammoth-image wmf-failed",
+                    };
+                  }
+                }
+
+                // Standard handling for supported images
+                const base64 = arrayBufferToBase64(buffer);
                 return {
-                  src: `data:${contentType};base64,${imageBuffer}`,
+                  src: `data:${contentType};base64,${base64}`,
                   alt: `Embedded image ${imageCount} (${contentType})`,
                   class: "mammoth-image",
                 };
