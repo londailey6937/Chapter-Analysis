@@ -43,6 +43,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
               return image.read("base64").then((imageBuffer) => ({
                 src: `data:${image.contentType};base64,${imageBuffer}`,
                 alt: `Embedded image ${imageCount}`,
+                class: "mammoth-image",
               }));
             }),
           }

@@ -801,6 +801,7 @@ const ReadOnlyView: React.FC<ReadOnlyViewProps> = ({
         <div
           ref={htmlContentRef}
           data-sanitized-html="true"
+          className="prose-content"
           style={{
             whiteSpace: "normal",
             lineHeight: 1.6,

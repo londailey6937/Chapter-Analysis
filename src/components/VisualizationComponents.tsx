@@ -197,161 +197,195 @@ export const ChapterOverviewTimeline: React.FC<{
     <div className="viz-container chapter-timeline">
       <h3>Chapter Structure Overview</h3>
       <p className="viz-subtitle">
-        Color-coded sections show where improvements are needed
+        Navigate sections and identify areas needing attention
       </p>
-      <div className={`timeline-bar ${isScrollable ? "scrollable" : ""}`}>
-        {isScrollable ? (
-          <div
-            className="timeline-track"
-            style={{ width: `${sections.length * perWidth}px` }}
-          >
-            {sections.map((sec: any, idx: number) => {
-              const issue = sectionIssues[sec.sectionId] || {
-                load: 0,
-                hasBlocking: false,
-                sectionName: sec.heading,
-              };
-              const color = getSectionColor(issue.load, issue.hasBlocking);
-              const label = getSectionLabel(issue.load, issue.hasBlocking);
-              return (
-                <div
-                  key={sec.sectionId || idx}
-                  className="timeline-section"
-                  style={{ width: `${perWidth}px`, backgroundColor: color }}
-                  title={`${issue.sectionName}: ${label}`}
-                  onClick={() => {
-                    console.log("🖱️ Click handler triggered!");
-                    const pos =
-                      (sec as any).position ?? (sec as any).startPosition ?? 0;
-                    console.log("🖱️ Timeline section clicked:", {
-                      sectionName: issue.sectionName,
-                      position: pos,
-                      sectionIndex: idx,
-                      sectionId: sec.sectionId,
-                    });
-                    window.dispatchEvent(
-                      new CustomEvent("jump-to-position", {
-                        detail: {
-                          position: pos,
-                          heading: issue.sectionName,
-                          sectionIndex: idx,
-                          sectionId: sec.sectionId,
-                        },
-                      })
-                    );
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      const pos =
-                        (sec as any).position ??
-                        (sec as any).startPosition ??
-                        0;
-                      window.dispatchEvent(
-                        new CustomEvent("jump-to-position", {
-                          detail: {
-                            position: pos,
-                            heading: issue.sectionName,
-                            sectionIndex: idx,
-                            sectionId: sec.sectionId,
-                          },
-                        })
-                      );
-                    }
-                  }}
-                >
-                  <span className="section-index">{idx + 1}</span>
-                </div>
-              );
-            })}
+
+      {/* Summary Stats */}
+      <div className="structure-stats">
+        <div className="stat-card">
+          <div className="stat-value">{sections.length}</div>
+          <div className="stat-label">Sections</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">
+            {
+              sections.filter((sec: any) => {
+                const issue = sectionIssues[sec.sectionId] || {
+                  load: 0,
+                  hasBlocking: false,
+                };
+                return issue.load > 0.8 || issue.hasBlocking;
+              }).length
+            }
           </div>
-        ) : (
-          sections.map((sec: any, idx: number) => {
+          <div className="stat-label">High Priority</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">
+            {
+              sections.filter((sec: any) => {
+                const issue = sectionIssues[sec.sectionId] || {
+                  load: 0,
+                  hasBlocking: false,
+                };
+                return (
+                  issue.load > 0.6 && issue.load <= 0.8 && !issue.hasBlocking
+                );
+              }).length
+            }
+          </div>
+          <div className="stat-label">Moderate Load</div>
+        </div>
+        <div className="stat-card stat-success">
+          <div className="stat-value">
+            {
+              sections.filter((sec: any) => {
+                const issue = sectionIssues[sec.sectionId] || {
+                  load: 0,
+                  hasBlocking: false,
+                };
+                return issue.load <= 0.6 && !issue.hasBlocking;
+              }).length
+            }
+          </div>
+          <div className="stat-label">Well-Balanced</div>
+        </div>
+      </div>
+
+      {/* Line Graph */}
+      <ResponsiveContainer width="100%" height={320}>
+        <LineChart
+          data={sections.map((sec: any, idx: number) => {
             const issue = sectionIssues[sec.sectionId] || {
               load: 0,
               hasBlocking: false,
               sectionName: sec.heading,
             };
-            const color = getSectionColor(issue.load, issue.hasBlocking);
-            const label = getSectionLabel(issue.load, issue.hasBlocking);
-            const width = `${100 / sections.length}%`;
-            return (
-              <div
-                key={sec.sectionId || idx}
-                className="timeline-section"
-                style={{ width, backgroundColor: color }}
-                title={`${issue.sectionName}: ${label}`}
-                onClick={() => {
-                  console.log("🖱️ Click handler triggered (non-scrollable)!");
-                  const pos =
-                    (sec as any).position ?? (sec as any).startPosition ?? 0;
-                  console.log("🖱️ Timeline section clicked:", {
-                    sectionName: issue.sectionName,
-                    position: pos,
-                    sectionIndex: idx,
-                    sectionId: sec.sectionId,
-                  });
-                  window.dispatchEvent(
-                    new CustomEvent("jump-to-position", {
-                      detail: {
-                        position: pos,
-                        heading: issue.sectionName,
-                        sectionIndex: idx,
-                        sectionId: sec.sectionId,
-                      },
-                    })
-                  );
-                }}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    const pos =
-                      (sec as any).position ?? (sec as any).startPosition ?? 0;
-                    window.dispatchEvent(
-                      new CustomEvent("jump-to-position", {
-                        detail: {
-                          position: pos,
-                          heading: issue.sectionName,
-                          sectionIndex: idx,
-                          sectionId: sec.sectionId,
-                        },
-                      })
-                    );
-                  }
-                }}
-              >
-                <span className="section-index">{idx + 1}</span>
-                <span className="section-name">{issue.sectionName}</span>
-              </div>
-            );
-          })
-        )}
-      </div>
-      {isScrollable && (
-        <div className="timeline-controls">
-          <button
-            className="zoom-btn"
-            onClick={() =>
-              setZoom((z) => Math.max(0.4, Number((z - 0.15).toFixed(2))))
+            // Shorten section name to first 2 words
+            const fullName = issue.sectionName || `Section ${idx + 1}`;
+            const words = fullName.split(/\s+/);
+            const shortName =
+              words.length > 2 ? words.slice(0, 2).join(" ") + "..." : fullName;
+
+            return {
+              section: shortName,
+              fullSection: fullName,
+              sectionIndex: idx + 1,
+              load: Math.round(issue.load * 100),
+              novelConcepts: sec.novelConcepts || 0,
+              hasBlocking: issue.hasBlocking,
+              position:
+                (sec as any).position ?? (sec as any).startPosition ?? 0,
+              sectionId: sec.sectionId,
+            };
+          })}
+          margin={{ top: 5, right: 30, left: 0, bottom: 70 }}
+          onClick={(data) => {
+            if (data && data.activePayload && data.activePayload[0]) {
+              const payload = data.activePayload[0].payload;
+              window.dispatchEvent(
+                new CustomEvent("jump-to-position", {
+                  detail: {
+                    position: payload.position,
+                    heading: payload.section,
+                    sectionIndex: payload.sectionIndex - 1,
+                    sectionId: payload.sectionId,
+                  },
+                })
+              );
             }
-          >
-            −
-          </button>
-          <div className="zoom-meter">{Math.round(perWidth)}px</div>
-          <button
-            className="zoom-btn"
-            onClick={() =>
-              setZoom((z) => Math.min(3, Number((z + 0.15).toFixed(2))))
-            }
-          >
-            +
-          </button>
-        </div>
-      )}
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <XAxis
+            dataKey="section"
+            tick={{ fontSize: 10 }}
+            interval={(() => {
+              const n = sections.length;
+              if (n > 200) return Math.ceil(n / 20);
+              if (n > 100) return Math.ceil(n / 15);
+              if (n > 60) return Math.ceil(n / 12);
+              if (n > 35) return Math.ceil(n / 10);
+              return 0;
+            })()}
+            angle={-35}
+            textAnchor="end"
+            height={70}
+          />
+          <YAxis
+            label={{ value: "Load %", angle: -90, position: "insideLeft" }}
+            domain={[0, 100]}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "#fff",
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              padding: "8px",
+            }}
+            formatter={(value: any, name: string) => {
+              if (name === "Cognitive Load") return `${value}%`;
+              if (name === "New Concepts") return String(value);
+              return String(value);
+            }}
+            labelFormatter={(label: any, payload: any) => {
+              if (payload && payload[0]) {
+                const data = payload[0].payload;
+                return `${data.fullSection || data.section}${
+                  data.hasBlocking ? " (Blocking Issues)" : ""
+                }`;
+              }
+              return `Section: ${label}`;
+            }}
+          />
+          <Legend
+            verticalAlign="bottom"
+            height={30}
+            wrapperStyle={{ paddingTop: 4 }}
+          />
+          <Line
+            type="monotone"
+            dataKey="load"
+            stroke="#ef8432"
+            strokeWidth={2}
+            name="Cognitive Load"
+            dot={(props: any) => {
+              const { cx, cy, payload } = props;
+              const issue = sectionIssues[payload.sectionId] || {
+                load: 0,
+                hasBlocking: false,
+              };
+              let fill = "#10b981"; // green
+              if (issue.load > 0.8 || issue.hasBlocking) {
+                fill = "#ef4444"; // red
+              } else if (issue.load > 0.6) {
+                fill = "#bfa100"; // yellow
+              }
+              return (
+                <circle
+                  cx={cx}
+                  cy={cy}
+                  r={issue.hasBlocking ? 6 : 4}
+                  fill={fill}
+                  stroke="white"
+                  strokeWidth={2}
+                  style={{ cursor: "pointer" }}
+                />
+              );
+            }}
+            isAnimationActive={true}
+          />
+          <Line
+            type="monotone"
+            dataKey="novelConcepts"
+            stroke="#82ca9d"
+            name="New Concepts"
+            dot={false}
+            strokeDasharray="5 5"
+          />
+        </LineChart>
+      </ResponsiveContainer>
+
       <div className="timeline-legend">
         <div className="legend-item">
           <span
@@ -372,59 +406,95 @@ export const ChapterOverviewTimeline: React.FC<{
           High load or blocking
         </div>
       </div>
+
+      <div className="why-matters-block">
+        <strong>Why this matters:</strong> Managing peaks prevents overload.
+        Balanced cognitive demand keeps working memory free for meaning-making
+        instead of survival.
+      </div>
+
+      {(() => {
+        const loadData = sections.map((sec: any) => {
+          const issue = sectionIssues[sec.sectionId] || {
+            load: 0,
+            hasBlocking: false,
+            sectionName: sec.heading,
+          };
+          return {
+            load: issue.load * 100,
+            section: issue.sectionName,
+            hasBlocking: issue.hasBlocking,
+          };
+        });
+        const maxLoad = Math.max(...loadData.map((d) => d.load));
+        const avgLoad =
+          loadData.reduce((sum, d) => sum + d.load, 0) / loadData.length;
+        const peakSection = loadData.find((d) => d.load === maxLoad);
+
+        return (
+          <div className="recommendation-block">
+            <strong>Recommendation:</strong>{" "}
+            {maxLoad > 80
+              ? `Peak load at ${Math.round(maxLoad)}% in "${
+                  peakSection?.section || "a section"
+                }"—consider breaking dense sections into smaller chunks or adding examples.`
+              : maxLoad > 60
+              ? `Load is manageable but watch sections above 60%${
+                  peakSection ? ` (e.g., "${peakSection.section}")` : ""
+                }—add scaffolding or worked examples if needed.`
+              : `Excellent! Cognitive load is well-balanced. Current pacing and concept density are optimal for learner comprehension.`}
+          </div>
+        );
+      })()}
+
       <style>{`
         .chapter-timeline {
           margin-bottom: 24px;
         }
-        .timeline-bar {
-          display: flex;
-          height: 40px;
-          border-radius: 6px;
-          overflow: hidden;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        .structure-stats {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+          gap: 12px;
           margin: 16px 0;
-          position: relative;
         }
-        .timeline-bar.scrollable { overflow-x: auto; overflow-y: hidden; }
-        .timeline-track { display: flex; height: 100%; }
-        .timeline-section {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-right: 1px solid rgba(255,255,255,0.3);
-          transition: all 0.2s ease;
-          cursor: pointer;
-          position: relative;
+        .stat-card {
+          background: white;
+          border: 2px solid #ef8432;
+          border-radius: 12px;
+          padding: 16px;
+          text-align: center;
+          transition: transform 0.2s, box-shadow 0.2s;
         }
-        .timeline-section:hover {
-          filter: brightness(0.85);
-          transform: scaleY(1.15);
-          z-index: 1;
+        .stat-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(239, 132, 50, 0.2);
         }
-        .section-index {
-          color: white;
-          font-size: 11px;
-          font-weight: 600;
-          text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        .stat-card.stat-success {
+          border-color: var(--success-600);
         }
-        .section-name {
-          color: white;
-          font-size: 10px;
+        .stat-card.stat-success:hover {
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+        .stat-value {
+          font-size: 32px;
+          font-weight: 700;
+          color: #2c3e50;
+          line-height: 1;
+          margin-bottom: 8px;
+        }
+        .stat-label {
+          font-size: 13px;
+          color: #64748b;
           font-weight: 500;
-          text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-          display: block;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          padding: 0 4px;
-          margin-top: 2px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
         }
         .timeline-legend {
           display: flex;
           gap: 20px;
           flex-wrap: wrap;
           font-size: 12px;
-          margin-top: 10px;
+          margin-top: -36px;
         }
         .legend-dot {
           width: 12px;
@@ -433,10 +503,10 @@ export const ChapterOverviewTimeline: React.FC<{
           display: inline-block;
           margin-right: 6px;
         }
-        .timeline-controls { display:flex; align-items:center; gap:8px; justify-content:flex-end; margin-top:4px; }
-        .zoom-btn { border:1px solid var(--border-soft); background:white; border-radius:6px; width:28px; height:28px; cursor:pointer; font-size:16px; line-height:1; }
-        .zoom-btn:hover { background:#f3f4f6; }
-        .zoom-meter { font-size:12px; color: var(--text-subtle); min-width:48px; text-align:center; }
+        .legend-item {
+          display: flex;
+          align-items: center;
+        }
       `}</style>
     </div>
   );
@@ -529,165 +599,6 @@ export const PrincipleScoresRadar: React.FC<{ analysis: ChapterAnalysis }> = ({
             : "Several principles need attention—prioritize adding interleaving, elaboration, and retrieval practice."}
         </span>
       </div>
-    </div>
-  );
-};
-
-// ============================================================================
-// COGNITIVE LOAD CURVE
-// ============================================================================
-
-export const CognitiveLoadCurve: React.FC<{ analysis: ChapterAnalysis }> = ({
-  analysis,
-}) => {
-  const sanitizeHeadingForAxis = (
-    value: string | undefined,
-    fallback: string
-  ): string => {
-    const raw = (value || "")
-      .replace(/\\[A-Za-z]+/g, " ")
-      .replace(/[_*#]+/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-    if (!raw) {
-      return fallback;
-    }
-    return /[A-Za-z0-9]/.test(raw) ? raw : fallback;
-  };
-
-  const truncateLabel = (value: string): string => {
-    if (!value) return "";
-    const trimmed = value.trim();
-    if (trimmed.length <= 18) {
-      return trimmed;
-    }
-    const words = trimmed.split(/\s+/);
-    if (words.length === 1) {
-      return trimmed.slice(0, 18) + "…";
-    }
-    const rebuilt: string[] = [];
-    for (const word of words) {
-      const next = [...rebuilt, word].join(" ");
-      if (next.length > 18) break;
-      rebuilt.push(word);
-    }
-    return rebuilt.join(" ") + "…";
-  };
-
-  const points = analysis.visualizations.cognitiveLoadCurve || [];
-  const hasData = points.length > 0;
-  const data = points.map((point, idx) => ({
-    section: truncateLabel(
-      sanitizeHeadingForAxis(
-        point.heading || point.sectionId,
-        `Section ${idx + 1}`
-      )
-    ),
-    load: Math.round(point.load * 100),
-    novelConcepts: point.factors.novelConcepts,
-    complexity: point.factors.sentenceComplexity,
-  }));
-
-  return (
-    <div className="viz-container">
-      <h3>Cognitive Load Distribution</h3>
-      <p className="viz-subtitle">
-        Lower is better; peaks indicate challenging sections
-      </p>
-      {hasData ? (
-        <ResponsiveContainer width="100%" height={320}>
-          <LineChart
-            data={data}
-            margin={{ top: 5, right: 30, left: 0, bottom: 30 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis
-              dataKey="section"
-              tick={{ fontSize: 10 }}
-              interval={(() => {
-                const n = data.length;
-                if (n > 200) return Math.ceil(n / 20); // show ~20 ticks
-                if (n > 100) return Math.ceil(n / 15);
-                if (n > 60) return Math.ceil(n / 12);
-                if (n > 35) return Math.ceil(n / 10);
-                return 0;
-              })()}
-              angle={-35}
-              textAnchor="end"
-              height={70}
-            />
-            <YAxis
-              label={{ value: "Load %", angle: -90, position: "insideLeft" }}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "#fff",
-                border: "1px solid #ccc",
-              }}
-              formatter={(value: any, name: string) => {
-                if (name === "Cognitive Load") return `${value}%`;
-                if (name === "New Concepts") return String(value);
-                return String(value);
-              }}
-              labelFormatter={(label: any) => `Heading: ${label}`}
-            />
-            <Legend
-              verticalAlign="bottom"
-              height={40}
-              wrapperStyle={{ paddingTop: 12 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="load"
-              stroke="#ff7c7c"
-              name="Cognitive Load"
-              dot={{ r: 3 }}
-              isAnimationActive={true}
-            />
-            <Line
-              type="monotone"
-              dataKey="novelConcepts"
-              stroke="#82ca9d"
-              name="New Concepts"
-              dot={false}
-              strokeDasharray="5 5"
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      ) : (
-        <div style={{ padding: "30px", textAlign: "center", color: "#666" }}>
-          <em>
-            No section load data – likely no sections detected or concept
-            extraction empty.
-          </em>
-        </div>
-      )}
-      <div className="why-matters-block">
-        <strong>Why this matters:</strong> Managing peaks prevents overload.
-        Balanced cognitive demand keeps working memory free for meaning-making
-        instead of survival.
-      </div>
-      {hasData &&
-        (() => {
-          const maxLoad = Math.max(...data.map((d) => d.load));
-          const avgLoad =
-            data.reduce((sum, d) => sum + d.load, 0) / data.length;
-          const peakSection = data.find((d) => d.load === maxLoad);
-          return (
-            <div className="recommendation-block">
-              <strong>Recommendation:</strong>{" "}
-              {maxLoad > 80
-                ? `Peak load at ${maxLoad}% in "${
-                    peakSection?.section || "a section"
-                  }"—consider breaking dense sections into smaller chunks or adding examples.`
-                : maxLoad > 60
-                ? `Load is manageable but watch sections above 60%${
-                    peakSection ? ` (e.g., "${peakSection.section}")` : ""
-                  }—add scaffolding or worked examples if needed.`
-                : `Excellent! Cognitive load is well-balanced. Current pacing and concept density are optimal for learner comprehension.`}
-            </div>
-          );
-        })()}
     </div>
   );
 };
@@ -2205,7 +2116,6 @@ export const ChapterAnalysisDashboard: React.FC<{
 
       <div className="viz-grid">
         <PrincipleScoresRadar analysis={analysis} />
-        <CognitiveLoadCurve analysis={analysis} />
         {hasDomain && (
           <ConceptMentionFrequency
             analysis={analysis}
@@ -2476,7 +2386,6 @@ export const ChapterAnalysisDashboard: React.FC<{
 export default {
   ChapterOverviewTimeline,
   PrincipleScoresRadar,
-  CognitiveLoadCurve,
   ConceptMentionFrequency,
   ConceptMapVisualization,
   InterleavingPattern,

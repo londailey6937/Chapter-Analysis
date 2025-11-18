@@ -24,6 +24,12 @@
   opacity: 1 !important;
 }
 
+.prose-content img.mammoth-image {
+  transform: scale(2);
+  transform-origin: left center;
+  margin: 3rem 0;
+}
+
 .prose-content p {
   margin: 1rem 0;
   line-height: 1.8;
