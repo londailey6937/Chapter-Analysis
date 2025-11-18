@@ -100,9 +100,18 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
                 const buffer = base64ToArrayBuffer(base64String);
                 const detectedType = detectMimeType(buffer);
 
-                console.log(
-                  `📸 Extracted image ${imageCount}: Declared=${image.contentType}, Detected=${detectedType}, Size=${buffer.byteLength}`
-                );
+                // Only log for non-WMF images to reduce console noise
+                const isWmfType =
+                  detectedType === "image/x-wmf" ||
+                  detectedType === "image/x-emf" ||
+                  image.contentType?.includes("wmf") ||
+                  image.contentType?.includes("emf");
+
+                if (!isWmfType) {
+                  console.log(
+                    `📸 Extracted image ${imageCount}: Declared=${image.contentType}, Detected=${detectedType}, Size=${buffer.byteLength}`
+                  );
+                }
 
                 // 1. If it's a known web-safe format, render it directly.
                 if (
@@ -132,9 +141,6 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
                   try {
                     const convertedSrc = wmfToPng(buffer);
                     if (convertedSrc) {
-                      console.log(
-                        `✅ Converted WMF/EMF image ${imageCount} to PNG`
-                      );
                       return {
                         src: convertedSrc,
                         alt: `Embedded Equation/Image ${imageCount} (Converted)`,
@@ -142,18 +148,12 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
                       };
                     }
                   } catch (err) {
-                    console.error(
-                      `Error converting WMF image ${imageCount}:`,
-                      err
-                    );
+                    // Silently handle WMF conversion errors (known issue with MathType equations)
                   }
 
                   // If conversion failed AND it was explicitly WMF, show the error placeholder.
                   // If it was just "unknown", we fall through to the generic handler just in case it's something else.
                   if (isExplicitWmf) {
-                    console.warn(
-                      `⚠️ Failed to convert WMF image ${imageCount}`
-                    );
                     return {
                       src: getPlaceholderSvg("WMF/EMF"),
                       alt: `Embedded Equation/Image ${imageCount} (Conversion Failed)`,
