@@ -99,29 +99,45 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
               return image.read("base64").then((base64String) => {
                 const buffer = base64ToArrayBuffer(base64String);
                 const detectedType = detectMimeType(buffer);
-                const contentType =
-                  detectedType || image.contentType || "image/png";
 
                 console.log(
-                  `📸 Extracted image ${imageCount}: Declared=${image.contentType}, Detected=${detectedType}, Final=${contentType}, Size=${buffer.byteLength}`
+                  `📸 Extracted image ${imageCount}: Declared=${image.contentType}, Detected=${detectedType}, Size=${buffer.byteLength}`
                 );
 
-                // Handle WMF/EMF (Windows Metafiles - common for equations)
+                // 1. If it's a known web-safe format, render it directly.
                 if (
-                  contentType === "image/x-wmf" ||
-                  contentType === "image/x-emf" ||
-                  contentType.includes("wmf") ||
-                  contentType.includes("emf")
+                  [
+                    "image/png",
+                    "image/jpeg",
+                    "image/gif",
+                    "image/webp",
+                  ].includes(detectedType)
                 ) {
+                  return {
+                    src: `data:${detectedType};base64,${base64String}`,
+                    alt: `Embedded image ${imageCount} (${detectedType})`,
+                    class: "mammoth-image",
+                  };
+                }
+
+                // 2. If it's WMF/EMF (detected or declared) OR unknown (likely raw WMF), try conversion.
+                const isExplicitWmf =
+                  detectedType === "image/x-wmf" ||
+                  detectedType === "image/x-emf" ||
+                  image.contentType?.includes("wmf") ||
+                  image.contentType?.includes("emf");
+
+                // If we don't know what it is, it's often a WMF in disguise (Word does this).
+                if (isExplicitWmf || !detectedType) {
                   try {
                     const convertedSrc = wmfToPng(buffer);
                     if (convertedSrc) {
                       console.log(
-                        `✅ Converted WMF image ${imageCount} to PNG`
+                        `✅ Converted WMF/EMF image ${imageCount} to PNG`
                       );
                       return {
                         src: convertedSrc,
-                        alt: `Embedded Equation/Image ${imageCount} (Converted from WMF)`,
+                        alt: `Embedded Equation/Image ${imageCount} (Converted)`,
                         class: "mammoth-image wmf-converted",
                       };
                     }
@@ -132,18 +148,27 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
                     );
                   }
 
-                  console.warn(`⚠️ Failed to convert WMF image ${imageCount}`);
-                  return {
-                    src: getPlaceholderSvg("WMF/EMF"),
-                    alt: `Embedded Equation/Image ${imageCount} (WMF - Conversion Failed)`,
-                    class: "mammoth-image wmf-failed",
-                  };
+                  // If conversion failed AND it was explicitly WMF, show the error placeholder.
+                  // If it was just "unknown", we fall through to the generic handler just in case it's something else.
+                  if (isExplicitWmf) {
+                    console.warn(
+                      `⚠️ Failed to convert WMF image ${imageCount}`
+                    );
+                    return {
+                      src: getPlaceholderSvg("WMF/EMF"),
+                      alt: `Embedded Equation/Image ${imageCount} (Conversion Failed)`,
+                      class: "mammoth-image wmf-failed",
+                    };
+                  }
                 }
 
-                // Standard handling for supported images
+                // 3. Fallback: Trust the declared type or default to PNG.
+                // This handles cases where detection failed but the browser might still understand it,
+                // or if it's a format we don't have a magic number for yet.
+                const finalMime = image.contentType || "image/png";
                 return {
-                  src: `data:${contentType};base64,${base64String}`,
-                  alt: `Embedded image ${imageCount} (${contentType})`,
+                  src: `data:${finalMime};base64,${base64String}`,
+                  alt: `Embedded image ${imageCount} (${finalMime})`,
                   class: "mammoth-image",
                 };
               });
