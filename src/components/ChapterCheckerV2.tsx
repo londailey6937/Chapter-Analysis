@@ -1328,6 +1328,13 @@ export const ChapterCheckerV2: React.FC = () => {
       })();
 
       // Create Chapter object with plain text
+      const htmlSourceCandidate = chapterData?.isHybridDocx
+        ? chapterData?.editorHtml ?? chapterData?.html ?? ""
+        : "";
+      const normalizedHtmlSource = htmlSourceCandidate?.trim().length
+        ? htmlSourceCandidate
+        : undefined;
+
       const chapter = {
         id: `chapter-${Date.now()}`,
         title: fileName || "Untitled Chapter",
@@ -1349,6 +1356,10 @@ export const ChapterCheckerV2: React.FC = () => {
           ),
           createdAt: new Date(),
           lastAnalyzed: new Date(),
+          embeddedImageCount: chapterData?.imageCount ?? 0,
+          hasHtmlContent: Boolean(chapterData?.isHybridDocx),
+          sourceHtml: normalizedHtmlSource,
+          originalFormat: chapterData?.isHybridDocx ? "html" : "text",
         },
       };
 

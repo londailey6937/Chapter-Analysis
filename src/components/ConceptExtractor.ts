@@ -1425,6 +1425,7 @@ export class ConceptExtractor {
       "explain",
       "ask",
       "answer",
+      "reduce",
       // Document structure terms (not conceptual categories)
       "question",
       "example",
@@ -1513,6 +1514,7 @@ export class ConceptExtractor {
       "few",
       "many",
       "much",
+      "some",
       "little",
       "large",
       "small",

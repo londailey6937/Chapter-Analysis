@@ -350,7 +350,7 @@ export const ChapterOverviewTimeline: React.FC<{
             strokeWidth={2}
             name="Cognitive Load"
             dot={(props: any) => {
-              const { cx, cy, payload } = props;
+              const { cx, cy, payload, index } = props;
               const issue = sectionIssues[payload.sectionId] || {
                 load: 0,
                 hasBlocking: false,
@@ -363,6 +363,7 @@ export const ChapterOverviewTimeline: React.FC<{
               }
               return (
                 <circle
+                  key={payload.sectionId || `timeline-dot-${index}`}
                   cx={cx}
                   cy={cy}
                   r={issue.hasBlocking ? 6 : 4}
@@ -1168,37 +1169,119 @@ export const InterleavingPattern: React.FC<{
       </div>
 
       <div className="section-divider">
-        <h4>Concept Sequence (First 50 mentions)</h4>
-        <div className="interleaving-sequence">
-          {sequence.map((conceptId, idx) => (
+        <h4>Concept Sequence Visualization</h4>
+        <p style={{ fontSize: "13px", color: "#64748b", marginBottom: "12px" }}>
+          Each bar represents a concept mention. Vertical groupings indicate
+          blocking (repeated focus on one topic).
+        </p>
+
+        {/* Interactive sequence grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(12px, 1fr))",
+            gap: "3px",
+            marginBottom: "16px",
+            maxWidth: "100%",
+          }}
+        >
+          {sequence.slice(0, 50).map((conceptId, idx) => (
             <div
               key={idx}
-              className="interleaving-block"
               style={{
                 backgroundColor: colorMap[conceptId],
-                width: `${100 / sequence.length}%`,
-                height: "40px",
+                height: "60px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                transition: "transform 0.2s, box-shadow 0.2s",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
               }}
               title={`${idx + 1}. ${idToName[conceptId] || conceptId}`}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.1)";
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
+              }}
             />
           ))}
         </div>
-        <div className="interleaving-legend">
-          {uniqueConcepts.slice(0, 8).map((conceptId) => (
-            <span key={conceptId} className="legend-item">
-              <span
-                className="legend-color"
-                style={{ backgroundColor: colorMap[conceptId] }}
-              />
-              {(idToName[conceptId] || conceptId).substring(0, 20)}
-            </span>
-          ))}
-          {uniqueConcepts.length > 8 && (
-            <span className="legend-item">
-              +{uniqueConcepts.length - 8} more
-            </span>
-          )}
+
+        {/* Concept legend with counts */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: "8px",
+            marginTop: "16px",
+          }}
+        >
+          {uniqueConcepts.slice(0, 8).map((conceptId) => {
+            const count = sequence.filter((id) => id === conceptId).length;
+            return (
+              <div
+                key={conceptId}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "8px 12px",
+                  backgroundColor: "#f8fafc",
+                  borderRadius: "8px",
+                  border: "1px solid #e2e8f0",
+                }}
+              >
+                <span
+                  style={{
+                    width: "20px",
+                    height: "20px",
+                    borderRadius: "4px",
+                    backgroundColor: colorMap[conceptId],
+                    flexShrink: 0,
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: "13px",
+                    flex: 1,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {(idToName[conceptId] || conceptId).substring(0, 25)}
+                </span>
+                <span
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: "600",
+                    color: "#64748b",
+                    backgroundColor: "white",
+                    padding: "2px 8px",
+                    borderRadius: "12px",
+                  }}
+                >
+                  {count}
+                </span>
+              </div>
+            );
+          })}
         </div>
+
+        {uniqueConcepts.length > 8 && (
+          <div
+            style={{
+              marginTop: "12px",
+              fontSize: "13px",
+              color: "#64748b",
+              fontStyle: "italic",
+            }}
+          >
+            + {uniqueConcepts.length - 8} more concepts not shown
+          </div>
+        )}
       </div>
 
       {worstBlocks.length > 0 && (

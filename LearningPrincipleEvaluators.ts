@@ -9,6 +9,7 @@ import {
   Suggestion,
   Evidence,
   Chapter,
+  ChapterMetadata,
   ConceptGraph,
   // LearningPrinciple, (unused)
 } from "./index";
@@ -2309,7 +2310,10 @@ export class DualCodingEvaluator {
     _concepts: ConceptGraph,
     patternAnalysis?: any
   ): PrincipleEvaluation {
-    const visualReferences = this.countVisualReferences(chapter.content);
+    const visualReferences = this.countVisualReferences(
+      chapter.content,
+      chapter.metadata
+    );
     const findings: Finding[] = [];
     const suggestions: Suggestion[] = [];
     const evidence: Evidence[] = [];
@@ -2426,9 +2430,55 @@ export class DualCodingEvaluator {
     };
   }
 
-  private static countVisualReferences(text: string): number {
-    // Only count actual figure/diagram references with numbers (e.g., "Figure 1", "Diagram 2")
-    // Not just mentions of the words "diagram" or "figure"
+  private static countVisualReferences(
+    text: string,
+    metadata?: ChapterMetadata
+  ): number {
+    // Decode HTML entities to handle encoded content (e.g., &lt;img&gt; -> <img>)
+    // Using manual replacement since we're in a Worker context without DOM access
+    const decodeHtmlEntities = (str: string): string => {
+      return str
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&amp;/g, "&")
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'");
+    };
+
+    const htmlSource = metadata?.sourceHtml?.trim().length
+      ? metadata.sourceHtml
+      : "";
+    const baseForImageScan = htmlSource || text;
+    const decodedImageSource = decodeHtmlEntities(baseForImageScan);
+    const decodedText = decodeHtmlEntities(text);
+
+    // Count actual embedded images (e.g., <img> tags from DOCX files)
+    const imgMatches = decodedImageSource.match(/<img[^>]*>/gi);
+    const embeddedImages = imgMatches ? imgMatches.length : 0;
+    const metadataImageCount = metadata?.embeddedImageCount ?? 0;
+    const totalEmbeddedImages = Math.max(embeddedImages, metadataImageCount);
+
+    // Debug logging
+    console.log("[DEBUG] Visual References Detection:");
+    console.log(
+      "- Text decoded:",
+      text.length,
+      "->",
+      decodedText.length,
+      "chars"
+    );
+    console.log(
+      "- Embedded images found:",
+      embeddedImages,
+      "(metadata:",
+      metadataImageCount,
+      ")"
+    );
+    if (imgMatches) {
+      console.log("- First img tag sample:", imgMatches[0]?.substring(0, 100));
+    }
+
+    // Count figure/diagram references with numbers (e.g., "Figure 1", "Diagram 2")
     const patterns = [
       /\bfigure\s+\d+/gi, // "Figure 1", "Figure 12"
       /\bdiagram\s+\d+/gi, // "Diagram 1"
@@ -2440,9 +2490,19 @@ export class DualCodingEvaluator {
       /\bfig\.\s*\d+/gi, // "Fig. 1"
     ];
 
-    return patterns.reduce((sum, pattern) => {
-      return sum + (text.match(pattern) || []).length;
+    const referenceSource = decodedText.trim().length ? decodedText : text;
+    const textReferences = patterns.reduce((sum, pattern) => {
+      return sum + (referenceSource.match(pattern) || []).length;
     }, 0);
+
+    console.log("- Text references found:", textReferences);
+    console.log(
+      "- Total visual references:",
+      totalEmbeddedImages + textReferences
+    );
+
+    // Return the total of embedded images + text references
+    return totalEmbeddedImages + textReferences;
   }
 }
 

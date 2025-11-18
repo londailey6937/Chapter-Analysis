@@ -81,6 +81,10 @@ export interface ChapterMetadata {
   estimatedReadingTime: number;
   createdAt: Date;
   lastAnalyzed: Date;
+  embeddedImageCount?: number;
+  hasHtmlContent?: boolean;
+  sourceHtml?: string;
+  originalFormat?: "html" | "text";
 }
 
 /**

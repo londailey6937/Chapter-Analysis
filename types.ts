@@ -150,6 +150,10 @@ export interface ChapterMetadata {
   estimatedReadingTime: number; // minutes
   createdAt: Date;
   lastAnalyzed: Date;
+  embeddedImageCount?: number; // # of images detected during upload
+  hasHtmlContent?: boolean; // whether original upload preserved HTML
+  sourceHtml?: string; // original HTML content (with images) when available
+  originalFormat?: "html" | "text"; // track original data format
 }
 
 // ============================================================================
