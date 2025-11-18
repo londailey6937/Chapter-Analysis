@@ -42,6 +42,9 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
               imageCount += 1;
               return image.read("base64").then((imageBuffer) => {
                 const contentType = image.contentType || "image/png";
+                console.log(
+                  `📸 Extracted image: ${contentType}, size: ${imageBuffer.length}`
+                );
                 return {
                   src: `data:${contentType};base64,${imageBuffer}`,
                   alt: `Embedded image ${imageCount}`,

@@ -1679,7 +1679,7 @@ const TAG_SPECIFIC_ATTRS: Record<string, Set<string>> = {
 };
 
 const SAFE_URL_PATTERN =
-  /^(?:https?:|mailto:|tel:|\/?|#|\.\/|\.\.?\/|data:image\/[^;]+;base64,)/i;
+  /^(?:https?:|mailto:|tel:|\/?|#|\.\/|\.\.?\/|data:image\/)/i;
 
 function sanitizeHtml(html: string): string {
   if (!html || typeof html !== "string") {
@@ -1807,9 +1807,7 @@ function sanitizeStyle(value: string): string {
         return false;
       }
       if (lower.includes("url(")) {
-        return /url\(\s*(?:['\"])?(?:https?:|data:image\/(?:png|jpe?g|gif|webp);base64,)/i.test(
-          lower
-        );
+        return /url\(\s*(?:['\"])?(?:https?:|data:image\/)/i.test(lower);
       }
       return true;
     })
