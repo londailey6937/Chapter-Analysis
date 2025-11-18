@@ -1072,8 +1072,17 @@ export const ChapterCheckerV2: React.FC = () => {
       const escapeRegex = (value: string) =>
         value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-      const buildFlexiblePattern = (termLower: string) =>
-        escapeRegex(termLower).replace(/\s+/g, "\\s+");
+      const buildFlexiblePattern = (termLower: string) => {
+        if (!termLower.length) {
+          return "";
+        }
+        const core = escapeRegex(termLower).replace(/\s+/g, "\\s+");
+        const startsWithWord = /[a-z0-9]/i.test(termLower[0]);
+        const endsWithWord = /[a-z0-9]/i.test(termLower[termLower.length - 1]);
+        const prefix = startsWithWord ? "\\b" : "";
+        const suffix = endsWithWord ? "(?=\\b)" : "";
+        return `${prefix}${core}${suffix}`;
+      };
 
       const matchFlexibleAtPosition = (position: number, termLower: string) => {
         if (!termLower || position < 0 || position >= displayTextLower.length) {

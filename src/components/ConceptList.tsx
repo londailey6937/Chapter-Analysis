@@ -24,55 +24,28 @@ export const ConceptList: React.FC<ConceptListProps> = ({
   const highlightedConcept = concepts.find(
     (c) => c.id === highlightedConceptId
   );
-  const totalMentions = highlightedConcept?.mentions.length || 0;
 
-  const getPrimaryMentionIndex = (concept: Concept): number => {
+  const buildNavigableMentionIndices = (concept?: Concept): number[] => {
     if (!concept?.mentions || concept.mentions.length === 0) {
-      return 0;
+      return [];
     }
-    const canonicalIndex = concept.mentions.findIndex(
+    const hasCanonical = concept.mentions.some(
       (mention) => mention && mention.isAlias !== true
     );
-    return canonicalIndex >= 0 ? canonicalIndex : 0;
+    return concept.mentions.reduce<number[]>((acc, mention, index) => {
+      if (!mention) {
+        return acc;
+      }
+      if (mention.isAlias !== true || !hasCanonical) {
+        acc.push(index);
+      }
+      return acc;
+    }, []);
   };
 
-  const findNextMentionIndex = (
-    concept: Concept | undefined,
-    startIndex: number,
-    direction: 1 | -1
-  ): number | null => {
-    if (!concept?.mentions || concept.mentions.length === 0) {
-      return null;
-    }
-
-    const { mentions } = concept;
-    const hasCanonical = mentions.some((mention) => mention.isAlias !== true);
-    let index = startIndex + direction;
-    let aliasFallback: number | null = null;
-
-    while (index >= 0 && index < mentions.length) {
-      const mention = mentions[index];
-      if (!mention) {
-        index += direction;
-        continue;
-      }
-
-      if (mention.isAlias !== true) {
-        return index;
-      }
-
-      if (!hasCanonical) {
-        return index;
-      }
-
-      if (aliasFallback === null) {
-        aliasFallback = index;
-      }
-
-      index += direction;
-    }
-
-    return aliasFallback;
+  const getPrimaryMentionIndex = (concept: Concept): number => {
+    const navigable = buildNavigableMentionIndices(concept);
+    return navigable.length ? navigable[0] : 0;
   };
 
   // Sort concepts alphabetically (all are core concepts now)
@@ -80,12 +53,29 @@ export const ConceptList: React.FC<ConceptListProps> = ({
     a.name.localeCompare(b.name)
   );
 
-  const previousMentionIndex = highlightedConcept
-    ? findNextMentionIndex(highlightedConcept, currentMentionIndex, -1)
-    : null;
-  const nextMentionIndex = highlightedConcept
-    ? findNextMentionIndex(highlightedConcept, currentMentionIndex, 1)
-    : null;
+  const navigableIndices = buildNavigableMentionIndices(highlightedConcept);
+  const currentNavigablePosition = navigableIndices.findIndex(
+    (index) => index === currentMentionIndex
+  );
+  const resolveAdjacentMentionIndex = (direction: 1 | -1): number | null => {
+    if (!highlightedConcept || navigableIndices.length === 0) {
+      return null;
+    }
+    const baselinePosition =
+      currentNavigablePosition === -1
+        ? direction === 1
+          ? -1
+          : navigableIndices.length
+        : currentNavigablePosition;
+    const nextPosition = baselinePosition + direction;
+    if (nextPosition < 0 || nextPosition >= navigableIndices.length) {
+      return null;
+    }
+    return navigableIndices[nextPosition];
+  };
+
+  const previousMentionIndex = resolveAdjacentMentionIndex(-1);
+  const nextMentionIndex = resolveAdjacentMentionIndex(1);
 
   const handlePrevious = () => {
     if (highlightedConcept && previousMentionIndex !== null) {
@@ -136,13 +126,14 @@ export const ConceptList: React.FC<ConceptListProps> = ({
       </div>
 
       {/* Floating Navigation Widget */}
-      {highlightedConcept && totalMentions > 1 && (
+      {highlightedConcept && navigableIndices.length > 1 && (
         <div className="floating-nav">
           <div className="floating-nav-content">
             <div className="floating-nav-label">
               <strong>{highlightedConcept.name}</strong>
               <span className="mention-counter">
-                {currentMentionIndex + 1} / {totalMentions}
+                {Math.max(currentNavigablePosition, 0) + 1} /{" "}
+                {navigableIndices.length}
               </span>
             </div>
             <div className="floating-nav-buttons">
