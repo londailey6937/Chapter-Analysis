@@ -5,6 +5,7 @@ interface NavigationMenuProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenHelp: () => void;
+  onOpenReferenceLibrary: () => void;
 }
 
 /**
@@ -21,6 +22,7 @@ export function NavigationMenu({
   isOpen,
   onClose,
   onOpenHelp,
+  onOpenReferenceLibrary,
 }: NavigationMenuProps): JSX.Element | null {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
@@ -28,18 +30,6 @@ export function NavigationMenu({
 
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? null : section);
-  };
-
-  const openReferenceResources = () => {
-    if (typeof window === "undefined") return;
-    try {
-      window.open("/REFERENCE_LIBRARY.html", "_blank", "noopener,noreferrer");
-    } catch (err) {
-      console.error("Unable to open reference file", err);
-      alert(
-        "Reference file could not be opened automatically. You can access REFERENCE_LIBRARY.html in the public folder."
-      );
-    }
   };
 
   return (
@@ -82,10 +72,7 @@ export function NavigationMenu({
             padding: "1.5rem",
             background: "#f7e6d0",
             color: "#2c3e50",
-            border: "1px solid #ef8432",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
+            borderBottom: "2px solid #ef8432",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -127,27 +114,6 @@ export function NavigationMenu({
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            style={{
-              background: "#ef8432",
-              border: "none",
-              color: "white",
-              fontSize: "1.5rem",
-              cursor: "pointer",
-              width: "36px",
-              height: "36px",
-              borderRadius: "20px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "background 0.2s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "#c16659")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "#ef8432")}
-          >
-            ×
-          </button>
         </div>
 
         {/* Quick Actions */}
@@ -174,7 +140,7 @@ export function NavigationMenu({
                 padding: "0.875rem 1rem",
                 background: "white",
                 color: "#2c3e50",
-                border: "2px solid #2c3e50",
+                border: "2px solid #ef8432",
                 borderRadius: "20px",
                 fontSize: "1rem",
                 fontWeight: "600",
@@ -182,16 +148,16 @@ export function NavigationMenu({
                 display: "flex",
                 alignItems: "center",
                 gap: "0.75rem",
-                transition: "transform 0.2s, border-color 0.2s",
+                transition: "transform 0.2s, background-color 0.2s",
                 boxShadow: "none",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "translateY(-2px)";
-                e.currentTarget.style.borderColor = "#ef8432";
+                e.currentTarget.style.backgroundColor = "#f7e6d0";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.borderColor = "#2c3e50";
+                e.currentTarget.style.backgroundColor = "white";
               }}
             >
               <span style={{ fontSize: "1.25rem" }}>📚</span>
@@ -200,15 +166,15 @@ export function NavigationMenu({
 
             <button
               onClick={() => {
-                openReferenceResources();
+                onOpenReferenceLibrary();
                 onClose();
               }}
               style={{
                 width: "100%",
                 padding: "0.875rem 1rem",
                 backgroundColor: "white",
-                color: "#1f2937",
-                border: "1.5px solid #9ca3af",
+                color: "#2c3e50",
+                border: "1.5px solid #ef8432",
                 borderRadius: "20px",
                 fontSize: "1rem",
                 fontWeight: "600",
@@ -219,11 +185,11 @@ export function NavigationMenu({
                 transition: "background-color 0.2s, transform 0.2s",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#f3f4f6";
+                e.currentTarget.style.backgroundColor = "#f7e6d0";
                 e.currentTarget.style.transform = "translateY(-1px)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#f3f4f6";
+                e.currentTarget.style.backgroundColor = "white";
                 e.currentTarget.style.transform = "translateY(0)";
               }}
             >
@@ -237,9 +203,9 @@ export function NavigationMenu({
         <div
           style={{
             padding: "1.5rem",
-            background: "linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)",
-            borderTop: "1px solid #e5e7eb",
-            borderBottom: "1px solid #e5e7eb",
+            background: "#fef5e7",
+            borderTop: "1px solid #ef8432",
+            borderBottom: "1px solid #ef8432",
           }}
         >
           <h3
@@ -810,21 +776,23 @@ function FeatureSection({
         style={{
           width: "100%",
           padding: "0.875rem 1rem",
-          backgroundColor: isExpanded ? "#f3f4f6" : "white",
-          border: "1.5px solid #9ca3af",
+          marginBottom: "0.75rem",
+          background: isExpanded ? "#f7e6d0" : "white",
+          color: "#2c3e50",
+          border: isExpanded ? "2px solid #ef8432" : "1.5px solid #ef8432",
           borderRadius: "20px",
+          fontSize: "0.875rem",
+          fontWeight: "600",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
+          textAlign: "left",
           transition: "all 0.2s",
-          fontSize: "0.95rem",
-          fontWeight: "600",
-          color: "#1f2937",
         }}
         onMouseEnter={(e) => {
           if (!isExpanded) {
-            e.currentTarget.style.backgroundColor = "#f3f4f6";
+            e.currentTarget.style.backgroundColor = "#f7e6d0";
           }
         }}
         onMouseLeave={(e) => {
@@ -869,9 +837,9 @@ function FeatureSection({
           style={{
             marginTop: "0.5rem",
             padding: "0.75rem",
-            backgroundColor: "white",
+            backgroundColor: "#fef5e7",
             borderRadius: "20px",
-            border: "1.5px solid #9ca3af",
+            border: "1.5px solid #ef8432",
             animation: "expandIn 0.2s ease-out",
           }}
         >
@@ -947,7 +915,7 @@ function ComingSoonItem({ icon, title, desc }: ComingSoonItemProps) {
         padding: "0.75rem 1rem",
         backgroundColor: "white",
         borderRadius: "6px",
-        border: "1.5px solid #9ca3af",
+        border: "1.5px solid #ef8432",
         display: "flex",
         alignItems: "center",
         gap: "0.75rem",
@@ -990,7 +958,7 @@ function MenuLink({ icon, title, desc, badge, onClick }: MenuLinkProps) {
         marginBottom: "0.5rem",
         backgroundColor: "white",
         borderRadius: "6px",
-        border: "1.5px solid #9ca3af",
+        border: "1.5px solid #ef8432",
         display: "flex",
         alignItems: "center",
         gap: "0.75rem",
@@ -999,12 +967,10 @@ function MenuLink({ icon, title, desc, badge, onClick }: MenuLinkProps) {
         transition: "all 0.2s",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = "#f3f4f6";
-        e.currentTarget.style.borderColor = "#6b7280";
+        e.currentTarget.style.backgroundColor = "#f7e6d0";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.backgroundColor = "white";
-        e.currentTarget.style.borderColor = "#e5e7eb";
       }}
     >
       <span style={{ fontSize: "1.25rem" }}>{icon}</span>

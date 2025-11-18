@@ -87,10 +87,10 @@ export function AnimatedLogo({
 
         @keyframes glow-pulse {
           0%, 100% {
-            filter: drop-shadow(0 0 4px rgba(147, 51, 234, 0.4));
+            filter: drop-shadow(0 0 4px rgba(239, 132, 50, 0.4));
           }
           50% {
-            filter: drop-shadow(0 0 12px rgba(147, 51, 234, 0.8));
+            filter: drop-shadow(0 0 12px rgba(239, 132, 50, 0.8));
           }
         }
 
@@ -139,8 +139,8 @@ export function AnimatedLogo({
         className="logo-svg"
         style={{
           filter: isHovered
-            ? "drop-shadow(0 0 10px rgba(167, 139, 250, 0.6))"
-            : "drop-shadow(0 0 4px rgba(167, 139, 250, 0.3))",
+            ? "drop-shadow(0 0 10px rgba(239, 132, 50, 0.6))"
+            : "drop-shadow(0 0 4px rgba(239, 132, 50, 0.3))",
           transition: "filter 0.3s ease",
         }}
       >
@@ -148,15 +148,15 @@ export function AnimatedLogo({
           <linearGradient id="techGradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop
               offset="0%"
-              style={{ stopColor: "#a78bfa", stopOpacity: 0.95 }}
+              style={{ stopColor: "#f7e6d0", stopOpacity: 0.95 }}
             />
             <stop
               offset="50%"
-              style={{ stopColor: "#818cf8", stopOpacity: 0.9 }}
+              style={{ stopColor: "#ef8432", stopOpacity: 0.9 }}
             />
             <stop
               offset="100%"
-              style={{ stopColor: "#06b6d4", stopOpacity: 0.95 }}
+              style={{ stopColor: "#2c3e50", stopOpacity: 0.95 }}
             />
           </linearGradient>
 
@@ -169,11 +169,11 @@ export function AnimatedLogo({
           >
             <stop
               offset="0%"
-              style={{ stopColor: "#a78bfa", stopOpacity: 0.7 }}
+              style={{ stopColor: "#f7e6d0", stopOpacity: 0.7 }}
             />
             <stop
               offset="100%"
-              style={{ stopColor: "#06b6d4", stopOpacity: 0.7 }}
+              style={{ stopColor: "#ef8432", stopOpacity: 0.7 }}
             />
           </linearGradient>
         </defs>
@@ -183,7 +183,7 @@ export function AnimatedLogo({
           <path
             d="M 50 15 L 73 28 L 73 54 L 50 67 L 27 54 L 27 28 Z"
             fill="none"
-            stroke="#a78bfa"
+            stroke="#ef8432"
             strokeWidth="1.5"
             opacity="0.8"
           />
@@ -194,7 +194,7 @@ export function AnimatedLogo({
           <path
             d="M 50 25 L 65 33 L 65 49 L 50 57 L 35 49 L 35 33 Z"
             fill="none"
-            stroke="#06b6d4"
+            stroke="#2c3e50"
             strokeWidth="1"
             opacity="0.6"
           />
@@ -209,7 +209,7 @@ export function AnimatedLogo({
             y1="50"
             x2="65"
             y2="50"
-            stroke="#a78bfa"
+            stroke="#ef8432"
             strokeWidth="1.2"
           />
 
@@ -220,7 +220,7 @@ export function AnimatedLogo({
             y1="38"
             x2="58"
             y2="62"
-            stroke="#06b6d4"
+            stroke="#2c3e50"
             strokeWidth="1"
           />
           <line
@@ -229,7 +229,7 @@ export function AnimatedLogo({
             y1="38"
             x2="42"
             y2="62"
-            stroke="#06b6d4"
+            stroke="#2c3e50"
             strokeWidth="1"
           />
 
@@ -240,7 +240,7 @@ export function AnimatedLogo({
             y1="50"
             x2="35"
             y2="35"
-            stroke="#818cf8"
+            stroke="#ef8432"
             strokeWidth="1"
           />
           <line
@@ -249,7 +249,7 @@ export function AnimatedLogo({
             y1="50"
             x2="65"
             y2="35"
-            stroke="#818cf8"
+            stroke="#ef8432"
             strokeWidth="1"
           />
           <line
@@ -258,7 +258,7 @@ export function AnimatedLogo({
             y1="50"
             x2="65"
             y2="65"
-            stroke="#818cf8"
+            stroke="#ef8432"
             strokeWidth="1"
           />
           <line
@@ -267,40 +267,40 @@ export function AnimatedLogo({
             y1="50"
             x2="35"
             y2="65"
-            stroke="#818cf8"
+            stroke="#ef8432"
             strokeWidth="1"
           />
         </g>
 
         {/* Neural nodes */}
-        <circle className="node node-1" cx="50" cy="50" r="3" fill="#818cf8" />
+        <circle className="node node-1" cx="50" cy="50" r="3" fill="#ef8432" />
         <circle
           className="node node-2"
           cx="35"
           cy="35"
           r="2.5"
-          fill="#06b6d4"
+          fill="#2c3e50"
         />
         <circle
           className="node node-3"
           cx="65"
           cy="35"
           r="2.5"
-          fill="#06b6d4"
+          fill="#2c3e50"
         />
         <circle
           className="node node-4"
           cx="65"
           cy="65"
           r="2.5"
-          fill="#06b6d4"
+          fill="#2c3e50"
         />
         <circle
           className="node node-5"
           cx="35"
           cy="65"
           r="2.5"
-          fill="#06b6d4"
+          fill="#2c3e50"
         />
 
         {/* Central intelligence core */}
@@ -309,14 +309,14 @@ export function AnimatedLogo({
           cy="50"
           r="8"
           fill="none"
-          stroke="#a78bfa"
+          stroke="#ef8432"
           strokeWidth="1.5"
           opacity="0.8"
         />
 
         {/* Inner core glow */}
         {isHovered && (
-          <circle cx="50" cy="50" r="6" fill="rgba(167, 139, 250, 0.3)">
+          <circle cx="50" cy="50" r="6" fill="rgba(239, 132, 50, 0.3)">
             <animate
               attributeName="r"
               values="6;8;6"

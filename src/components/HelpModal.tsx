@@ -66,13 +66,11 @@ export function HelpModal({
         <div
           style={{
             padding: "1.5rem",
-            borderBottom: "1px solid #e5e7eb",
+            borderBottom: "2px solid #ef8432",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            background: "white",
-            color: "#1f2937",
-            border: "1px solid #d1d5db",
+            background: "#f7e6d0",
+            color: "#2c3e50",
             borderTopLeftRadius: "12px",
             borderTopRightRadius: "12px",
           }}
@@ -102,33 +100,6 @@ export function HelpModal({
               Quick Start Guide
             </span>
           </div>
-          <button
-            onClick={onClose}
-            style={{
-              background: "white",
-              border: "1.5px solid #9ca3af",
-              color: "#6b7280",
-              fontSize: "1.5rem",
-              cursor: "pointer",
-              width: "32px",
-              height: "32px",
-              borderRadius: "20px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "background 0.2s, border-color 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "#f3f4f6";
-              e.currentTarget.style.borderColor = "#6b7280";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "white";
-              e.currentTarget.style.borderColor = "#9ca3af";
-            }}
-          >
-            ×
-          </button>
         </div>
 
         {/* Content Area */}
@@ -137,10 +108,10 @@ export function HelpModal({
           <div
             style={{
               width: "200px",
-              borderRight: "1px solid #e5e7eb",
+              borderRight: "1px solid #ef8432",
               padding: "1rem",
               overflowY: "auto",
-              background: "#f9fafb",
+              background: "#fef5e7",
             }}
           >
             {Object.entries(sections).map(([key, label]) => (
@@ -148,27 +119,22 @@ export function HelpModal({
                 key={key}
                 onClick={() => setActiveSection(key)}
                 style={{
-                  display: "block",
                   width: "100%",
-                  textAlign: "left",
                   padding: "0.75rem",
                   marginBottom: "0.5rem",
+                  background: activeSection === key ? "#f7e6d0" : "transparent",
+                  color: activeSection === key ? "#2c3e50" : "#6b7280",
+                  border: activeSection === key ? "1px solid #ef8432" : "none",
+                  borderRadius: "8px",
+                  fontSize: "0.875rem",
+                  fontWeight: activeSection === key ? "600" : "500",
                   cursor: "pointer",
-                  fontSize: "0.9rem",
-                  fontWeight: activeSection === key ? "600" : "normal",
-                  backgroundColor:
-                    activeSection === key ? "white" : "transparent",
-                  border:
-                    activeSection === key
-                      ? "1.5px solid #6b7280"
-                      : "1.5px solid transparent",
-                  borderRadius: "20px",
-                  color: activeSection === key ? "#1f2937" : "#6b7280",
+                  textAlign: "left",
                   transition: "all 0.2s",
                 }}
                 onMouseEnter={(e) => {
                   if (activeSection !== key) {
-                    e.currentTarget.style.backgroundColor = "#e5e7eb";
+                    e.currentTarget.style.backgroundColor = "#f7e6d0";
                   }
                 }}
                 onMouseLeave={(e) => {
@@ -427,12 +393,12 @@ function OverallScoreSection() {
             }}
           >
             <thead>
-              <tr style={{ backgroundColor: "#f3f4f6" }}>
+              <tr style={{ backgroundColor: "#f7e6d0" }}>
                 <th
                   style={{
                     padding: "0.75rem",
                     textAlign: "left",
-                    borderBottom: "2px solid #e5e7eb",
+                    borderBottom: "2px solid #ef8432",
                   }}
                 >
                   Score Range
@@ -441,7 +407,7 @@ function OverallScoreSection() {
                   style={{
                     padding: "0.75rem",
                     textAlign: "left",
-                    borderBottom: "2px solid #e5e7eb",
+                    borderBottom: "2px solid #ef8432",
                   }}
                 >
                   Quality Level
@@ -450,7 +416,7 @@ function OverallScoreSection() {
                   style={{
                     padding: "0.75rem",
                     textAlign: "left",
-                    borderBottom: "2px solid #e5e7eb",
+                    borderBottom: "2px solid #ef8432",
                   }}
                 >
                   Interpretation
@@ -490,7 +456,7 @@ function OverallScoreSection() {
                   <td
                     style={{
                       padding: "0.75rem",
-                      borderBottom: "1px solid #e5e7eb",
+                      borderBottom: "1px solid #fad5a5",
                     }}
                   >
                     {row.range}
@@ -498,7 +464,7 @@ function OverallScoreSection() {
                   <td
                     style={{
                       padding: "0.75rem",
-                      borderBottom: "1px solid #e5e7eb",
+                      borderBottom: "1px solid #fad5a5",
                     }}
                   >
                     <strong>{row.level}</strong>
@@ -506,7 +472,7 @@ function OverallScoreSection() {
                   <td
                     style={{
                       padding: "0.75rem",
-                      borderBottom: "1px solid #e5e7eb",
+                      borderBottom: "1px solid #fad5a5",
                     }}
                   >
                     {row.interpretation}
@@ -521,7 +487,7 @@ function OverallScoreSection() {
           <h4>How It's Calculated</h4>
           <div
             style={{
-              backgroundColor: "#f3f4f6",
+              backgroundColor: "#fef5e7",
               padding: "1rem",
               borderRadius: "0.75rem",
               marginBottom: "1rem",
@@ -660,7 +626,7 @@ function RelationshipsSection() {
                   border: "1px solid rgba(15, 23, 42, 0.08)",
                   borderRadius: "0.75rem",
                   padding: "0.75rem",
-                  backgroundColor: "#f8fafc",
+                  backgroundColor: "#fef5e7",
                 }}
               >
                 <strong>{type.name}</strong>
@@ -850,7 +816,7 @@ function RecommendationsSection() {
                   border: "1px solid rgba(15, 23, 42, 0.08)",
                   borderRadius: "0.75rem",
                   padding: "0.85rem",
-                  backgroundColor: "#f8fafc",
+                  backgroundColor: "#fef5e7",
                 }}
               >
                 <h5 style={{ margin: 0 }}>{type.title}</h5>

@@ -8,6 +8,7 @@ import { DocumentUploader, UploadedDocumentPayload } from "./DocumentUploader";
 import { DocumentEditor } from "./DocumentEditor";
 import { ChapterAnalysisDashboard } from "./VisualizationComponents";
 import { HelpModal } from "./HelpModal";
+import { ReferenceLibraryModal } from "./ReferenceLibraryModal";
 import { NavigationMenu } from "./NavigationMenu";
 import { UpgradePrompt, InlineUpgradePrompt } from "./UpgradePrompt";
 import { MissingConceptSuggestions } from "./MissingConceptSuggestions";
@@ -443,6 +444,8 @@ export const ChapterCheckerV2: React.FC = () => {
   // UI state
   const [viewMode, setViewMode] = useState<"analysis" | "writer">("analysis");
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  const [isReferenceLibraryModalOpen, setIsReferenceLibraryModalOpen] =
+    useState(false);
   const [isNavigationOpen, setIsNavigationOpen] = useState(false);
   const [highlightedConceptId, setHighlightedConceptId] = useState<
     string | null
@@ -1624,7 +1627,7 @@ export const ChapterCheckerV2: React.FC = () => {
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "1rem",
+                gap: "0.5rem",
                 flex: "1 1 360px",
                 minWidth: "280px",
               }}
@@ -1644,7 +1647,6 @@ export const ChapterCheckerV2: React.FC = () => {
                 ☰
               </button>
 
-              <AnimatedLogo size={96} animate={true} />
               <div style={{ minWidth: 0 }}>
                 <h1
                   style={{
@@ -1653,12 +1655,16 @@ export const ChapterCheckerV2: React.FC = () => {
                     color: "#2c3e50",
                     fontWeight: "700",
                     lineHeight: "1.2",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
                   }}
                 >
                   Tome{" "}
                   <span style={{ fontStyle: "italic", fontWeight: "700" }}>
                     IQ
                   </span>
+                  <AnimatedLogo size={60} animate={true} />
                 </h1>
                 <p
                   style={{
@@ -1804,11 +1810,17 @@ export const ChapterCheckerV2: React.FC = () => {
         isOpen={isNavigationOpen}
         onClose={() => setIsNavigationOpen(false)}
         onOpenHelp={() => setIsHelpModalOpen(true)}
+        onOpenReferenceLibrary={() => setIsReferenceLibraryModalOpen(true)}
       />
 
       <HelpModal
         isOpen={isHelpModalOpen}
         onClose={() => setIsHelpModalOpen(false)}
+      />
+
+      <ReferenceLibraryModal
+        isOpen={isReferenceLibraryModalOpen}
+        onClose={() => setIsReferenceLibraryModalOpen(false)}
       />
 
       {/* Main Content */}
