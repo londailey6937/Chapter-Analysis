@@ -4,8 +4,9 @@ import { wmfToPng, getPlaceholderSvg } from "../utils/wmfUtils";
 
 // Helper to detect magic numbers
 function detectMimeType(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer).subarray(0, 4);
-  const header = Array.from(bytes)
+  const bytes = new Uint8Array(buffer);
+  const headerBytes = bytes.subarray(0, 4);
+  const header = Array.from(headerBytes)
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 
@@ -27,8 +28,21 @@ function detectMimeType(buffer: ArrayBuffer): string {
     case "d7cdc69a":
       return "image/x-wmf"; // WMF
     case "01000900":
-      return "image/x-wmf"; // WMF (another variant)
+      return "image/x-wmf"; // WMF (Standard)
+    case "02000900":
+      return "image/x-wmf"; // WMF (Standard)
+    case "01000000": {
+      // Possible EMF (Record Type 1). Check for " EMF" signature at offset 40
+      if (bytes.length >= 44) {
+        const signature = String.fromCharCode(...bytes.subarray(40, 44));
+        if (signature === " EMF") {
+          return "image/x-emf";
+        }
+      }
+      return "";
+    }
     default:
+      if (header.startsWith("424d")) return "image/bmp";
       return ""; // Unknown, rely on extension
   }
 }
