@@ -1867,10 +1867,14 @@ export const ChapterCheckerV2: React.FC = () => {
           minWidth: 0,
         }}
       >
-        {/* Left: Document Column (60%) */}
+        {/* Left: Document Column (60% in standard mode, 75% in writer mode) */}
         <div
           style={{
-            flex: isStackedLayout ? "1 1 100%" : "3 1 0",
+            flex: isStackedLayout
+              ? "1 1 100%"
+              : viewMode === "writer"
+              ? "3 1 0" // 75% in writer mode
+              : "3 1 0", // 60% in standard mode
             display: "flex",
             flexDirection: "column",
             gap: "16px",
@@ -2269,11 +2273,15 @@ export const ChapterCheckerV2: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Analysis Panel (40%) */}
+        {/* Right: Analysis Panel (40% in standard mode, 25% in writer mode) */}
         <div
           className="app-panel"
           style={{
-            flex: isStackedLayout ? "1 1 100%" : "2 1 0",
+            flex: isStackedLayout
+              ? "1 1 100%"
+              : viewMode === "writer"
+              ? "1 1 0" // 25% in writer mode
+              : "2 1 0", // 40% in standard mode
             maxWidth: "100%",
             minWidth: analysisMinWidth,
             display: "flex",
