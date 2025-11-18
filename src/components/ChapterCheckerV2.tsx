@@ -3035,11 +3035,14 @@ export const ChapterCheckerV2: React.FC = () => {
                     <div
                       style={{
                         padding: "20px",
-                        overflow: "auto",
-                        height: "100%",
                         backgroundColor: "transparent",
                         borderRadius: "24px",
+                        overflowY: "auto",
+                        overflowX: "hidden",
+                        maxHeight: "calc(100vh - 220px)",
+                        WebkitOverflowScrolling: "touch",
                       }}
+                      tabIndex={0}
                     >
                       <h3 className="section-header">✍️ Writing Suggestions</h3>
 
