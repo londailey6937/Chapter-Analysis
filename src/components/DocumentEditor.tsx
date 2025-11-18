@@ -1678,8 +1678,7 @@ const TAG_SPECIFIC_ATTRS: Record<string, Set<string>> = {
   div: new Set(["data-scroll-anchor"]),
 };
 
-const SAFE_URL_PATTERN =
-  /^(?:https?:|mailto:|tel:|\/?|#|\.\/|\.\.?\/|data:image\/)/i;
+const SAFE_URL_PATTERN = /^(?:https?:|mailto:|tel:|\/?|#|\.\/|\.\.?\/|data:)/i;
 
 function sanitizeHtml(html: string): string {
   if (!html || typeof html !== "string") {
@@ -1807,7 +1806,7 @@ function sanitizeStyle(value: string): string {
         return false;
       }
       if (lower.includes("url(")) {
-        return /url\(\s*(?:['\"])?(?:https?:|data:image\/)/i.test(lower);
+        return /url\(\s*(?:['\"])?(?:https?:|data:)/i.test(lower);
       }
       return true;
     })

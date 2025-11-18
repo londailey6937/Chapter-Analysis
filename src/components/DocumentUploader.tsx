@@ -47,7 +47,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
                 );
                 return {
                   src: `data:${contentType};base64,${imageBuffer}`,
-                  alt: `Embedded image ${imageCount}`,
+                  alt: `Embedded image ${imageCount} (${contentType})`,
                   class: "mammoth-image",
                 };
               });
