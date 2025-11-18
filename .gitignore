@@ -32,3 +32,6 @@ dist-ssr
 # Build output
 coverage
 build
+
+# Temporary Word files
+~$*

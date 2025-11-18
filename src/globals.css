@@ -25,9 +25,9 @@
 }
 
 .prose-content img.mammoth-image {
-  transform: scale(2);
-  transform-origin: left center;
-  margin: 3rem 0;
+  /* Removed scaling that was making images too large */
+  max-width: 100% !important;
+  margin: 1.5rem 0;
 }
 
 .prose-content p {

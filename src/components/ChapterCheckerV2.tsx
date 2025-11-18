@@ -44,7 +44,6 @@ import {
   extractGeneralConcepts,
   type GeneralConcept,
 } from "@/utils/generalConceptExtractor";
-import { GeneralConceptGenerator } from "./GeneralConceptGenerator";
 import { AnimatedLogo } from "./AnimatedLogo";
 
 const HEADING_LENGTH_LIMIT = 120;
@@ -896,6 +895,7 @@ export const ChapterCheckerV2: React.FC = () => {
         ? {
             ...prev,
             plainText: newText,
+            originalPlainText: newText,
             html: prev.html ?? newText,
             // Keep editorHtml, isHybridDocx, and imageCount if they exist
           }
@@ -917,6 +917,7 @@ export const ChapterCheckerV2: React.FC = () => {
     setChapterText(content.plainText);
     const updatedData = {
       plainText: content.plainText,
+      originalPlainText: content.plainText,
       editorHtml: content.html,
       lastSaved: new Date().toISOString(),
     };
@@ -1195,18 +1196,35 @@ export const ChapterCheckerV2: React.FC = () => {
       const aliasOccurrenceIndex = getOccurrenceIndex(searchTermLower);
       const canonicalOccurrenceIndex = getOccurrenceIndex(canonicalLower);
 
-      let matchResult = locateTerm(
-        searchTermLower,
-        Number.isFinite(mention.position) ? (mention.position as number) : 0,
-        aliasOccurrenceIndex
-      );
+      const isCanonicalMention = mention.isAlias !== true;
+      const mentionPosition = Number.isFinite(mention.position)
+        ? (mention.position as number)
+        : 0;
 
-      if (!matchResult && searchTermLower !== canonicalLower) {
-        matchResult = locateTerm(
-          canonicalLower,
-          Number.isFinite(mention.position) ? (mention.position as number) : 0,
-          canonicalOccurrenceIndex
-        );
+      const tryLocate = (termLower: string, occurrenceIndex: number) =>
+        locateTerm(termLower, mentionPosition, occurrenceIndex);
+
+      const canonicalFirst = [
+        { term: canonicalLower, occurrence: canonicalOccurrenceIndex },
+        { term: searchTermLower, occurrence: aliasOccurrenceIndex },
+      ];
+
+      const aliasFirst = [
+        { term: searchTermLower, occurrence: aliasOccurrenceIndex },
+        { term: canonicalLower, occurrence: canonicalOccurrenceIndex },
+      ];
+
+      const attempts = isCanonicalMention ? canonicalFirst : aliasFirst;
+
+      let matchResult: { position: number; length: number } | null = null;
+      for (const attempt of attempts) {
+        if (!attempt.term) {
+          continue;
+        }
+        matchResult = tryLocate(attempt.term, attempt.occurrence);
+        if (matchResult) {
+          break;
+        }
       }
 
       if (!matchResult) {
@@ -3047,21 +3065,21 @@ export const ChapterCheckerV2: React.FC = () => {
                         hasDomain={
                           selectedDomain !== "none" && selectedDomain !== null
                         }
+                        activeDomain={selectedDomain}
+                        relationships={
+                          analysis.conceptGraph?.relationships || []
+                        }
+                        generalConcepts={
+                          selectedDomain === "none"
+                            ? generalConcepts
+                            : undefined
+                        }
+                        onGeneralConceptClick={(position, term) => {
+                          setHighlightPosition(position);
+                          setSearchWord(term);
+                          setSearchOccurrence(0);
+                        }}
                       />
-
-                      {/* General Concept Generator - for non-domain content */}
-                      {selectedDomain === "none" &&
-                        generalConcepts.length > 0 && (
-                          <GeneralConceptGenerator
-                            concepts={generalConcepts}
-                            onConceptClick={(position, term) => {
-                              // Scroll to position in preview panel with full term highlighting
-                              setHighlightPosition(position);
-                              setSearchWord(term);
-                              setSearchOccurrence(0);
-                            }}
-                          />
-                        )}
                     </>
                   ) : (
                     <div

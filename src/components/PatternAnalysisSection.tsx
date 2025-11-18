@@ -86,7 +86,7 @@ const PatternAnalysisSection: React.FC<PatternAnalysisSectionProps> = ({
   }
 
   return (
-    <div style={{ marginTop: "40px" }}>
+    <div style={{ marginTop: "40px", marginBottom: "40px" }}>
       <h3 className="section-header">📚 Learning Patterns Detected</h3>
       <p className="section-subtitle">
         Pedagogical structures that support effective learning ({totalPatterns}{" "}

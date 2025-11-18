@@ -23,11 +23,15 @@ import {
   ConceptNode,
   ConceptLink,
   PrincipleEvaluation,
+  ConceptRelationship,
 } from "@/types";
 import type { ReviewPattern, InterleavingData } from "@/types";
 import { ConceptList } from "./ConceptList";
 import ConceptRelationshipsSection from "./ConceptRelationshipsSection";
 import PatternAnalysisSection from "./PatternAnalysisSection";
+import { PrerequisiteOrderCard } from "./PrerequisiteOrderCard";
+import { GeneralConceptGenerator } from "./GeneralConceptGenerator";
+import type { GeneralConcept } from "@/utils/generalConceptExtractor";
 
 // Friendly display names for principle enum codes to avoid raw concatenation (e.g., "dualCoding") in UI copy
 const PRINCIPLE_NAME_MAP: Record<string, string> = {
@@ -2160,6 +2164,10 @@ export const ChapterAnalysisDashboard: React.FC<{
   pageOffsets?: number[];
   accessLevel?: "free" | "premium" | "professional";
   hasDomain?: boolean;
+  activeDomain?: string | null;
+  relationships?: ConceptRelationship[];
+  generalConcepts?: GeneralConcept[];
+  onGeneralConceptClick?: (position: number, term: string) => void;
 }> = ({
   analysis,
   concepts,
@@ -2169,6 +2177,10 @@ export const ChapterAnalysisDashboard: React.FC<{
   pageOffsets,
   accessLevel = "professional",
   hasDomain = true,
+  activeDomain = null,
+  relationships = [],
+  generalConcepts,
+  onGeneralConceptClick,
 }) => {
   // Defensive guards in case analysis shape changes or fields are missing
   const overallScore = analysis.overallScore ?? 0;
@@ -2178,9 +2190,13 @@ export const ChapterAnalysisDashboard: React.FC<{
     conceptDensity: 0,
     hierarchyBalance: 0,
   };
+  const conceptCount = concepts?.length ?? 0;
 
   const recommendations = analysis.recommendations || [];
   const principles = analysis.principles || [];
+  const shouldShowGeneralConcepts =
+    !hasDomain && Array.isArray(generalConcepts) && generalConcepts.length > 0;
+  const handleGeneralConceptClick = onGeneralConceptClick ?? (() => undefined);
 
   // Filter principles based on access level
   const filteredPrinciples =
@@ -2215,6 +2231,17 @@ export const ChapterAnalysisDashboard: React.FC<{
         )}
         <InterleavingPattern analysis={analysis} pageOffsets={pageOffsets} />
       </div>
+
+      {shouldShowGeneralConcepts && (
+        <div className="viz-grid general-concepts-grid">
+          <GeneralConceptGenerator
+            concepts={generalConcepts!}
+            onConceptClick={handleGeneralConceptClick}
+            className="general-concepts-card"
+            style={{ marginTop: 0 }}
+          />
+        </div>
+      )}
 
       <div className="principles-section">
         <h3>Learning Principles Evaluation</h3>
@@ -2253,12 +2280,12 @@ export const ChapterAnalysisDashboard: React.FC<{
         </div>
       )}
 
-      {hasDomain && (
-        <div className="concepts-section">
-          <h3>📚 Concept Overview</h3>
-          <p className="section-subtitle">
-            Summary metrics for identified concepts
-          </p>
+      <div className="concepts-section">
+        <h3>📚 Concept Overview</h3>
+        <p className="section-subtitle">
+          Summary metrics for identified concepts
+        </p>
+        {conceptCount > 0 && (
           <div className="concept-stats">
             <div className="stat">
               <strong>{conceptAnalysis.totalConceptsIdentified}</strong>
@@ -2285,8 +2312,17 @@ export const ChapterAnalysisDashboard: React.FC<{
               </p>
             </div>
           </div>
+        )}
+        <div className="prereq-card-wrapper">
+          <PrerequisiteOrderCard
+            concepts={concepts || []}
+            conceptSequence={analysis.conceptGraph?.sequence}
+            domainSelected={hasDomain}
+            activeDomain={activeDomain}
+            relationships={relationships}
+          />
         </div>
-      )}
+      </div>
 
       {/* Learning Patterns Section */}
       {hasDomain &&
@@ -2468,6 +2504,23 @@ export const ChapterAnalysisDashboard: React.FC<{
             font-size: 11px;
             font-weight: bold;
             text-transform: uppercase;
+          }
+          .prereq-card-wrapper {
+            margin-top: 1.5rem;
+            margin-bottom: 2rem;
+          }
+          .general-concepts-grid {
+            margin-top: -10px;
+          }
+          .general-concepts-card {
+            height: 100%;
+            width: 100%;
+          }
+          @media (max-width: 640px) {
+            .prereq-card-wrapper {
+              margin-top: 1rem;
+              margin-bottom: 1.5rem;
+            }
           }
         `}</style>
     </div>
