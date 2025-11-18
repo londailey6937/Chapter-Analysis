@@ -50,6 +50,17 @@ const HEADING_LENGTH_LIMIT = 120;
 const MAX_FALLBACK_SECTIONS = 8;
 const STICKY_HEADER_OFFSET = 140;
 
+type AutosaveSnapshot = {
+  content?: {
+    plainText?: string;
+    editorHtml?: string;
+  };
+  fileName?: string;
+  timestamp: string;
+  analysis?: ChapterAnalysis | null;
+  isTemplateMode?: boolean;
+};
+
 // Custom Dropdown Component
 interface CustomDropdownProps {
   value: string;
@@ -445,6 +456,8 @@ export const ChapterCheckerV2: React.FC = () => {
   const [scrollToTopSignal, setScrollToTopSignal] = useState(0);
   const [windowScrolled, setWindowScrolled] = useState(false);
   const [contentScrolled, setContentScrolled] = useState(false);
+  const [pendingAutosave, setPendingAutosave] =
+    useState<AutosaveSnapshot | null>(null);
   const [layoutMode, setLayoutMode] = useState<LayoutMode>(() => {
     if (typeof window === "undefined") {
       return "desktop";
@@ -462,6 +475,16 @@ export const ChapterCheckerV2: React.FC = () => {
     [statisticsText]
   );
   const charCount = statisticsText.length;
+  const autosaveTimestampLabel = useMemo(() => {
+    if (!pendingAutosave?.timestamp) {
+      return "";
+    }
+    const parsedDate = new Date(pendingAutosave.timestamp);
+    if (Number.isNaN(parsedDate.getTime())) {
+      return pendingAutosave.timestamp;
+    }
+    return parsedDate.toLocaleString();
+  }, [pendingAutosave]);
 
   // Ref for analysis panel
   const analysisPanelRef = useRef<HTMLDivElement>(null);
@@ -587,6 +610,12 @@ export const ChapterCheckerV2: React.FC = () => {
     const secondPlace = sortedScores[1];
     const hasSignificantLead =
       !secondPlace || topDomain[1] >= secondPlace[1] * minLead;
+    const leadDifference = secondPlace
+      ? topDomain[1] - secondPlace[1]
+      : topDomain[1];
+    const absoluteLeadThreshold = isProgrammingDomain ? 200 : 60;
+    const passesLeadCheck =
+      hasSignificantLead || leadDifference >= absoluteLeadThreshold;
 
     const meetsThreshold = topDomain && topDomain[1] >= minScore;
     const hasEnoughConcepts =
@@ -602,14 +631,13 @@ export const ChapterCheckerV2: React.FC = () => {
       hasEnoughConcepts,
       `(count: ${uniqueConceptMatches[topDomain?.[0]]?.size || 0})`
     );
-    console.log(`  Has significant lead (${minLead}x):`, hasSignificantLead);
+    console.log(
+      `  Has significant lead (${minLead}x):`,
+      hasSignificantLead,
+      `(delta: ${leadDifference}, threshold: ${absoluteLeadThreshold})`
+    );
 
-    if (
-      topDomain &&
-      meetsThreshold &&
-      hasEnoughConcepts &&
-      hasSignificantLead
-    ) {
+    if (topDomain && meetsThreshold && hasEnoughConcepts && passesLeadCheck) {
       console.log(`  ✅ Detected: ${topDomain[0]}`);
       return topDomain[0] as Domain;
     }
@@ -683,46 +711,27 @@ export const ChapterCheckerV2: React.FC = () => {
 
   // Check for auto-saved work on startup
   useEffect(() => {
+    if (chapterData) {
+      return;
+    }
     try {
       const autosaved = localStorage.getItem("tomeiq_autosave");
-      if (autosaved && !chapterData) {
-        const saved = JSON.parse(autosaved);
-        const savedTime = new Date(saved.timestamp).toLocaleString();
-
-        // Show restore prompt
-        const restore = window.confirm(
-          `📝 Found auto-saved work from ${savedTime}\\n\\nFile: ${saved.fileName}\\n\\nWould you like to restore it?`
-        );
-
-        if (restore && saved.content) {
-          setFileName(saved.fileName);
-          setChapterData({
-            html: saved.content.editorHtml || "",
-            plainText: saved.content.plainText || "",
-            originalPlainText: saved.content.plainText || "",
-            isHybridDocx: true,
-            imageCount: 0,
-            editorHtml: saved.content.editorHtml,
-          });
-          setChapterText(saved.content.plainText || "");
-
-          // Restore template mode if it was active
-          if (saved.isTemplateMode) {
-            setIsTemplateMode(true);
-          }
-
-          // Restore analysis if available
-          if (saved.analysis) {
-            setAnalysis(saved.analysis);
-          }
-
-          setViewMode("writer");
-        }
+      if (!autosaved) {
+        return;
       }
+      const saved: AutosaveSnapshot = JSON.parse(autosaved);
+      if (!saved || !saved.timestamp) {
+        return;
+      }
+      const skipToken = localStorage.getItem("tomeiq_autosave_skip");
+      if (skipToken && skipToken === saved.timestamp) {
+        return;
+      }
+      setPendingAutosave(saved);
     } catch (error) {
       console.error("Error loading auto-saved work:", error);
     }
-  }, []); // Run only once on mount
+  }, [chapterData]);
 
   // Listen for jump-to-position events (from dual coding buttons, etc.)
   useEffect(() => {
@@ -847,6 +856,10 @@ export const ChapterCheckerV2: React.FC = () => {
       editorHtml: hasHtmlContent ? content : undefined,
     });
 
+    if (isTemplateMode) {
+      setIsTemplateMode(false);
+    }
+
     const detected = detectDomain(normalizedPlainText);
     console.log(`🔍 Domain detection result: ${detected || "none"}`);
     setDetectedDomain(detected);
@@ -934,6 +947,52 @@ export const ChapterCheckerV2: React.FC = () => {
     } catch (error) {
       console.error("Failed to auto-save:", error);
     }
+  };
+
+  const restoreAutosavedWork = (saved: AutosaveSnapshot) => {
+    const plainText = saved.content?.plainText || "";
+    const editorHtml = saved.content?.editorHtml || "";
+
+    setFileName(saved.fileName || "Autosaved chapter");
+    setChapterData({
+      html: editorHtml,
+      plainText,
+      originalPlainText: plainText,
+      isHybridDocx: true,
+      imageCount: 0,
+      editorHtml,
+    });
+    setChapterText(plainText);
+
+    if (saved.isTemplateMode) {
+      setIsTemplateMode(true);
+    } else {
+      setIsTemplateMode(false);
+    }
+
+    if (saved.analysis) {
+      setAnalysis(saved.analysis);
+    }
+
+    setViewMode("writer");
+    setPendingAutosave(null);
+  };
+
+  const handleRestoreAutosave = () => {
+    if (!pendingAutosave) {
+      return;
+    }
+    restoreAutosavedWork(pendingAutosave);
+  };
+
+  const handleDismissAutosave = () => {
+    if (!pendingAutosave) {
+      return;
+    }
+    if (pendingAutosave.timestamp) {
+      localStorage.setItem("tomeiq_autosave_skip", pendingAutosave.timestamp);
+    }
+    setPendingAutosave(null);
   };
 
   const handleAcceptMissingConcept = (
@@ -1243,6 +1302,19 @@ export const ChapterCheckerV2: React.FC = () => {
         `[ChapterCheckerV2] Derived ${sections.length} sections for analysis`
       );
 
+      const analysisDomain: Domain = (() => {
+        if (selectedDomain === "none") {
+          return "cross-domain";
+        }
+        if (selectedDomain) {
+          return selectedDomain;
+        }
+        if (detectedDomain) {
+          return detectedDomain;
+        }
+        return "cross-domain";
+      })();
+
       // Create Chapter object with plain text
       const chapter = {
         id: `chapter-${Date.now()}`,
@@ -1258,7 +1330,7 @@ export const ChapterCheckerV2: React.FC = () => {
         },
         metadata: {
           readingLevel: "college",
-          domain: selectedDomain === "none" ? null : selectedDomain,
+          domain: selectedDomain === "none" ? "general" : analysisDomain,
           targetAudience: "adult learners",
           estimatedReadingTime: Math.ceil(
             textForAnalysis.split(/\s+/).length / 200
@@ -1274,7 +1346,7 @@ export const ChapterCheckerV2: React.FC = () => {
       worker.postMessage({
         chapter,
         options: {
-          domain: selectedDomain === "none" ? null : selectedDomain,
+          domain: analysisDomain,
           includeCrossDomain: false,
           customConcepts,
         },
@@ -1410,6 +1482,7 @@ export const ChapterCheckerV2: React.FC = () => {
     setChapterData(null);
     setAnalysis(null);
     setError(null);
+    setIsTemplateMode(false);
   };
 
   const handleExportDocx = async () => {
@@ -1645,6 +1718,78 @@ export const ChapterCheckerV2: React.FC = () => {
           </div>
         </header>
       </div>
+
+      {pendingAutosave && (
+        <div
+          style={{
+            padding: "14px 18px",
+            borderBottom: "1px solid #f5d1ab",
+            background: "linear-gradient(120deg, #fff7ed, #fef3c7)",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "12px",
+            alignItems: "center",
+          }}
+        >
+          <div style={{ flex: "1 1 320px", minWidth: "220px" }}>
+            <div
+              style={{ fontWeight: 700, color: "#92400e", fontSize: "14px" }}
+            >
+              📝 Auto-saved work detected
+            </div>
+            <p
+              style={{
+                margin: "4px 0 0",
+                fontSize: "13px",
+                color: "#7c2d12",
+                lineHeight: 1.5,
+              }}
+            >
+              Last saved {autosaveTimestampLabel || "recently"} · File name:{" "}
+              <strong>{pendingAutosave.fileName || "untitled"}</strong>
+            </p>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              gap: "8px",
+              flexWrap: "wrap",
+              justifyContent: "flex-end",
+              alignItems: "center",
+            }}
+          >
+            <button
+              onClick={handleRestoreAutosave}
+              style={{
+                padding: "8px 16px",
+                borderRadius: "999px",
+                border: "none",
+                backgroundColor: "#f97316",
+                color: "#fff",
+                fontWeight: 600,
+                cursor: "pointer",
+                boxShadow: "0 1px 2px rgba(0,0,0,0.15)",
+              }}
+            >
+              Restore work
+            </button>
+            <button
+              onClick={handleDismissAutosave}
+              style={{
+                padding: "8px 16px",
+                borderRadius: "999px",
+                border: "1px solid #f97316",
+                backgroundColor: "#fff",
+                color: "#9a3412",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
 
       <NavigationMenu
         isOpen={isNavigationOpen}
@@ -2049,6 +2194,7 @@ export const ChapterCheckerV2: React.FC = () => {
                     analysisResult={analysis}
                     viewMode={viewMode}
                     isTemplateMode={isTemplateMode}
+                    onExitTemplateMode={() => setIsTemplateMode(false)}
                   />
                 </div>
               ) : (
@@ -2748,11 +2894,6 @@ export const ChapterCheckerV2: React.FC = () => {
                         // Clear highlight position when switching to analysis mode
                         // to prevent unwanted jumps
                         setHighlightPosition(null);
-                        setTimeout(() => {
-                          if (analysisPanelRef.current) {
-                            analysisPanelRef.current.scrollTop = 0;
-                          }
-                        }, 50);
                       }}
                       style={{
                         flex: 1,

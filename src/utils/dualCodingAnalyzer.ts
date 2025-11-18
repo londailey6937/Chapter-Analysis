@@ -12,6 +12,10 @@ export interface VisualSuggestion {
   context: string; // Surrounding text for context
 }
 
+export interface DualCodingAnalyzerOptions {
+  treatAsHtml?: boolean;
+}
+
 export class DualCodingAnalyzer {
   /**
    * Strip HTML tags from text for analysis
@@ -50,12 +54,19 @@ export class DualCodingAnalyzer {
    * Analyze text and identify where visual aids should be inserted
    * Works with both plain text and HTML - positions returned are for the original input
    */
-  static analyzeForVisuals(text: string): VisualSuggestion[] {
+  static analyzeForVisuals(
+    text: string,
+    options?: DualCodingAnalyzerOptions
+  ): VisualSuggestion[] {
     const suggestions: VisualSuggestion[] = [];
 
     // Check if input is HTML by looking for common HTML paragraph/block tags
-    const isHtml =
+    const inferredHtml =
       text.includes("<p>") || text.includes("<div>") || text.includes("<h1>");
+    const isHtml =
+      typeof options?.treatAsHtml === "boolean"
+        ? options.treatAsHtml
+        : inferredHtml;
 
     console.log(
       "[DualCodingAnalyzer] isHtml:",

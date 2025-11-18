@@ -36,6 +36,7 @@ interface DocumentEditorProps {
   analysisResult?: any;
   viewMode?: string;
   isTemplateMode?: boolean;
+  onExitTemplateMode?: () => void;
 }
 
 type HighlightRange = {
@@ -82,6 +83,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   analysisResult,
   viewMode,
   isTemplateMode = false,
+  onExitTemplateMode,
 }) => {
   const [text, setText] = useState(() => initialText);
   const [visualSuggestions, setVisualSuggestions] = useState<
@@ -91,7 +93,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     countWords(initialText)
   );
   const editorRef = useRef<HTMLDivElement>(null);
-  const highlightRef = useRef<HTMLSpanElement>(null);
+  const highlightRef = useRef<HTMLElement | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const isEditing = !readOnly;
   const skipNextPropSyncRef = useRef(false);
@@ -101,6 +103,20 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       : convertTextToHtml(initialText)
   );
   const scrollStateRef = useRef({ preview: false, editor: false });
+  const hasHtmlContent = useMemo(
+    () => Boolean(htmlContent && htmlContent.trim().length),
+    [htmlContent]
+  );
+  const hasHtmlWithMedia = useMemo(
+    () => Boolean(htmlContent && /<img/i.test(htmlContent)),
+    [htmlContent]
+  );
+  const sanitizedPreviewHtml = useMemo(() => {
+    if (hasHtmlWithMedia && htmlContent) {
+      return sanitizeHtml(htmlContent);
+    }
+    return null;
+  }, [hasHtmlWithMedia, htmlContent]);
 
   useEffect(() => {
     if (editorRef.current) {
@@ -156,13 +172,16 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     }
 
     try {
-      const suggestions = DualCodingAnalyzer.analyzeForVisuals(text);
+      const analyzerSource = hasHtmlContent && htmlContent ? htmlContent : text;
+      const suggestions = DualCodingAnalyzer.analyzeForVisuals(analyzerSource, {
+        treatAsHtml: hasHtmlContent,
+      });
       setVisualSuggestions(suggestions);
     } catch (error) {
       console.error("DualCodingAnalyzer failed", error);
       setVisualSuggestions([]);
     }
-  }, [text, showVisualSuggestions]);
+  }, [text, showVisualSuggestions, hasHtmlContent, htmlContent]);
 
   useEffect(() => {
     if (!highlightRange) {
@@ -179,15 +198,16 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     });
 
     if (readOnly) {
-      // Try using highlightRef first, but fall back quickly if not available
-      if (highlightRef.current) {
-        console.log("📍 Scrolling preview to highlight using ref");
-        highlightRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-      } else {
-        // Fallback: scroll the preview container to approximate position
+      const scrollPreview = () => {
+        if (highlightRef.current) {
+          console.log("📍 Scrolling preview to highlight using ref");
+          highlightRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+          return;
+        }
+
         console.warn("⚠️ Highlight ref not available, using fallback scroll");
         const previewContainer =
           previewRef.current ||
@@ -200,7 +220,14 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
           previewContainer.scrollTop =
             estimatedScroll - previewContainer.clientHeight / 2;
         }
+      };
+
+      if (hasHtmlWithMedia && !highlightRef.current) {
+        const waitForHighlight = window.setTimeout(scrollPreview, 40);
+        return () => window.clearTimeout(waitForHighlight);
       }
+
+      scrollPreview();
       return;
     }
 
@@ -215,7 +242,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
     } else {
       console.warn("⚠️ Editor ref not available for scrolling");
     }
-  }, [highlightRange, readOnly]);
+  }, [highlightRange, readOnly, hasHtmlWithMedia, text.length]);
 
   const paragraphs = useMemo(() => extractParagraphs(text), [text]);
 
@@ -352,6 +379,58 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
           background: "#f5ead9",
         }}
       >
+        {isTemplateMode && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: isCompactLayout ? "column" : "row",
+              alignItems: isCompactLayout ? "flex-start" : "center",
+              gap: "12px",
+              padding: "10px 14px",
+              borderRadius: "16px",
+              background:
+                "linear-gradient(120deg, rgba(44,62,80,0.9), rgba(127,90,57,0.85))",
+              color: "white",
+            }}
+          >
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 600, fontSize: "13px" }}>
+                🤖 Template mode active
+              </div>
+              <p
+                style={{
+                  margin: "4px 0 0",
+                  fontSize: "12px",
+                  opacity: 0.8,
+                  lineHeight: 1.4,
+                }}
+              >
+                Preview is hidden while you edit the scaffold. Exit template
+                mode to bring back the dual-pane layout.
+              </p>
+            </div>
+            {onExitTemplateMode && (
+              <button
+                type="button"
+                onClick={onExitTemplateMode}
+                style={{
+                  padding: isCompactLayout ? "6px 12px" : "7px 14px",
+                  borderRadius: "999px",
+                  border: "1.5px solid rgba(255,255,255,0.8)",
+                  backgroundColor: "transparent",
+                  color: "white",
+                  fontWeight: 600,
+                  fontSize: "12px",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Exit template mode
+              </button>
+            )}
+          </div>
+        )}
+
         <div
           style={{
             display: "flex",
@@ -479,7 +558,9 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
               suggestionsByParagraph={suggestionsByParagraph}
               containerRef={previewRef}
               onScroll={handlePreviewScroll}
-              htmlContent={htmlContent}
+              hasHtmlWithMedia={hasHtmlWithMedia}
+              sanitizedHtml={sanitizedPreviewHtml}
+              plainText={text}
               textLength={text.length}
               visualSuggestions={visualSuggestions}
             />
@@ -621,13 +702,15 @@ const GuidanceLegend: React.FC<GuidanceLegendProps> = ({
 type ReadOnlyViewProps = {
   paragraphs: ParagraphSummary[];
   highlightRange: HighlightRange | null;
-  highlightRef: React.RefObject<HTMLSpanElement>;
+  highlightRef: React.MutableRefObject<HTMLElement | null>;
   showSpacingIndicators: boolean;
   showVisualSuggestions: boolean;
   suggestionsByParagraph: Map<number, VisualSuggestion[]>;
   containerRef?: React.RefObject<HTMLDivElement>;
   onScroll?: () => void;
-  htmlContent?: string | null;
+  hasHtmlWithMedia: boolean;
+  sanitizedHtml: string | null;
+  plainText: string;
   textLength: number;
   visualSuggestions: VisualSuggestion[];
 };
@@ -641,16 +724,62 @@ const ReadOnlyView: React.FC<ReadOnlyViewProps> = ({
   suggestionsByParagraph,
   containerRef,
   onScroll,
-  htmlContent,
+  hasHtmlWithMedia,
+  sanitizedHtml,
+  plainText,
   textLength,
   visualSuggestions,
 }) => {
   let highlightAnchorAssigned = false;
-
-  const hasHtmlWithMedia = Boolean(htmlContent && /<img/i.test(htmlContent));
-  const sanitizedHtml =
-    hasHtmlWithMedia && htmlContent ? sanitizeHtml(htmlContent) : null;
   const overlayEnabled = hasHtmlWithMedia;
+  const htmlContentRef = useRef<HTMLDivElement>(null);
+  const whitespacePrefix = useMemo(() => {
+    if (!hasHtmlWithMedia || !plainText.length) {
+      return null;
+    }
+    return buildWhitespacePrefixMap(plainText);
+  }, [hasHtmlWithMedia, plainText]);
+
+  useEffect(() => {
+    if (!hasHtmlWithMedia || !sanitizedHtml || !htmlContentRef.current) {
+      if (
+        highlightRef.current &&
+        highlightRef.current.getAttribute("data-html-highlight") === "true"
+      ) {
+        highlightRef.current = null;
+      }
+      return;
+    }
+
+    clearExistingHtmlHighlights(htmlContentRef.current);
+
+    if (!highlightRange) {
+      highlightRef.current = null;
+      return;
+    }
+
+    const adjustedRange = adjustRangeForHtmlDisplay(
+      highlightRange,
+      whitespacePrefix
+    );
+
+    if (!adjustedRange) {
+      highlightRef.current = null;
+      return;
+    }
+
+    const mark = applyHighlightToSanitizedHtml(
+      htmlContentRef.current,
+      adjustedRange
+    );
+    highlightRef.current = mark;
+  }, [
+    hasHtmlWithMedia,
+    sanitizedHtml,
+    highlightRange,
+    whitespacePrefix,
+    highlightRef,
+  ]);
 
   return (
     <div
@@ -670,6 +799,8 @@ const ReadOnlyView: React.FC<ReadOnlyViewProps> = ({
     >
       {hasHtmlWithMedia && sanitizedHtml ? (
         <div
+          ref={htmlContentRef}
+          data-sanitized-html="true"
           style={{
             whiteSpace: "normal",
             lineHeight: 1.6,
@@ -1309,6 +1440,135 @@ function formatVisualSuggestionTitle(suggestion: VisualSuggestion): string {
   return `${typeLabel} - ${priorityLabel}`;
 }
 
+function clearExistingHtmlHighlights(container: HTMLElement) {
+  const highlights = container.querySelectorAll<HTMLElement>(
+    '[data-html-highlight="true"]'
+  );
+
+  highlights.forEach((mark) => {
+    const parent = mark.parentNode;
+    if (!parent) {
+      mark.remove();
+      return;
+    }
+
+    while (mark.firstChild) {
+      parent.insertBefore(mark.firstChild, mark);
+    }
+
+    parent.removeChild(mark);
+
+    if (parent instanceof HTMLElement) {
+      parent.normalize();
+    }
+  });
+}
+
+function applyHighlightToSanitizedHtml(
+  container: HTMLElement,
+  range: HighlightRange
+): HTMLElement | null {
+  if (!range || range.length < 0) {
+    return null;
+  }
+
+  const highlightLength = Math.max(range.length, 1);
+  const highlightEnd = range.start + highlightLength;
+  const walker = document.createTreeWalker(
+    container,
+    NodeFilter.SHOW_TEXT,
+    null
+  );
+
+  let currentOffset = 0;
+  let startNode: Text | null = null;
+  let endNode: Text | null = null;
+  let startOffset = 0;
+  let endOffset = 0;
+
+  while (walker.nextNode()) {
+    const node = walker.currentNode as Text;
+    const nodeLength = node.textContent?.length ?? 0;
+    const nodeStart = currentOffset;
+    const nodeEnd = nodeStart + nodeLength;
+
+    if (!startNode && nodeEnd > range.start) {
+      startNode = node;
+      startOffset = Math.max(0, range.start - nodeStart);
+    }
+
+    if (startNode && nodeEnd >= highlightEnd) {
+      endNode = node;
+      endOffset = Math.max(0, highlightEnd - nodeStart);
+      break;
+    }
+
+    currentOffset = nodeEnd;
+  }
+
+  if (!startNode) {
+    return null;
+  }
+
+  if (!endNode) {
+    endNode = startNode;
+    endOffset = startNode.textContent?.length ?? 0;
+  }
+
+  const domRange = document.createRange();
+  domRange.setStart(startNode, startOffset);
+  domRange.setEnd(
+    endNode,
+    Math.min(endOffset, endNode.textContent?.length ?? 0)
+  );
+
+  const mark = document.createElement("mark");
+  mark.dataset.htmlHighlight = "true";
+  Object.assign(mark.style, HIGHLIGHT_STYLE);
+  const extracted = domRange.extractContents();
+  mark.appendChild(extracted);
+  domRange.insertNode(mark);
+  return mark;
+}
+
+function buildWhitespacePrefixMap(source: string): Uint32Array {
+  const prefix = new Uint32Array(source.length + 1);
+  for (let i = 0; i < source.length; i += 1) {
+    const code = source.charCodeAt(i);
+    const isRemoved = code === 10 || code === 13 || code === 9;
+    prefix[i + 1] = prefix[i] + (isRemoved ? 1 : 0);
+  }
+  return prefix;
+}
+
+function adjustRangeForHtmlDisplay(
+  range: HighlightRange,
+  prefix: Uint32Array | null
+): HighlightRange | null {
+  if (!prefix || prefix.length === 0) {
+    return range;
+  }
+
+  const clampIndex = (value: number) =>
+    Math.max(0, Math.min(value, prefix.length - 1));
+  const safeLength = Math.max(range.length, 1);
+  const normalizedStart = clampIndex(range.start);
+  const normalizedEnd = clampIndex(range.start + safeLength);
+  const removedBeforeStart = prefix[normalizedStart];
+  const removedBeforeEnd = prefix[normalizedEnd];
+  const adjustedStart = Math.max(0, range.start - removedBeforeStart);
+  const adjustedLength = Math.max(
+    1,
+    safeLength - (removedBeforeEnd - removedBeforeStart)
+  );
+
+  if (!Number.isFinite(adjustedStart) || !Number.isFinite(adjustedLength)) {
+    return range;
+  }
+
+  return { start: adjustedStart, length: adjustedLength };
+}
+
 function buttonStyle(
   backgroundColor: string,
   isCompact?: boolean
@@ -1352,8 +1612,211 @@ function htmlToPlainText(html: string): string {
   return temp.textContent?.replace(/\u00A0/g, " ") ?? "";
 }
 
+const ALLOWED_HTML_TAGS = new Set([
+  "a",
+  "abbr",
+  "b",
+  "blockquote",
+  "br",
+  "caption",
+  "code",
+  "div",
+  "em",
+  "figcaption",
+  "figure",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "hr",
+  "i",
+  "img",
+  "li",
+  "ol",
+  "p",
+  "pre",
+  "section",
+  "small",
+  "span",
+  "strong",
+  "sub",
+  "sup",
+  "table",
+  "tbody",
+  "td",
+  "th",
+  "thead",
+  "tr",
+  "u",
+  "ul",
+]);
+
+const GLOBAL_ALLOWED_ATTRS = new Set([
+  "class",
+  "id",
+  "title",
+  "style",
+  "role",
+  "colspan",
+  "rowspan",
+  "scope",
+  "aria-label",
+  "aria-describedby",
+  "aria-hidden",
+  "aria-expanded",
+  "data-position",
+  "data-highlight-id",
+  "data-mention",
+]);
+
+const TAG_SPECIFIC_ATTRS: Record<string, Set<string>> = {
+  a: new Set(["href", "target", "rel"]),
+  img: new Set(["src", "alt", "width", "height", "loading"]),
+  div: new Set(["data-scroll-anchor"]),
+};
+
+const SAFE_URL_PATTERN =
+  /^(?:https?:|mailto:|tel:|\/?|#|\.\/|\.\.?\/|data:image\/(?:png|jpe?g|gif|webp);base64,)/i;
+
 function sanitizeHtml(html: string): string {
-  return html.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
+  if (!html || typeof html !== "string") {
+    return "";
+  }
+
+  if (
+    typeof window === "undefined" ||
+    typeof window.DOMParser === "undefined"
+  ) {
+    return basicSanitize(html);
+  }
+
+  try {
+    const parser = new window.DOMParser();
+    const parsed = parser.parseFromString(`<div>${html}</div>`, "text/html");
+    const wrapper = parsed.body.firstElementChild as HTMLElement | null;
+    if (!wrapper) {
+      return basicSanitize(html);
+    }
+
+    const sanitizeNode = (node: Element) => {
+      Array.from(node.children).forEach((child) =>
+        sanitizeNode(child as Element)
+      );
+
+      if (node === wrapper) {
+        return;
+      }
+
+      const tag = node.tagName.toLowerCase();
+      if (!ALLOWED_HTML_TAGS.has(tag)) {
+        unwrapNode(node);
+        return;
+      }
+
+      Array.from(node.attributes).forEach((attribute) => {
+        const name = attribute.name.toLowerCase();
+        const value = attribute.value;
+
+        if (name.startsWith("on")) {
+          node.removeAttribute(attribute.name);
+          return;
+        }
+
+        if (name === "href" || name === "src") {
+          if (!isSafeUrl(value)) {
+            node.removeAttribute(attribute.name);
+            return;
+          }
+        }
+
+        if (!isAllowedAttribute(tag, name)) {
+          node.removeAttribute(attribute.name);
+          return;
+        }
+
+        if (name === "style") {
+          const safeStyle = sanitizeStyle(value);
+          if (safeStyle) {
+            node.setAttribute("style", safeStyle);
+          } else {
+            node.removeAttribute("style");
+          }
+        }
+      });
+    };
+
+    sanitizeNode(wrapper);
+    return wrapper.innerHTML;
+  } catch (error) {
+    console.error("sanitizeHtml failed", error);
+    return basicSanitize(html);
+  }
+}
+
+function unwrapNode(node: Element): void {
+  const parent = node.parentNode;
+  if (!parent) {
+    node.remove();
+    return;
+  }
+  while (node.firstChild) {
+    parent.insertBefore(node.firstChild, node);
+  }
+  parent.removeChild(node);
+}
+
+function isAllowedAttribute(tag: string, attr: string): boolean {
+  if (GLOBAL_ALLOWED_ATTRS.has(attr)) {
+    return true;
+  }
+  if (attr.startsWith("data-") || attr.startsWith("aria-")) {
+    return true;
+  }
+  const tagAttrs = TAG_SPECIFIC_ATTRS[tag];
+  return tagAttrs ? tagAttrs.has(attr) : false;
+}
+
+function isSafeUrl(value: string | null | undefined): boolean {
+  if (!value) {
+    return false;
+  }
+  return SAFE_URL_PATTERN.test(value.trim());
+}
+
+function sanitizeStyle(value: string): string {
+  return value
+    .split(";")
+    .map((chunk) => chunk.trim())
+    .filter(Boolean)
+    .filter((chunk) => {
+      const lower = chunk.toLowerCase();
+      if (lower.includes("expression(")) {
+        return false;
+      }
+      if (lower.includes("javascript:")) {
+        return false;
+      }
+      if (lower.startsWith("@import")) {
+        return false;
+      }
+      if (lower.includes("url(")) {
+        return /url\(\s*(?:['\"])?(?:https?:|data:image\/(?:png|jpe?g|gif|webp);base64,)/i.test(
+          lower
+        );
+      }
+      return true;
+    })
+    .join("; ");
+}
+
+function basicSanitize(html: string): string {
+  return html
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
+    .replace(/on[a-z]+="[^"]*"/gi, "")
+    .replace(/on[a-z]+='[^']*'/gi, "")
+    .replace(/javascript:/gi, "");
 }
 
 function escapeHtml(value: string): string {

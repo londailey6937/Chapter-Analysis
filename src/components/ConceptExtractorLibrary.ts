@@ -343,7 +343,10 @@ export class ConceptExtractor {
     return "";
   }
 
-  private slugify(value: string): string {
+  private slugify(value?: string | null): string {
+    if (!value) {
+      return "";
+    }
     return value
       .toLowerCase()
       .normalize("NFKD")

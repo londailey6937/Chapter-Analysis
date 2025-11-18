@@ -1,16 +1,19 @@
 import React, { useState, useRef, useEffect } from "react";
 import type { ChapterAnalysis } from "@/types";
+import { exportToHtml } from "@/utils/htmlExport";
 
 interface WriterModeProps {
   extractedText: string;
   analysisResult: ChapterAnalysis | null;
   onTextChange?: (newText: string) => void;
+  fileName?: string;
 }
 
 export const WriterMode: React.FC<WriterModeProps> = ({
   extractedText,
   analysisResult,
   onTextChange,
+  fileName,
 }) => {
   const [editableText, setEditableText] = useState(extractedText);
   const [selectedSuggestion, setSelectedSuggestion] = useState<number | null>(
@@ -207,11 +210,30 @@ export const WriterMode: React.FC<WriterModeProps> = ({
       setGeneratedTemplate(template);
       setIsTemplateMode(true);
       setEditableText(template);
+      onTextChange?.(template);
     } catch (error) {
       console.error("Error generating template:", error);
       alert("Error generating template. Please try again.");
     } finally {
       setIsGeneratingTemplate(false);
+    }
+  };
+
+  const handleExport = () => {
+    if (!editableText.trim()) {
+      alert("Nothing to export yet. Add content before exporting.");
+      return;
+    }
+
+    try {
+      exportToHtml({
+        text: editableText,
+        fileName: fileName || "writer-mode-draft",
+        analysis: analysisResult || undefined,
+      });
+    } catch (error) {
+      console.error("WriterMode export failed", error);
+      alert("Failed to export draft. Please try again.");
     }
   };
 
@@ -264,10 +286,7 @@ export const WriterMode: React.FC<WriterModeProps> = ({
             )}
             <button
               className="px-3 md:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base whitespace-nowrap"
-              onClick={() => {
-                // TODO: Export functionality
-                console.log("Export edited text:", editableText);
-              }}
+              onClick={handleExport}
             >
               {isCompactView ? "Export" : "Export Text"}
             </button>
