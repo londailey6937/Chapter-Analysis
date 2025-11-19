@@ -353,12 +353,12 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
         }}
         onMouseEnter={(e) => {
           if (!disabled) {
-            e.currentTarget.style.borderColor = "#a54d43";
+            e.currentTarget.style.backgroundColor = "#f7e6d0";
           }
         }}
         onMouseLeave={(e) => {
           if (!disabled) {
-            e.currentTarget.style.borderColor = "#c16659";
+            e.currentTarget.style.backgroundColor = "#ffffff";
           }
         }}
       >
