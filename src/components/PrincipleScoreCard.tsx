@@ -79,7 +79,7 @@ function PrincipleScoreCard({
       >
         <div className="flex-1 text-left flex items-start gap-3">
           {/* Subtle principle number */}
-          <span className="text-gray-300 text-sm font-medium mt-0.5 flex-shrink-0 w-6">
+          <span className="text-gray-400 text-sm font-medium mt-0.5 flex-shrink-0 w-6">
             {principleNumber}.
           </span>
           <div className="flex-1">
