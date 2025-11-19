@@ -120,6 +120,7 @@ export function NavigationMenu({
         <div
           style={{
             padding: "1.5rem",
+            backgroundColor: "#fef5e7",
             borderBottom: "1px solid #e5e7eb",
           }}
         >
@@ -562,7 +563,13 @@ export function NavigationMenu({
         </div>
 
         {/* Company & Support Section */}
-        <div style={{ padding: "1.5rem", borderTop: "1px solid #e5e7eb" }}>
+        <div
+          style={{
+            padding: "1.5rem",
+            backgroundColor: "#fef5e7",
+            borderTop: "1px solid #e5e7eb",
+          }}
+        >
           <h3
             style={{
               margin: "0 0 1rem 0",
