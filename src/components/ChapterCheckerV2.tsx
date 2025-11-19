@@ -1382,7 +1382,7 @@ export const ChapterCheckerV2: React.FC = () => {
       };
 
       // Run analysis in worker (with cache-busting timestamp for dev)
-      const worker = new AnalysisWorker({ type: "module" });
+      const worker = new AnalysisWorker();
 
       worker.postMessage({
         chapter,

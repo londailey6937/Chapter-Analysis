@@ -3,7 +3,7 @@
  * Manages saving and loading custom domains from localStorage
  */
 
-import type { SavedCustomDomain } from "../../types";
+import type { SavedCustomDomain, SavedConceptData } from "../../types";
 import type { ConceptDefinition } from "@/data/conceptLibraryRegistry";
 
 const STORAGE_KEY = "tomeiq_custom_domains";
@@ -41,11 +41,13 @@ export function saveCustomDomain(
 
     const newDomain: SavedCustomDomain = {
       name,
-      concepts: concepts.map((c) => ({
-        name: c.name,
-        category: c.category,
-        importance: c.importance,
-      })),
+      concepts: concepts.map(
+        (c): SavedConceptData => ({
+          name: c.name,
+          category: c.category,
+          importance: c.importance,
+        })
+      ),
       createdAt: new Date().toISOString(),
     };
 

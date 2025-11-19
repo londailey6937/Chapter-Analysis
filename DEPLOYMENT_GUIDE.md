@@ -67,6 +67,31 @@
      VITE_SUPABASE_ANON_KEY=your-anon-key-from-supabase
      VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your-stripe-key
      ```
+   - `vercel.json` no longer references Vercel secrets, so whatever you configure here is exactly what the build receives. Set the variables in **Production**, **Preview**, and **Development** scopes so every deploy target has them.
+
+     **Option A – Vercel dashboard**
+
+     - Settings → Environment Variables → "Add"
+     - Add the three `VITE_*` variables above (Scope: All)
+     - Click "Redeploy" so the new values reach the next build
+
+     **Option B – Vercel CLI**
+
+     Run the following (paste your real values when prompted):
+
+     ```bash
+     vercel env add VITE_SUPABASE_URL production
+     vercel env add VITE_SUPABASE_URL preview
+     vercel env add VITE_SUPABASE_URL development
+     vercel env add VITE_SUPABASE_ANON_KEY production
+     vercel env add VITE_SUPABASE_ANON_KEY preview
+     vercel env add VITE_SUPABASE_ANON_KEY development
+     vercel env add VITE_STRIPE_PUBLISHABLE_KEY production
+     vercel env add VITE_STRIPE_PUBLISHABLE_KEY preview
+     vercel env add VITE_STRIPE_PUBLISHABLE_KEY development
+     ```
+
+     After adding the variables, trigger a redeploy so the new Supabase credentials are available to the build. (If you still prefer Vercel secrets, create them first and then set the `VITE_*` variables to `@your_secret_name` inside the dashboard.)
 
 3. **Deploy**
 

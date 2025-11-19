@@ -63,9 +63,15 @@ export const ACCESS_TIERS: Record<AccessLevel, AccessFeatures> = {
 };
 
 // Custom Domain Storage
+export interface SavedConceptData {
+  name: string;
+  category?: string;
+  importance?: string;
+}
+
 export interface SavedCustomDomain {
   name: string;
-  concepts: Array<{ name: string; category?: string; importance?: string }>;
+  concepts: SavedConceptData[];
   createdAt: string;
 }
 
