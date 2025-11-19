@@ -166,7 +166,23 @@ export const MissingConceptSuggestions: React.FC<
                         e.stopPropagation();
                         handleReject(missing.concept.name);
                       }}
-                      className="px-3 py-1.5 text-xs text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
+                      className="px-3 py-1.5 text-xs rounded transition-colors"
+                      style={{
+                        backgroundColor: "white",
+                        color: "#6b7280",
+                        border: "1px solid #e5e7eb",
+                        transition: "all 0.2s",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#f7e6d0";
+                        e.currentTarget.style.borderColor = "#ef8432";
+                        e.currentTarget.style.color = "#2c3e50";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "white";
+                        e.currentTarget.style.borderColor = "#e5e7eb";
+                        e.currentTarget.style.color = "#6b7280";
+                      }}
                     >
                       Dismiss
                     </button>
@@ -181,7 +197,19 @@ export const MissingConceptSuggestions: React.FC<
         <div className="text-center py-2">
           <button
             onClick={() => setShowAll(true)}
-            className="text-xs text-blue-600 hover:text-blue-700 font-medium px-4 py-2 border border-blue-300 rounded hover:bg-blue-50 transition-colors"
+            className="text-xs font-medium px-4 py-2 rounded transition-colors"
+            style={{
+              backgroundColor: "white",
+              color: "#2c3e50",
+              border: "1px solid #ef8432",
+              transition: "background-color 0.2s",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#f7e6d0")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "white")
+            }
           >
             Show All {missingConcepts.length} Missing Concepts
           </button>
@@ -191,7 +219,19 @@ export const MissingConceptSuggestions: React.FC<
         <div className="text-center py-2">
           <button
             onClick={() => setShowAll(false)}
-            className="text-xs text-gray-600 hover:text-gray-700 font-medium px-4 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+            className="text-xs font-medium px-4 py-2 rounded transition-colors"
+            style={{
+              backgroundColor: "white",
+              color: "#2c3e50",
+              border: "1px solid #ef8432",
+              transition: "background-color 0.2s",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#f7e6d0")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "white")
+            }
           >
             Show Less (First 10 Only)
           </button>

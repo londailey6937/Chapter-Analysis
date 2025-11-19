@@ -217,8 +217,8 @@ export const ConceptList: React.FC<ConceptListProps> = ({
           padding: 8px 16px;
           border-radius: 6px;
           background: white;
-          border: 2px solid #3b82f6;
-          color: #3b82f6;
+          border: 2px solid #ef8432;
+          color: #2c3e50;
           font-size: 14px;
           font-weight: 600;
           cursor: pointer;
@@ -226,10 +226,9 @@ export const ConceptList: React.FC<ConceptListProps> = ({
         }
 
         .nav-button:hover:not(:disabled) {
-          background: #3b82f6;
-          color: white;
+          background: #f7e6d0;
           transform: translateY(-1px);
-          box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+          box-shadow: 0 2px 4px rgba(239, 132, 50, 0.3);
         }
 
         .nav-button:disabled {
@@ -237,6 +236,7 @@ export const ConceptList: React.FC<ConceptListProps> = ({
           cursor: not-allowed;
           border-color: #d1d5db;
           color: #9ca3af;
+          background: #f3f4f6;
         }
       `}</style>
     </div>

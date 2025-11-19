@@ -91,7 +91,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-2xl"
+            className="text-2xl transition-colors"
+            style={{
+              color: "#9ca3af",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#ef8432")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#9ca3af")}
           >
             ×
           </button>
@@ -191,7 +199,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <button
             onClick={switchMode}
             style={{
-              color: "#1e3a8a",
+              color: "#ef8432",
               textDecoration: "underline",
               backgroundColor: "transparent",
               border: "none",
