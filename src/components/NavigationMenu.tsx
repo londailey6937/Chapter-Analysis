@@ -196,6 +196,42 @@ export function NavigationMenu({
               <span style={{ fontSize: "1.25rem" }}>📖</span>
               <span>Reference Library</span>
             </button>
+
+            <button
+              onClick={() => {
+                window.open(
+                  "https://github.com/londailey6937/Chapter-Analysis/issues/new",
+                  "_blank"
+                );
+                onClose();
+              }}
+              style={{
+                width: "100%",
+                padding: "0.875rem 1rem",
+                backgroundColor: "white",
+                color: "#2c3e50",
+                border: "1.5px solid #dc2626",
+                borderRadius: "20px",
+                fontSize: "1rem",
+                fontWeight: "600",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.75rem",
+                transition: "background-color 0.2s, transform 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#fee2e2";
+                e.currentTarget.style.transform = "translateY(-1px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "white";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              <span style={{ fontSize: "1.25rem" }}>🐛</span>
+              <span>Report Bug</span>
+            </button>
           </div>
         </div>
 

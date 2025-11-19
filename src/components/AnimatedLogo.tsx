@@ -87,10 +87,10 @@ export function AnimatedLogo({
 
         @keyframes glow-pulse {
           0%, 100% {
-            filter: drop-shadow(0 0 4px rgba(239, 132, 50, 0.4));
+            filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.4));
           }
           50% {
-            filter: drop-shadow(0 0 12px rgba(239, 132, 50, 0.8));
+            filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.8));
           }
         }
 
