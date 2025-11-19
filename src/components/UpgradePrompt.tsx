@@ -44,7 +44,18 @@ export const UpgradePrompt: React.FC<UpgradePromptProps> = ({
         {onDismiss && (
           <button
             onClick={onDismiss}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+            className="absolute top-4 right-4 text-gray-400 text-2xl w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+            style={{
+              backgroundColor: "transparent",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#f7e6d0";
+              e.currentTarget.style.color = "#ef8432";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "transparent";
+              e.currentTarget.style.color = "#9ca3af";
+            }}
             aria-label="Close"
           >
             ×
@@ -94,14 +105,40 @@ export const UpgradePrompt: React.FC<UpgradePromptProps> = ({
         <div className="space-y-3">
           <button
             onClick={onUpgrade}
-            className="w-full bg-white text-gray-700 border-2 border-gray-600 py-3 rounded-full font-semibold hover:border-gray-700 hover:text-gray-800 transition-all"
+            className="w-full py-3 rounded-full font-semibold transition-all"
+            style={{
+              backgroundColor: "white",
+              color: "#2c3e50",
+              border: "2px solid #ef8432",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#f7e6d0")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "white")
+            }
           >
             Upgrade to {tierName}
           </button>
           {onDismiss && (
             <button
               onClick={onDismiss}
-              className="w-full text-gray-600 py-2 rounded-full hover:bg-gray-100 border border-gray-300 transition-colors"
+              className="w-full py-2 rounded-full transition-colors"
+              style={{
+                backgroundColor: "white",
+                color: "#6b7280",
+                border: "1px solid #d1d5db",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#f7e6d0";
+                e.currentTarget.style.borderColor = "#ef8432";
+                e.currentTarget.style.color = "#2c3e50";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "white";
+                e.currentTarget.style.borderColor = "#d1d5db";
+                e.currentTarget.style.color = "#6b7280";
+              }}
             >
               Maybe Later
             </button>
@@ -141,7 +178,18 @@ export const InlineUpgradePrompt: React.FC<InlineUpgradePromptProps> = ({
           <p className="text-gray-700 mb-4">{description}</p>
           <button
             onClick={onUpgrade}
-            className="bg-white text-gray-700 border-2 border-gray-600 px-6 py-2 rounded-full font-semibold hover:border-gray-700 hover:text-gray-800 transition-all"
+            className="px-6 py-2 rounded-full font-semibold transition-all"
+            style={{
+              backgroundColor: "white",
+              color: "#2c3e50",
+              border: "2px solid #ef8432",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#f7e6d0")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "white")
+            }
           >
             Upgrade to {tierName}
           </button>
