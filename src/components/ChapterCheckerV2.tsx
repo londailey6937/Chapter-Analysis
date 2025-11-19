@@ -2724,6 +2724,15 @@ export const ChapterCheckerV2: React.FC = () => {
                                 fontWeight: "600",
                                 cursor: isAnalyzing ? "not-allowed" : "pointer",
                                 opacity: isAnalyzing ? 0.5 : 1,
+                                transition: "background-color 0.2s",
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!isAnalyzing)
+                                  e.currentTarget.style.backgroundColor =
+                                    "#f7e6d0";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = "white";
                               }}
                             >
                               Change
@@ -2775,6 +2784,15 @@ export const ChapterCheckerV2: React.FC = () => {
                                 fontWeight: "600",
                                 cursor: isAnalyzing ? "not-allowed" : "pointer",
                                 opacity: isAnalyzing ? 0.5 : 1,
+                                transition: "background-color 0.2s",
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!isAnalyzing)
+                                  e.currentTarget.style.backgroundColor =
+                                    "#f7e6d0";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = "white";
                               }}
                             >
                               Change
@@ -2796,6 +2814,14 @@ export const ChapterCheckerV2: React.FC = () => {
                                 fontSize: "12px",
                                 fontWeight: "600",
                                 cursor: "pointer",
+                                transition: "background-color 0.2s",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor =
+                                  "#f7e6d0";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = "white";
                               }}
                             >
                               Select Domain
@@ -2827,6 +2853,15 @@ export const ChapterCheckerV2: React.FC = () => {
                                 cursor: ACCESS_TIERS[accessLevel].customDomains
                                   ? "pointer"
                                   : "not-allowed",
+                                transition: "background-color 0.2s",
+                              }}
+                              onMouseEnter={(e) => {
+                                if (ACCESS_TIERS[accessLevel].customDomains)
+                                  e.currentTarget.style.backgroundColor =
+                                    "#f7e6d0";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = "white";
                               }}
                             >
                               Create Custom{" "}
@@ -2925,6 +2960,13 @@ export const ChapterCheckerV2: React.FC = () => {
                             fontSize: "12px",
                             fontWeight: "600",
                             cursor: "pointer",
+                            transition: "background-color 0.2s",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#f7e6d0";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "white";
                           }}
                         >
                           Cancel
@@ -2958,6 +3000,14 @@ export const ChapterCheckerV2: React.FC = () => {
                             cursor: ACCESS_TIERS[accessLevel].customDomains
                               ? "pointer"
                               : "not-allowed",
+                            transition: "background-color 0.2s",
+                          }}
+                          onMouseEnter={(e) => {
+                            if (ACCESS_TIERS[accessLevel].customDomains)
+                              e.currentTarget.style.backgroundColor = "#f7e6d0";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "white";
                           }}
                         >
                           Create Custom{" "}
@@ -3000,7 +3050,18 @@ export const ChapterCheckerV2: React.FC = () => {
                       (selectedDomain || selectedDomain === "none")
                         ? "pointer"
                         : "not-allowed",
-                    boxShadow: "none",
+                    transition: "background-color 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (
+                      chapterText.trim() &&
+                      !isAnalyzing &&
+                      (selectedDomain || selectedDomain === "none")
+                    )
+                      e.currentTarget.style.backgroundColor = "#f7e6d0";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "white";
                   }}
                 >
                   {isAnalyzing ? "⏳ Analyzing..." : "🔍 Analyze Chapter"}
@@ -3016,7 +3077,7 @@ export const ChapterCheckerV2: React.FC = () => {
                       borderLeft: "4px solid #2c3e50",
                       borderRadius: "20px",
                       fontSize: "13px",
-                      lineHeight: "1.6",
+                      lineHeight: 1.6,
                     }}
                   >
                     <div
