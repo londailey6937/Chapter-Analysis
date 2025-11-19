@@ -273,8 +273,8 @@ export const JAVASCRIPT_CONCEPTS: ConceptLibrary = {
       description: "Returns the first element that satisfies a test condition.",
     },
     {
-      name: "some",
-      aliases: ["Array.some", "some method", "every", "Array.every"],
+      name: "Array.some",
+      aliases: ["some method", "Array.every", "every method"],
       category: "Arrays",
       subcategory: "Testing",
       importance: "core",

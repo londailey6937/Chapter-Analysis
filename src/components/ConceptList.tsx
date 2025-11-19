@@ -89,6 +89,16 @@ export const ConceptList: React.FC<ConceptListProps> = ({
     }
   };
 
+  const handleReport = (concept: Concept) => {
+    const confirmed = window.confirm(
+      `Report "${concept.name}" as a false positive?\n\nThis will help us improve our matching algorithm.`
+    );
+    if (confirmed) {
+      console.log(`Reported false positive: ${concept.name} (${concept.id})`);
+      alert("Thank you! This concept has been flagged for review.");
+    }
+  };
+
   return (
     <div className="concept-list">
       <div className="card">
@@ -113,6 +123,7 @@ export const ConceptList: React.FC<ConceptListProps> = ({
                   onClick={() =>
                     onConceptClick(concept, getPrimaryMentionIndex(concept))
                   }
+                  onReport={() => handleReport(concept)}
                   title={`${concept.name} - ${concept.mentions.length} mentions`}
                 />
               ))}

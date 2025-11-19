@@ -10,10 +10,11 @@
 2. [Dual Coding Analysis Reference](#dual-coding-analysis-reference)
 3. [Export Formats Guide](#export-formats-guide)
 4. [Domain Libraries Explained](#domain-libraries-explained)
-5. [Access Tiers & Features](#access-tiers--features)
-6. [Writer Mode Workflow](#writer-mode-workflow)
-7. [Color Coding System](#color-coding-system)
-8. [Technical Specifications](#technical-specifications)
+5. [Concept Matching Strategy](#concept-matching-strategy)
+6. [Access Tiers & Features](#access-tiers--features)
+7. [Writer Mode Workflow](#writer-mode-workflow)
+8. [Color Coding System](#color-coding-system)
+9. [Technical Specifications](#technical-specifications)
 
 ---
 
@@ -229,11 +230,13 @@ Domain libraries are pre-built concept dictionaries tailored to specific subject
 
 | Domain             | Concept Count | Best For                                                  |
 | ------------------ | ------------- | --------------------------------------------------------- |
-| **Chemistry**      | 150+          | General chemistry, organic, reactions, lab techniques     |
-| **Algebra & Trig** | 120+          | Mathematical concepts, equations, functions               |
-| **Computing**      | 180+          | Programming, data structures, algorithms, systems         |
-| **Finance**        | 90+           | Financial concepts, markets, accounting, economics        |
-| **React**          | 85+           | React.js development, hooks, components, state management |
+| **Chemistry**      | 377           | General chemistry, organic, reactions, lab techniques     |
+| **Algebra & Trig** | 102           | Mathematical concepts, equations, functions               |
+| **Computing**      | 52            | Programming, data structures, algorithms, systems         |
+| **Finance**        | 652           | Financial concepts, markets, accounting, economics        |
+| **React**          | 47            | React.js development, hooks, components, state management |
+| **JavaScript**     | 57            | JavaScript language features, syntax, DOM                 |
+| **Cross Domain**   | 50            | General academic terms, common verbs                      |
 
 ### Selecting the Right Domain
 
@@ -325,6 +328,25 @@ Score Impact: Lower scores, missed learning opportunities
 - **Include synonyms** if concepts have multiple names
 - **Test with sample chapter** before finalizing
 - **Update as you discover missed terms**
+
+---
+
+## Concept Matching Strategy
+
+### How We Identify Concepts
+
+Our analysis engine uses a sophisticated **Two-Pass Logic** to ensure both accuracy and flexibility when identifying concepts in your text.
+
+### The Matching Workflow
+
+1. **Strict Match (Pass 1):** We first look for the exact, canonical name of the concept (e.g., "Real option exercise rule"). This ensures the most specific terminology is recognized.
+2. **Flexible Match (Pass 2):** If the exact name isn't found, we scan for approved aliases and variations (e.g., "exercise rule"). This captures natural language usage while mapping it back to the core concept.
+
+### False Positive Reporting
+
+Language is complex, and sometimes a word might be matched out of context (e.g., "Bond" as a name vs. "Bond" as a financial instrument).
+
+You can now **Report False Positives** directly from the concept list. Look for the flag icon on any concept pill to flag it for review. This helps us refine our libraries and improve accuracy for everyone.
 
 ---
 
@@ -714,3 +736,11 @@ A: Custom domains are stored per-browser. If you clear browser data or switch co
 
 **Last Updated:** November 15, 2025
 **Version:** 2.0
+
+---
+
+## Concept Manifest
+
+For a complete list of all concepts currently available in the system, including their IDs and importance levels, please refer to the [Concept Library Manifest](./CONCEPT_LIBRARY_MANIFEST.md).
+
+This manifest is auto-generated and reflects the exact state of the codebase.

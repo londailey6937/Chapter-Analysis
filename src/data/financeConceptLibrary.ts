@@ -3,10 +3,15 @@
 
 import { Concept } from "../../types";
 
-export const financeConceptLibrary: Concept[] = [
+export interface LibraryConcept extends Concept {
+  aliases?: string[];
+}
+
+export const financeConceptLibrary: LibraryConcept[] = [
   {
     id: "finance-1",
     name: "Finance",
+    aliases: ["financial management", "financial systems"],
     definition:
       "The study of money management, investments, and financial systems.",
     importance: "core",
@@ -22,6 +27,7 @@ export const financeConceptLibrary: Concept[] = [
   {
     id: "finance-3",
     name: "Investments",
+    aliases: ["investing", "investment strategy"],
     definition:
       "Assets or items acquired with the goal of generating income or appreciation.",
     importance: "core",
@@ -37,6 +43,7 @@ export const financeConceptLibrary: Concept[] = [
   {
     id: "finance-2019",
     name: "Real option exercise rule",
+    aliases: ["exercise rule", "real options rule", "option exercise criteria"],
     definition:
       "Guidelines for when management should exercise flexibility options based on threshold values.",
     importance: "supporting",
@@ -52,6 +59,11 @@ export const financeConceptLibrary: Concept[] = [
   {
     id: "finance-2021",
     name: "Underlying asset value",
+    aliases: [
+      "asset value",
+      "underlying value",
+      "project value without options",
+    ],
     definition:
       "The present value of expected project cash flows without flexibility, used in option models.",
     importance: "supporting",
@@ -67,6 +79,7 @@ export const financeConceptLibrary: Concept[] = [
   {
     id: "finance-2023",
     name: "Risk-neutral probability",
+    aliases: ["risk-neutral measure", "risk neutral probabilities"],
     definition:
       "A probability measure adjusted for risk preferences used in option pricing trees.",
     importance: "supporting",
@@ -82,6 +95,7 @@ export const financeConceptLibrary: Concept[] = [
   {
     id: "finance-2025",
     name: "State-contingent cash flows",
+    aliases: ["contingent cash flows", "state-dependent cash flows"],
     definition:
       "Cash flow outcomes that depend on future states of the world modeled in decision trees.",
     importance: "supporting",
@@ -97,6 +111,7 @@ export const financeConceptLibrary: Concept[] = [
   {
     id: "finance-2027",
     name: "Compound option",
+    aliases: ["option on an option", "multi-stage option"],
     definition:
       "An option on an option, such as the choice to expand after delaying a project.",
     importance: "supporting",
@@ -112,6 +127,7 @@ export const financeConceptLibrary: Concept[] = [
   {
     id: "finance-2029",
     name: "Decision rules with options",
+    aliases: ["option decision rules", "flexible decision rules"],
     definition:
       "Adjusting accept-reject criteria to include the value of managerial flexibility.",
     importance: "supporting",
@@ -127,6 +143,7 @@ export const financeConceptLibrary: Concept[] = [
   {
     id: "finance-2031",
     name: "Learning option",
+    aliases: ["option to learn", "information option"],
     definition:
       "Value derived from waiting for information that improves project forecast accuracy.",
     importance: "supporting",
@@ -142,6 +159,7 @@ export const financeConceptLibrary: Concept[] = [
   {
     id: "finance-2033",
     name: "Switching option",
+    aliases: ["option to switch", "flexible inputs option"],
     definition:
       "The ability to change inputs or outputs in response to market shifts without abandoning the project.",
     importance: "supporting",

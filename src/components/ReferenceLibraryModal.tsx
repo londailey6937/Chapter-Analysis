@@ -28,11 +28,119 @@ export function ReferenceLibraryModal({
     writer: "Writer Mode",
     colors: "Color Coding",
     technical: "Technical Specs",
+    matching: "Concept Matching",
     faq: "FAQ",
   };
 
   const renderContent = () => {
     switch (activeSection) {
+      case "matching":
+        return (
+          <div className="quickstart-shell">
+            <div className="quickstart-content">
+              <section
+                className="quickstart-card"
+                style={{ borderRadius: "1rem" }}
+              >
+                <h4>Concept Matching Strategy</h4>
+
+                <h3
+                  style={{
+                    marginTop: "1.5rem",
+                    marginBottom: "0.5rem",
+                    color: "#374151",
+                  }}
+                >
+                  How We Identify Concepts
+                </h3>
+                <p style={{ marginBottom: "1rem", lineHeight: "1.6" }}>
+                  Our analysis engine uses a sophisticated{" "}
+                  <strong>Two-Pass Logic</strong> to ensure both accuracy and
+                  flexibility when identifying concepts in your text.
+                </p>
+
+                <div
+                  style={{
+                    backgroundColor: "#f0f9ff",
+                    borderLeft: "4px solid #0ea5e9",
+                    padding: "1rem",
+                    marginBottom: "1.5rem",
+                    borderRadius: "0 0.5rem 0.5rem 0",
+                  }}
+                >
+                  <h5
+                    style={{
+                      margin: "0 0 0.5rem 0",
+                      color: "#0369a1",
+                      fontSize: "1rem",
+                    }}
+                  >
+                    The Matching Workflow
+                  </h5>
+                  <ol
+                    style={{
+                      margin: 0,
+                      paddingLeft: "1.5rem",
+                      color: "#334155",
+                    }}
+                  >
+                    <li style={{ marginBottom: "0.5rem" }}>
+                      <strong>Strict Match (Pass 1):</strong> We first look for
+                      the exact, canonical name of the concept (e.g., "Real
+                      option exercise rule"). This ensures the most specific
+                      terminology is recognized.
+                    </li>
+                    <li>
+                      <strong>Flexible Match (Pass 2):</strong> If the exact
+                      name isn't found, we scan for approved aliases and
+                      variations (e.g., "exercise rule"). This captures natural
+                      language usage while mapping it back to the core concept.
+                    </li>
+                  </ol>
+                </div>
+
+                <h3
+                  style={{
+                    marginTop: "1.5rem",
+                    marginBottom: "0.5rem",
+                    color: "#374151",
+                  }}
+                >
+                  False Positive Reporting
+                </h3>
+                <p style={{ marginBottom: "1rem", lineHeight: "1.6" }}>
+                  Language is complex, and sometimes a word might be matched out
+                  of context (e.g., "Bond" as a name vs. "Bond" as a financial
+                  instrument).
+                </p>
+                <p style={{ marginBottom: "1rem", lineHeight: "1.6" }}>
+                  You can now <strong>Report False Positives</strong> directly
+                  from the concept list. Look for the flag icon{" "}
+                  <span
+                    style={{ display: "inline-block", verticalAlign: "middle" }}
+                  >
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                      <line x1="4" y1="22" x2="4" y2="15"></line>
+                    </svg>
+                  </span>{" "}
+                  on any concept pill to flag it for review. This helps us
+                  refine our libraries and improve accuracy for everyone.
+                </p>
+              </section>
+            </div>
+          </div>
+        );
+
       case "spacing":
         return (
           <div className="quickstart-shell">

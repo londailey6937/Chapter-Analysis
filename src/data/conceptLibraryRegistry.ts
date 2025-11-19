@@ -86,7 +86,7 @@ const RAW_CONCEPT_LIBRARIES: Record<Domain, ConceptLibrary> = {
     concepts: financeConceptLibrary.map((c) => ({
       id: c.id,
       name: c.name,
-      aliases: [],
+      aliases: c.aliases || [],
       category: "Finance",
       importance: c.importance,
       description: c.definition,

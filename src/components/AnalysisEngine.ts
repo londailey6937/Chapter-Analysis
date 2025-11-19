@@ -25,6 +25,17 @@ import { ConceptExtractor } from "./ConceptExtractorLibrary";
 import type { Domain } from "@/data/conceptLibraryRegistry";
 import type { ConceptDefinition } from "@/data/conceptLibraryRegistry";
 import { PatternRecognizer } from "@/utils/PatternRecognizer";
+import {
+  analyzeParagraphSpacing,
+  extractParagraphs,
+} from "@/utils/spacingInsights";
+import { DualCodingAnalyzer } from "@/utils/dualCodingAnalyzer";
+import { clamp } from "lodash";
+import {
+  evaluateCognitiveLoad,
+  evaluateInterleaving,
+  evaluateKeywordPrinciple,
+} from "@/utils/localHeuristics";
 
 // Human-friendly labels for principle codes used in visualization summaries
 const PRINCIPLE_LABELS: Record<string, string> = {
@@ -166,7 +177,8 @@ export class AnalysisEngine {
             conceptId: concept.id,
             conceptName: concept.name,
             mentions,
-            positions, // <-- add real mention positions for visualization
+            // <-- add real mention positions for visualization
+            positions: concept.mentions.map((m) => m.position) ?? [],
             firstAppearance: concept.firstMentionPosition,
             spacing,
             avgSpacing: Math.round(avgSpacing),
@@ -364,8 +376,151 @@ export class AnalysisEngine {
       return data.results;
     } catch (err) {
       console.error("[AnalysisEngine] Error running evaluators:", err);
-      // Fallback or rethrow? For now, rethrow to alert user
-      throw err;
+      console.warn("[AnalysisEngine] Falling back to local evaluation.");
+
+      // Local Fallback Logic
+      try {
+        const paragraphs = extractParagraphs(chapter.content);
+        const spacingInsights = paragraphs.map((p) => ({
+          paragraph: p,
+          assessment: analyzeParagraphSpacing(p.wordCount),
+        }));
+
+        const balancedCount = spacingInsights.filter(
+          (i) => i.assessment.tone === "balanced"
+        ).length;
+        const extendedCount = spacingInsights.filter(
+          (i) => i.assessment.tone === "extended"
+        ).length;
+        const compactCount = spacingInsights.filter(
+          (i) => i.assessment.tone === "compact"
+        ).length;
+
+        const spacingScore = Math.min(
+          98,
+          Math.max(
+            35,
+            78 +
+              (balancedCount / Math.max(1, spacingInsights.length)) * 20 -
+              extendedCount * 6 -
+              compactCount * 3
+          )
+        );
+
+        const visualSuggestions = DualCodingAnalyzer.analyzeForVisuals(
+          chapter.content
+        );
+        const highPriorityVisuals = visualSuggestions.filter(
+          (s) => s.priority === "high"
+        ).length;
+        const dualCodingScore = Math.min(
+          97,
+          Math.max(
+            30,
+            90 -
+              highPriorityVisuals * 8 -
+              (visualSuggestions.length - highPriorityVisuals) * 4
+          )
+        );
+
+        return [
+          {
+            principle: "spacedRepetition",
+            score: Math.round(spacingScore),
+            weight: 1,
+            findings: spacingInsights
+              .filter((i) => i.assessment.tone !== "balanced")
+              .map((i) => ({
+                type:
+                  i.assessment.tone === "extended"
+                    ? ("warning" as const)
+                    : ("neutral" as const),
+                message: i.assessment.message,
+                severity: i.assessment.tone === "extended" ? 0.6 : 0.3,
+                location: {
+                  sectionId: "unknown",
+                  position: i.paragraph.startIndex,
+                },
+                evidence: i.paragraph.text.substring(0, 50) + "...",
+              })),
+            suggestions: [],
+            evidence: [],
+          },
+          {
+            principle: "dualCoding",
+            score: Math.round(dualCodingScore),
+            weight: 1,
+            findings: visualSuggestions.map((s) => ({
+              type:
+                s.priority === "high"
+                  ? ("critical" as const)
+                  : ("neutral" as const),
+              message: `${s.visualType} needed: ${s.reason}`,
+              severity: s.priority === "high" ? 0.8 : 0.4,
+              location: { sectionId: "unknown", position: s.position },
+              evidence: s.context || "Context unavailable",
+            })),
+            suggestions: [],
+            evidence: [],
+          },
+          evaluateInterleaving(chapter.content),
+          evaluateKeywordPrinciple(
+            chapter.content,
+            "deepProcessing",
+            "deepProcessing"
+          ),
+          evaluateKeywordPrinciple(
+            chapter.content,
+            "retrievalPractice",
+            "retrievalPractice"
+          ),
+          evaluateKeywordPrinciple(
+            chapter.content,
+            "generativeLearning",
+            "generativeLearning"
+          ),
+          evaluateKeywordPrinciple(
+            chapter.content,
+            "metacognition",
+            "metacognition"
+          ),
+          evaluateKeywordPrinciple(
+            chapter.content,
+            "schemaBuilding",
+            "schemaBuilding"
+          ),
+          evaluateCognitiveLoad(chapter.content),
+          evaluateKeywordPrinciple(
+            chapter.content,
+            "emotionAndRelevance",
+            "emotionAndRelevance"
+          ),
+        ];
+      } catch (fallbackErr) {
+        console.error(
+          "[AnalysisEngine] Fallback analysis failed:",
+          fallbackErr
+        );
+        // Ultimate fallback to prevent crash
+        return [
+          {
+            principle: "spacedRepetition",
+            score: 0,
+            weight: 1,
+            findings: [
+              {
+                type: "warning" as const,
+                message: "Analysis unavailable. Please check your connection.",
+                severity: 1,
+                location: { sectionId: "system", position: 0 },
+                evidence: "Fallback failed",
+              },
+            ],
+            suggestions: [],
+            evidence: [],
+          },
+        ];
+      }
     }
   }
 
