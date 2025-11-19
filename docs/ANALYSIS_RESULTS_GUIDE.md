@@ -170,6 +170,79 @@ Concepts marked as "core" importance receive special highlighting in the analysi
 3. **Check understanding**: Can you explain how concepts relate?
 4. **Identify confusion**: Which concepts are unclear? Ask for help on these.
 
+### Prerequisite Order Check
+
+The Prerequisite Order Check card identifies sequencing issues where advanced concepts appear before their foundational prerequisites.
+
+**What It Shows:**
+
+The card displays three key metrics:
+
+- **Tracked Prerequisites**: Total number of prerequisite relationships detected in the chapter
+- **Conflicts/Missing**: Concepts that appear out of order or prerequisites that are referenced but never introduced
+- **In Sequence**: Prerequisites that correctly appear before dependent concepts
+
+**How It Works:**
+
+The system combines three sources of prerequisite information:
+
+1. **Domain Library**: Predefined prerequisite relationships in concept libraries (e.g., "atom" must precede "molecule")
+2. **Detected Relationships**: Prerequisite connections identified in the chapter text through phrases like "Before understanding X..." or "builds on Y"
+3. **Concept Metadata**: Explicit prerequisites defined in concept definitions
+
+For each concept with prerequisites, the analysis checks if all prerequisites are introduced earlier in the chapter sequence.
+
+**Severity Levels:**
+
+When a prerequisite violation is detected, it's classified by severity:
+
+- **Low (yellow)**: Prerequisite appears 1 concept later (minor issue)
+- **Medium (orange)**: Prerequisite appears 2-3 concepts later (moderate concern)
+- **High (red)**: Prerequisite appears 4+ concepts later (significant pedagogical issue)
+
+**Example Violation:**
+
+```
+⚠️ High Severity
+Concept: "ionic bonding" (introduced early)
+Missing prerequisite: "electronegativity" (introduced 6 concepts later)
+Gap: ~2 paragraphs earlier
+
+Problem: Students can't understand ionic bonding without knowing about
+electronegativity differences between atoms.
+```
+
+**Interpreting Results:**
+
+✅ **All in sequence (0 conflicts)**: Chapter has excellent pedagogical flow with proper scaffolding.
+
+⚠️ **Minor conflicts (1-3 low severity)**: Small sequencing improvements possible but not critical. Consider reordering if easy.
+
+🔴 **Major conflicts (multiple medium/high)**: Significant pedagogical issue. Students will struggle with forward references to unexplained concepts. Reordering strongly recommended.
+
+❌ **Missing prerequisites**: Referenced concepts never appear in chapter. Either add definitions or remove references.
+
+**When to Act:**
+
+- **High severity violations**: Always fix these - they directly impair comprehension
+- **Medium severity**: Fix if the concepts are central to the chapter
+- **Low severity**: Consider fixing during revision, but not urgent
+- **Missing prerequisites**: Add definitions for core concepts, remove references to peripheral ones
+
+**Common Causes:**
+
+1. **Enthusiasm for applications**: Jumping to interesting examples before covering basics
+2. **Expert blind spot**: Author assumes prerequisite knowledge readers may lack
+3. **Restructured content**: Chapter was reorganized but dependencies weren't updated
+4. **Cross-references**: Legitimate forward references that need "defined later" notes
+
+**Best Practices:**
+
+- Review all high-severity violations before publication
+- For unavoidable forward references, add explicit notes: "We'll define X in Section 3"
+- Consider adding prerequisite concept refreshers in margin notes or callout boxes
+- Test sequence with novice readers to catch non-obvious dependencies
+
 ---
 
 ## Concept Relationships
@@ -1352,7 +1425,7 @@ Each principle receives:
 ✓ **Positive**: "Well-balanced concept hierarchy (22% core, 28% supporting, 50% detail)"
 ✓ **Positive**: "87 definition-example pairs scaffold schema construction"
 
-⚠️ **Warning**: "Too many core concepts (32%)—demote some to supporting"
+⚠️ **Warning**: "Too many core concepts (32%)—focus on the most essential foundational concepts"
 🔴 **Critical**: "Poor hierarchy balance—schema organization needs restructuring"
 
 **How to Improve:**

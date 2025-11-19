@@ -1113,24 +1113,24 @@ export function ReferenceLibraryModal({
                   </thead>
                   <tbody>
                     <tr>
-                      <td style={{ padding: "0.5rem" }}>1,000 words</td>
+                      <td style={{ padding: "0.5rem" }}>~5,000 words</td>
                       <td style={{ padding: "0.5rem" }}>1-2 seconds</td>
-                      <td style={{ padding: "0.5rem" }}>~50 MB</td>
+                      <td style={{ padding: "0.5rem" }}>~40 MB</td>
                     </tr>
                     <tr>
-                      <td style={{ padding: "0.5rem" }}>5,000 words</td>
-                      <td style={{ padding: "0.5rem" }}>3-5 seconds</td>
-                      <td style={{ padding: "0.5rem" }}>~100 MB</td>
+                      <td style={{ padding: "0.5rem" }}>~28,000 words</td>
+                      <td style={{ padding: "0.5rem" }}>4-6 seconds</td>
+                      <td style={{ padding: "0.5rem" }}>~80 MB</td>
                     </tr>
                     <tr>
-                      <td style={{ padding: "0.5rem" }}>20,000 words</td>
-                      <td style={{ padding: "0.5rem" }}>10-15 seconds</td>
-                      <td style={{ padding: "0.5rem" }}>~200 MB</td>
-                    </tr>
-                    <tr>
-                      <td style={{ padding: "0.5rem" }}>50,000+ words</td>
-                      <td style={{ padding: "0.5rem" }}>20-30 seconds</td>
+                      <td style={{ padding: "0.5rem" }}>~210,000 words</td>
+                      <td style={{ padding: "0.5rem" }}>25-35 seconds</td>
                       <td style={{ padding: "0.5rem" }}>~400 MB</td>
+                    </tr>
+                    <tr>
+                      <td style={{ padding: "0.5rem" }}>~350,000 words</td>
+                      <td style={{ padding: "0.5rem" }}>40-60 seconds</td>
+                      <td style={{ padding: "0.5rem" }}>~650 MB</td>
                     </tr>
                   </tbody>
                 </table>

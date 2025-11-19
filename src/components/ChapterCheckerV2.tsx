@@ -46,6 +46,9 @@ import {
   type GeneralConcept,
 } from "@/utils/generalConceptExtractor";
 import { AnimatedLogo } from "./AnimatedLogo";
+import { AuthModal } from "./AuthModal";
+import { UserMenu } from "./UserMenu";
+import { supabase, saveAnalysis, getCurrentUser } from "@/utils/supabase";
 
 const HEADING_LENGTH_LIMIT = 120;
 const MAX_FALLBACK_SECTIONS = 8;
@@ -462,6 +465,9 @@ export const ChapterCheckerV2: React.FC = () => {
   const [contentScrolled, setContentScrolled] = useState(false);
   const [pendingAutosave, setPendingAutosave] =
     useState<AutosaveSnapshot | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [layoutMode, setLayoutMode] = useState<LayoutMode>(() => {
     if (typeof window === "undefined") {
       return "desktop";
@@ -1610,6 +1616,44 @@ export const ChapterCheckerV2: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handleSaveAnalysis = async () => {
+    const user = await getCurrentUser();
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    if (!analysis || !chapterData) {
+      setSaveMessage("No analysis to save");
+      setTimeout(() => setSaveMessage(null), 3000);
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveMessage(null);
+
+    try {
+      await saveAnalysis({
+        file_name: fileName || "Untitled",
+        chapter_text: chapterData.plainText,
+        editor_html: chapterData.editorHtml || chapterData.html,
+        analysis_data: analysis,
+        domain:
+          selectedDomain === "none" ? "General" : selectedDomain || "General",
+        is_template_mode: isTemplateMode,
+      });
+
+      setSaveMessage("✅ Analysis saved successfully!");
+      setTimeout(() => setSaveMessage(null), 5000);
+    } catch (error: any) {
+      console.error("Save error:", error);
+      setSaveMessage(`❌ Error: ${error.message}`);
+      setTimeout(() => setSaveMessage(null), 5000);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const tierFeatures = ACCESS_TIERS[accessLevel];
   const canEditChapter =
     viewMode === "writer" && tierFeatures.writerMode && !isAnalyzing;
@@ -1720,6 +1764,45 @@ export const ChapterCheckerV2: React.FC = () => {
                 </p>
               </div>
             </div>
+
+            {/* Save Button (only show if analysis exists and user has access) */}
+            {analysis && accessLevel !== "free" && (
+              <div
+                style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}
+              >
+                <button
+                  onClick={handleSaveAnalysis}
+                  disabled={isSaving}
+                  style={{
+                    padding: "8px 16px",
+                    backgroundColor: isSaving ? "#94a3b8" : "#10b981",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "20px",
+                    cursor: isSaving ? "not-allowed" : "pointer",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {isSaving ? "Saving..." : "💾 Save Analysis"}
+                </button>
+                {saveMessage && (
+                  <span
+                    style={{
+                      fontSize: "12px",
+                      color: saveMessage.includes("✅") ? "#10b981" : "#ef4444",
+                      fontWeight: "600",
+                    }}
+                  >
+                    {saveMessage}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* User Menu / Auth */}
+            <UserMenu onAuthRequired={() => setIsAuthModalOpen(true)} />
 
             {/* Access Level Selector (for demo purposes) */}
             <div
@@ -1852,6 +1935,15 @@ export const ChapterCheckerV2: React.FC = () => {
       <ReferenceLibraryModal
         isOpen={isReferenceLibraryModalOpen}
         onClose={() => setIsReferenceLibraryModalOpen(false)}
+      />
+
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={() => {
+          setSaveMessage("✅ Signed in! You can now save your analyses.");
+          setTimeout(() => setSaveMessage(null), 5000);
+        }}
       />
 
       {/* Main Content */}
@@ -2454,24 +2546,11 @@ export const ChapterCheckerV2: React.FC = () => {
                   </ul>
                 </li>
               </ul>
-              {!chapterData && (
-                <div
-                  style={{
-                    fontSize: "13px",
-                    color: "#2c3e50",
-                    backgroundColor: "#e0c392",
-                    padding: "12px",
-                    borderRadius: "20px",
-                  }}
-                >
-                  Upload a chapter to generate spacing summaries and dual-coding
-                  insights.
-                </div>
-              )}
+
               <div
                 style={{
-                  marginTop: "auto",
-                  paddingTop: "12px",
+                  marginTop: "16px",
+                  paddingTop: "16px",
                   borderTop: "1px solid #e0c392",
                   display: "flex",
                   flexDirection: "column",
@@ -2504,6 +2583,22 @@ export const ChapterCheckerV2: React.FC = () => {
                   Preview Tier 2 Features
                 </button>
               </div>
+
+              {!chapterData && (
+                <div
+                  style={{
+                    marginTop: "16px",
+                    fontSize: "13px",
+                    color: "#2c3e50",
+                    backgroundColor: "#e0c392",
+                    padding: "12px",
+                    borderRadius: "20px",
+                  }}
+                >
+                  Upload a chapter to generate spacing summaries and dual-coding
+                  insights.
+                </div>
+              )}
             </div>
           ) : (
             <div

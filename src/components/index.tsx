@@ -9,6 +9,10 @@ import WordCounter from "./WordCounter";
 import InfoCard from "./InfoCard";
 import ErrorAlert from "./ErrorAlert";
 
+// Export new auth components
+export { AuthModal } from "./AuthModal";
+export { UserMenu } from "./UserMenu";
+
 /**
  * Props interface for ChapterInput component
  */

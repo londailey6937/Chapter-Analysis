@@ -546,12 +546,12 @@ Score Impact: Lower scores, missed learning opportunities
 
 ### Analysis Performance
 
-| Document Size | Analysis Time | Memory Usage |
-| ------------- | ------------- | ------------ |
-| 1,000 words   | 1-2 seconds   | ~50 MB       |
-| 5,000 words   | 3-5 seconds   | ~100 MB      |
-| 20,000 words  | 10-15 seconds | ~200 MB      |
-| 50,000+ words | 20-30 seconds | ~400 MB      |
+| Document Size  | Analysis Time | Memory Usage |
+| -------------- | ------------- | ------------ |
+| ~5,000 words   | 1-2 seconds   | ~40 MB       |
+| ~28,000 words  | 4-6 seconds   | ~80 MB       |
+| ~210,000 words | 25-35 seconds | ~400 MB      |
+| ~350,000 words | 40-60 seconds | ~650 MB      |
 
 **Tips for Large Documents:**
 

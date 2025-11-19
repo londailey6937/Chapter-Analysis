@@ -27,11 +27,10 @@ export const UpgradePrompt: React.FC<UpgradePromptProps> = ({
 
   const professionalFeatures = [
     "✓ Everything in Premium, plus:",
-    "✓ Writer Mode - Real-time Editing",
-    "✓ Live Analysis Updates",
+    "✓ Writer Mode with Live Analysis",
     "✓ Unlimited Document Analyses",
+    "✓ 1,000 Page Upload Limit",
     "✓ Priority Support",
-    "✓ Advanced Customization",
   ];
 
   const features =

@@ -2308,7 +2308,7 @@ export const ChapterAnalysisDashboard: React.FC<{
               <p>Hierarchy Balance</p>
               <p className="stat-note">Target: 60-80%</p>
               <p className="stat-description">
-                Ratio of core to supporting concepts
+                Distribution of concept importance levels
               </p>
             </div>
           </div>

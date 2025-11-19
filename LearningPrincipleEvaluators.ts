@@ -2884,15 +2884,16 @@ export class SchemaBuildingEvaluator {
       let advice = "";
       if (coreRatio < 0.15) {
         advice =
-          "Identify more foundational concepts as 'core' (aim for ~20% of concepts)";
+          "Identify more foundational concepts as 'core' (aim for ~20% of total concepts)";
       } else if (coreRatio > 0.25) {
         advice =
-          "Too many core concepts—demote some to 'supporting' (aim for ~20% core)";
+          "Too many core concepts identified—focus on the most essential foundational concepts (aim for ~20% of total)";
       } else if (supportingRatio < 0.25) {
         advice =
-          "Add more supporting concepts to bridge core ideas and details (aim for ~30%)";
+          "Consider adding more concepts to bridge core ideas and provide detail (aim for ~30% supporting concepts)";
       } else {
-        advice = "Rebalance detail concepts—they should be ~50% of total";
+        advice =
+          "Rebalance concept distribution—detail concepts should be ~50% of total";
       }
 
       suggestions.push({
@@ -2902,7 +2903,7 @@ export class SchemaBuildingEvaluator {
         title: "Improve Concept Hierarchy Balance",
         description: advice,
         implementation:
-          "Review concept classifications: Core = foundational must-knows, Supporting = bridges and applications, Detail = specific examples and extensions",
+          "Review concept classifications: Focus on identifying core concepts (foundational must-knows that all students should master)",
         expectedImpact:
           "Clear hierarchies help students organize knowledge and distinguish essential from supplementary information",
         relatedConcepts: concepts.hierarchy.core.map((c) => c.id).slice(0, 5),
