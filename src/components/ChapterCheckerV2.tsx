@@ -2047,7 +2047,7 @@ export const ChapterCheckerV2: React.FC = () => {
                         onClick={handleClear}
                         style={{
                           padding: "10px 18px",
-                          backgroundColor: "#f5ead9",
+                          backgroundColor: "white",
                           color: "#2c3e50",
                           border: "1.5px solid #e0c392",
                           borderRadius: "12px",
@@ -2055,6 +2055,13 @@ export const ChapterCheckerV2: React.FC = () => {
                           fontSize: "13px",
                           fontWeight: "600",
                           textAlign: "center",
+                          transition: "background-color 0.2s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#f7e6d0";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "white";
                         }}
                       >
                         🗑️ Clear
@@ -2064,7 +2071,7 @@ export const ChapterCheckerV2: React.FC = () => {
                         onClick={handleExportDocx}
                         style={{
                           padding: "10px 18px",
-                          backgroundColor: "#f5ead9",
+                          backgroundColor: "white",
                           color: "#2c3e50",
                           border: "1.5px solid #e0c392",
                           borderRadius: "12px",
@@ -2072,6 +2079,13 @@ export const ChapterCheckerV2: React.FC = () => {
                           fontSize: "13px",
                           fontWeight: "600",
                           textAlign: "center",
+                          transition: "background-color 0.2s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#f7e6d0";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "white";
                         }}
                       >
                         📥 Export DOCX
@@ -2081,7 +2095,7 @@ export const ChapterCheckerV2: React.FC = () => {
                         onClick={handleExportHtml}
                         style={{
                           padding: "10px 18px",
-                          backgroundColor: "#f5ead9",
+                          backgroundColor: "white",
                           color: "#2c3e50",
                           border: "1.5px solid #e0c392",
                           borderRadius: "12px",
@@ -2089,6 +2103,13 @@ export const ChapterCheckerV2: React.FC = () => {
                           fontSize: "13px",
                           fontWeight: "600",
                           textAlign: "center",
+                          transition: "background-color 0.2s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#f7e6d0";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "white";
                         }}
                         title="Export as styled HTML document"
                       >
@@ -2123,7 +2144,7 @@ export const ChapterCheckerV2: React.FC = () => {
                         }}
                         style={{
                           padding: "10px 18px",
-                          backgroundColor: "#f5ead9",
+                          backgroundColor: "white",
                           color: "#2c3e50",
                           border: "1.5px solid #e0c392",
                           borderRadius: "12px",
@@ -2131,6 +2152,13 @@ export const ChapterCheckerV2: React.FC = () => {
                           fontSize: "13px",
                           fontWeight: "600",
                           textAlign: "center",
+                          transition: "background-color 0.2s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#f7e6d0";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "white";
                         }}
                         title="Check auto-save status"
                       >
@@ -3238,6 +3266,14 @@ export const ChapterCheckerV2: React.FC = () => {
                       fontSize: "14px",
                       fontWeight: "600",
                       marginBottom: "16px",
+                      transition: "background-color 0.2s",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (ACCESS_TIERS[accessLevel].exportResults)
+                        e.currentTarget.style.backgroundColor = "#f7e6d0";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "white";
                     }}
                   >
                     📥 Export JSON{" "}

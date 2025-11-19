@@ -488,6 +488,13 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
                   backgroundColor: "white",
                   cursor: "pointer",
                   whiteSpace: "nowrap",
+                  transition: "background-color 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f7e6d0";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "white";
                 }}
               >
                 {isCompactLayout ? "Save" : "Save changes"}
