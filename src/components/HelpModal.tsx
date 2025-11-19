@@ -262,7 +262,7 @@ function QuickStartSection() {
                 <li>
                   <strong>Premium/Pro:</strong> Export results as DOCX
                 </li>
-                <li>Use recommendations to revise content</li>
+                <li>Use recommendations to improve content in your editor</li>
                 <li>Compare before/after analyses to track improvements</li>
               </ul>
             </li>

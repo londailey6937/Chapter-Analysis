@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import mammoth from "mammoth";
 import { wmfToPng, getPlaceholderSvg } from "../utils/wmfUtils";
+import { AccessLevel, ACCESS_TIERS } from "../../types";
 
 // Helper to detect magic numbers
 function detectMimeType(buffer: ArrayBuffer): string {
@@ -69,11 +70,13 @@ export interface UploadedDocumentPayload {
 interface DocumentUploaderProps {
   onDocumentLoad: (payload: UploadedDocumentPayload) => void;
   disabled?: boolean;
+  accessLevel?: AccessLevel;
 }
 
 export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
   onDocumentLoad,
   disabled = false,
+  accessLevel = "free",
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -181,6 +184,39 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
         });
         const rawHtml = htmlResult.value?.trim() ?? "";
         const plainText = textResult.value?.trim() ?? "";
+
+        // Estimate page count (approximately 350 words per page for textbooks)
+        const wordCount = plainText
+          .split(/\s+/)
+          .filter((w) => w.length > 0).length;
+        const estimatedPages = Math.ceil(wordCount / 350);
+        const maxPages = ACCESS_TIERS[accessLevel].maxPages;
+
+        // Check page limit
+        if (estimatedPages > maxPages) {
+          const tierName =
+            accessLevel === "free"
+              ? "Free (Single Chapter)"
+              : accessLevel === "premium"
+              ? "Premium (Full Textbook)"
+              : "Professional";
+          alert(
+            `Document too large: ~${estimatedPages} pages detected.\n\n` +
+              `Your ${tierName} tier allows up to ${maxPages} pages.\n\n` +
+              (accessLevel === "free"
+                ? "Free tier: Up to 80 pages (1 generous textbook chapter)\n" +
+                  "Premium tier: Up to 600 pages (full textbooks)\n" +
+                  "Professional tier: Up to 1,000 pages (multiple books)\n\n" +
+                  "Please upgrade or split your document into smaller chapters."
+                : accessLevel === "premium"
+                ? "Premium tier: Up to 600 pages (typical undergraduate textbook)\n" +
+                  "Professional tier: Up to 1,000 pages (reference books, handbooks)\n\n" +
+                  "Please upgrade or split your document."
+                : "Please split your document into smaller sections.")
+          );
+          return;
+        }
+
         const fallbackPlainText = rawHtml
           ? rawHtml
               .replace(
@@ -225,6 +261,38 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
         if (!textContent.trim()) {
           alert(
             "Could not extract text from the document. Please try a different file."
+          );
+          return;
+        }
+
+        // Estimate page count (approximately 350 words per page for textbooks)
+        const wordCount = textContent
+          .split(/\s+/)
+          .filter((w) => w.length > 0).length;
+        const estimatedPages = Math.ceil(wordCount / 350);
+        const maxPages = ACCESS_TIERS[accessLevel].maxPages;
+
+        // Check page limit
+        if (estimatedPages > maxPages) {
+          const tierName =
+            accessLevel === "free"
+              ? "Free (Single Chapter)"
+              : accessLevel === "premium"
+              ? "Premium (Full Textbook)"
+              : "Professional";
+          alert(
+            `Document too large: ~${estimatedPages} pages detected.\n\n` +
+              `Your ${tierName} tier allows up to ${maxPages} pages.\n\n` +
+              (accessLevel === "free"
+                ? "Free tier: Up to 80 pages (1 generous textbook chapter)\n" +
+                  "Premium tier: Up to 600 pages (full textbooks)\n" +
+                  "Professional tier: Up to 1,000 pages (multiple books)\n\n" +
+                  "Please upgrade or split your document into smaller chapters."
+                : accessLevel === "premium"
+                ? "Premium tier: Up to 600 pages (typical undergraduate textbook)\n" +
+                  "Professional tier: Up to 1,000 pages (comprehensive texts)\n\n" +
+                  "Please upgrade or split your document."
+                : "Please split your document into smaller sections.")
           );
           return;
         }

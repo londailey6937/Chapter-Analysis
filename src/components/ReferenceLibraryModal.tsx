@@ -722,7 +722,7 @@ export function ReferenceLibraryModal({
                     color: "#374151",
                   }}
                 >
-                  Editing Features
+                  Editing Features (Pro Tier Only)
                 </h3>
                 <ul style={{ marginBottom: "1rem", paddingLeft: "1.5rem" }}>
                   <li style={{ marginBottom: "0.5rem" }}>
@@ -753,8 +753,8 @@ export function ReferenceLibraryModal({
                 >
                   <p style={{ margin: 0, fontWeight: "600" }}>💡 Pro Tip:</p>
                   <p style={{ margin: "0.5rem 0 0 0" }}>
-                    Export after each major revision to track improvement over
-                    time!
+                    Edit in your external editor, then upload new versions to
+                    track improvement over time!
                   </p>
                 </div>
               </section>
@@ -1014,6 +1014,9 @@ export function ReferenceLibraryModal({
                       <th style={{ padding: "0.5rem", textAlign: "left" }}>
                         Max Size
                       </th>
+                      <th style={{ padding: "0.5rem", textAlign: "left" }}>
+                        Page Limits by Tier
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1021,14 +1024,44 @@ export function ReferenceLibraryModal({
                       <td style={{ padding: "0.5rem" }}>Microsoft Word</td>
                       <td style={{ padding: "0.5rem" }}>.docx</td>
                       <td style={{ padding: "0.5rem" }}>200 MB</td>
+                      <td style={{ padding: "0.5rem", fontSize: "0.9em" }}>
+                        Free: 80 pages
+                        <br />
+                        Premium: 600 pages
+                        <br />
+                        Professional: 1,000 pages
+                      </td>
                     </tr>
                     <tr>
                       <td style={{ padding: "0.5rem" }}>Open Book Text</td>
                       <td style={{ padding: "0.5rem" }}>.obt</td>
                       <td style={{ padding: "0.5rem" }}>200 MB</td>
+                      <td style={{ padding: "0.5rem", fontSize: "0.9em" }}>
+                        Free: 80 pages
+                        <br />
+                        Premium: 600 pages
+                        <br />
+                        Professional: 1,000 pages
+                      </td>
                     </tr>
                   </tbody>
                 </table>
+
+                <p
+                  style={{
+                    marginBottom: "1rem",
+                    lineHeight: "1.6",
+                    fontSize: "0.95em",
+                    color: "#6b7280",
+                  }}
+                >
+                  <strong>Note:</strong> Page count is estimated at
+                  approximately 350 words per page (typical textbook density).
+                  Free tier accommodates a generous single chapter, Premium tier
+                  handles full undergraduate textbooks, and Professional tier
+                  supports large comprehensive texts like reference books and
+                  handbooks.
+                </p>
 
                 <h3
                   style={{

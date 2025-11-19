@@ -845,7 +845,6 @@ function FeatureSection({
               style={{
                 padding: "0.125rem 0.5rem",
                 backgroundColor: "white",
-                border: "1.5px solid #10b981",
                 color: "white",
                 fontSize: "0.625rem",
                 fontWeight: "700",
@@ -1033,7 +1032,6 @@ function MenuLink({ icon, title, desc, badge, onClick }: MenuLinkProps) {
               style={{
                 padding: "0.125rem 0.5rem",
                 backgroundColor: "white",
-                border: "1.5px solid #10b981",
                 color: "white",
                 fontSize: "0.625rem",
                 fontWeight: "700",

@@ -11,6 +11,7 @@ import { HelpModal } from "./HelpModal";
 import { ReferenceLibraryModal } from "./ReferenceLibraryModal";
 import { NavigationMenu } from "./NavigationMenu";
 import { UpgradePrompt, InlineUpgradePrompt } from "./UpgradePrompt";
+import { TierTwoPreview } from "./TierTwoPreview";
 import { MissingConceptSuggestions } from "./MissingConceptSuggestions";
 import { ChapterAnalysis, Section } from "@/types";
 import { AccessLevel, ACCESS_TIERS } from "../../types";
@@ -394,8 +395,9 @@ const deriveSectionsFromText = (rawText: string): Section[] => {
 
 export const ChapterCheckerV2: React.FC = () => {
   // Access control state
-  const [accessLevel, setAccessLevel] = useState<AccessLevel>("professional");
+  const [accessLevel, setAccessLevel] = useState<AccessLevel>("free");
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const [showTierTwoPreview, setShowTierTwoPreview] = useState(false);
   const [upgradeTarget, setUpgradeTarget] = useState<
     "premium" | "professional"
   >("premium");
@@ -1742,7 +1744,7 @@ export const ChapterCheckerV2: React.FC = () => {
                   whiteSpace: "nowrap",
                 }}
               >
-                Demo Mode:
+                Access Tier:
               </span>
               <CustomDropdown
                 value={accessLevel}
@@ -1915,6 +1917,7 @@ export const ChapterCheckerV2: React.FC = () => {
                   <DocumentUploader
                     onDocumentLoad={handleDocumentLoad}
                     disabled={isAnalyzing}
+                    accessLevel={accessLevel}
                   />
 
                   {/* Action buttons below upload */}
@@ -2333,9 +2336,9 @@ export const ChapterCheckerV2: React.FC = () => {
                     Tier 1 · Document Insights
                   </strong>
                   <p style={{ margin: "4px 0" }}>
-                    Upload any DOCX or OBT chapter to unlock live spacing
-                    metrics and dual-coding suggestions directly inside the
-                    editor. Highlights update instantly as you revise.
+                    Upload any DOCX or OBT chapter (up to 80 pages) to unlock
+                    live spacing metrics and dual-coding suggestions directly in
+                    the viewer.
                   </p>
                   <ul
                     style={{
@@ -2345,6 +2348,10 @@ export const ChapterCheckerV2: React.FC = () => {
                       listStyleType: "circle",
                     }}
                   >
+                    <li>
+                      <strong>Upload limit:</strong> Up to 80 pages (generous
+                      single textbook chapter).
+                    </li>
                     <li>
                       Spacing overview shows paragraph word counts and density
                       trends.
@@ -2364,8 +2371,9 @@ export const ChapterCheckerV2: React.FC = () => {
                     Tier 2 · Full Analysis Suite
                   </strong>
                   <p style={{ margin: "4px 0" }}>
-                    Run the complete 10-principle evaluator over your draft for
-                    richer learning-science diagnostics.
+                    Run the complete 10-principle evaluator over your draft (up
+                    to 600 pages) for richer learning-science diagnostics and
+                    export capabilities.
                   </p>
                   <ul
                     style={{
@@ -2375,6 +2383,10 @@ export const ChapterCheckerV2: React.FC = () => {
                       listStyleType: "circle",
                     }}
                   >
+                    <li>
+                      <strong>Upload limit:</strong> Up to 600 pages (full
+                      textbooks in chemistry, math, CS, etc.).
+                    </li>
                     <li>
                       Principle-by-principle scoring with severity badges and
                       supporting evidence.
@@ -2387,6 +2399,14 @@ export const ChapterCheckerV2: React.FC = () => {
                       Auto-generated recommendations with rationale and
                       suggested edits.
                     </li>
+                    <li>
+                      Export results as DOCX, JSON, or HTML for documentation
+                      and sharing.
+                    </li>
+                    <li>
+                      Create and save custom domain libraries for specialized
+                      subjects.
+                    </li>
                   </ul>
                 </li>
 
@@ -2395,8 +2415,9 @@ export const ChapterCheckerV2: React.FC = () => {
                     Tier 3 · Pro Collaboration Mode
                   </strong>
                   <p style={{ margin: "4px 0" }}>
-                    Unlock writer tools and export workflows for teams
-                    finalizing publish-ready chapters.
+                    Everything in Premium plus real-time editing, unlimited
+                    analyses (up to 1,000 pages), and priority support for
+                    professional teams.
                   </p>
                   <ul
                     style={{
@@ -2407,16 +2428,28 @@ export const ChapterCheckerV2: React.FC = () => {
                     }}
                   >
                     <li>
-                      Real-time writer mode with tracked highlights and
-                      version-safe exports.
+                      <strong>Upload limit:</strong> Up to 1,000 pages
+                      (comprehensive texts, reference books, handbooks,
+                      long-form manuscripts).
                     </li>
                     <li>
-                      Custom domain libraries plus bulk concept suggestions for
-                      specialized curricula.
+                      Writer Mode with real-time editing and live analysis
+                      updates as you type.
                     </li>
                     <li>
-                      Download bundled reports (DOCX + JSON insights) for review
-                      cycles.
+                      Unlimited document analyses with no restrictions or
+                      quotas.
+                    </li>
+                    <li>
+                      Priority support with faster response times for technical
+                      assistance.
+                    </li>
+                    <li>
+                      Advanced customization and team collaboration features.
+                    </li>
+                    <li>
+                      Version tracking and comprehensive export options for
+                      workflow integration.
                     </li>
                   </ul>
                 </li>
@@ -2454,9 +2487,7 @@ export const ChapterCheckerV2: React.FC = () => {
                 </p>
                 <button
                   onClick={() => {
-                    setUpgradeFeature("Full 10-Principle Analysis");
-                    setUpgradeTarget("premium");
-                    setShowUpgradePrompt(true);
+                    setShowTierTwoPreview(true);
                   }}
                   style={{
                     alignSelf: "flex-start",
@@ -4052,6 +4083,19 @@ export const ChapterCheckerV2: React.FC = () => {
             setShowUpgradePrompt(false);
           }}
           onDismiss={() => setShowUpgradePrompt(false)}
+        />
+      )}
+
+      {/* Tier Two Preview Modal */}
+      {showTierTwoPreview && (
+        <TierTwoPreview
+          onClose={() => setShowTierTwoPreview(false)}
+          onUpgrade={() => {
+            setShowTierTwoPreview(false);
+            setUpgradeFeature("Full 10-Principle Analysis");
+            setUpgradeTarget("premium");
+            setShowUpgradePrompt(true);
+          }}
         />
       )}
     </div>
