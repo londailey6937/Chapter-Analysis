@@ -26,6 +26,22 @@ function PrincipleScoreCard({
   const [expanded, setExpanded] = useState(false);
 
   /**
+   * Map of principle names to their numbers (1-10)
+   */
+  const principleNumbers: Record<string, number> = {
+    deepProcessing: 1,
+    spacedRepetition: 2,
+    retrievalPractice: 3,
+    interleaving: 4,
+    dualCoding: 5,
+    generativeLearning: 6,
+    metacognition: 7,
+    schemaBuilding: 8,
+    cognitiveLoad: 9,
+    emotionAndRelevance: 10,
+  };
+
+  /**
    * Determines color based on score
    */
   const getScoreColor = (score: number): string => {
@@ -52,6 +68,7 @@ function PrincipleScoreCard({
   const { score, findings, suggestions } = principle;
   const scoreColor = getScoreColor(score);
   const displayName = formatPrincipleName(principle.principle);
+  const principleNumber = principleNumbers[principle.principle] || 0;
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-soft transition-shadow">
@@ -60,20 +77,26 @@ function PrincipleScoreCard({
         onClick={() => setExpanded(!expanded)}
         className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
       >
-        <div className="flex-1 text-left">
-          <h4 className="font-semibold text-gray-900 mb-1">{displayName}</h4>
-          <div className="flex items-center gap-2">
-            <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div
-                className={`h-full ${getScoreColor(
-                  score
-                )} transition-all duration-500`}
-                style={{ width: `${Math.round(score)}%` }}
-              />
+        <div className="flex-1 text-left flex items-start gap-3">
+          {/* Subtle principle number */}
+          <span className="text-gray-300 text-sm font-medium mt-0.5 flex-shrink-0 w-6">
+            {principleNumber}.
+          </span>
+          <div className="flex-1">
+            <h4 className="font-semibold text-gray-900 mb-1">{displayName}</h4>
+            <div className="flex items-center gap-2">
+              <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className={`h-full ${getScoreColor(
+                    score
+                  )} transition-all duration-500`}
+                  style={{ width: `${Math.round(score)}%` }}
+                />
+              </div>
+              <span className={`text-sm font-bold ${scoreColor}`}>
+                {Math.round(score)}/100
+              </span>
             </div>
-            <span className={`text-sm font-bold ${scoreColor}`}>
-              {Math.round(score)}/100
-            </span>
           </div>
         </div>
         <span className="text-gray-500 text-xl transition-transform">
