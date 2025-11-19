@@ -769,7 +769,16 @@ export const ChapterCheckerV2: React.FC = () => {
     };
   }, []);
 
-  const handleAccessLevelChange = (level: AccessLevel) => {
+  const handleAccessLevelChange = async (level: AccessLevel) => {
+    // If switching to premium or professional, check authentication first
+    if (level === "premium" || level === "professional") {
+      const user = await getCurrentUser();
+      if (!user) {
+        // User not authenticated - show auth modal
+        setIsAuthModalOpen(true);
+        return;
+      }
+    }
     setAccessLevel(level);
   };
 
