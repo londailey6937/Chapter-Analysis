@@ -44,10 +44,11 @@ function PrincipleScoresGrid({
       </div>
       <div className="card-body">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {principles.map((principle) => (
+          {principles.map((principle, index) => (
             <PrincipleScoreCard
               key={principle.principle}
               principle={principle}
+              displayNumber={index + 1}
             />
           ))}
         </div>

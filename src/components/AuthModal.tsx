@@ -160,7 +160,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              width: "100%",
+              padding: "8px 16px",
+              backgroundColor: loading ? "#e2e8f0" : "#ffffff",
+              color: loading ? "#64748b" : "#2c3e50",
+              border: loading ? "none" : "2px solid #ef8432",
+              borderRadius: "20px",
+              cursor: loading ? "not-allowed" : "pointer",
+              fontSize: "14px",
+              fontWeight: "600",
+              transition: "background-color 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) e.currentTarget.style.backgroundColor = "#f7e6d0";
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) e.currentTarget.style.backgroundColor = "#ffffff";
+            }}
           >
             {loading
               ? "Processing..."
@@ -173,7 +190,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <div className="mt-4 text-center">
           <button
             onClick={switchMode}
-            className="text-blue-600 hover:text-blue-800 text-sm"
+            style={{
+              color: "#1e3a8a",
+              textDecoration: "underline",
+              backgroundColor: "transparent",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "14px",
+              padding: "4px",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#1e40af")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#1e3a8a")}
           >
             {mode === "login"
               ? "Need an account? Sign up"

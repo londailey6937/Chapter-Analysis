@@ -1941,7 +1941,8 @@ export const ReviewScheduleTimeline: React.FC<{
 
 export const PrincipleFindings: React.FC<{
   principle: PrincipleEvaluation;
-}> = ({ principle }) => {
+  displayNumber?: number;
+}> = ({ principle, displayNumber }) => {
   const [expanded, setExpanded] = useState(false);
 
   const scoreColor =
@@ -1959,6 +1960,17 @@ export const PrincipleFindings: React.FC<{
     <div className="principle-card" onClick={() => setExpanded(!expanded)}>
       <div className="principle-header">
         <h4>
+          {displayNumber && (
+            <span
+              style={{
+                color: "var(--text-subtle)",
+                marginRight: "8px",
+                fontWeight: 500,
+              }}
+            >
+              {displayNumber}.
+            </span>
+          )}
           {PRINCIPLE_NAME_MAP[principle.principle] || principle.principle}
         </h4>
         <div className="score-badge" style={{ backgroundColor: scoreColor }}>
@@ -2256,8 +2268,12 @@ export const ChapterAnalysisDashboard: React.FC<{
             analysis engine.
           </div>
         )}
-        {filteredPrinciples.map((principle: any) => (
-          <PrincipleFindings key={principle.principle} principle={principle} />
+        {filteredPrinciples.map((principle: any, index: number) => (
+          <PrincipleFindings
+            key={principle.principle}
+            principle={principle}
+            displayNumber={index + 1}
+          />
         ))}
       </div>
 

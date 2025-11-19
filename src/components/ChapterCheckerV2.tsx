@@ -1507,6 +1507,9 @@ export const ChapterCheckerV2: React.FC = () => {
             }
           } else if (typeof rawError === "string") {
             detailMessage = rawError;
+          } else if (err instanceof Event) {
+            detailMessage =
+              "Script loading error. The worker script could not be loaded or executed. Check console for 404s or syntax errors.";
           }
         }
 
@@ -1784,14 +1787,23 @@ export const ChapterCheckerV2: React.FC = () => {
                   disabled={isSaving}
                   style={{
                     padding: "8px 16px",
-                    backgroundColor: isSaving ? "#94a3b8" : "#10b981",
-                    color: "white",
-                    border: "none",
+                    backgroundColor: isSaving ? "#e2e8f0" : "#ffffff",
+                    color: isSaving ? "#64748b" : "#2c3e50",
+                    border: isSaving ? "none" : "2px solid #ef8432",
                     borderRadius: "20px",
                     cursor: isSaving ? "not-allowed" : "pointer",
                     fontSize: "14px",
                     fontWeight: "600",
                     whiteSpace: "nowrap",
+                    transition: "background-color 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isSaving)
+                      e.currentTarget.style.backgroundColor = "#f7e6d0";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isSaving)
+                      e.currentTarget.style.backgroundColor = "#ffffff";
                   }}
                 >
                   {isSaving ? "Saving..." : "💾 Save Analysis"}

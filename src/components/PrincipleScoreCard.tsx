@@ -7,6 +7,8 @@ import { PrincipleEvaluation } from "@/types";
 interface PrincipleScoreCardProps {
   /** Principle evaluation data */
   principle: PrincipleEvaluation;
+  /** Display number for this principle (1-based index) */
+  displayNumber: number;
 }
 
 /**
@@ -22,24 +24,9 @@ interface PrincipleScoreCardProps {
  */
 function PrincipleScoreCard({
   principle,
+  displayNumber,
 }: PrincipleScoreCardProps): JSX.Element {
   const [expanded, setExpanded] = useState(false);
-
-  /**
-   * Map of principle names to their numbers (1-10)
-   */
-  const principleNumbers: Record<string, number> = {
-    deepProcessing: 1,
-    spacedRepetition: 2,
-    retrievalPractice: 3,
-    interleaving: 4,
-    dualCoding: 5,
-    generativeLearning: 6,
-    metacognition: 7,
-    schemaBuilding: 8,
-    cognitiveLoad: 9,
-    emotionAndRelevance: 10,
-  };
 
   /**
    * Determines color based on score
@@ -68,7 +55,6 @@ function PrincipleScoreCard({
   const { score, findings, suggestions } = principle;
   const scoreColor = getScoreColor(score);
   const displayName = formatPrincipleName(principle.principle);
-  const principleNumber = principleNumbers[principle.principle] || 0;
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-soft transition-shadow">
@@ -80,7 +66,7 @@ function PrincipleScoreCard({
         <div className="flex-1 text-left flex items-start gap-3">
           {/* Subtle principle number */}
           <span className="text-gray-400 text-sm font-medium mt-0.5 flex-shrink-0 w-6">
-            {principleNumber}.
+            {displayNumber}.
           </span>
           <div className="flex-1">
             <h4 className="font-semibold text-gray-900 mb-1">{displayName}</h4>

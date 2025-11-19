@@ -79,7 +79,23 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onAuthRequired }) => {
     return (
       <button
         onClick={onAuthRequired}
-        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        style={{
+          padding: "8px 16px",
+          backgroundColor: "#ffffff",
+          color: "#2c3e50",
+          border: "2px solid #ef8432",
+          borderRadius: "20px",
+          cursor: "pointer",
+          fontSize: "14px",
+          fontWeight: "600",
+          transition: "background-color 0.2s",
+        }}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.backgroundColor = "#f7e6d0")
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.backgroundColor = "#ffffff")
+        }
       >
         Sign In
       </button>
@@ -87,51 +103,148 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onAuthRequired }) => {
   }
 
   return (
-    <div className="relative" ref={menuRef}>
+    <div style={{ position: "relative" }} ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "0.5rem",
+          padding: "4px 12px 4px 4px",
+          backgroundColor: "#ffffff",
+          border: "2px solid #ef8432",
+          borderRadius: "24px",
+          cursor: "pointer",
+          transition: "all 0.2s",
+          color: "#2c3e50",
+        }}
+        onMouseEnter={(e) =>
+          (e.currentTarget.style.backgroundColor = "#f7e6d0")
+        }
+        onMouseLeave={(e) =>
+          (e.currentTarget.style.backgroundColor = "#ffffff")
+        }
       >
-        <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium">
+        <div
+          style={{
+            width: "32px",
+            height: "32px",
+            backgroundColor: "#2c3e50",
+            borderRadius: "50%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "white",
+            fontWeight: "600",
+            fontSize: "14px",
+          }}
+        >
           {profile?.full_name?.[0]?.toUpperCase() ||
             user.email?.[0]?.toUpperCase() ||
             "U"}
         </div>
-        <span className="text-sm font-medium text-gray-700">
+        <span
+          style={{
+            fontSize: "14px",
+            fontWeight: "600",
+            color: "#2c3e50",
+          }}
+        >
           {profile?.full_name || user.email}
         </span>
         <svg
-          className={`w-4 h-4 transition-transform ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          viewBox="0 0 24 24"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{
+            transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+            transition: "transform 0.2s",
+          }}
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M19 9l-7 7-7-7"
-          />
+          <path d="M6 9l6 6 6-6" />
         </svg>
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-          <div className="px-4 py-3 border-b border-gray-200">
-            <p className="text-sm font-medium text-gray-900">
+        <div
+          style={{
+            position: "absolute",
+            right: 0,
+            marginTop: "8px",
+            width: "260px",
+            backgroundColor: "white",
+            borderRadius: "12px",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
+            border: "1px solid #e2e8f0",
+            padding: "8px 0",
+            zIndex: 50,
+          }}
+        >
+          <div
+            style={{
+              padding: "12px 16px",
+              borderBottom: "1px solid #e2e8f0",
+            }}
+          >
+            <p
+              style={{
+                margin: 0,
+                fontSize: "14px",
+                fontWeight: "600",
+                color: "#1e293b",
+              }}
+            >
               {profile?.full_name || "User"}
             </p>
-            <p className="text-xs text-gray-500 truncate">{user.email}</p>
-            <p className="text-xs text-blue-600 mt-1 capitalize">
+            <p
+              style={{
+                margin: "4px 0 0",
+                fontSize: "12px",
+                color: "#64748b",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {user.email}
+            </p>
+            <p
+              style={{
+                margin: "4px 0 0",
+                fontSize: "12px",
+                color: "#ef8432",
+                fontWeight: "600",
+                textTransform: "capitalize",
+              }}
+            >
               {profile?.access_level || "free"} plan
             </p>
           </div>
 
           <button
             onClick={handleSignOut}
-            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 focus:outline-none"
+            style={{
+              width: "100%",
+              textAlign: "left",
+              padding: "10px 16px",
+              fontSize: "14px",
+              color: "#ef4444",
+              backgroundColor: "transparent",
+              border: "none",
+              cursor: "pointer",
+              fontWeight: "500",
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "#fef2f2")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "transparent")
+            }
           >
             Sign Out
           </button>
