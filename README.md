@@ -1,6 +1,6 @@
-# Chapter Checker: Learning Science-Based Chapter Analysis Tool
+# Chapter Analysis Tool (Tome IQ)
 
-A React application that analyzes chapters against 10 evidence-based learning principles to help educators and writers create more effective learning materials.
+A sophisticated educational content analyzer that evaluates textbook chapters and learning materials against evidence-based learning principles.
 
 ## 🎯 Overview
 
@@ -50,8 +50,8 @@ npm install recharts
 ### Usage in Your React App
 
 ```tsx
-import React from 'react';
-import { ChapterChecker } from './ChapterChecker';
+import React from "react";
+import { ChapterChecker } from "./ChapterChecker";
 
 function App() {
   return <ChapterChecker />;
@@ -113,6 +113,7 @@ User-Friendly Report with Recommendations
 ### 1. **ConceptExtractor.ts**
 
 Identifies key concepts using:
+
 - **NLP Patterns**: "X is a Y", "X refers to Y"
 - **Structural Signals**: Headings, capitalization
 - **Frequency Analysis**: TF-IDF scoring
@@ -126,6 +127,7 @@ const conceptGraph = await ConceptExtractor.extractConceptsFromChapter(
 ```
 
 **Output**: Concept objects with:
+
 - Name, definition, importance
 - Mention positions and depth
 - Related concepts and prerequisites
@@ -141,6 +143,7 @@ const evaluation = DeepProcessingEvaluator.evaluate(chapter, concepts);
 ```
 
 **Key Features**:
+
 - Evidence-based scoring (0-100)
 - Weighted importance (0-1)
 - Specific, actionable findings
@@ -157,6 +160,7 @@ const analysis = await AnalysisEngine.analyzeChapter(chapter, config);
 ```
 
 **Analysis Includes**:
+
 - Concept graph analysis
 - Chapter structure evaluation
 - 10 principle evaluations
@@ -178,6 +182,7 @@ Interactive visualizations using React + Recharts:
 ### 5. **ChapterChecker.tsx**
 
 Main application component with:
+
 - File upload support
 - Real-time analysis with progress
 - Error handling
@@ -189,7 +194,7 @@ Main application component with:
 ### Basic Usage
 
 ```tsx
-import { ChapterChecker } from './ChapterChecker';
+import { ChapterChecker } from "./ChapterChecker";
 
 function MyApp() {
   return <ChapterChecker />;
@@ -199,42 +204,48 @@ function MyApp() {
 ### Programmatic Analysis
 
 ```typescript
-import { AnalysisEngine } from './AnalysisEngine';
-import ConceptExtractor from './ConceptExtractor';
+import { AnalysisEngine } from "./AnalysisEngine";
+import ConceptExtractor from "./ConceptExtractor";
 
 async function analyzeMyChapter() {
   const chapter: Chapter = {
-    id: 'my-chapter',
-    title: 'Introduction to Learning',
+    id: "my-chapter",
+    title: "Introduction to Learning",
     content: chapterText,
     wordCount: 2500,
     sections: parsedSections,
-    conceptGraph: { /* ... */ },
-    metadata: { /* ... */ }
+    conceptGraph: {
+      /* ... */
+    },
+    metadata: {
+      /* ... */
+    },
   };
 
   const config: AnalysisConfig = {
-    domain: 'education',
-    readingLevel: 'intermediate',
+    domain: "education",
+    readingLevel: "intermediate",
     enableVisualization: true,
     conceptExtractionThreshold: 0.5,
-    detailedReport: true
+    detailedReport: true,
   };
 
   const analysis = await AnalysisEngine.analyzeChapter(chapter, config);
-  
+
   console.log(`Overall Score: ${analysis.overallScore}/100`);
-  console.log(`Concepts Found: ${analysis.conceptAnalysis.totalConceptsIdentified}`);
-  
-  analysis.principles.forEach(p => {
+  console.log(
+    `Concepts Found: ${analysis.conceptAnalysis.totalConceptsIdentified}`
+  );
+
+  analysis.principles.forEach((p) => {
     console.log(`${p.principle}: ${p.score}/100`);
   });
-  
+
   // Get top recommendations
-  analysis.recommendations.forEach(rec => {
+  analysis.recommendations.forEach((rec) => {
     console.log(`[${rec.priority}] ${rec.title}`);
     console.log(`  ${rec.description}`);
-    rec.actionItems.forEach(item => console.log(`  - ${item}`));
+    rec.actionItems.forEach((item) => console.log(`  - ${item}`));
   });
 }
 ```
@@ -242,23 +253,27 @@ async function analyzeMyChapter() {
 ### Custom Evaluator
 
 ```typescript
-import {
-  PrincipleEvaluation,
-  Finding,
-  Chapter,
-  ConceptGraph
-} from './types';
+import { PrincipleEvaluation, Finding, Chapter, ConceptGraph } from "./types";
 
 class CustomPrincipleEvaluator {
-  static evaluate(chapter: Chapter, concepts: ConceptGraph): PrincipleEvaluation {
+  static evaluate(
+    chapter: Chapter,
+    concepts: ConceptGraph
+  ): PrincipleEvaluation {
     // Your custom evaluation logic
     return {
-      principle: 'customPrinciple' as any,
+      principle: "customPrinciple" as any,
       score: 75,
       weight: 0.8,
-      findings: [/* ... */],
-      suggestions: [/* ... */],
-      evidence: [/* ... */]
+      findings: [
+        /* ... */
+      ],
+      suggestions: [
+        /* ... */
+      ],
+      evidence: [
+        /* ... */
+      ],
     };
   }
 }
@@ -307,6 +322,7 @@ class CustomPrincipleEvaluator {
 ### Individual Principle Scores
 
 Each principle is scored 0-100:
+
 - **80+**: Excellent implementation
 - **60-79**: Good, minor improvements possible
 - **40-59**: Adequate, but should improve
@@ -320,11 +336,11 @@ Each principle is scored 0-100:
 // In AnalysisEngine.ts
 private static evaluateAllPrinciples(...) {
   const principles = [...];
-  
+
   // Custom weights
   principles.find(p => p.principle === 'deepProcessing')!.weight = 1.0;
   principles.find(p => p.principle === 'emotionAndRelevance')!.weight = 0.6;
-  
+
   return principles;
 }
 ```
@@ -357,23 +373,23 @@ const exportData = {
   chapterId: analysis.chapterId,
   score: analysis.overallScore,
   timestamp: analysis.timestamp,
-  principles: analysis.principles.map(p => ({
+  principles: analysis.principles.map((p) => ({
     name: p.principle,
     score: p.score,
-    recommendations: p.suggestions.map(s => s.description)
+    recommendations: p.suggestions.map((s) => s.description),
   })),
-  recommendations: analysis.recommendations.map(r => ({
+  recommendations: analysis.recommendations.map((r) => ({
     id: r.id,
     title: r.title,
     priority: r.priority,
-    action: r.actionItems.join('; ')
-  }))
+    action: r.actionItems.join("; "),
+  })),
 };
 
 // Send to LMS API
-fetch('/api/chapter-analysis', {
-  method: 'POST',
-  body: JSON.stringify(exportData)
+fetch("/api/chapter-analysis", {
+  method: "POST",
+  body: JSON.stringify(exportData),
 });
 ```
 
@@ -392,8 +408,11 @@ async function getConcepts(text: string) {
   if (conceptCache.has(hash)) {
     return conceptCache.get(hash)!;
   }
-  
-  const result = await ConceptExtractor.extractConceptsFromChapter(text, sections);
+
+  const result = await ConceptExtractor.extractConceptsFromChapter(
+    text,
+    sections
+  );
   conceptCache.set(hash, result);
   return result;
 }
@@ -402,12 +421,15 @@ async function getConcepts(text: string) {
 ## 🐛 Troubleshooting
 
 **Issue**: Analysis takes too long
+
 - Solution: Reduce section size or disable visualization
 
 **Issue**: Low concept detection
+
 - Solution: Increase `conceptExtractionThreshold` or ensure sections have headings
 
 **Issue**: Unbalanced hierarchy
+
 - Solution: Check if chapter properly introduces concepts before details
 
 ## 📚 References
