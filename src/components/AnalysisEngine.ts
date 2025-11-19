@@ -19,18 +19,7 @@ import type {
   Section,
 } from "../types";
 
-import {
-  DeepProcessingEvaluator,
-  SpacedRepetitionEvaluator,
-  RetrievalPracticeEvaluator,
-  InterleavingEvaluator,
-  DualCodingEvaluator,
-  GenerativeLearningEvaluator,
-  MetacognitionEvaluator,
-  SchemaBuildingEvaluator,
-  CognitiveLoadEvaluator,
-  EmotionAndRelevanceEvaluator,
-} from "../../LearningPrincipleEvaluators";
+import { supabase } from "../utils/supabase";
 
 import { ConceptExtractor } from "./ConceptExtractorLibrary";
 import type { Domain } from "@/data/conceptLibraryRegistry";
@@ -342,49 +331,42 @@ export class AnalysisEngine {
   ): Promise<PrincipleEvaluation[]> {
     const overallStart = performance.now();
 
-    const evaluators = [
-      { name: "Deep Processing", evaluator: DeepProcessingEvaluator },
-      { name: "Spaced Repetition", evaluator: SpacedRepetitionEvaluator },
-      { name: "Retrieval Practice", evaluator: RetrievalPracticeEvaluator },
-      { name: "Interleaving", evaluator: InterleavingEvaluator },
-      { name: "Dual Coding", evaluator: DualCodingEvaluator },
-      { name: "Generative Learning", evaluator: GenerativeLearningEvaluator },
-      { name: "Metacognition", evaluator: MetacognitionEvaluator },
-      { name: "Schema Building", evaluator: SchemaBuildingEvaluator },
-      { name: "Cognitive Load", evaluator: CognitiveLoadEvaluator },
-      { name: "Emotion & Relevance", evaluator: EmotionAndRelevanceEvaluator },
-    ];
+    onProgress?.("evaluating-server", "Running secure server-side analysis...");
 
-    const results: PrincipleEvaluation[] = [];
-    const timings: { name: string; time: number }[] = [];
-
-    for (let i = 0; i < evaluators.length; i++) {
-      const { name, evaluator } = evaluators[i];
-      onProgress?.(
-        `evaluating-${i + 1}`,
-        `Evaluating ${name} (${i + 1}/${evaluators.length})`
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "analyze-concept",
+        {
+          body: {
+            chapter,
+            concepts: conceptGraph,
+            patternAnalysis,
+          },
+        }
       );
 
-      const evalStart = performance.now();
-      const result = evaluator.evaluate(chapter, conceptGraph, patternAnalysis);
-      const evalTime = performance.now() - evalStart;
+      if (error) {
+        console.error("[AnalysisEngine] Server analysis failed:", error);
+        throw error;
+      }
 
-      results.push(result);
-      timings.push({ name, time: evalTime });
+      if (!data || !data.results) {
+        throw new Error("Invalid response from analysis server");
+      }
+
+      const overallTime = performance.now() - overallStart;
+      console.log(
+        `[AnalysisEngine] ✅ Server analysis complete in ${overallTime.toFixed(
+          2
+        )}ms`
+      );
+
+      return data.results;
+    } catch (err) {
+      console.error("[AnalysisEngine] Error running evaluators:", err);
+      // Fallback or rethrow? For now, rethrow to alert user
+      throw err;
     }
-
-    const overallTime = performance.now() - overallStart;
-    console.log(
-      `[AnalysisEngine] ✅ All evaluators complete in ${overallTime.toFixed(
-        2
-      )}ms (${(overallTime / 1000).toFixed(2)}s)`
-    );
-    console.log(
-      `[AnalysisEngine] Evaluator timings:`,
-      timings.map((t) => `${t.name}=${t.time.toFixed(0)}ms`).join(", ")
-    );
-
-    return results;
   }
 
   private static calculateWeightedScoreDisplay(

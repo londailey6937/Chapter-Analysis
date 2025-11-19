@@ -32,10 +32,7 @@ export default defineConfig({
           "mammoth-vendor": ["mammoth"],
           "docx-vendor": ["docx"],
           // Large evaluators and analysis engine
-          "analysis-engine": [
-            "./src/components/AnalysisEngine.ts",
-            "./LearningPrincipleEvaluators.ts",
-          ],
+          "analysis-engine": ["./src/components/AnalysisEngine.ts"],
           // Concept extraction and domain libraries
           "concept-libs": [
             "./src/components/ConceptExtractor.ts",

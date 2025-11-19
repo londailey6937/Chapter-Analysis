@@ -36,13 +36,7 @@
     }
   },
 
-  "include": [
-    "src",
-    "types.ts",
-    "LearningPrincipleEvaluators.ts",
-    "index.ts",
-    "scripts/**/*.ts"
-  ],
+  "include": ["src", "types.ts", "index.ts", "scripts/**/*.ts"],
 
   "references": [{ "path": "./tsconfig.node.json" }]
 }

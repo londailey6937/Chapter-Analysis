@@ -49,6 +49,7 @@ import { AnimatedLogo } from "./AnimatedLogo";
 import { AuthModal } from "./AuthModal";
 import { UserMenu } from "./UserMenu";
 import { supabase, saveAnalysis, getCurrentUser } from "@/utils/supabase";
+import { ServerAnalysisTest } from "./ServerAnalysisTest";
 
 const HEADING_LENGTH_LIMIT = 120;
 const MAX_FALLBACK_SECTIONS = 8;
@@ -4318,6 +4319,11 @@ export const ChapterCheckerV2: React.FC = () => {
           }}
         />
       )}
+
+      {/* Temporary Server Analysis Test Component */}
+      <div className="max-w-4xl mx-auto mt-8 mb-8">
+        <ServerAnalysisTest />
+      </div>
     </div>
   );
 };
