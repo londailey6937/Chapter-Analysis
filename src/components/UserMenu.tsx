@@ -180,15 +180,17 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onAuthRequired }) => {
             backgroundColor: "white",
             borderRadius: "12px",
             boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-            border: "1px solid #e2e8f0",
-            padding: "8px 0",
+            border: "2px solid #ef8432",
+            padding: "0",
             zIndex: 50,
+            overflow: "hidden",
           }}
         >
           <div
             style={{
               padding: "12px 16px",
-              borderBottom: "1px solid #e2e8f0",
+              borderBottom: "1px solid #ef8432",
+              backgroundColor: "#f7e6d0",
             }}
           >
             <p
@@ -196,7 +198,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onAuthRequired }) => {
                 margin: 0,
                 fontSize: "14px",
                 fontWeight: "600",
-                color: "#1e293b",
+                color: "#2c3e50",
               }}
             >
               {profile?.full_name || "User"}
@@ -205,7 +207,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onAuthRequired }) => {
               style={{
                 margin: "4px 0 0",
                 fontSize: "12px",
-                color: "#64748b",
+                color: "#4b5563",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
@@ -218,7 +220,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onAuthRequired }) => {
                 margin: "4px 0 0",
                 fontSize: "12px",
                 color: "#ef8432",
-                fontWeight: "600",
+                fontWeight: "700",
                 textTransform: "capitalize",
               }}
             >
@@ -226,28 +228,33 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onAuthRequired }) => {
             </p>
           </div>
 
-          <button
-            onClick={handleSignOut}
-            style={{
-              width: "100%",
-              textAlign: "left",
-              padding: "10px 16px",
-              fontSize: "14px",
-              color: "#ef4444",
-              backgroundColor: "transparent",
-              border: "none",
-              cursor: "pointer",
-              fontWeight: "500",
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = "#fef2f2")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = "transparent")
-            }
-          >
-            Sign Out
-          </button>
+          <div style={{ padding: "8px 0" }}>
+            <button
+              onClick={handleSignOut}
+              style={{
+                width: "100%",
+                textAlign: "left",
+                padding: "10px 16px",
+                fontSize: "14px",
+                color: "#2c3e50",
+                backgroundColor: "transparent",
+                border: "none",
+                cursor: "pointer",
+                fontWeight: "500",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#f7e6d0";
+                e.currentTarget.style.color = "#ef8432";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+                e.currentTarget.style.color = "#2c3e50";
+              }}
+            >
+              Sign Out
+            </button>
+          </div>
         </div>
       )}
     </div>
