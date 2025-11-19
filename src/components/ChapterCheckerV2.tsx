@@ -2599,6 +2599,13 @@ export const ChapterCheckerV2: React.FC = () => {
                     fontSize: "13px",
                     fontWeight: 600,
                     cursor: "pointer",
+                    transition: "background-color 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#f7e6d0";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "white";
                   }}
                 >
                   Preview Tier 2 Features

@@ -355,7 +355,7 @@ export function NavigationMenu({
         </div>
 
         {/* Features Section */}
-        <div style={{ padding: "1.5rem" }}>
+        <div style={{ padding: "1.5rem", backgroundColor: "#fef5e7" }}>
           <h3
             style={{
               margin: "0 0 1rem 0",
@@ -654,7 +654,7 @@ export function NavigationMenu({
         <div
           style={{
             padding: "1.5rem",
-            backgroundColor: "white",
+            backgroundColor: "#fef5e7",
             borderTop: "1px solid #e5e7eb",
           }}
         >
@@ -709,7 +709,7 @@ export function NavigationMenu({
         <div
           style={{
             padding: "1.5rem",
-            backgroundColor: "white",
+            backgroundColor: "#fef5e7",
             borderTop: "1px solid #e5e7eb",
           }}
         >
@@ -723,7 +723,7 @@ export function NavigationMenu({
               letterSpacing: "0.05em",
             }}
           >
-            🔮 Coming Soon
+            Coming Soon
           </h3>
           <div
             style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}
