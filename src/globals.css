@@ -147,19 +147,26 @@
   .btn-primary {
     /* Pill button style - border only, no fill */
     @apply btn-base bg-white border-2 text-gray-700 hover:-translate-y-0.5;
-    border-color: #9ca3af;
+    border-color: #ef8432;
+    color: #2c3e50;
     border-radius: 24px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
   .btn-primary:hover {
-    border-color: #6b7280;
+    background-color: #f7e6d0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
   .btn-secondary {
-    @apply btn-base bg-white border-2 border-gray-200 text-gray-900 hover:border-gray-400 hover:shadow-soft;
+    @apply btn-base bg-white border-2 border-gray-200 text-gray-900 hover:shadow-soft;
     border-radius: 24px;
+    color: #2c3e50;
+  }
+
+  .btn-secondary:hover {
+    background-color: #f7e6d0;
+    border-color: #ef8432;
   }
 
   .btn-danger {
