@@ -2119,13 +2119,13 @@ export const ChapterCheckerV2: React.FC = () => {
                   {chapterData.imageCount > 0 && (
                     <div
                       style={{
-                        padding: "8px 12px",
-                        backgroundColor: "#dbeafe",
-                        borderLeft: "3px solid #3b82f6",
+                        padding: "10px 14px",
+                        backgroundColor: "#f5ead9",
+                        border: "1.5px solid #e0c392",
                         marginBottom: "12px",
                         borderRadius: "8px",
                         fontSize: "13px",
-                        color: "#1e40af",
+                        color: "#2c3e50",
                         display: "flex",
                         alignItems: "center",
                         gap: "8px",
@@ -2133,7 +2133,7 @@ export const ChapterCheckerV2: React.FC = () => {
                     >
                       <span>📸</span>
                       <span>
-                        <strong>
+                        <strong style={{ color: "#ef8432" }}>
                           {chapterData.imageCount} image
                           {chapterData.imageCount > 1 ? "s" : ""} detected
                         </strong>{" "}

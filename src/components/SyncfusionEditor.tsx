@@ -685,11 +685,19 @@ export const SyncfusionEditor: React.FC<SyncfusionEditorProps> = ({
       {/* Analysis Sidebar */}
       {(showSpacingIndicators || showVisualSuggestions) && (
         <div className="analysis-sidebar w-64 bg-gray-50 border-l border-gray-200 overflow-y-auto p-4 text-sm">
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs">
-            <div className="font-semibold text-blue-800 mb-1">
+          <div
+            className="mb-4 rounded-lg text-xs"
+            style={{
+              padding: "12px",
+              backgroundColor: "#f5ead9",
+              border: "1.5px solid #e0c392",
+              color: "#2c3e50",
+            }}
+          >
+            <div className="font-semibold mb-1" style={{ color: "#ef8432" }}>
               💡 How Analysis Works
             </div>
-            <div className="text-blue-700">
+            <div>
               <strong>In Document:</strong> Color-coded labels show spacing &
               visual opportunities inline.
               <br />
