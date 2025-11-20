@@ -194,8 +194,12 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
       historyIndexRef.current = 0;
       setCanUndo(false);
       setCanRedo(false);
+
+      // Run initial analysis
+      const text = editorRef.current.innerText;
+      analyzeContent(text);
     }
-  }, []); // Only on mount
+  }, [analyzeContent]); // Only on mount
 
   // Undo function
   const performUndo = useCallback(() => {
@@ -482,7 +486,9 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
 
   // Render spacing indicators
   const renderIndicators = () => {
-    if (!editorRef.current || !showSpacingIndicators || focusMode) return null;
+    if (!editorRef.current || !showSpacingIndicators) return null;
+    // In free mode, always show indicators. In paid mode, respect focus mode toggle.
+    if (!isFreeMode && focusMode) return null;
 
     const paragraphs = Array.from(editorRef.current.querySelectorAll("p, div"));
 
@@ -519,7 +525,9 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
 
   // Render visual suggestions
   const renderSuggestions = () => {
-    if (!editorRef.current || !showVisualSuggestions || focusMode) return null;
+    if (!editorRef.current || !showVisualSuggestions) return null;
+    // In free mode, always show suggestions. In paid mode, respect focus mode toggle.
+    if (!isFreeMode && focusMode) return null;
 
     const paragraphs = Array.from(editorRef.current.querySelectorAll("p, div"));
 
