@@ -6,28 +6,15 @@ import {
   NodeViewWrapper,
   NodeViewContent,
 } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Paragraph from "@tiptap/extension-paragraph";
 import { Extension } from "@tiptap/core";
 import { Plugin, PluginKey } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
-import Document from "@tiptap/extension-document";
-import Text from "@tiptap/extension-text";
-import Bold from "@tiptap/extension-bold";
-import Italic from "@tiptap/extension-italic";
-import Strike from "@tiptap/extension-strike";
-import Heading from "@tiptap/extension-heading";
-import BulletList from "@tiptap/extension-bullet-list";
-import OrderedList from "@tiptap/extension-ordered-list";
-import ListItem from "@tiptap/extension-list-item";
-import Blockquote from "@tiptap/extension-blockquote";
-import CodeBlock from "@tiptap/extension-code-block";
-import HorizontalRule from "@tiptap/extension-horizontal-rule";
-import HardBreak from "@tiptap/extension-hard-break";
-import Highlight from "@tiptap/extension-highlight";
-import Placeholder from "@tiptap/extension-placeholder";
-import Paragraph from "@tiptap/extension-paragraph";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
-import History from "@tiptap/extension-history";
+import Highlight from "@tiptap/extension-highlight";
+import Placeholder from "@tiptap/extension-placeholder";
 import { TextSelection } from "@tiptap/pm/state";
 import { analyzeParagraphSpacing, countWords } from "@/utils/spacingInsights";
 import { DualCodingAnalyzer } from "@/utils/dualCodingAnalyzer";
@@ -254,26 +241,23 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 }) => {
   const editor = useEditor({
     extensions: [
-      Document,
-      Text,
+      StarterKit.configure({
+        paragraph: false, // We'll add our custom paragraph
+        heading: {
+          levels: [1, 2, 3],
+        },
+        codeBlock: {
+          HTMLAttributes: {
+            class: "code-block",
+          },
+        },
+      }),
       Paragraph.extend({
         addNodeView() {
           return ReactNodeViewRenderer(ParagraphWithAnalysis);
         },
       }),
-      History,
-      Bold,
-      Italic,
-      Strike,
       Underline,
-      Heading.configure({ levels: [1, 2, 3] }),
-      BulletList,
-      OrderedList,
-      ListItem,
-      Blockquote,
-      CodeBlock,
-      HorizontalRule,
-      HardBreak,
       Highlight.configure({ multicolor: true }),
       TextAlign.configure({
         types: ["heading", "paragraph"],
@@ -285,6 +269,13 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
     ],
     content,
     editable: isEditable,
+    editorProps: {
+      attributes: {
+        class:
+          "prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none",
+        spellcheck: "true",
+      },
+    },
     onUpdate: ({ editor }) => {
       if (onUpdate) {
         onUpdate({
@@ -511,18 +502,22 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             <button
               onClick={() => editor.chain().focus().undo().run()}
               disabled={!editor.can().chain().focus().undo().run()}
-              className="p-1.5 rounded hover:bg-gray-200 disabled:opacity-30 text-gray-700"
-              title="Undo (Cmd+Z)"
+              className="p-1.5 rounded hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed text-gray-700 transition-colors"
+              title="Undo (⌘Z / Ctrl+Z)"
             >
-              ↩️
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+              </svg>
             </button>
             <button
               onClick={() => editor.chain().focus().redo().run()}
               disabled={!editor.can().chain().focus().redo().run()}
-              className="p-1.5 rounded hover:bg-gray-200 disabled:opacity-30 text-gray-700"
-              title="Redo (Cmd+Shift+Z)"
+              className="p-1.5 rounded hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed text-gray-700 transition-colors"
+              title="Redo (⌘⇧Z / Ctrl+Y)"
             >
-              ↪️
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10h-10a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" />
+              </svg>
             </button>
           </div>
 
@@ -532,45 +527,45 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <div className="flex gap-0.5 mr-2">
             <button
               onClick={() => editor.chain().focus().toggleBold().run()}
-              className={`p-1.5 rounded min-w-[28px] font-bold ${
+              className={`px-2 py-1.5 rounded min-w-[32px] font-bold text-sm transition-colors ${
                 editor.isActive("bold")
                   ? "bg-blue-100 text-blue-700"
                   : "hover:bg-gray-200 text-gray-700"
               }`}
-              title="Bold (Cmd+B)"
+              title="Bold (⌘B / Ctrl+B)"
             >
               B
             </button>
             <button
               onClick={() => editor.chain().focus().toggleItalic().run()}
-              className={`p-1.5 rounded min-w-[28px] italic ${
+              className={`px-2 py-1.5 rounded min-w-[32px] italic text-sm transition-colors ${
                 editor.isActive("italic")
                   ? "bg-blue-100 text-blue-700"
                   : "hover:bg-gray-200 text-gray-700"
               }`}
-              title="Italic (Cmd+I)"
+              title="Italic (⌘I / Ctrl+I)"
             >
               I
             </button>
             <button
               onClick={() => editor.chain().focus().toggleUnderline().run()}
-              className={`p-1.5 rounded min-w-[28px] underline ${
+              className={`px-2 py-1.5 rounded min-w-[32px] underline text-sm transition-colors ${
                 editor.isActive("underline")
                   ? "bg-blue-100 text-blue-700"
                   : "hover:bg-gray-200 text-gray-700"
               }`}
-              title="Underline (Cmd+U)"
+              title="Underline (⌘U / Ctrl+U)"
             >
               U
             </button>
             <button
               onClick={() => editor.chain().focus().toggleStrike().run()}
-              className={`p-1.5 rounded min-w-[28px] line-through ${
+              className={`px-2 py-1.5 rounded min-w-[32px] line-through text-sm transition-colors ${
                 editor.isActive("strike")
                   ? "bg-blue-100 text-blue-700"
                   : "hover:bg-gray-200 text-gray-700"
               }`}
-              title="Strikethrough"
+              title="Strikethrough (⌘⇧X)"
             >
               S
             </button>
@@ -582,25 +577,25 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <div className="flex gap-0.5 mr-2">
             <button
               onClick={() => editor.chain().focus().setParagraph().run()}
-              className={`px-2 py-1.5 rounded text-sm ${
+              className={`px-2 py-1.5 rounded text-xs transition-colors ${
                 editor.isActive("paragraph")
                   ? "bg-blue-100 text-blue-700"
                   : "hover:bg-gray-200 text-gray-700"
               }`}
-              title="Normal Text"
+              title="Paragraph"
             >
-              Normal
+              ¶
             </button>
             <button
               onClick={() =>
                 editor.chain().focus().toggleHeading({ level: 1 }).run()
               }
-              className={`px-2 py-1.5 rounded text-sm font-bold ${
+              className={`px-2 py-1.5 rounded text-xs font-bold transition-colors ${
                 editor.isActive("heading", { level: 1 })
                   ? "bg-blue-100 text-blue-700"
                   : "hover:bg-gray-200 text-gray-700"
               }`}
-              title="Heading 1"
+              title="Heading 1 (⌘⌥1)"
             >
               H1
             </button>
@@ -608,12 +603,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               onClick={() =>
                 editor.chain().focus().toggleHeading({ level: 2 }).run()
               }
-              className={`px-2 py-1.5 rounded text-sm font-bold ${
+              className={`px-2 py-1.5 rounded text-xs font-bold transition-colors ${
                 editor.isActive("heading", { level: 2 })
                   ? "bg-blue-100 text-blue-700"
                   : "hover:bg-gray-200 text-gray-700"
               }`}
-              title="Heading 2"
+              title="Heading 2 (⌘⌥2)"
             >
               H2
             </button>
@@ -621,14 +616,59 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               onClick={() =>
                 editor.chain().focus().toggleHeading({ level: 3 }).run()
               }
-              className={`px-2 py-1.5 rounded text-sm font-bold ${
+              className={`px-2 py-1.5 rounded text-xs font-bold transition-colors ${
                 editor.isActive("heading", { level: 3 })
                   ? "bg-blue-100 text-blue-700"
                   : "hover:bg-gray-200 text-gray-700"
               }`}
-              title="Heading 3"
+              title="Heading 3 (⌘⌥3)"
             >
               H3
+            </button>
+          </div>
+
+          <div className="w-px h-5 bg-gray-300 mx-1" />
+
+          {/* Lists */}
+          <div className="flex gap-0.5 mr-2">
+            <button
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              className={`p-1.5 rounded min-w-[32px] transition-colors ${
+                editor.isActive("bulletList")
+                  ? "bg-blue-100 text-blue-700"
+                  : "hover:bg-gray-200 text-gray-700"
+              }`}
+              title="Bullet List (⌘⇧8)"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleOrderedList().run()}
+              className={`p-1.5 rounded min-w-[32px] transition-colors ${
+                editor.isActive("orderedList")
+                  ? "bg-blue-100 text-blue-700"
+                  : "hover:bg-gray-200 text-gray-700"
+              }`}
+              title="Numbered List (⌘⇧7)"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+              </svg>
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleBlockquote().run()}
+              className={`p-1.5 rounded min-w-[32px] transition-colors ${
+                editor.isActive("blockquote")
+                  ? "bg-blue-100 text-blue-700"
+                  : "hover:bg-gray-200 text-gray-700"
+              }`}
+              title="Quote (⌘⇧B)"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+              </svg>
             </button>
           </div>
 
@@ -638,79 +678,96 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           <div className="flex gap-0.5 mr-2">
             <button
               onClick={() => editor.chain().focus().setTextAlign("left").run()}
-              className={`p-1.5 rounded min-w-[28px] ${
+              className={`p-1.5 rounded min-w-[32px] transition-colors ${
                 editor.isActive({ textAlign: "left" })
                   ? "bg-blue-100 text-blue-700"
                   : "hover:bg-gray-200 text-gray-700"
               }`}
-              title="Align Left"
+              title="Align Left (⌘⇧L)"
             >
-              ⬅️
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h10M4 18h16" />
+              </svg>
             </button>
             <button
               onClick={() =>
                 editor.chain().focus().setTextAlign("center").run()
               }
-              className={`p-1.5 rounded min-w-[28px] ${
+              className={`p-1.5 rounded min-w-[32px] transition-colors ${
                 editor.isActive({ textAlign: "center" })
                   ? "bg-blue-100 text-blue-700"
                   : "hover:bg-gray-200 text-gray-700"
               }`}
-              title="Align Center"
+              title="Align Center (⌘⇧E)"
             >
-              ↔️
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M7 12h10M4 18h16" />
+              </svg>
             </button>
             <button
               onClick={() => editor.chain().focus().setTextAlign("right").run()}
-              className={`p-1.5 rounded min-w-[28px] ${
+              className={`p-1.5 rounded min-w-[32px] transition-colors ${
                 editor.isActive({ textAlign: "right" })
                   ? "bg-blue-100 text-blue-700"
                   : "hover:bg-gray-200 text-gray-700"
               }`}
-              title="Align Right"
+              title="Align Right (⌘⇧R)"
             >
-              ➡️
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M10 12h10M4 18h16" />
+              </svg>
             </button>
             <button
               onClick={() =>
                 editor.chain().focus().setTextAlign("justify").run()
               }
-              className={`p-1.5 rounded min-w-[28px] ${
+              className={`p-1.5 rounded min-w-[32px] transition-colors ${
                 editor.isActive({ textAlign: "justify" })
                   ? "bg-blue-100 text-blue-700"
                   : "hover:bg-gray-200 text-gray-700"
               }`}
-              title="Justify"
+              title="Justify (⌘⇧J)"
             >
-              ≣
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
             </button>
           </div>
 
           <div className="w-px h-5 bg-gray-300 mx-1" />
 
-          {/* Lists */}
+          {/* Additional Tools */}
           <div className="flex gap-0.5">
             <button
-              onClick={() => editor.chain().focus().toggleBulletList().run()}
-              className={`p-1.5 rounded min-w-[28px] ${
-                editor.isActive("bulletList")
+              onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+              className={`p-1.5 rounded min-w-[32px] transition-colors ${
+                editor.isActive("codeBlock")
                   ? "bg-blue-100 text-blue-700"
                   : "hover:bg-gray-200 text-gray-700"
               }`}
-              title="Bullet List"
+              title="Code Block (⌘⌥C)"
             >
-              •
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
             </button>
             <button
-              onClick={() => editor.chain().focus().toggleOrderedList().run()}
-              className={`p-1.5 rounded min-w-[28px] ${
-                editor.isActive("orderedList")
-                  ? "bg-blue-100 text-blue-700"
-                  : "hover:bg-gray-200 text-gray-700"
-              }`}
-              title="Ordered List"
+              onClick={() => editor.chain().focus().setHorizontalRule().run()}
+              className="p-1.5 rounded min-w-[32px] hover:bg-gray-200 text-gray-700 transition-colors"
+              title="Horizontal Rule"
             >
-              1.
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14" />
+              </svg>
+            </button>
+            <button
+              onClick={() => editor.chain().focus().setHardBreak().run()}
+              className="p-1.5 rounded min-w-[32px] hover:bg-gray-200 text-gray-700 transition-colors"
+              title="Line Break (⇧↵)"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
             </button>
           </div>
         </div>
@@ -722,31 +779,137 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         .ProseMirror {
           outline: none;
           min-height: 300px;
+          line-height: 1.75;
         }
+        
         .ProseMirror p {
           margin-bottom: 1em;
+          line-height: 1.75;
         }
-        .ProseMirror h1, .ProseMirror h2, .ProseMirror h3 {
+        
+        .ProseMirror h1 {
+          font-size: 2em;
+          margin-top: 1.5em;
+          margin-bottom: 0.75em;
+          font-weight: 700;
+          line-height: 1.2;
+        }
+        
+        .ProseMirror h2 {
+          font-size: 1.5em;
+          margin-top: 1.5em;
+          margin-bottom: 0.75em;
+          font-weight: 600;
+          line-height: 1.3;
+        }
+        
+        .ProseMirror h3 {
+          font-size: 1.25em;
           margin-top: 1.5em;
           margin-bottom: 0.5em;
           font-weight: 600;
+          line-height: 1.4;
         }
+        
+        .ProseMirror ul,
+        .ProseMirror ol {
+          list-style-position: outside;
+          padding-left: 1.75em;
+          margin: 1em 0;
+        }
+        
         .ProseMirror ul {
           list-style-type: disc;
-          padding-left: 1.5em;
         }
+        
+        .ProseMirror ol {
+          list-style-type: decimal;
+        }
+        
+        .ProseMirror li {
+          margin: 0.5em 0;
+        }
+        
+        .ProseMirror blockquote {
+          border-left: 3px solid #d1d5db;
+          padding-left: 1em;
+          margin: 1em 0;
+          color: #6b7280;
+          font-style: italic;
+        }
+        
+        .ProseMirror pre {
+          background: #1f2937;
+          color: #f3f4f6;
+          font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+          padding: 1em;
+          border-radius: 0.5em;
+          overflow-x: auto;
+          margin: 1em 0;
+        }
+        
+        .ProseMirror code {
+          background: #f3f4f6;
+          color: #1f2937;
+          padding: 0.2em 0.4em;
+          border-radius: 0.25em;
+          font-size: 0.9em;
+          font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+        }
+        
+        .ProseMirror pre code {
+          background: none;
+          padding: 0;
+          color: inherit;
+        }
+        
+        .ProseMirror hr {
+          border: none;
+          border-top: 2px solid #e5e7eb;
+          margin: 2em 0;
+        }
+        
         .ProseMirror mark {
-          background-color: #fde68a;
+          background-color: #fef08a;
           color: #1f2937;
           border-radius: 2px;
+          padding: 0.1em 0.2em;
+        }
+        
+        .ProseMirror [data-placeholder]::before {
+          color: #9ca3af;
+          content: attr(data-placeholder);
+          float: left;
+          height: 0;
+          pointer-events: none;
+        }
+
+        /* Concept highlighting */
+        .ProseMirror .concept-highlight {
+          transition: background-color 0.2s ease;
+        }
+        
+        .ProseMirror .concept-highlight:hover {
+          background-color: rgba(255, 140, 0, 0.35) !important;
         }
 
         /* Toggle visibility based on parent class */
         .rich-text-editor:not(.show-spacing) .spacing-indicator {
           display: none;
         }
+        
         .rich-text-editor:not(.show-visuals) .visual-suggestions {
           display: none;
+        }
+        
+        /* Better focus styles */
+        .ProseMirror:focus {
+          outline: none;
+        }
+        
+        /* Selection styling */
+        .ProseMirror ::selection {
+          background-color: #bfdbfe;
         }
       `}</style>
     </div>
