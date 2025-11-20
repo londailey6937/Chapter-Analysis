@@ -1,5 +1,5 @@
 import React from "react";
-import { RichTextEditor } from "./RichTextEditor";
+import { LexicalEditor } from "./LexicalEditor";
 
 interface DocumentEditorProps {
   initialText: string;
@@ -54,13 +54,10 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       className="document-editor-wrapper"
       style={{ height: "100%", display: "flex", flexDirection: "column" }}
     >
-      <RichTextEditor
+      <LexicalEditor
         content={startContent}
         onUpdate={handleUpdate}
         isEditable={!readOnly}
-        highlightPosition={highlightPosition}
-        searchWord={searchWord}
-        searchOccurrence={searchOccurrence}
         showSpacingIndicators={showSpacingIndicators}
         showVisualSuggestions={showVisualSuggestions}
         concepts={concepts}
