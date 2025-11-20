@@ -1784,10 +1784,10 @@ export const ChapterCheckerV2: React.FC = () => {
           minWidth: 0,
         }}
       >
-        {/* Left: Document Column (60% in all modes) */}
+        {/* Left: Document Column (63% in all modes) */}
         <div
           style={{
-            flex: isStackedLayout ? "1 1 100%" : "6 1 0", // 60% in all modes
+            flex: isStackedLayout ? "1 1 100%" : "63 1 0", // 63% in all modes
             display: "flex",
             flexDirection: "column",
             gap: "16px",
@@ -2264,11 +2264,11 @@ export const ChapterCheckerV2: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Analysis Panel (40% in all modes) */}
+        {/* Right: Analysis Panel (37% in all modes) */}
         <div
           className="app-panel"
           style={{
-            flex: isStackedLayout ? "1 1 100%" : "4 1 0", // 40% in all modes
+            flex: isStackedLayout ? "1 1 100%" : "37 1 0", // 37% in all modes
             maxWidth: "100%",
             minWidth: analysisMinWidth,
             display: "flex",
