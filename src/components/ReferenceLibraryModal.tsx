@@ -645,45 +645,85 @@ export function ReferenceLibraryModal({
 
                 <div
                   style={{
-                    background: "#fef5e7",
+                    background: "#ecfdf5",
                     padding: "1rem",
                     borderRadius: "8px",
                     marginBottom: "1.5rem",
-                    border: "1px solid #ef8432",
+                    border: "2px solid #10b981",
                   }}
                 >
                   <h3
                     style={{
                       marginTop: 0,
                       marginBottom: "0.5rem",
-                      color: "#374151",
+                      color: "#065f46",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
                     }}
                   >
-                    Free Tier
+                    🎉 Free Tier - Start Here!
                   </h3>
-                  <p style={{ marginBottom: "0.5rem" }}>
-                    <strong>What You Get:</strong>
+                  <p style={{ marginBottom: "0.5rem", fontWeight: "600" }}>
+                    <strong>Powerful Features, Zero Cost:</strong>
                   </p>
                   <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
-                    <li>✅ Spacing analysis (full)</li>
-                    <li>✅ Dual coding analysis (full)</li>
-                    <li>✅ Upload DOCX/OBT files</li>
-                    <li>✅ View analysis dashboard</li>
-                    <li>✅ Access all built-in domains</li>
-                    <li>❌ No exports (HTML/DOCX/JSON)</li>
-                    <li>❌ No Writer Mode</li>
-                    <li>❌ No custom domains</li>
+                    <li>
+                      ✅ <strong>Professional Syncfusion Editor</strong> with
+                      inline analysis
+                    </li>
+                    <li>
+                      ✅ <strong>Spacing & Pacing Analysis</strong>{" "}
+                      (paragraph-by-paragraph)
+                    </li>
+                    <li>
+                      ✅ <strong>Dual-Coding AI</strong> (visual opportunity
+                      detection)
+                    </li>
+                    <li>✅ Color-coded pills & banners in your document</li>
+                    <li>✅ Smart sidebar with detailed analysis cards</li>
+                    <li>✅ Upload DOCX files with images (up to 80 pages)</li>
+                    <li>✅ All 8 built-in academic domains</li>
+                    <li>✅ Auto-domain detection</li>
+                    <li>✅ Real-time editing with live analysis</li>
                   </ul>
                   <p
                     style={{
-                      marginTop: "0.5rem",
-                      marginBottom: 0,
+                      marginTop: "0.75rem",
+                      marginBottom: "0.5rem",
+                      fontSize: "0.9rem",
+                      color: "#059669",
+                      fontWeight: "600",
+                    }}
+                  >
+                    🔒 Want More? Upgrade to unlock:
+                  </p>
+                  <ul
+                    style={{
+                      paddingLeft: "1.5rem",
+                      margin: 0,
                       fontSize: "0.9rem",
                       color: "#6b7280",
                     }}
                   >
-                    <strong>Best for:</strong> Trying out the tool, quick
-                    checks, students
+                    <li>All 10 learning principles (not just 2)</li>
+                    <li>Export to HTML, DOCX, JSON</li>
+                    <li>Interactive concept graphs</li>
+                    <li>Create custom domains</li>
+                    <li>Analyze entire textbooks (600-1000 pages)</li>
+                  </ul>
+                  <p
+                    style={{
+                      marginTop: "0.75rem",
+                      marginBottom: 0,
+                      fontSize: "0.9rem",
+                      color: "#065f46",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    <strong>Perfect for:</strong> Students, educators testing
+                    the tool, single-chapter analysis, anyone wanting to see
+                    what learning science can do for their content.
                   </p>
                 </div>
 
@@ -693,46 +733,79 @@ export function ReferenceLibraryModal({
                     padding: "1rem",
                     borderRadius: "8px",
                     marginBottom: "1.5rem",
-                    border: "1px solid #ef8432",
+                    border: "2px solid #f59e0b",
                   }}
                 >
                   <h3
                     style={{
                       marginTop: 0,
                       marginBottom: "0.5rem",
-                      color: "#374151",
+                      color: "#92400e",
                     }}
                   >
-                    Premium Tier 👑
+                    👑 Premium Tier - Unlock Everything
                   </h3>
-                  <p style={{ marginBottom: "0.5rem" }}>
-                    <strong>What You Get:</strong>
+                  <p style={{ marginBottom: "0.5rem", fontWeight: "600" }}>
+                    <strong>Everything in Free, PLUS:</strong>
                   </p>
                   <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
-                    <li>✅ Everything in Free</li>
                     <li>
-                      ✅ <strong>Full 10-principle analysis</strong>
+                      ⭐ <strong>Full 10-Principle Analysis</strong> - Complete
+                      learning science evaluation
                     </li>
                     <li>
-                      ✅ <strong>Export results</strong> (HTML, DOCX, JSON)
+                      ⭐ <strong>Export Anywhere</strong> - HTML, DOCX, JSON
+                      formats
                     </li>
-                    <li>✅ Concept graphs and visualizations</li>
                     <li>
-                      ✅ <strong>Custom domain creation</strong>
+                      ⭐ <strong>Interactive Concept Graphs</strong> - Visual
+                      knowledge mapping
                     </li>
-                    <li>✅ Comprehensive recommendations</li>
-                    <li>❌ No Writer Mode (view-only)</li>
+                    <li>
+                      ⭐ <strong>Custom Domains</strong> - Build your own
+                      concept libraries
+                    </li>
+                    <li>
+                      ⭐ <strong>Up to 600 pages</strong> - Analyze entire
+                      textbooks
+                    </li>
+                    <li>⭐ Comprehensive recommendations dashboard</li>
+                    <li>⭐ Priority feature access</li>
                   </ul>
-                  <p
+                  <div
                     style={{
-                      marginTop: "0.5rem",
-                      marginBottom: 0,
-                      fontSize: "0.9rem",
-                      color: "#6b7280",
+                      marginTop: "0.75rem",
+                      padding: "0.75rem",
+                      background: "#fffbeb",
+                      borderRadius: "6px",
+                      border: "1px solid #fbbf24",
                     }}
                   >
-                    <strong>Best for:</strong> Educators, content creators,
-                    analysts
+                    <p
+                      style={{
+                        margin: 0,
+                        fontSize: "0.9rem",
+                        color: "#78350f",
+                      }}
+                    >
+                      <strong>💡 Why Upgrade?</strong> Free tier proves the AI
+                      works. Premium gives you the complete toolkit to transform
+                      your entire curriculum with research-backed learning
+                      science.
+                    </p>
+                  </div>
+                  <p
+                    style={{
+                      marginTop: "0.75rem",
+                      marginBottom: 0,
+                      fontSize: "0.9rem",
+                      color: "#92400e",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    <strong>Perfect for:</strong> Professional educators,
+                    instructional designers, content creators, textbook authors,
+                    curriculum developers.
                   </p>
                 </div>
 

@@ -1,5 +1,49 @@
 # Syncfusion DocumentEditor Integration Guide
 
+## Free Tier Experience - "Powerful Teaser" Strategy
+
+### What Free Users See
+
+**Full-Featured Document Editor:**
+
+- ✅ Complete Syncfusion DocumentEditor with professional toolbar
+- ✅ **Inline analysis pills** - Color-coded spacing indicators (blue/green/orange)
+- ✅ **Inline analysis banners** - Visual opportunity callouts with Unicode borders
+- ✅ **Smart sidebar** - Detailed analysis cards with hover effects
+- ✅ Real-time editing with live analysis updates
+- ✅ DOCX import with structure preservation (images preserved for export)
+
+**Core Analysis Features:**
+
+- ✅ **Spacing & Pacing Analysis** - Paragraph-by-paragraph cognitive load assessment
+- ✅ **Dual-Coding AI** - Detects where diagrams, flowcharts, and visuals would help
+- ✅ Auto-domain detection (8 built-in academic domains)
+- ✅ Up to 80 pages per document (1 generous textbook chapter)
+
+**What's Locked (Premium Teasers):**
+
+- 🔒 Export buttons visible but disabled (HTML/DOCX/JSON)
+- 🔒 Full 10-principle analysis (only 2/10 principles shown)
+- 🔒 Concept graphs (preview shown, full view locked)
+- 🔒 Custom domain creation (option visible but locked)
+- 🔒 Writer Mode (button shown with upgrade prompt)
+
+### Strategic Upgrade Points
+
+**1. After Analysis Completes:**
+Show banner: "✨ You've analyzed 1 chapter! Upgrade to Premium to analyze your entire 600-page textbook and export results."
+
+**2. Export Buttons:**
+Visible but show tooltip: "🔒 Export to HTML/DOCX requires Premium - Save your work and share results"
+
+**3. Locked Principles:**
+Show grayed-out cards: "🔒 Premium unlocks 8 more learning principles including Coherence, Signaling, Redundancy, and more"
+
+**4. After 2-3 Uses:**
+"You're getting great value from free tier! Upgrade to unlock exports, concept graphs, and full textbook analysis."
+
+---
+
 ## Overview
 
 The Chapter Analysis app uses Syncfusion's DocumentEditor component to provide a rich text editing experience with document import/export capabilities. This guide explains how it's integrated, its limitations, and best practices.

@@ -1,16 +1,49 @@
 # Tome IQ - Quick Start Guide
 
-Get your Tome IQ running in 10 minutes!
+**Experience Learning Science-Powered Document Analysis**
+
+## 🎯 What You Get (Free Tier)
+
+**Start analyzing immediately with powerful features:**
+
+✅ **Professional Document Editor**
+
+- Full-featured Syncfusion editor with rich text formatting
+- Inline color-coded analysis pills & banners
+- Real-time spacing and dual-coding insights
+- Import DOCX files with images preserved
+
+✅ **Core Analysis Features**
+
+- **Spacing & Pacing Analysis**: Paragraph-by-paragraph cognitive load assessment
+- **Dual-Coding Suggestions**: AI-powered visual opportunity detection
+- Smart sidebar with detailed analysis cards
+- Up to 80 pages per document (1 generous textbook chapter)
+
+✅ **Smart Content Understanding**
+
+- Auto-detects academic domain (Chemistry, Biology, Finance, etc.)
+- Identifies compact, balanced, and extended paragraphs
+- Suggests diagrams, flowcharts, and concept maps
+- Proves the AI understands your content
+
+## 🚀 Unlock More with Premium
+
+**See what you're missing:**
+
+- 🔒 **Full 10-Principle Analysis** - Complete learning science evaluation
+- 🔒 **Export Features** - Save as HTML, DOCX, or JSON
+- 🔒 **Concept Graphs** - Visual relationship mapping
+- 🔒 **Custom Domains** - Build your own concept libraries
+- 🔒 **Unlimited Pages** - Analyze entire textbooks (600+ pages)
+
+---
 
 ## Document Size Support
 
-**Designed for True "Tome" Analysis**
-
-Tome IQ can handle large academic documents:
-
-- **Tested up to 200 MB** - Approximately 800-1,200 pages
-- A typical **500-page academic textbook** with moderate images is usually 50-80 MB
-- Comfortably handles even the **largest scholarly works** or complete multi-volume compilations
+**Free Tier:** Up to 80 pages (perfect for single chapters)
+**Premium Tier:** Up to 600 pages (full textbooks)
+**Professional Tier:** Up to 1,000 pages (comprehensive references)
 
 Supported formats: `.docx` and `.obt`
 
