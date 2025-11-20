@@ -256,11 +256,28 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         addNodeView() {
           return ReactNodeViewRenderer(ParagraphWithAnalysis);
         },
+        addAttributes() {
+          return {
+            ...this.parent?.(),
+            textAlign: {
+              default: null,
+              parseHTML: (element) => element.style.textAlign || null,
+              renderHTML: (attributes) => {
+                if (!attributes.textAlign) {
+                  return {};
+                }
+                return { style: `text-align: ${attributes.textAlign}` };
+              },
+            },
+          };
+        },
       }),
       Underline,
       Highlight.configure({ multicolor: true }),
       TextAlign.configure({
         types: ["heading", "paragraph"],
+        alignments: ["left", "center", "right", "justify"],
+        defaultAlignment: "left",
       }),
       Placeholder.configure({
         placeholder: "Start writing or paste your chapter content here...",
@@ -274,6 +291,10 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         class:
           "prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none",
         spellcheck: "true",
+      },
+      handleKeyDown: (view, event) => {
+        // Let TipTap handle all keyboard shortcuts
+        return false;
       },
     },
     onUpdate: ({ editor }) => {
@@ -505,8 +526,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               className="p-1.5 rounded hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed text-gray-700 transition-colors"
               title="Undo (⌘Z / Ctrl+Z)"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"
+                />
               </svg>
             </button>
             <button
@@ -515,8 +546,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               className="p-1.5 rounded hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed text-gray-700 transition-colors"
               title="Redo (⌘⇧Z / Ctrl+Y)"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10h-10a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 10h-10a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6"
+                />
               </svg>
             </button>
           </div>
@@ -640,8 +681,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               }`}
               title="Bullet List (⌘⇧8)"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             </button>
             <button
@@ -653,8 +704,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               }`}
               title="Numbered List (⌘⇧7)"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
+                />
               </svg>
             </button>
             <button
@@ -666,8 +727,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               }`}
               title="Quote (⌘⇧B)"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                />
               </svg>
             </button>
           </div>
@@ -685,8 +756,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               }`}
               title="Align Left (⌘⇧L)"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h10M4 18h16" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h10M4 18h16"
+                />
               </svg>
             </button>
             <button
@@ -700,8 +781,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               }`}
               title="Align Center (⌘⇧E)"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M7 12h10M4 18h16" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M7 12h10M4 18h16"
+                />
               </svg>
             </button>
             <button
@@ -713,8 +804,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               }`}
               title="Align Right (⌘⇧R)"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M10 12h10M4 18h16" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M10 12h10M4 18h16"
+                />
               </svg>
             </button>
             <button
@@ -728,8 +829,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               }`}
               title="Justify (⌘⇧J)"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             </button>
           </div>
@@ -747,8 +858,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               }`}
               title="Code Block (⌘⌥C)"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+                />
               </svg>
             </button>
             <button
@@ -756,8 +877,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               className="p-1.5 rounded min-w-[32px] hover:bg-gray-200 text-gray-700 transition-colors"
               title="Horizontal Rule"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 12h14"
+                />
               </svg>
             </button>
             <button
@@ -765,8 +896,18 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
               className="p-1.5 rounded min-w-[32px] hover:bg-gray-200 text-gray-700 transition-colors"
               title="Line Break (⇧↵)"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
               </svg>
             </button>
           </div>
@@ -781,12 +922,41 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           min-height: 300px;
           line-height: 1.75;
         }
-        
+
         .ProseMirror p {
           margin-bottom: 1em;
           line-height: 1.75;
         }
-        
+
+        /* Text alignment support */
+        .ProseMirror p[style*="text-align: left"],
+        .ProseMirror h1[style*="text-align: left"],
+        .ProseMirror h2[style*="text-align: left"],
+        .ProseMirror h3[style*="text-align: left"] {
+          text-align: left !important;
+        }
+
+        .ProseMirror p[style*="text-align: center"],
+        .ProseMirror h1[style*="text-align: center"],
+        .ProseMirror h2[style*="text-align: center"],
+        .ProseMirror h3[style*="text-align: center"] {
+          text-align: center !important;
+        }
+
+        .ProseMirror p[style*="text-align: right"],
+        .ProseMirror h1[style*="text-align: right"],
+        .ProseMirror h2[style*="text-align: right"],
+        .ProseMirror h3[style*="text-align: right"] {
+          text-align: right !important;
+        }
+
+        .ProseMirror p[style*="text-align: justify"],
+        .ProseMirror h1[style*="text-align: justify"],
+        .ProseMirror h2[style*="text-align: justify"],
+        .ProseMirror h3[style*="text-align: justify"] {
+          text-align: justify !important;
+        }
+
         .ProseMirror h1 {
           font-size: 2em;
           margin-top: 1.5em;
@@ -794,7 +964,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           font-weight: 700;
           line-height: 1.2;
         }
-        
+
         .ProseMirror h2 {
           font-size: 1.5em;
           margin-top: 1.5em;
@@ -802,7 +972,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           font-weight: 600;
           line-height: 1.3;
         }
-        
+
         .ProseMirror h3 {
           font-size: 1.25em;
           margin-top: 1.5em;
@@ -810,26 +980,26 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           font-weight: 600;
           line-height: 1.4;
         }
-        
+
         .ProseMirror ul,
         .ProseMirror ol {
           list-style-position: outside;
           padding-left: 1.75em;
           margin: 1em 0;
         }
-        
+
         .ProseMirror ul {
           list-style-type: disc;
         }
-        
+
         .ProseMirror ol {
           list-style-type: decimal;
         }
-        
+
         .ProseMirror li {
           margin: 0.5em 0;
         }
-        
+
         .ProseMirror blockquote {
           border-left: 3px solid #d1d5db;
           padding-left: 1em;
@@ -837,7 +1007,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           color: #6b7280;
           font-style: italic;
         }
-        
+
         .ProseMirror pre {
           background: #1f2937;
           color: #f3f4f6;
@@ -847,7 +1017,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           overflow-x: auto;
           margin: 1em 0;
         }
-        
+
         .ProseMirror code {
           background: #f3f4f6;
           color: #1f2937;
@@ -856,26 +1026,26 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
           font-size: 0.9em;
           font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
         }
-        
+
         .ProseMirror pre code {
           background: none;
           padding: 0;
           color: inherit;
         }
-        
+
         .ProseMirror hr {
           border: none;
           border-top: 2px solid #e5e7eb;
           margin: 2em 0;
         }
-        
+
         .ProseMirror mark {
           background-color: #fef08a;
           color: #1f2937;
           border-radius: 2px;
           padding: 0.1em 0.2em;
         }
-        
+
         .ProseMirror [data-placeholder]::before {
           color: #9ca3af;
           content: attr(data-placeholder);
@@ -888,7 +1058,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         .ProseMirror .concept-highlight {
           transition: background-color 0.2s ease;
         }
-        
+
         .ProseMirror .concept-highlight:hover {
           background-color: rgba(255, 140, 0, 0.35) !important;
         }
@@ -897,16 +1067,16 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         .rich-text-editor:not(.show-spacing) .spacing-indicator {
           display: none;
         }
-        
+
         .rich-text-editor:not(.show-visuals) .visual-suggestions {
           display: none;
         }
-        
+
         /* Better focus styles */
         .ProseMirror:focus {
           outline: none;
         }
-        
+
         /* Selection styling */
         .ProseMirror ::selection {
           background-color: #bfdbfe;
