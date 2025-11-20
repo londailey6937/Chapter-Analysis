@@ -110,7 +110,7 @@ const ConceptHighlighter = Extension.create({
                       class: "concept-highlight",
                       "data-concept": concept,
                       style:
-                        "background-color: rgba(255, 140, 0, 0.15); font-weight: 500; cursor: pointer; transition: background-color 0.2s;",
+                        "background-color: rgba(255, 140, 0, 0.22); font-weight: 500; cursor: pointer; transition: background-color 0.2s;",
                     })
                   );
                 }
