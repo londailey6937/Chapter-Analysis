@@ -2187,6 +2187,7 @@ export const ChapterCheckerV2: React.FC = () => {
                     highlightPosition={highlightPosition}
                     searchWord={searchWord}
                     searchOccurrence={searchOccurrence}
+                    isFreeMode={!tierFeatures.writerMode}
                     concepts={
                       analysis?.conceptGraph?.concepts?.map(
                         (c: any) => c.name

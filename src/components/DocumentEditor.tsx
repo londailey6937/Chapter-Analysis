@@ -23,6 +23,7 @@ interface DocumentEditorProps {
   onExitTemplateMode?: () => void;
   concepts?: string[];
   onConceptClick?: (concept: string) => void;
+  isFreeMode?: boolean;
 }
 
 export const DocumentEditor: React.FC<DocumentEditorProps> = ({
@@ -38,6 +39,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   readOnly,
   concepts,
   onConceptClick,
+  isFreeMode = false,
 }) => {
   // Determine initial content: prefer HTML if available, otherwise text
   const startContent = htmlContent || initialText;
@@ -62,6 +64,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
         showVisualSuggestions={showVisualSuggestions}
         concepts={concepts}
         onConceptClick={onConceptClick}
+        isFreeMode={isFreeMode}
         style={{ flex: 1, minHeight: 0 }}
       />
     </div>

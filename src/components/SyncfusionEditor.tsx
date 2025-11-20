@@ -32,6 +32,7 @@ interface SyncfusionEditorProps {
   showVisualSuggestions?: boolean;
   concepts?: string[];
   onConceptClick?: (concept: string) => void;
+  isFreeMode?: boolean;
 }
 
 export const SyncfusionEditor: React.FC<SyncfusionEditorProps> = ({
@@ -44,6 +45,7 @@ export const SyncfusionEditor: React.FC<SyncfusionEditorProps> = ({
   showVisualSuggestions = true,
   concepts = [],
   onConceptClick,
+  isFreeMode = false,
 }) => {
   const containerRef = useRef<DocumentEditorContainerComponent>(null);
   const [analysisResults, setAnalysisResults] = useState<{
@@ -657,8 +659,102 @@ export const SyncfusionEditor: React.FC<SyncfusionEditorProps> = ({
                   if (openButton) {
                     (openButton as HTMLElement).style.display = "none";
                   }
+
+                  // Grey out New, Open, Undo, and Redo buttons in free mode and disable functionality
+                  if (isFreeMode) {
+                    // Disable New button
+                    const newButton = document.querySelector(
+                      '[title="New"]'
+                    ) as HTMLElement;
+                    if (newButton) {
+                      // Add event blocker FIRST before styling
+                      newButton.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        console.log("🔒 New button disabled in free mode");
+                        return false;
+                      }, { capture: true });
+                      newButton.addEventListener("mousedown", (e) => {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        return false;
+                      }, { capture: true });
+                      newButton.style.opacity = "0.4";
+                      newButton.style.cursor = "not-allowed";
+                      (newButton as any).disabled = true;
+                    }
+                    
+                    // Disable Open button
+                    const openBtn = document.querySelector(
+                      '[title="Open"]'
+                    ) as HTMLElement;
+                    if (openBtn) {
+                      openBtn.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        console.log("🔒 Open button disabled in free mode");
+                        return false;
+                      }, { capture: true });
+                      openBtn.addEventListener("mousedown", (e) => {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        return false;
+                      }, { capture: true });
+                      openBtn.style.opacity = "0.4";
+                      openBtn.style.cursor = "not-allowed";
+                      (openBtn as any).disabled = true;
+                    }
+                    
+                    // Disable Undo button
+                    const undoButton = document.querySelector(
+                      '[title="Undo"]'
+                    ) as HTMLElement;
+                    if (undoButton) {
+                      undoButton.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        console.log("🔒 Undo button disabled in free mode");
+                        return false;
+                      }, { capture: true });
+                      undoButton.addEventListener("mousedown", (e) => {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        return false;
+                      }, { capture: true });
+                      undoButton.style.opacity = "0.4";
+                      undoButton.style.cursor = "not-allowed";
+                      (undoButton as any).disabled = true;
+                    }
+                    
+                    // Disable Redo button
+                    const redoButton = document.querySelector(
+                      '[title="Redo"]'
+                    ) as HTMLElement;
+                    if (redoButton) {
+                      redoButton.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        console.log("🔒 Redo button disabled in free mode");
+                        return false;
+                      }, { capture: true });
+                      redoButton.addEventListener("mousedown", (e) => {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        return false;
+                      }, { capture: true });
+                      redoButton.style.opacity = "0.4";
+                      redoButton.style.cursor = "not-allowed";
+                      (redoButton as any).disabled = true;
+                    }
+                    
+                    // Disable undo/redo functionality at the editor level
+                    if (containerRef.current.documentEditor.editorHistory) {
+                      containerRef.current.documentEditor.editorHistory.canUndo = () => false;
+                      containerRef.current.documentEditor.editorHistory.canRedo = () => false;
+                    }
+                  }
                 } catch (e) {
-                  console.warn("Could not hide Open button:", e);
+                  console.warn("Could not modify toolbar buttons:", e);
                 }
               }
 
