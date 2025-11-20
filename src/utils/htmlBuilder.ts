@@ -295,6 +295,14 @@ function buildHighlightsWithImages(
         return;
       }
 
+      // Skip image placeholder paragraphs (they're for editor display only)
+      const isImagePlaceholder =
+        element.classList.contains("image-placeholder") ||
+        element.textContent?.includes("[📸 Image");
+      if (isImagePlaceholder) {
+        return; // Don't include placeholders in export
+      }
+
       // For paragraph-like elements without images, add spacing indicators
       if (tag === "p" || tag === "div") {
         const textContent = element.textContent?.trim() || "";
