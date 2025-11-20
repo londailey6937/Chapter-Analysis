@@ -1791,6 +1791,8 @@ export const ChapterCheckerV2: React.FC = () => {
             display: "flex",
             flexDirection: "column",
             gap: "16px",
+            minWidth: 0,
+            overflow: "hidden",
           }}
         >
           <div
@@ -2090,6 +2092,7 @@ export const ChapterCheckerV2: React.FC = () => {
               padding: 0,
               backgroundColor: "#eddcc5",
               background: "#eddcc5",
+              overflow: "hidden",
             }}
           >
             <div
@@ -2099,6 +2102,7 @@ export const ChapterCheckerV2: React.FC = () => {
                 flexDirection: "column",
                 padding: "16px",
                 minHeight: 0,
+                overflow: "hidden",
               }}
             >
               {chapterData ? (
@@ -2108,8 +2112,37 @@ export const ChapterCheckerV2: React.FC = () => {
                     display: "flex",
                     flexDirection: "column",
                     minHeight: 0,
+                    overflow: "hidden",
                   }}
                 >
+                  {/* Image notification banner */}
+                  {chapterData.imageCount > 0 && (
+                    <div
+                      style={{
+                        padding: "8px 12px",
+                        backgroundColor: "#dbeafe",
+                        borderLeft: "3px solid #3b82f6",
+                        marginBottom: "12px",
+                        borderRadius: "8px",
+                        fontSize: "13px",
+                        color: "#1e40af",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      <span>📸</span>
+                      <span>
+                        <strong>
+                          {chapterData.imageCount} image
+                          {chapterData.imageCount > 1 ? "s" : ""} detected
+                        </strong>{" "}
+                        - Images are preserved in HTML exports. Editor shows
+                        text structure with spacing/dual-coding analysis.
+                      </span>
+                    </div>
+                  )}
+
                   <DocumentEditor
                     key={fileName} // Force new component instance when file changes
                     initialText={

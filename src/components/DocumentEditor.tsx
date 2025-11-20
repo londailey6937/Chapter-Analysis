@@ -1,5 +1,5 @@
 import React from "react";
-import { LexicalEditor } from "./LexicalEditor";
+import { SyncfusionEditor } from "./SyncfusionEditor";
 
 interface DocumentEditorProps {
   initialText: string;
@@ -54,7 +54,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       className="document-editor-wrapper"
       style={{ height: "100%", display: "flex", flexDirection: "column" }}
     >
-      <LexicalEditor
+      <SyncfusionEditor
         content={startContent}
         onUpdate={handleUpdate}
         isEditable={!readOnly}

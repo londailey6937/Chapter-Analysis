@@ -251,6 +251,9 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
         );
         if (imageCount > 0) {
           console.log("📸 HTML content includes images (base64 encoded)");
+          console.log(
+            "ℹ️  Images preserved for export; editor shows text with structure"
+          );
           // Log first 500 chars of HTML to verify images are embedded
           console.log("HTML preview:", rawHtml.substring(0, 500));
         }
