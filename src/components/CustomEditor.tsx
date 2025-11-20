@@ -201,6 +201,81 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
     }
   }, [analyzeContent]); // Only on mount
 
+  // Apply concept underlining
+  useEffect(() => {
+    if (!editorRef.current || concepts.length === 0) return;
+
+    const applyConceptUnderlines = () => {
+      if (!editorRef.current) return;
+
+      const walker = document.createTreeWalker(
+        editorRef.current,
+        NodeFilter.SHOW_TEXT,
+        null
+      );
+
+      const textNodes: Text[] = [];
+      let node: Node | null;
+      while ((node = walker.nextNode())) {
+        textNodes.push(node as Text);
+      }
+
+      textNodes.forEach((textNode) => {
+        const text = textNode.textContent || "";
+        let html = text;
+        let hasMatch = false;
+
+        // Sort concepts by length (longest first) to avoid partial matches
+        const sortedConcepts = [...concepts].sort(
+          (a, b) => b.length - a.length
+        );
+
+        sortedConcepts.forEach((concept) => {
+          const regex = new RegExp(
+            `\\b(${concept.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})\\b`,
+            "gi"
+          );
+          if (regex.test(html)) {
+            html = html.replace(
+              regex,
+              '<span class="concept-underline" data-concept="$1">$1</span>'
+            );
+            hasMatch = true;
+          }
+        });
+
+        if (hasMatch && textNode.parentElement) {
+          const tempDiv = document.createElement("div");
+          tempDiv.innerHTML = html;
+          const fragment = document.createDocumentFragment();
+          while (tempDiv.firstChild) {
+            fragment.appendChild(tempDiv.firstChild);
+          }
+          textNode.parentElement.replaceChild(fragment, textNode);
+        }
+      });
+
+      // Add click handlers to underlined concepts
+      const underlinedElements =
+        editorRef.current.querySelectorAll(".concept-underline");
+      underlinedElements.forEach((el) => {
+        el.addEventListener("click", (e) => {
+          e.preventDefault();
+          const conceptName = (e.target as HTMLElement).getAttribute(
+            "data-concept"
+          );
+          if (conceptName && onConceptClick) {
+            onConceptClick(conceptName);
+          }
+        });
+      });
+    };
+
+    // Delay to ensure content is loaded
+    const timer = setTimeout(applyConceptUnderlines, 100);
+    return () => clearTimeout(timer);
+  }, [concepts, content, onConceptClick]);
+
   // Undo function
   const performUndo = useCallback(() => {
     if (!editorRef.current || historyIndexRef.current <= 0) return;

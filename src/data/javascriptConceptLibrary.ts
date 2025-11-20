@@ -52,6 +52,7 @@ export const JAVASCRIPT_CONCEPTS: ConceptLibrary = {
       importance: "core",
       description:
         "A concise syntax for writing function expressions using =>.",
+      prerequisites: ["function"],
     },
     {
       name: "callback",
@@ -61,6 +62,7 @@ export const JAVASCRIPT_CONCEPTS: ConceptLibrary = {
       importance: "core",
       description:
         "A function passed as an argument to another function to be executed later.",
+      prerequisites: ["function"],
     },
     {
       name: "closure",
@@ -70,6 +72,7 @@ export const JAVASCRIPT_CONCEPTS: ConceptLibrary = {
       importance: "core",
       description:
         "A function that has access to variables from its outer scope even after the outer function has returned.",
+      prerequisites: ["function", "variable"],
     },
     {
       name: "this keyword",
@@ -79,6 +82,7 @@ export const JAVASCRIPT_CONCEPTS: ConceptLibrary = {
       importance: "core",
       description:
         "A keyword that refers to the object that is executing the current function.",
+      prerequisites: ["function", "object"],
     },
     {
       name: "prototype",
@@ -93,6 +97,7 @@ export const JAVASCRIPT_CONCEPTS: ConceptLibrary = {
       importance: "core",
       description:
         "The mechanism by which JavaScript objects inherit features from one another.",
+      prerequisites: ["object", "function"],
     },
     {
       name: "hoisting",
@@ -115,6 +120,7 @@ export const JAVASCRIPT_CONCEPTS: ConceptLibrary = {
       importance: "core",
       description:
         "An object representing the eventual completion or failure of an asynchronous operation.",
+      prerequisites: ["callback", "function"],
     },
     {
       name: "async/await",
@@ -124,6 +130,7 @@ export const JAVASCRIPT_CONCEPTS: ConceptLibrary = {
       importance: "core",
       description:
         "Modern syntax for handling asynchronous operations that makes async code look synchronous.",
+      prerequisites: ["promise", "function"],
     },
     {
       name: "event loop",

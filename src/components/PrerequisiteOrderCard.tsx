@@ -51,19 +51,21 @@ export const PrerequisiteOrderCard: React.FC<PrerequisiteOrderCardProps> = ({
     if (!domainLibrary) return null;
     const map = new Map<string, string[]>();
     domainLibrary.concepts.forEach((concept) => {
-      if (concept.id && concept.prerequisites?.length) {
-        map.set(concept.id, concept.prerequisites);
+      if (concept.name && concept.prerequisites?.length) {
+        // Map by name (lowercase) since detected concepts have different IDs
+        map.set(concept.name.toLowerCase(), concept.prerequisites);
       }
     });
     return map;
   }, [domainLibrary]);
 
-  const libraryNameMap = useMemo(() => {
+  const libraryConceptMap = useMemo(() => {
     if (!domainLibrary) return null;
-    const map = new Map<string, string>();
+    const map = new Map<string, any>();
     domainLibrary.concepts.forEach((concept) => {
-      if (concept.id) {
-        map.set(concept.id, concept.name);
+      if (concept.name) {
+        // Map by name (lowercase) for easy lookup
+        map.set(concept.name.toLowerCase(), concept);
       }
     });
     return map;
@@ -82,18 +84,42 @@ export const PrerequisiteOrderCard: React.FC<PrerequisiteOrderCardProps> = ({
 
   const resolvePrerequisites = (concept: Concept): string[] => {
     const set = new Set<string>();
+    // Add from concept's own prerequisites
     (concept.prerequisites || []).forEach((id) => set.add(id));
-    libraryPrerequisites?.get(concept.id)?.forEach((id) => set.add(id));
+
+    // Add from library prerequisites (match by name)
+    const libraryPrereqNames = libraryPrerequisites?.get(
+      concept.name.toLowerCase()
+    );
+    if (libraryPrereqNames) {
+      libraryPrereqNames.forEach((prereqName) => {
+        // Find the detected concept with this name
+        const matchingConcept = concepts.find(
+          (c) => c.name.toLowerCase() === prereqName.toLowerCase()
+        );
+        if (matchingConcept) {
+          set.add(matchingConcept.id);
+        }
+      });
+    }
+
+    // Add from relationship prerequisites
     relationshipPrerequisites.get(concept.id)?.forEach((id) => set.add(id));
     return Array.from(set);
   };
 
   const getConceptLabel = (conceptId: string): string => {
-    return (
-      conceptMap.get(conceptId)?.name ||
-      libraryNameMap?.get(conceptId) ||
-      conceptId
-    );
+    const detectedConcept = conceptMap.get(conceptId);
+    if (detectedConcept) return detectedConcept.name;
+
+    // Try to find in library by searching all concepts
+    if (libraryConceptMap) {
+      for (const [name, libConcept] of libraryConceptMap.entries()) {
+        if (libConcept.id === conceptId) return libConcept.name;
+      }
+    }
+
+    return conceptId;
   };
 
   const orderedConceptIds = useMemo(() => {
@@ -126,8 +152,30 @@ export const PrerequisiteOrderCard: React.FC<PrerequisiteOrderCardProps> = ({
     const issues: PrerequisiteOrderIssue[] = [];
     const missing: MissingPrerequisite[] = [];
 
-    concepts.forEach((concept) => {
+    // Debug logging
+    console.log("🔍 Prerequisite Order Check Debug:");
+    console.log("  Total concepts:", concepts.length);
+    console.log("  Domain library:", domainLibrary ? "loaded" : "none");
+    console.log(
+      "  Library prerequisites map size:",
+      libraryPrerequisites?.size || 0
+    );
+    console.log(
+      "  Relationship prerequisites map size:",
+      relationshipPrerequisites.size
+    );
+
+    concepts.forEach((concept, idx) => {
       const prereqIds = resolvePrerequisites(concept);
+
+      if (idx < 3) {
+        console.log(
+          `  Concept "${concept.name}":`,
+          prereqIds.length,
+          "prerequisites"
+        );
+      }
+
       if (!prereqIds || prereqIds.length === 0) {
         return;
       }
@@ -171,6 +219,11 @@ export const PrerequisiteOrderCard: React.FC<PrerequisiteOrderCardProps> = ({
 
     const trimmedIssues = sortedIssues.slice(0, maxItems);
     const resolved = Math.max(total - issues.length - missing.length, 0);
+
+    console.log("  Total tracked:", total);
+    console.log("  Out of order:", issues.length);
+    console.log("  Missing:", missing.length);
+    console.log("  In sequence:", resolved);
 
     return {
       totalTracked: total,

@@ -503,3 +503,19 @@ select:focus option:checked {
   background: linear-gradient(white, white) !important;
   background-color: white !important;
 }
+
+/* Concept underlines in editor */
+.concept-underline {
+  text-decoration: underline;
+  text-decoration-color: #ef8432;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.concept-underline:hover {
+  text-decoration-color: #d97326;
+  text-decoration-thickness: 3px;
+  background-color: rgba(239, 132, 50, 0.1);
+}

@@ -810,7 +810,13 @@ export class ConceptExtractor {
             if (
               context.includes(`before ${other.name}`) ||
               context.includes(`prerequisite`) ||
-              context.includes(`foundation`)
+              context.includes(`foundation`) ||
+              context.includes(`requires ${other.name}`) ||
+              context.includes(`depends on ${other.name}`) ||
+              context.includes(`builds on ${other.name}`) ||
+              context.includes(`assumes ${other.name}`) ||
+              context.includes(`first learn ${other.name}`) ||
+              context.includes(`understanding of ${other.name}`)
             ) {
               relationshipType = "prerequisite";
             } else if (
@@ -858,6 +864,19 @@ export class ConceptExtractor {
           });
         }
       });
+    });
+
+    // Populate concept.prerequisites arrays from relationships
+    relationships.forEach((rel) => {
+      if (rel.type === "prerequisite") {
+        const targetConcept = concepts.find((c) => c.id === rel.target);
+        if (
+          targetConcept &&
+          !targetConcept.prerequisites.includes(rel.source)
+        ) {
+          targetConcept.prerequisites.push(rel.source);
+        }
+      }
     });
 
     return relationships;

@@ -208,7 +208,7 @@ export function ReferenceLibraryModal({
                     </tr>
                     <tr>
                       <td style={{ padding: "0.5rem" }}>
-                        🟡 <strong>Amber</strong> (Compact)
+                        🔵 <strong>Blue</strong> (Compact)
                       </td>
                       <td style={{ padding: "0.5rem" }}>&lt;60 words</td>
                       <td style={{ padding: "0.5rem" }}>
@@ -217,7 +217,7 @@ export function ReferenceLibraryModal({
                     </tr>
                     <tr>
                       <td style={{ padding: "0.5rem" }}>
-                        🔴 <strong>Orange</strong> (Extended)
+                        🟠 <strong>Orange</strong> (Extended)
                       </td>
                       <td style={{ padding: "0.5rem" }}>&gt;160 words</td>
                       <td style={{ padding: "0.5rem" }}>
@@ -463,9 +463,9 @@ export function ReferenceLibraryModal({
                     Color Coding:
                   </p>
                   <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
-                    <li>Blue background = Good spacing</li>
-                    <li>Orange background = Compact spacing warning</li>
-                    <li>Red background = Extended spacing warning</li>
+                    <li>Blue background = Compact spacing (too brief)</li>
+                    <li>Green background = Balanced spacing (ideal)</li>
+                    <li>Orange background = Extended spacing (too long)</li>
                     <li>Yellow background = Dual-coding suggestion</li>
                   </ul>
                 </div>
@@ -1059,19 +1059,23 @@ export function ReferenceLibraryModal({
                         Light Blue (#DBEAFE)
                       </td>
                       <td style={{ padding: "0.5rem" }}>
-                        Good paragraph length (60-160 words)
+                        Compact spacing (&lt;60 words)
                       </td>
                     </tr>
                     <tr>
-                      <td style={{ padding: "0.5rem" }}>Orange (#FEF3C7)</td>
                       <td style={{ padding: "0.5rem" }}>
-                        Too compact (&lt;60 words)
+                        Light Green (#D1FAE5)
+                      </td>
+                      <td style={{ padding: "0.5rem" }}>
+                        Balanced length (60-160 words)
                       </td>
                     </tr>
                     <tr>
-                      <td style={{ padding: "0.5rem" }}>Red (#FEE2E2)</td>
                       <td style={{ padding: "0.5rem" }}>
-                        Too extended (&gt;160 words)
+                        Light Orange (#FED7AA)
+                      </td>
+                      <td style={{ padding: "0.5rem" }}>
+                        Extended paragraph (&gt;160 words)
                       </td>
                     </tr>
                   </tbody>

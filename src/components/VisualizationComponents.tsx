@@ -268,7 +268,8 @@ export const ChapterOverviewTimeline: React.FC<{
               fullSection: fullName,
               sectionIndex: idx + 1,
               load: Math.round(issue.load * 100),
-              novelConcepts: sec.novelConcepts || 0,
+              novelConcepts:
+                sec.factors?.novelConcepts || sec.novelConcepts || 0,
               hasBlocking: issue.hasBlocking,
               position:
                 (sec as any).position ?? (sec as any).startPosition ?? 0,
