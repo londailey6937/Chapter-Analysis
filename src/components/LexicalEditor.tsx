@@ -13,12 +13,14 @@ import {
   $getSelection,
   $isRangeSelection,
   $createParagraphNode,
+  $createTextNode,
   EditorState,
   ParagraphNode,
   FORMAT_TEXT_COMMAND,
   UNDO_COMMAND,
   REDO_COMMAND,
   ElementNode,
+  TextNode,
 } from "lexical";
 import {
   HeadingNode,
@@ -171,6 +173,45 @@ const ConceptHighlightPlugin: React.FC<{
     rootElement.addEventListener("click", handleClick);
     return () => rootElement.removeEventListener("click", handleClick);
   }, [editor, concepts, onConceptClick]);
+
+  return null;
+};
+
+// Initial Content Plugin - loads content when component mounts
+const InitialContentPlugin: React.FC<{ content: string }> = ({ content }) => {
+  const [editor] = useLexicalComposerContext();
+  const [initialized, setInitialized] = React.useState(false);
+
+  useEffect(() => {
+    if (!content || initialized) return;
+
+    editor.update(() => {
+      const root = $getRoot();
+      root.clear();
+
+      // Split content into paragraphs and create nodes
+      const paragraphs = content.split(/\n\n+/);
+
+      paragraphs.forEach((paragraphText) => {
+        if (!paragraphText.trim()) return;
+
+        const paragraph = $createParagraphNode();
+        const lines = paragraphText.split(/\n/);
+
+        lines.forEach((line, index) => {
+          if (index > 0) {
+            // Add line break for single newlines within paragraph
+            paragraph.append($createTextNode("\n"));
+          }
+          paragraph.append($createTextNode(line));
+        });
+
+        root.append(paragraph);
+      });
+    });
+
+    setInitialized(true);
+  }, [editor, content, initialized]);
 
   return null;
 };
@@ -483,6 +524,7 @@ export const LexicalEditor: React.FC<LexicalEditorProps> = ({
           <HistoryPlugin />
           <ListPlugin />
           <LinkPlugin />
+          <InitialContentPlugin content={content} />
           <ConceptHighlightPlugin
             concepts={concepts}
             onConceptClick={onConceptClick}
