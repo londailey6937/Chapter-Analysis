@@ -1065,233 +1065,34 @@ export const ChapterCheckerV2: React.FC = () => {
       "mentionIndex:",
       mentionIndex
     );
-    console.log("🎯 Concept object:", concept);
 
     // Set the highlighted concept and mention index
     setHighlightedConceptId(concept.id);
     setCurrentMentionIndex(mentionIndex);
 
-    // Get the position of the mention
+    // With the new Embedded Highlight system, we don't need to calculate positions manually.
+    // The editor already knows where the concepts are.
+    // We just need to tell the editor to scroll to the first occurrence of this concept.
+
+    // However, to maintain compatibility with the existing "jump" effect (yellow flash),
+    // we can still pass the position if we have it, OR we can rely on the editor's internal search.
+
+    // For now, let's try to use the existing position logic as a hint,
+    // but the editor's "ConceptHighlighter" will handle the visual persistence.
+
     const mention = concept.mentions?.[mentionIndex];
-    console.log("🎯 Mention object:", mention);
-
     if (mention && mention.position !== undefined) {
-      const normalizeMatchedText = (text: string | null | undefined) =>
-        text ? text.replace(/\s+/g, " ").trim() : "";
-
-      const displayText = chapterData?.plainText ?? chapterText ?? "";
-      const displayTextLower = displayText.toLowerCase();
-
-      const matchedTextRaw = normalizeMatchedText(mention.matchedText);
-      const fallbackTerm = concept.name;
-      const searchTerm =
-        matchedTextRaw && matchedTextRaw.length > 0
-          ? matchedTextRaw
-          : fallbackTerm;
-      const searchTermLower = searchTerm.toLowerCase();
-      const canonicalLower = fallbackTerm.toLowerCase();
-
-      const escapeRegex = (value: string) =>
-        value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-      const buildFlexiblePattern = (termLower: string) => {
-        if (!termLower.length) {
-          return "";
-        }
-        const core = escapeRegex(termLower).replace(/\s+/g, "\\s+");
-        const startsWithWord = /[a-z0-9]/i.test(termLower[0]);
-        const endsWithWord = /[a-z0-9]/i.test(termLower[termLower.length - 1]);
-        const prefix = startsWithWord ? "\\b" : "";
-        const suffix = endsWithWord ? "(?=\\b)" : "";
-        return `${prefix}${core}${suffix}`;
-      };
-
-      const matchFlexibleAtPosition = (position: number, termLower: string) => {
-        if (!termLower || position < 0 || position >= displayTextLower.length) {
-          return null;
-        }
-        const snippet = displayTextLower.slice(position);
-        const regex = new RegExp(`^${buildFlexiblePattern(termLower)}`);
-        const match = regex.exec(snippet);
-        if (match && match[0]) {
-          return { position, length: match[0].length };
-        }
-        return null;
-      };
-
-      const findFlexibleOccurrence = (
-        termLower: string,
-        occurrence: number
-      ) => {
-        if (!termLower || occurrence < 0) {
-          return null;
-        }
-        const regex = new RegExp(buildFlexiblePattern(termLower), "g");
-        let match: RegExpExecArray | null;
-        let count = 0;
-        while ((match = regex.exec(displayTextLower)) !== null) {
-          if (count === occurrence) {
-            return { position: match.index, length: match[0].length };
-          }
-          count++;
-          if (match.index === regex.lastIndex) {
-            regex.lastIndex++;
-          }
-        }
-        return null;
-      };
-
-      const findNearestFlexible = (termLower: string, reference: number) => {
-        if (!termLower) {
-          return null;
-        }
-        const regex = new RegExp(buildFlexiblePattern(termLower), "g");
-        let best: { position: number; length: number } | null = null;
-        let match: RegExpExecArray | null;
-        while ((match = regex.exec(displayTextLower)) !== null) {
-          const candidate = { position: match.index, length: match[0].length };
-          if (
-            !best ||
-            Math.abs(candidate.position - reference) <
-              Math.abs(best.position - reference)
-          ) {
-            best = candidate;
-          }
-          if (match.index === regex.lastIndex) {
-            regex.lastIndex++;
-          }
-        }
-        return best;
-      };
-
-      const getOccurrenceIndex = (termLower: string): number => {
-        if (!termLower) {
-          return 0;
-        }
-        return (
-          concept.mentions
-            ?.slice(0, mentionIndex)
-            .reduce((count: number, currentMention: any) => {
-              if (!currentMention) {
-                return count;
-              }
-              const currentMatched = normalizeMatchedText(
-                currentMention.matchedText
-              );
-              const currentSearchWord = (
-                currentMatched && currentMatched.length > 0
-                  ? currentMatched
-                  : fallbackTerm
-              ).toLowerCase();
-
-              return currentSearchWord === termLower ? count + 1 : count;
-            }, 0) ?? 0
-        );
-      };
-
-      const locateTerm = (
-        termLower: string,
-        preferredStart: number,
-        occurrence: number
-      ) => {
-        if (!termLower) {
-          return null;
-        }
-
-        const direct = matchFlexibleAtPosition(preferredStart, termLower);
-        if (direct) {
-          return direct;
-        }
-
-        const occurrenceMatch = findFlexibleOccurrence(termLower, occurrence);
-        if (occurrenceMatch) {
-          return occurrenceMatch;
-        }
-
-        return findNearestFlexible(termLower, preferredStart);
-      };
-
-      const aliasOccurrenceIndex = getOccurrenceIndex(searchTermLower);
-      const canonicalOccurrenceIndex = getOccurrenceIndex(canonicalLower);
-
-      const isCanonicalMention = mention.isAlias !== true;
-      const mentionPosition = Number.isFinite(mention.position)
+      const pos = Number.isFinite(mention.position)
         ? (mention.position as number)
         : 0;
-
-      const tryLocate = (termLower: string, occurrenceIndex: number) =>
-        locateTerm(termLower, mentionPosition, occurrenceIndex);
-
-      const canonicalFirst = [
-        { term: canonicalLower, occurrence: canonicalOccurrenceIndex },
-        { term: searchTermLower, occurrence: aliasOccurrenceIndex },
-      ];
-
-      const aliasFirst = [
-        { term: searchTermLower, occurrence: aliasOccurrenceIndex },
-        { term: canonicalLower, occurrence: canonicalOccurrenceIndex },
-      ];
-
-      const attempts = isCanonicalMention ? canonicalFirst : aliasFirst;
-
-      let matchResult: { position: number; length: number } | null = null;
-      for (const attempt of attempts) {
-        if (!attempt.term) {
-          continue;
-        }
-        matchResult = tryLocate(attempt.term, attempt.occurrence);
-        if (matchResult) {
-          break;
-        }
-      }
-
-      if (!matchResult) {
-        console.warn(
-          "⚠️ Unable to resolve concept position, skipping highlight",
-          concept.name,
-          "mentionIndex:",
-          mentionIndex
-        );
-        return;
-      }
-
-      const { position: resolvedPosition, length: matchLength } = matchResult;
-      const highlightText = displayText.substring(
-        resolvedPosition,
-        resolvedPosition + matchLength
-      );
-      const finalHighlightText = highlightText || searchTerm;
-      const normalizedFinal =
-        normalizeMatchedText(finalHighlightText).toLowerCase();
-      const finalOccurrenceIndex = getOccurrenceIndex(
-        normalizedFinal || canonicalLower
-      );
-
-      console.log("🎯 Setting highlightPosition to:", resolvedPosition);
-      setHighlightPosition(resolvedPosition);
-      setSearchWord(finalHighlightText);
-      setSearchOccurrence(finalOccurrenceIndex);
-
-      console.log(
-        "📍 Jumping to position:",
-        resolvedPosition,
-        "for concept:",
-        concept.name,
-        "mention:",
-        mentionIndex + 1,
-        "/",
-        concept.mentions.length
-      );
-
-      console.log(
-        "🔍 First 5 positions for",
-        concept.name,
-        ":",
-        concept.mentions
-          .slice(0, 5)
-          .map((m: any, i: number) => `[${i}]: pos=${m.position}`)
-          .join(", ")
-      );
+      setHighlightPosition(pos);
+      setSearchWord(concept.name);
+      setSearchOccurrence(-1);
+    } else {
+      // Fallback: just search for the word
+      setHighlightPosition(null);
+      setSearchWord(concept.name);
+      setSearchOccurrence(0);
     }
   };
 
@@ -1983,14 +1784,10 @@ export const ChapterCheckerV2: React.FC = () => {
           minWidth: 0,
         }}
       >
-        {/* Left: Document Column (60% in standard mode, 75% in writer mode) */}
+        {/* Left: Document Column (60% in all modes) */}
         <div
           style={{
-            flex: isStackedLayout
-              ? "1 1 100%"
-              : viewMode === "writer"
-              ? "3 1 0" // 75% in writer mode
-              : "3 1 0", // 60% in standard mode
+            flex: isStackedLayout ? "1 1 100%" : "6 1 0", // 60% in all modes
             display: "flex",
             flexDirection: "column",
             gap: "16px",
@@ -2357,6 +2154,21 @@ export const ChapterCheckerV2: React.FC = () => {
                     highlightPosition={highlightPosition}
                     searchWord={searchWord}
                     searchOccurrence={searchOccurrence}
+                    concepts={
+                      analysis?.conceptGraph?.concepts?.map(
+                        (c: any) => c.name
+                      ) || []
+                    }
+                    onConceptClick={(conceptName) => {
+                      // Find the concept object
+                      const concept = analysis?.conceptGraph?.concepts?.find(
+                        (c: any) => c.name === conceptName
+                      );
+                      if (concept) {
+                        // Trigger the same logic as clicking in the sidebar
+                        handleConceptClick(concept, 0);
+                      }
+                    }}
                     onSave={
                       analysis && viewMode === "writer"
                         ? () => {
@@ -2418,15 +2230,11 @@ export const ChapterCheckerV2: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Analysis Panel (40% in standard mode, 25% in writer mode) */}
+        {/* Right: Analysis Panel (40% in all modes) */}
         <div
           className="app-panel"
           style={{
-            flex: isStackedLayout
-              ? "1 1 100%"
-              : viewMode === "writer"
-              ? "1 1 0" // 25% in writer mode
-              : "2 1 0", // 40% in standard mode
+            flex: isStackedLayout ? "1 1 100%" : "4 1 0", // 40% in all modes
             maxWidth: "100%",
             minWidth: analysisMinWidth,
             display: "flex",
@@ -4319,11 +4127,6 @@ export const ChapterCheckerV2: React.FC = () => {
           }}
         />
       )}
-
-      {/* Temporary Server Analysis Test Component */}
-      <div className="max-w-4xl mx-auto mt-8 mb-8">
-        <ServerAnalysisTest />
-      </div>
     </div>
   );
 };

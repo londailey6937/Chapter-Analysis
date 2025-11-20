@@ -2235,12 +2235,6 @@ export const ChapterAnalysisDashboard: React.FC<{
 
       <div className="viz-grid">
         <PrincipleScoresRadar analysis={analysis} />
-        {hasDomain && (
-          <ConceptMentionFrequency
-            analysis={analysis}
-            pageOffsets={pageOffsets}
-          />
-        )}
         <InterleavingPattern analysis={analysis} pageOffsets={pageOffsets} />
       </div>
 
@@ -2348,16 +2342,6 @@ export const ChapterAnalysisDashboard: React.FC<{
             patternAnalysis={(analysis as any).patternAnalysis}
           />
         )}
-
-      {/* Concept List with click-to-highlight */}
-      {concepts && concepts.length > 0 && (
-        <ConceptList
-          concepts={concepts}
-          onConceptClick={onConceptClick}
-          highlightedConceptId={highlightedConceptId}
-          currentMentionIndex={currentMentionIndex}
-        />
-      )}
 
       <style>{`
           .dashboard {

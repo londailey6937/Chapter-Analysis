@@ -51,6 +51,160 @@ export class DualCodingAnalyzer {
   }
 
   /**
+   * Analyze a single paragraph for visual suggestions
+   */
+  static analyzeParagraph(
+    text: string,
+    position: number,
+    prevPara: string = "",
+    nextPara: string = ""
+  ): VisualSuggestion[] {
+    const suggestions: VisualSuggestion[] = [];
+    const trimmedPara = text.trim();
+
+    // Pattern 1: Descriptive spatial/structural language
+    const spatialPatterns = [
+      /\b(above|below|beneath|adjacent|parallel|perpendicular|horizontal|vertical|diagonal)\b/gi,
+      /\b(left|right|top|bottom|center|middle|side|corner)\b/gi,
+      /\b(structure|shape|form|arrangement|configuration|layout|position)\b/gi,
+      /\b(connected|attached|linked|joined|bonded|between)\b/gi,
+    ];
+
+    const spatialMatches = spatialPatterns.reduce(
+      (sum, pattern) => sum + (trimmedPara.match(pattern) || []).length,
+      0
+    );
+
+    if (spatialMatches >= 3 && trimmedPara.length > 100) {
+      suggestions.push({
+        position: position,
+        paragraph: trimmedPara.substring(0, 150) + "...",
+        reason: "Contains spatial/structural descriptions",
+        visualType: "diagram",
+        priority: spatialMatches >= 5 ? "high" : "medium",
+        context: this.getContext(prevPara, trimmedPara, nextPara),
+      });
+    }
+
+    // Pattern 2: Process or sequence descriptions
+    const processPatterns = [
+      /\b(first|second|third|next|then|finally|subsequently|afterward)\b/gi,
+      /\b(step|stage|phase|process|procedure|sequence|cycle)\b/gi,
+      /\b(begins|starts|initiates|leads to|results in|produces|forms)\b/gi,
+    ];
+
+    const processMatches = processPatterns.reduce(
+      (sum, pattern) => sum + (trimmedPara.match(pattern) || []).length,
+      0
+    );
+
+    if (processMatches >= 3 && trimmedPara.length > 100) {
+      suggestions.push({
+        position: position,
+        paragraph: trimmedPara.substring(0, 150) + "...",
+        reason: "Describes a process or sequence",
+        visualType: "flowchart",
+        priority: processMatches >= 5 ? "high" : "medium",
+        context: this.getContext(prevPara, trimmedPara, nextPara),
+      });
+    }
+
+    // Pattern 3: Quantitative data or comparisons
+    const quantitativePatterns = [
+      /\b\d+(\.\d+)?\s*(percent|%|times|fold|ratio|proportion)\b/gi,
+      /\b(increase|decrease|higher|lower|greater|less|more|fewer)\b/gi,
+      /\b(compare|comparison|versus|vs\.|contrast|difference|similar)\b/gi,
+      /\b(data|values|measurements|results|statistics)\b/gi,
+    ];
+
+    const quantMatches = quantitativePatterns.reduce(
+      (sum, pattern) => sum + (trimmedPara.match(pattern) || []).length,
+      0
+    );
+
+    if (quantMatches >= 3 && trimmedPara.length > 80) {
+      suggestions.push({
+        position: position,
+        paragraph: trimmedPara.substring(0, 150) + "...",
+        reason: "Contains quantitative data or comparisons",
+        visualType: "graph",
+        priority: quantMatches >= 5 ? "high" : "medium",
+        context: this.getContext(prevPara, trimmedPara, nextPara),
+      });
+    }
+
+    // Pattern 4: Abstract concept definitions
+    const conceptPatterns = [
+      /\b(concept|theory|principle|law|hypothesis|model)\b/gi,
+      /\b(relationship|interaction|correlation|connection)\b/gi,
+      /\b(defined as|refers to|means|represents|symbolizes)\b/gi,
+      /\b(consists of|composed of|made up of|includes)\b/gi,
+    ];
+
+    const conceptMatches = conceptPatterns.reduce(
+      (sum, pattern) => sum + (trimmedPara.match(pattern) || []).length,
+      0
+    );
+
+    if (
+      conceptMatches >= 3 &&
+      trimmedPara.length > 150
+      // Note: hasNearbyVisual check removed for single paragraph analysis as it requires full text context
+    ) {
+      suggestions.push({
+        position: position,
+        paragraph: trimmedPara.substring(0, 150) + "...",
+        reason: "Explains abstract concepts",
+        visualType: "concept-map",
+        priority: "medium",
+        context: this.getContext(prevPara, trimmedPara, nextPara),
+      });
+    }
+
+    // Pattern 5: Complex terminology dense paragraphs
+    const technicalDensity = this.calculateTechnicalDensity(trimmedPara);
+    if (
+      technicalDensity > 0.15 &&
+      trimmedPara.length > 200
+      // Note: hasNearbyVisual check removed for single paragraph analysis
+    ) {
+      suggestions.push({
+        position: position,
+        paragraph: trimmedPara.substring(0, 150) + "...",
+        reason: "High density of technical terms",
+        visualType: "illustration",
+        priority: technicalDensity > 0.25 ? "high" : "medium",
+        context: this.getContext(prevPara, trimmedPara, nextPara),
+      });
+    }
+
+    // Pattern 6: System or component descriptions
+    const systemPatterns = [
+      /\b(system|component|part|element|unit|module)\b/gi,
+      /\b(contains|comprises|consists of|includes)\b/gi,
+      /\b(function|role|purpose|operates|works)\b/gi,
+    ];
+
+    const systemMatches = systemPatterns.reduce(
+      (sum, pattern) => sum + (trimmedPara.match(pattern) || []).length,
+      0
+    );
+
+    if (systemMatches >= 4 && trimmedPara.length > 120) {
+      suggestions.push({
+        position: position,
+        paragraph: trimmedPara.substring(0, 150) + "...",
+        reason: "Describes system or components",
+        visualType: "diagram",
+        priority: "medium",
+        context: this.getContext(prevPara, trimmedPara, nextPara),
+      });
+    }
+
+    return suggestions;
+  }
+
+  /**
    * Analyze text and identify where visual aids should be inserted
    * Works with both plain text and HTML - positions returned are for the original input
    */
@@ -143,155 +297,21 @@ export class DualCodingAnalyzer {
       const trimmedPara = para.text;
       const currentPosition = para.position;
 
-      const lowerPara = trimmedPara.toLowerCase();
       const nextPara = paragraphs[index + 1]?.text || "";
       const prevPara = paragraphs[index - 1]?.text || "";
 
-      // Pattern 1: Descriptive spatial/structural language
-      const spatialPatterns = [
-        /\b(above|below|beneath|adjacent|parallel|perpendicular|horizontal|vertical|diagonal)\b/gi,
-        /\b(left|right|top|bottom|center|middle|side|corner)\b/gi,
-        /\b(structure|shape|form|arrangement|configuration|layout|position)\b/gi,
-        /\b(connected|attached|linked|joined|bonded|between)\b/gi,
-      ];
+      // Check for nearby visuals before analyzing
+      if (this.hasNearbyVisual(text, currentPosition)) {
+        return;
+      }
 
-      const spatialMatches = spatialPatterns.reduce(
-        (sum, pattern) => sum + (trimmedPara.match(pattern) || []).length,
-        0
+      const paraSuggestions = this.analyzeParagraph(
+        trimmedPara,
+        currentPosition,
+        prevPara,
+        nextPara
       );
-
-      if (spatialMatches >= 3 && trimmedPara.length > 100) {
-        const suggestion: VisualSuggestion = {
-          position: currentPosition,
-          paragraph: trimmedPara.substring(0, 150) + "...",
-          reason: "Contains spatial/structural descriptions",
-          visualType: "diagram",
-          priority: spatialMatches >= 5 ? "high" : "medium",
-          context: this.getContext(prevPara, trimmedPara, nextPara),
-        };
-        console.log(
-          "[DualCodingAnalyzer] Adding spatial suggestion at position:",
-          currentPosition,
-          "paragraph preview:",
-          trimmedPara.substring(0, 50)
-        );
-        suggestions.push(suggestion);
-      }
-
-      // Pattern 2: Process or sequence descriptions
-      const processPatterns = [
-        /\b(first|second|third|next|then|finally|subsequently|afterward)\b/gi,
-        /\b(step|stage|phase|process|procedure|sequence|cycle)\b/gi,
-        /\b(begins|starts|initiates|leads to|results in|produces|forms)\b/gi,
-      ];
-
-      const processMatches = processPatterns.reduce(
-        (sum, pattern) => sum + (trimmedPara.match(pattern) || []).length,
-        0
-      );
-
-      if (processMatches >= 3 && trimmedPara.length > 100) {
-        suggestions.push({
-          position: currentPosition,
-          paragraph: trimmedPara.substring(0, 150) + "...",
-          reason: "Describes a process or sequence",
-          visualType: "flowchart",
-          priority: processMatches >= 5 ? "high" : "medium",
-          context: this.getContext(prevPara, trimmedPara, nextPara),
-        });
-      }
-
-      // Pattern 3: Quantitative data or comparisons
-      const quantitativePatterns = [
-        /\b\d+(\.\d+)?\s*(percent|%|times|fold|ratio|proportion)\b/gi,
-        /\b(increase|decrease|higher|lower|greater|less|more|fewer)\b/gi,
-        /\b(compare|comparison|versus|vs\.|contrast|difference|similar)\b/gi,
-        /\b(data|values|measurements|results|statistics)\b/gi,
-      ];
-
-      const quantMatches = quantitativePatterns.reduce(
-        (sum, pattern) => sum + (trimmedPara.match(pattern) || []).length,
-        0
-      );
-
-      if (quantMatches >= 3 && trimmedPara.length > 80) {
-        suggestions.push({
-          position: currentPosition,
-          paragraph: trimmedPara.substring(0, 150) + "...",
-          reason: "Contains quantitative data or comparisons",
-          visualType: "graph",
-          priority: quantMatches >= 5 ? "high" : "medium",
-          context: this.getContext(prevPara, trimmedPara, nextPara),
-        });
-      }
-
-      // Pattern 4: Abstract concept definitions
-      const conceptPatterns = [
-        /\b(concept|theory|principle|law|hypothesis|model)\b/gi,
-        /\b(relationship|interaction|correlation|connection)\b/gi,
-        /\b(defined as|refers to|means|represents|symbolizes)\b/gi,
-        /\b(consists of|composed of|made up of|includes)\b/gi,
-      ];
-
-      const conceptMatches = conceptPatterns.reduce(
-        (sum, pattern) => sum + (trimmedPara.match(pattern) || []).length,
-        0
-      );
-
-      if (
-        conceptMatches >= 3 &&
-        trimmedPara.length > 150 &&
-        !this.hasNearbyVisual(text, currentPosition)
-      ) {
-        suggestions.push({
-          position: currentPosition,
-          paragraph: trimmedPara.substring(0, 150) + "...",
-          reason: "Explains abstract concepts",
-          visualType: "concept-map",
-          priority: "medium",
-          context: this.getContext(prevPara, trimmedPara, nextPara),
-        });
-      }
-
-      // Pattern 5: Complex terminology dense paragraphs
-      const technicalDensity = this.calculateTechnicalDensity(trimmedPara);
-      if (
-        technicalDensity > 0.15 &&
-        trimmedPara.length > 200 &&
-        !this.hasNearbyVisual(text, currentPosition)
-      ) {
-        suggestions.push({
-          position: currentPosition,
-          paragraph: trimmedPara.substring(0, 150) + "...",
-          reason: "High density of technical terms",
-          visualType: "illustration",
-          priority: technicalDensity > 0.25 ? "high" : "medium",
-          context: this.getContext(prevPara, trimmedPara, nextPara),
-        });
-      }
-
-      // Pattern 6: System or component descriptions
-      const systemPatterns = [
-        /\b(system|component|part|element|unit|module)\b/gi,
-        /\b(contains|comprises|consists of|includes)\b/gi,
-        /\b(function|role|purpose|operates|works)\b/gi,
-      ];
-
-      const systemMatches = systemPatterns.reduce(
-        (sum, pattern) => sum + (trimmedPara.match(pattern) || []).length,
-        0
-      );
-
-      if (systemMatches >= 4 && trimmedPara.length > 120) {
-        suggestions.push({
-          position: currentPosition,
-          paragraph: trimmedPara.substring(0, 150) + "...",
-          reason: "Describes system or components",
-          visualType: "diagram",
-          priority: "medium",
-          context: this.getContext(prevPara, trimmedPara, nextPara),
-        });
-      }
+      suggestions.push(...paraSuggestions);
     });
 
     // Remove duplicates (same position) and sort by priority
