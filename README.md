@@ -4,7 +4,7 @@ A sophisticated educational content analyzer that evaluates textbook chapters an
 
 ## 🎯 Overview
 
-The Chapter Checker evaluates educational content using cognitive science principles to provide actionable insights for improvement. It combines NLP for concept extraction, principle-based evaluation, and interactive visualizations.
+Tome IQ evaluates educational content using cognitive science principles to provide actionable insights for improvement. It combines NLP for concept extraction, principle-based evaluation, interactive visualizations, and a professional rich text editor with live analysis indicators.
 
 ## 🧠 The 10 Learning Principles Evaluated
 
@@ -26,39 +26,39 @@ The Chapter Checker evaluates educational content using cognitive science princi
 ├── ConceptExtractor.ts                   # NLP-based concept extraction engine
 ├── LearningPrincipleEvaluators.ts        # Evaluators for each principle
 ├── AnalysisEngine.ts                     # Orchestration and report generation
+├── CustomEditor.tsx                      # Professional rich text editor with live analysis
 ├── VisualizationComponents.tsx           # React components with Recharts/D3
-├── ChapterChecker.tsx                    # Main application component
+├── ChapterCheckerV2.tsx                  # Main application component
 └── README.md                             # This file
 ```
 
-## 🚀 Installation & Setup
+## 🚀 Quick Start
 
 ### Prerequisites
 
 ```bash
-Node.js >= 14.0
+Node.js >= 18.0
 React >= 18.0
-Recharts >= 2.0
+Vite >= 7.0
 ```
 
 ### Installation
 
 ```bash
-npm install recharts
+npm install
+npm run dev
 ```
 
-### Usage in Your React App
+Open [http://localhost:5173](http://localhost:5173) to view the application.
 
-```tsx
-import React from "react";
-import { ChapterChecker } from "./ChapterChecker";
+### Writer Mode Features
 
-function App() {
-  return <ChapterChecker />;
-}
-
-export default App;
-```
+- **Rich Text Editor**: Professional editor with formatting, images, tables, and links
+- **Live Analysis**: Real-time spacing and dual-coding indicators in your document
+- **Keyboard Shortcuts**: Cmd/Ctrl+B (bold), I (italic), U (underline), K (link), F (find), Z (undo)
+- **Image Support**: Upload or paste images directly into your document
+- **Statistics Panel**: Word count, reading time, and Flesch-Kincaid reading level
+- **Focus Mode**: Hide analysis indicators for distraction-free writing
 
 ## 🏗️ Architecture
 

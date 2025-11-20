@@ -20,10 +20,11 @@ npm run dev
 
 ### 3️⃣ Open Your Browser
 
-- Automatically opens at `http://localhost:5178` (or next available port)
-- Paste a chapter or upload a .docx or .obt file
-- Select domain (auto-detected or manual)
+- Opens at `http://localhost:5173` (or next available port)
+- Upload a .docx file or type/paste content directly
+- Select domain (auto-detected or manual override)
 - Click "Analyze Chapter" to see results
+- Use Writer Mode for enhanced editing with AI templates
 
 ---
 
@@ -311,6 +312,22 @@ function TextAreaInput({
 ```css
 /* In src/styles/globals.css */
 .btn-primary       /* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
 /* Primary button */
 /* Primary button */
 /* Primary button */

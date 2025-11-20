@@ -59,9 +59,7 @@ export const WriterMode: React.FC<WriterModeProps> = ({
   const principleScores = analysisResult?.principles || [];
 
   // Debug logging
-  console.log("[WriterMode] analysisResult exists:", !!analysisResult);
-  console.log("[WriterMode] concepts count:", concepts.length);
-  console.log("[WriterMode] principle scores count:", principleScores.length);
+  // Analysis data loaded
 
   // Helper to highlight text issues based on principles
   const getTextIssues = () => {
@@ -411,9 +409,6 @@ export const WriterMode: React.FC<WriterModeProps> = ({
                   <div className="space-y-1.5 md:space-y-2">
                     {principleScores.map((ps, idx) => {
                       const roundedScore = Math.round(Number(ps.score));
-                      console.log(
-                        `[WriterMode] ${ps.principle}: ${ps.score} -> ${roundedScore}`
-                      );
                       return (
                         <div
                           key={idx}

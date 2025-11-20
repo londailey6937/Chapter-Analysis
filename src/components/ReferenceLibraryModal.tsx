@@ -669,8 +669,8 @@ export function ReferenceLibraryModal({
                   </p>
                   <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
                     <li>
-                      ✅ <strong>Professional Syncfusion Editor</strong> with
-                      inline analysis
+                      ✅ <strong>Professional Rich Text Editor</strong> with
+                      formatting, images, and live analysis
                     </li>
                     <li>
                       ✅ <strong>Spacing & Pacing Analysis</strong>{" "}

@@ -111,9 +111,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
                   image.contentType?.includes("emf");
 
                 if (!isWmfType) {
-                  console.log(
-                    `📸 Extracted image ${imageCount}: Declared=${image.contentType}, Detected=${detectedType}, Size=${buffer.byteLength}`
-                  );
+                  // Image extracted silently
                 }
 
                 // 1. If it's a known web-safe format, render it directly.
@@ -246,17 +244,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
           imageCount,
         };
 
-        console.log(
-          `✅ DOCX extracted: ${plainText.length} characters, ${imageCount} image(s)`
-        );
-        if (imageCount > 0) {
-          console.log("📸 HTML content includes images (base64 encoded)");
-          console.log(
-            "ℹ️  Images preserved for export; editor shows text with structure"
-          );
-          // Log first 500 chars of HTML to verify images are embedded
-          console.log("HTML preview:", rawHtml.substring(0, 500));
-        }
+        // Document loaded successfully
         onDocumentLoad(payload);
       } else if (fileType === "obt") {
         const textContent = await file.text();
@@ -309,9 +297,6 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
           imageCount: 0,
         };
 
-        console.log(
-          `✅ Extracted ${textContent.length} characters from ${fileName}`
-        );
         onDocumentLoad(payload);
       } else {
         alert("Please upload a .docx or .obt file");

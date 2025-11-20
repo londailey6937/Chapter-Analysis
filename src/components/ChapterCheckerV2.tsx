@@ -504,10 +504,6 @@ export const ChapterCheckerV2: React.FC = () => {
 
   // Detect document domain based on keywords from concept libraries
   const detectDomain = (text: string): Domain | null => {
-    console.log("🔍 Starting domain detection...");
-    console.log(`  Text length: ${text.length} characters`);
-    console.log(`  First 200 chars: ${text.substring(0, 200)}...`);
-
     const lowerText = text.toLowerCase();
     const scores: Record<string, number> = {};
     const uniqueConceptMatches: Record<string, Set<string>> = {};
@@ -515,11 +511,6 @@ export const ChapterCheckerV2: React.FC = () => {
     // Get available domains (excluding custom and cross-domain)
     const domains = getAvailableDomains().filter(
       (d) => d.id !== "custom" && d.id !== "cross-domain"
-    );
-
-    console.log(
-      `  Checking ${domains.length} domains:`,
-      domains.map((d) => d.id).join(", ")
     );
 
     // Score each domain based on concept matches from their libraries
@@ -576,34 +567,11 @@ export const ChapterCheckerV2: React.FC = () => {
       }
 
       scores[domain.id] = score;
-
-      // Log the matches for this domain
-      if (score > 0) {
-        console.log(
-          `  ${domain.id}: score=${score}, matched concepts:`,
-          Array.from(uniqueConceptMatches[domain.id]).slice(0, 10).join(", ") +
-            (uniqueConceptMatches[domain.id].size > 10 ? "..." : "")
-        );
-      }
     }
 
     // Find domain with highest score
     const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
     const topDomain = sortedScores[0];
-
-    // Log detection details for debugging
-    console.log("🔍 Domain Detection Analysis:");
-    console.log(
-      "  Top 3 scores:",
-      sortedScores
-        .slice(0, 3)
-        .map(
-          ([domain, score]) =>
-            `${domain}: ${score} (${
-              uniqueConceptMatches[domain]?.size || 0
-            } unique concepts)`
-        )
-    );
 
     // Strict requirements to prevent false positives while catching real content:
     // Programming languages need stricter thresholds since common English words can match
@@ -632,28 +600,9 @@ export const ChapterCheckerV2: React.FC = () => {
     const hasEnoughConcepts =
       uniqueConceptMatches[topDomain?.[0]]?.size >= minConcepts;
 
-    console.log(
-      `  Meets threshold (≥${minScore}):`,
-      meetsThreshold,
-      `(score: ${topDomain?.[1] || 0})`
-    );
-    console.log(
-      `  Has enough concepts (≥${minConcepts}):`,
-      hasEnoughConcepts,
-      `(count: ${uniqueConceptMatches[topDomain?.[0]]?.size || 0})`
-    );
-    console.log(
-      `  Has significant lead (${minLead}x):`,
-      hasSignificantLead,
-      `(delta: ${leadDifference}, threshold: ${absoluteLeadThreshold})`
-    );
-
     if (topDomain && meetsThreshold && hasEnoughConcepts && passesLeadCheck) {
-      console.log(`  ✅ Detected: ${topDomain[0]}`);
       return topDomain[0] as Domain;
     }
-
-    console.log("  ❌ No domain detected (thresholds not met)");
     return null;
   };
 

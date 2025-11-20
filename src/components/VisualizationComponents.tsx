@@ -189,14 +189,6 @@ export const ChapterOverviewTimeline: React.FC<{
   const baseWidth = 26;
   const perWidth = Math.max(8, Math.min(60, Math.round(baseWidth * zoom)));
 
-  console.log("📊 Timeline rendering:", {
-    sectionsCount: sections.length,
-    isScrollable,
-    perWidth,
-    zoom,
-    firstSection: sections[0],
-  });
-
   return (
     <div className="viz-container chapter-timeline">
       <h3>Chapter Structure Overview</h3>

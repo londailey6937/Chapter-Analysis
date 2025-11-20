@@ -1,4 +1,4 @@
-# Chapter Checker Reference Library
+# Tome IQ Reference Library
 
 **Complete feature reference and technical documentation**
 

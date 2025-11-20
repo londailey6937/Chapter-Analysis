@@ -94,7 +94,7 @@ export const ConceptList: React.FC<ConceptListProps> = ({
       `Report "${concept.name}" as a false positive?\n\nThis will help us improve our matching algorithm.`
     );
     if (confirmed) {
-      console.log(`Reported false positive: ${concept.name} (${concept.id})`);
+      // False positive reported
       alert("Thank you! This concept has been flagged for review.");
     }
   };

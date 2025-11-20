@@ -8,10 +8,12 @@
 
 ✅ **Professional Document Editor**
 
-- Full-featured Syncfusion editor with rich text formatting
-- Inline color-coded analysis pills & banners
+- Custom-built editor with rich text formatting (headings, lists, links, tables)
+- Full image support (upload & paste)
+- Working keyboard shortcuts (Cmd+B/I/U/K/F/Z)
+- Inline color-coded analysis indicators
 - Real-time spacing and dual-coding insights
-- Import DOCX files with images preserved
+- Import DOCX files with formatting preserved
 
 ✅ **Core Analysis Features**
 
