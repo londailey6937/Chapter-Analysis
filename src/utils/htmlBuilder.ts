@@ -2,6 +2,7 @@ import { ChapterAnalysis, Recommendation } from "@/types";
 import {
   analyzeParagraphSpacing,
   extractParagraphs,
+  ParagraphSummary,
 } from "@/utils/spacingInsights";
 import {
   DualCodingAnalyzer,
@@ -182,6 +183,7 @@ function buildPrincipleHtml(principle: any, title: string): string {
 
 /**
  * Build document content with spacing and dual-coding highlights
+ * Preserves images from original HTML while adding analysis indicators
  */
 function buildDocumentWithHighlights(
   text: string,
@@ -215,39 +217,137 @@ function buildDocumentWithHighlights(
 
   let contentHtml = '<div class="chapter-content">';
 
-  paragraphs.forEach((paragraph, index) => {
-    // Spacing indicator
-    if (index > 0) {
-      const spacingInfo = analyzeParagraphSpacing(paragraph.wordCount);
-      const toneClass =
-        spacingInfo.tone === "compact"
-          ? "compact"
-          : spacingInfo.tone === "extended"
-          ? "extended"
-          : "";
+  // If we have HTML with images, parse and enhance it
+  if (html?.trim()?.length && html.includes("<img")) {
+    contentHtml += buildHighlightsWithImages(html, paragraphs, suggestionMap);
+  } else {
+    // Plain text or HTML without images - use existing logic
+    paragraphs.forEach((paragraph, index) => {
+      // Spacing indicator
+      if (index > 0) {
+        const spacingInfo = analyzeParagraphSpacing(paragraph.wordCount);
+        const toneClass =
+          spacingInfo.tone === "compact"
+            ? "compact"
+            : spacingInfo.tone === "extended"
+            ? "extended"
+            : "";
 
-      contentHtml += `<div class="spacing-indicator ${toneClass}">`;
-      contentHtml += `<div class="spacing-label">Spacing Target · Paragraph ${
-        paragraph.id + 1
-      } · ${paragraph.wordCount} words · ${spacingInfo.shortLabel}</div>`;
-      contentHtml += `<div class="spacing-message">${sanitizeHtml(
-        spacingInfo.message
-      )}</div>`;
-      contentHtml += "</div>";
-    }
+        contentHtml += `<div class="spacing-indicator ${toneClass}">`;
+        contentHtml += `<div class="spacing-label">Spacing Target · Paragraph ${
+          paragraph.id + 1
+        } · ${paragraph.wordCount} words · ${spacingInfo.shortLabel}</div>`;
+        contentHtml += `<div class="spacing-message">${sanitizeHtml(
+          spacingInfo.message
+        )}</div>`;
+        contentHtml += "</div>";
+      }
 
-    // Paragraph text
-    contentHtml += `<p>${sanitizeHtml(paragraph.text)}</p>`;
+      // Paragraph text
+      contentHtml += `<p>${sanitizeHtml(paragraph.text)}</p>`;
 
-    // Dual coding callouts
-    const suggestions = suggestionMap.get(paragraph.id) || [];
-    suggestions.forEach((suggestion) => {
-      contentHtml += buildDualCodingCalloutHtml(suggestion);
+      // Dual coding callouts
+      const suggestions = suggestionMap.get(paragraph.id) || [];
+      suggestions.forEach((suggestion) => {
+        contentHtml += buildDualCodingCalloutHtml(suggestion);
+      });
     });
-  });
+  }
 
   contentHtml += "</div>";
   return contentHtml;
+}
+
+/**
+ * Parse HTML and inject analysis indicators while preserving images
+ */
+function buildHighlightsWithImages(
+  html: string,
+  paragraphs: ParagraphSummary[],
+  suggestionMap: Map<number, VisualSuggestion[]>
+): string {
+  if (typeof window === "undefined" || typeof DOMParser === "undefined") {
+    // Server-side fallback
+    return html;
+  }
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+  let resultHtml = "";
+  let paragraphIndex = 0;
+
+  // Process each child node in the body
+  Array.from(doc.body.childNodes).forEach((node) => {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const element = node as HTMLElement;
+      const tag = element.tagName.toLowerCase();
+
+      // Preserve images (check both standalone and nested)
+      if (tag === "img") {
+        resultHtml += element.outerHTML;
+        return;
+      }
+
+      // Check if element contains images - preserve full element if so
+      const hasNestedImages = element.querySelector("img") !== null;
+      if (hasNestedImages) {
+        resultHtml += element.outerHTML;
+        return;
+      }
+
+      // For paragraph-like elements without images, add spacing indicators
+      if (tag === "p" || tag === "div") {
+        const textContent = element.textContent?.trim() || "";
+        if (textContent.length > 0 && paragraphIndex > 0) {
+          const paragraph = paragraphs[paragraphIndex];
+          if (paragraph) {
+            const spacingInfo = analyzeParagraphSpacing(paragraph.wordCount);
+            const toneClass =
+              spacingInfo.tone === "compact"
+                ? "compact"
+                : spacingInfo.tone === "extended"
+                ? "extended"
+                : "";
+
+            resultHtml += `<div class="spacing-indicator ${toneClass}">`;
+            resultHtml += `<div class="spacing-label">Spacing Target · Paragraph ${
+              paragraph.id + 1
+            } · ${paragraph.wordCount} words · ${spacingInfo.shortLabel}</div>`;
+            resultHtml += `<div class="spacing-message">${sanitizeHtml(
+              spacingInfo.message
+            )}</div>`;
+            resultHtml += "</div>";
+          }
+        }
+
+        // Add the paragraph
+        resultHtml += element.outerHTML;
+
+        // Add dual coding callouts
+        if (textContent.length > 0) {
+          const paragraph = paragraphs[paragraphIndex];
+          if (paragraph) {
+            const suggestions = suggestionMap.get(paragraph.id) || [];
+            suggestions.forEach((suggestion) => {
+              resultHtml += buildDualCodingCalloutHtml(suggestion);
+            });
+          }
+          paragraphIndex++;
+        }
+        return;
+      }
+
+      // Preserve other elements as-is
+      resultHtml += element.outerHTML;
+    } else if (node.nodeType === Node.TEXT_NODE) {
+      const text = node.textContent?.trim();
+      if (text) {
+        resultHtml += `<p>${sanitizeHtml(text)}</p>`;
+      }
+    }
+  });
+
+  return resultHtml;
 }
 
 /**

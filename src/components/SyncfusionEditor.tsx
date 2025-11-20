@@ -111,6 +111,25 @@ export const SyncfusionEditor: React.FC<SyncfusionEditorProps> = ({
         const container = document.createElement("div");
         container.innerHTML = html;
 
+        // Replace images with placeholder text
+        let imageCount = 0;
+        container.querySelectorAll("img").forEach((img) => {
+          imageCount++;
+          const alt = img.getAttribute("alt") || "";
+          const placeholder = document.createElement("p");
+          placeholder.style.fontWeight = "bold";
+          placeholder.style.color = "#0066cc";
+          placeholder.className = "image-placeholder";
+          placeholder.textContent = `[📸 Image ${imageCount}${
+            alt ? ` - ${alt}` : ""
+          }]`;
+          img.parentNode?.replaceChild(placeholder, img);
+        });
+
+        if (imageCount > 0) {
+          console.log(`📸 Replaced ${imageCount} images with placeholders`);
+        }
+
         // Prefix list markers so innerText keeps bullet/number markers
         container.querySelectorAll("ol").forEach((ol) => {
           const start = parseInt(ol.getAttribute("start") || "1", 10) || 1;
@@ -134,6 +153,13 @@ export const SyncfusionEditor: React.FC<SyncfusionEditorProps> = ({
         });
 
         const text = container.innerText;
+        const modifiedHtml = container.innerHTML;
+
+        // Store modified HTML for editor loading
+        if (imageCount > 0) {
+          (window as any).__modifiedHtmlWithPlaceholders = modifiedHtml;
+        }
+
         return normalizePlainText(text);
       } catch (error) {
         console.warn(
@@ -240,11 +266,15 @@ export const SyncfusionEditor: React.FC<SyncfusionEditorProps> = ({
       try {
         console.log("📄 Loading HTML content into Syncfusion editor...");
 
+        // Use modified HTML with image placeholders if available
+        const htmlToUse =
+          (window as any).__modifiedHtmlWithPlaceholders || content;
+
         // Parse HTML to extract structured content
         const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = content;
+        tempDiv.innerHTML = htmlToUse;
 
-        // Extract paragraphs with their text
+        // Extract paragraphs with their text (including image placeholders)
         const paragraphs: string[] = [];
         tempDiv
           .querySelectorAll("p, div, h1, h2, h3, h4, h5, h6, li")
