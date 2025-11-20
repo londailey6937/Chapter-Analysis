@@ -48,6 +48,12 @@ export const SyncfusionEditor: React.FC<SyncfusionEditorProps> = ({
   isFreeMode = false,
 }) => {
   const containerRef = useRef<DocumentEditorContainerComponent>(null);
+  // Generate a unique ID for this editor instance to prevent collisions
+  const containerId = useMemo(
+    () => `doc-editor-${Math.random().toString(36).substr(2, 9)}`,
+    []
+  );
+  const toolbarObserverRef = useRef<MutationObserver | null>(null);
   const [analysisResults, setAnalysisResults] = useState<{
     spacing: any[];
     visuals: any[];
@@ -203,6 +209,68 @@ export const SyncfusionEditor: React.FC<SyncfusionEditorProps> = ({
     }
     return paragraphBlocks.join("\n\n");
   }, [normalizedContent, paragraphBlocks]);
+
+  const pruneRogueToolbars = useCallback(() => {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    const containerElement = document.getElementById(containerId);
+    if (!containerElement) {
+      return;
+    }
+
+    const hideElement = (element: Element | null) => {
+      if (!element) return;
+      const node = element as HTMLElement;
+      node.style.display = "none";
+      node.style.visibility = "hidden";
+      node.style.height = "0px";
+      node.style.minHeight = "0px";
+      node.style.margin = "0";
+      node.style.padding = "0";
+      node.style.overflow = "hidden";
+      node.style.pointerEvents = "none";
+      node.setAttribute("aria-hidden", "true");
+      node.classList.add("rogue-toolbar-hidden");
+    };
+
+    const toolbarWrappers = Array.from(
+      containerElement.querySelectorAll(
+        ".e-de-toolbar-wrapper, .e-de-ctn-toolbar"
+      )
+    );
+
+    toolbarWrappers.forEach((wrapper, index) => {
+      if (index === 0) {
+        (wrapper as HTMLElement).classList.remove("rogue-toolbar-hidden");
+        (wrapper as HTMLElement).style.removeProperty("display");
+        (wrapper as HTMLElement).style.removeProperty("visibility");
+        (wrapper as HTMLElement).style.removeProperty("height");
+        return;
+      }
+
+      hideElement(wrapper);
+    });
+
+    const statusBars = containerElement.querySelectorAll(
+      ".e-status-bar, .e-de-status-bar, .e-de-statusbar, .e-de-ctn-status-bar, .e-document-editor-status-bar"
+    );
+    statusBars.forEach((bar) => hideElement(bar));
+
+    const strayToolbars = Array.from(
+      containerElement.querySelectorAll(
+        ".e-documenteditor-container .e-toolbar"
+      )
+    );
+
+    strayToolbars.forEach((toolbar, index) => {
+      if (index === 0) {
+        return;
+      }
+      hideElement(toolbar);
+    });
+  }, [containerId]);
 
   const runAnalysis = useCallback(
     (text: string) => {
@@ -572,6 +640,31 @@ export const SyncfusionEditor: React.FC<SyncfusionEditorProps> = ({
   }, [loadContentIntoEditor]);
 
   useEffect(() => {
+    if (!isEditorReady || typeof MutationObserver === "undefined") {
+      return;
+    }
+
+    const containerElement = document.getElementById(containerId);
+    if (!containerElement) {
+      return;
+    }
+
+    pruneRogueToolbars();
+
+    const observer = new MutationObserver(() => {
+      pruneRogueToolbars();
+    });
+
+    observer.observe(containerElement, { childList: true, subtree: true });
+    toolbarObserverRef.current = observer;
+
+    return () => {
+      observer.disconnect();
+      toolbarObserverRef.current = null;
+    };
+  }, [containerId, isEditorReady, pruneRogueToolbars]);
+
+  useEffect(() => {
     if (containerRef.current?.documentEditor) {
       containerRef.current.documentEditor.isReadOnly = !isEditable;
     }
@@ -639,10 +732,10 @@ export const SyncfusionEditor: React.FC<SyncfusionEditorProps> = ({
       <div style={{ flex: 1, height: "100%", overflow: "hidden" }}>
         <DocumentEditorContainerComponent
           ref={containerRef}
-          id="container"
+          id={containerId}
           height="100%"
           width="100%"
-          enableToolbar={true}
+          enableToolbar={!isFreeMode}
           restrictEditing={!isEditable}
           serviceUrl="" // We are client-side only for now
           contentChange={handleContentChange}
@@ -664,7 +757,7 @@ export const SyncfusionEditor: React.FC<SyncfusionEditorProps> = ({
 
                     // Grey out New, Open, Undo, and Redo buttons in free mode and disable functionality
                     console.log("🔧 isFreeMode:", isFreeMode);
-                    
+
                     if (isFreeMode) {
                       console.log(
                         "🔒 Free mode detected - disabling toolbar buttons"
@@ -811,6 +904,7 @@ export const SyncfusionEditor: React.FC<SyncfusionEditorProps> = ({
               }
 
               setIsEditorReady(true);
+              pruneRogueToolbars();
             }
           }}
         >
@@ -938,6 +1032,35 @@ export const SyncfusionEditor: React.FC<SyncfusionEditorProps> = ({
         /* Syncfusion Material Theme Overrides if needed */
         .e-documenteditor-container {
           border: none !important;
+        }
+        /* Hide the status bar (bottom toolbar) which is often dysfunctional */
+        .e-status-bar,
+        .e-de-status-bar,
+        .e-de-statusbar,
+        .e-statusbar,
+        .e-document-editor-status-bar,
+        .e-de-ctn-status-bar {
+          display: none !important;
+          visibility: hidden !important;
+          height: 0 !important;
+          min-height: 0 !important;
+          padding: 0 !important;
+          border: none !important;
+          overflow: hidden !important;
+        }
+
+        /* Safety: Prevent duplicate toolbars from appearing */
+        .e-documenteditor-container .e-toolbar:nth-of-type(n+2) {
+          display: none !important;
+        }
+
+        .syncfusion-editor-wrapper .rogue-toolbar-hidden {
+          display: none !important;
+          visibility: hidden !important;
+          height: 0 !important;
+          min-height: 0 !important;
+          overflow: hidden !important;
+          pointer-events: none !important;
         }
       `}</style>
     </div>

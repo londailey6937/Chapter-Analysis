@@ -1,5 +1,5 @@
 import React from "react";
-import { SyncfusionEditor } from "./SyncfusionEditor";
+import { CustomEditor } from "./CustomEditor";
 
 interface DocumentEditorProps {
   initialText: string;
@@ -56,7 +56,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
       className="document-editor-wrapper"
       style={{ height: "100%", display: "flex", flexDirection: "column" }}
     >
-      <SyncfusionEditor
+      <CustomEditor
         content={startContent}
         onUpdate={handleUpdate}
         isEditable={!readOnly}
