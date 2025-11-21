@@ -620,14 +620,14 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
           className="absolute p-2 bg-yellow-50 border-l-3 border-yellow-400 rounded text-xs text-yellow-900 select-none pointer-events-none"
           style={{
             top: `${rect.bottom - container.top + 8}px`,
-            left: `${rect.left - container.left + 204}px`,
-            maxWidth: "400px",
+            right: `0px`,
+            maxWidth: "225px",
           }}
         >
           {item.suggestions.map((s, i) => (
             <div key={i} className="mb-1 last:mb-0">
-              <span className="font-semibold">💡 {s.visualType}:</span>{" "}
-              <span className="opacity-90">{s.reason}</span>
+              <div className="font-semibold mb-0.5">💡 {s.visualType}</div>
+              <div className="opacity-90">{s.reason}</div>
             </div>
           ))}
         </div>

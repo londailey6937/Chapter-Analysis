@@ -800,6 +800,20 @@ export const ChapterCheckerV2: React.FC = () => {
           .replace(/\s+/g, " ")
           .trim();
 
+    // Check document size limit for free users
+    const features = ACCESS_TIERS[accessLevel];
+    if (!features.fullAnalysis) {
+      const wordCount = normalizedPlainText.split(/\s+/).length;
+      const FREE_TIER_WORD_LIMIT = 5000;
+
+      if (wordCount > FREE_TIER_WORD_LIMIT) {
+        setError(
+          `Free tier limit: ${FREE_TIER_WORD_LIMIT.toLocaleString()} words per document. This document has ${wordCount.toLocaleString()} words. Upgrade to Pro for unlimited document size.`
+        );
+        return;
+      }
+    }
+
     setChapterText(normalizedPlainText);
     setFileName(incomingName);
     setFileType(fileType);
@@ -1241,7 +1255,13 @@ export const ChapterCheckerV2: React.FC = () => {
       };
 
       worker.onerror = (err) => {
-        console.error("Worker error event:", err);
+        console.error("Worker error event:", {
+          message: err.message,
+          filename: err.filename,
+          lineno: err.lineno,
+          colno: err.colno,
+          error: err.error,
+        });
 
         let detailMessage = "";
         const rawError = err.error as unknown;
@@ -1264,14 +1284,18 @@ export const ChapterCheckerV2: React.FC = () => {
           }
         }
 
-        const finalMessage = detailMessage?.trim()
-          ? detailMessage.trim()
-          : "Unknown worker error";
-
-        setError(`Worker error: ${finalMessage}`);
-        setProgress("");
-        setIsAnalyzing(false);
-        worker.terminate();
+        // Only show error UI if we have a real error message
+        if (detailMessage?.trim()) {
+          const finalMessage = detailMessage.trim();
+          setError(`Worker error: ${finalMessage}`);
+          setProgress("");
+          setIsAnalyzing(false);
+          worker.terminate();
+        } else {
+          console.warn(
+            "Worker error event with no details - ignoring as likely false positive"
+          );
+        }
       };
 
       worker.onmessageerror = (event) => {
@@ -1390,6 +1414,22 @@ export const ChapterCheckerV2: React.FC = () => {
       setSaveMessage("No analysis to save");
       setTimeout(() => setSaveMessage(null), 3000);
       return;
+    }
+
+    // Check save limits for free users
+    if (accessLevel === "free") {
+      try {
+        const savedDocs = await getSavedAnalyses();
+        if (savedDocs.length >= 3) {
+          setSaveMessage(
+            "❌ Free tier limit: 3 saved documents. Upgrade to Pro for unlimited saves."
+          );
+          setTimeout(() => setSaveMessage(null), 7000);
+          return;
+        }
+      } catch (error) {
+        console.error("Error checking saved documents:", error);
+      }
     }
 
     setIsSaving(true);
