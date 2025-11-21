@@ -617,17 +617,17 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
       return (
         <div
           key={`visual-${idx}`}
-          className="absolute left-0 right-0 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded-r text-sm text-yellow-900 select-none pointer-events-none"
+          className="absolute p-2 bg-yellow-50 border-l-3 border-yellow-400 rounded text-xs text-yellow-900 select-none pointer-events-none"
           style={{
             top: `${rect.bottom - container.top + 8}px`,
+            left: `${rect.left - container.left + 204}px`,
+            maxWidth: "400px",
           }}
         >
           {item.suggestions.map((s, i) => (
-            <div key={i} className="mb-2 last:mb-0">
-              <div className="font-semibold flex items-center gap-1">
-                <span>💡</span> {s.visualType}
-              </div>
-              <div className="text-xs mt-1">{s.reason}</div>
+            <div key={i} className="mb-1 last:mb-0">
+              <span className="font-semibold">💡 {s.visualType}:</span>{" "}
+              <span className="opacity-90">{s.reason}</span>
             </div>
           ))}
         </div>
