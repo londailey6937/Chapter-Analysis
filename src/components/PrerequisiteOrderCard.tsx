@@ -92,6 +92,8 @@ export const PrerequisiteOrderCard: React.FC<PrerequisiteOrderCardProps> = ({
     (concept.prerequisites || []).forEach((id) => set.add(id));
 
     // Add from library prerequisites (match by name)
+    // IMPORTANT: Only checks prerequisites that are ALSO mentioned in the document
+    // We don't flag missing foundational knowledge (e.g., "algebra chapter missing arithmetic")
     const libraryPrereqNames = libraryPrerequisites?.get(
       concept.name.toLowerCase()
     );
@@ -101,6 +103,7 @@ export const PrerequisiteOrderCard: React.FC<PrerequisiteOrderCardProps> = ({
         const matchingConcept = concepts.find(
           (c) => c.name.toLowerCase() === prereqName.toLowerCase()
         );
+        // Only add if prerequisite is actually mentioned in this document
         if (matchingConcept) {
           set.add(matchingConcept.id);
         }
@@ -108,6 +111,7 @@ export const PrerequisiteOrderCard: React.FC<PrerequisiteOrderCardProps> = ({
     }
 
     // Add category-based prerequisites (for mathematics domain)
+    // Again, only checks concepts explicitly mentioned in the document
     if (activeDomain === "mathematics" && concept.category) {
       const categoryPrereqs = getCategoryPrerequisites(concept.category);
       if (categoryPrereqs.length > 0) {
@@ -268,7 +272,8 @@ export const PrerequisiteOrderCard: React.FC<PrerequisiteOrderCardProps> = ({
             Prerequisite Order Check
           </h3>
           <p className="text-sm text-gray-600 mt-1">
-            Highlights when dependent concepts outrun their foundations.
+            Checks ordering of concepts mentioned in this document. Assumes
+            foundational knowledge taught in prior chapters.
           </p>
         </div>
         <div className="card-body">
@@ -330,7 +335,8 @@ export const PrerequisiteOrderCard: React.FC<PrerequisiteOrderCardProps> = ({
           Prerequisite Order Check
         </h3>
         <p className="text-sm text-gray-600 mt-1">
-          Highlights when dependent concepts outrun their foundations.
+          Checks ordering of concepts mentioned in this document. Assumes
+          foundational knowledge taught in prior chapters.
         </p>
       </div>
       <div className="card-body">
