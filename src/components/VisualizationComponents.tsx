@@ -249,142 +249,190 @@ export const ChapterOverviewTimeline: React.FC<{
       </div>
 
       {/* Line Graph */}
-      <ResponsiveContainer width="100%" height={320}>
-        <LineChart
-          data={sections.map((sec: any, idx: number) => {
-            const issue = sectionIssues[sec.sectionId] || {
-              load: 0,
-              hasBlocking: false,
-              sectionName: sec.heading,
-            };
-            // Shorten section name to first 2 words
-            const fullName = issue.sectionName || `Section ${idx + 1}`;
-            const words = fullName.split(/\s+/);
-            const shortName =
-              words.length > 2 ? words.slice(0, 2).join(" ") + "..." : fullName;
-
-            return {
-              section: shortName,
-              fullSection: fullName,
-              sectionIndex: idx + 1,
-              load: Math.round(issue.load * 100),
-              novelConcepts:
-                sec.factors?.novelConcepts || sec.novelConcepts || 0,
-              hasBlocking: issue.hasBlocking,
-              position:
-                (sec as any).position ?? (sec as any).startPosition ?? 0,
-              sectionId: sec.sectionId,
-            };
-          })}
-          margin={{ top: 5, right: 30, left: 0, bottom: 70 }}
-          onClick={(data) => {
-            if (data && data.activePayload && data.activePayload[0]) {
-              const payload = data.activePayload[0].payload;
-              window.dispatchEvent(
-                new CustomEvent("jump-to-position", {
-                  detail: {
-                    position: payload.position,
-                    heading: payload.section,
-                    sectionIndex: payload.sectionIndex - 1,
-                    sectionId: payload.sectionId,
-                  },
-                })
-              );
-            }
-          }}
+      <div
+        style={{
+          width: "100%",
+          overflowX: sections.length > 60 ? "auto" : "visible",
+          overflowY: "visible",
+          marginBottom: "16px",
+        }}
+      >
+        <ResponsiveContainer
+          width={sections.length > 60 ? sections.length * 15 : "100%"}
+          height={320}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-          <XAxis
-            dataKey="section"
-            tick={{ fontSize: 10 }}
-            interval={(() => {
-              const n = sections.length;
-              if (n > 200) return Math.ceil(n / 20);
-              if (n > 100) return Math.ceil(n / 15);
-              if (n > 60) return Math.ceil(n / 12);
-              if (n > 35) return Math.ceil(n / 10);
-              return 0;
-            })()}
-            angle={-35}
-            textAnchor="end"
-            height={70}
-          />
-          <YAxis
-            label={{ value: "Load %", angle: -90, position: "insideLeft" }}
-            domain={[0, 100]}
-          />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: "#fff",
-              border: "1px solid #ccc",
-              borderRadius: "8px",
-              padding: "8px",
-            }}
-            formatter={(value: any, name: string) => {
-              if (name === "Cognitive Load") return `${value}%`;
-              if (name === "New Concepts") return String(value);
-              return String(value);
-            }}
-            labelFormatter={(label: any, payload: any) => {
-              if (payload && payload[0]) {
-                const data = payload[0].payload;
-                return `${data.fullSection || data.section}${
-                  data.hasBlocking ? " (Blocking Issues)" : ""
-                }`;
-              }
-              return `Section: ${label}`;
-            }}
-          />
-          <Legend
-            verticalAlign="bottom"
-            height={30}
-            wrapperStyle={{ paddingTop: 4 }}
-          />
-          <Line
-            type="monotone"
-            dataKey="load"
-            stroke="#ef8432"
-            strokeWidth={2}
-            name="Cognitive Load"
-            dot={(props: any) => {
-              const { cx, cy, payload, index } = props;
-              const issue = sectionIssues[payload.sectionId] || {
+          <LineChart
+            data={sections.map((sec: any, idx: number) => {
+              const issue = sectionIssues[sec.sectionId] || {
                 load: 0,
                 hasBlocking: false,
+                sectionName: sec.heading,
               };
-              let fill = "#10b981"; // green
-              if (issue.load > 0.8 || issue.hasBlocking) {
-                fill = "#ef4444"; // red
-              } else if (issue.load > 0.6) {
-                fill = "#bfa100"; // yellow
-              }
-              return (
-                <circle
-                  key={payload.sectionId || `timeline-dot-${index}`}
-                  cx={cx}
-                  cy={cy}
-                  r={issue.hasBlocking ? 6 : 4}
-                  fill={fill}
-                  stroke="white"
-                  strokeWidth={2}
-                  style={{ cursor: "pointer" }}
-                />
-              );
-            }}
-            isAnimationActive={true}
-          />
-          <Line
-            type="monotone"
-            dataKey="novelConcepts"
-            stroke="#82ca9d"
-            name="New Concepts"
-            dot={false}
-            strokeDasharray="5 5"
-          />
-        </LineChart>
-      </ResponsiveContainer>
+              // Shorten section name to first 2 words
+              const fullName = issue.sectionName || `Section ${idx + 1}`;
+              const words = fullName.split(/\s+/);
+              const shortName =
+                words.length > 2
+                  ? words.slice(0, 2).join(" ") + "..."
+                  : fullName;
 
-      <div className="timeline-legend">
+              return {
+                section: shortName,
+                fullSection: fullName,
+                sectionIndex: idx + 1,
+                load: Math.round(issue.load * 100),
+                novelConcepts:
+                  sec.factors?.novelConcepts || sec.novelConcepts || 0,
+                hasBlocking: issue.hasBlocking,
+                position:
+                  (sec as any).position ?? (sec as any).startPosition ?? 0,
+                sectionId: sec.sectionId,
+              };
+            })}
+            margin={{ top: 5, right: 30, left: 0, bottom: 20 }}
+            onClick={(data) => {
+              if (data && data.activePayload && data.activePayload[0]) {
+                const payload = data.activePayload[0].payload;
+                window.dispatchEvent(
+                  new CustomEvent("jump-to-position", {
+                    detail: {
+                      position: payload.position,
+                      heading: payload.section,
+                      sectionIndex: payload.sectionIndex - 1,
+                      sectionId: payload.sectionId,
+                    },
+                  })
+                );
+              }
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+            <XAxis hide={true} />
+            <YAxis
+              label={{ value: "Load %", angle: -90, position: "insideLeft" }}
+              domain={[0, 100]}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#fff",
+                border: "1px solid #ccc",
+                borderRadius: "8px",
+                padding: "8px",
+              }}
+              formatter={(value: any, name: string) => {
+                if (name === "Cognitive Load") return `${value}%`;
+                if (name === "New Concepts") return String(value);
+                return String(value);
+              }}
+              labelFormatter={(label: any, payload: any) => {
+                if (payload && payload[0]) {
+                  const data = payload[0].payload;
+                  return `${data.fullSection || data.section}${
+                    data.hasBlocking ? " (Blocking Issues)" : ""
+                  }`;
+                }
+                return `Section: ${label}`;
+              }}
+            />
+            <Line
+              type="monotone"
+              dataKey="load"
+              stroke="#ef8432"
+              strokeWidth={2}
+              name="Cognitive Load"
+              dot={(props: any) => {
+                const { cx, cy, payload, index } = props;
+                const issue = sectionIssues[payload.sectionId] || {
+                  load: 0,
+                  hasBlocking: false,
+                };
+                let fill = "#10b981"; // green
+                if (issue.load > 0.8 || issue.hasBlocking) {
+                  fill = "#ef4444"; // red
+                } else if (issue.load > 0.6) {
+                  fill = "#bfa100"; // yellow
+                }
+                return (
+                  <circle
+                    key={payload.sectionId || `timeline-dot-${index}`}
+                    cx={cx}
+                    cy={cy}
+                    r={issue.hasBlocking ? 6 : 4}
+                    fill={fill}
+                    stroke="white"
+                    strokeWidth={2}
+                    style={{ cursor: "pointer" }}
+                  />
+                );
+              }}
+              isAnimationActive={true}
+            />
+            <Line
+              type="monotone"
+              dataKey="novelConcepts"
+              stroke="#82ca9d"
+              name="New Concepts"
+              dot={false}
+              strokeDasharray="5 5"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Legend for line types - outside scroll area */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: "24px",
+          marginTop: "12px",
+          marginBottom: "16px",
+          fontSize: "14px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div
+            style={{
+              width: "24px",
+              height: "3px",
+              backgroundColor: "#ef8432",
+              borderRadius: "2px",
+            }}
+          />
+          <span>Cognitive Load</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <div
+            style={{
+              width: "24px",
+              height: "3px",
+              backgroundColor: "#82ca9d",
+              borderRadius: "2px",
+              backgroundImage:
+                "repeating-linear-gradient(90deg, #82ca9d 0, #82ca9d 5px, transparent 5px, transparent 10px)",
+            }}
+          />
+          <span>New Concepts</span>
+        </div>
+      </div>
+
+      <p
+        style={{
+          fontSize: "13px",
+          color: "#6b7280",
+          fontStyle: "italic",
+          marginTop: "8px",
+          marginBottom: "20px",
+        }}
+      >
+        {sections.length > 60
+          ? `💡 Scroll horizontally to view all ${sections.length} sections. `
+          : "💡 "}
+        Hover over graph points for section details and click to jump to that
+        section.
+      </p>
+
+      <div className="timeline-legend" style={{ marginTop: "20px" }}>
         <div className="legend-item">
           <span
             className="legend-dot"
@@ -409,6 +457,14 @@ export const ChapterOverviewTimeline: React.FC<{
         <strong>Why this matters:</strong> Managing peaks prevents overload.
         Balanced cognitive demand keeps working memory free for meaning-making
         instead of survival.
+        <br />
+        <br />
+        <strong>New Concepts & Cognitive Load:</strong> Each new concept adds to
+        cognitive load because learners must process unfamiliar information
+        while maintaining existing knowledge in working memory. Introducing too
+        many new concepts at once (high green dashed line) can overwhelm
+        learners, especially when combined with other demands like complex
+        examples or prerequisite gaps.
       </div>
 
       {(() => {
