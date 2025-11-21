@@ -76,46 +76,116 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
   const analyzeContent = useCallback((text: string) => {
     if (!editorRef.current) return;
 
-    const paragraphs = text.split("\n\n").filter((p) => p.trim());
+    // Get paragraphs from the actual DOM to match rendering
+    const domParagraphs = Array.from(
+      editorRef.current.querySelectorAll("p, div")
+    );
+    const paragraphs = domParagraphs
+      .map((p) => (p as HTMLElement).innerText || "")
+      .filter((p) => p.trim());
+
     const spacingData: AnalysisData["spacing"] = [];
     const visualsData: AnalysisData["visuals"] = [];
 
-    paragraphs.forEach((para, index) => {
-      const wordCount = countWords(para);
-      if (wordCount > 0) {
-        const spacingInfo = analyzeParagraphSpacing(wordCount);
-        spacingData.push({
-          index,
-          wordCount,
-          tone: spacingInfo.tone,
-          label: spacingInfo.shortLabel,
-        });
-      }
+    // For very large documents (>2000 paragraphs / ~800 pages), sample analysis
+    // For medium-large documents (500-2000 paragraphs), analyze all but limit dual-coding
+    const isVeryLarge = paragraphs.length > 2000;
+    const isLarge = paragraphs.length > 500;
 
-      if (para.length >= 10) {
-        const suggestions = DualCodingAnalyzer.analyzeParagraph(para, index);
-        if (suggestions.length > 0) {
-          visualsData.push({ index, suggestions });
+    if (isVeryLarge) {
+      // Sample every 4th paragraph for extremely large documents
+      paragraphs.forEach((para, index) => {
+        if (index % 4 === 0) {
+          const wordCount = countWords(para);
+          if (wordCount > 0) {
+            const spacingInfo = analyzeParagraphSpacing(wordCount);
+            spacingData.push({
+              index,
+              wordCount,
+              tone: spacingInfo.tone,
+              label: spacingInfo.shortLabel,
+            });
+          }
+
+          // Also analyze dual-coding for sampled paragraphs with 50+ words
+          if (wordCount >= 50) {
+            const suggestions = DualCodingAnalyzer.analyzeParagraph(
+              para,
+              index
+            );
+            if (suggestions.length > 0) {
+              visualsData.push({ index, suggestions });
+            }
+          }
         }
-      }
-    });
+      });
+    } else {
+      // Normal or large documents: analyze all spacing, limit dual-coding for large docs
+      paragraphs.forEach((para, index) => {
+        const wordCount = countWords(para);
+        if (wordCount > 0) {
+          const spacingInfo = analyzeParagraphSpacing(wordCount);
+          spacingData.push({
+            index,
+            wordCount,
+            tone: spacingInfo.tone,
+            label: spacingInfo.shortLabel,
+          });
+        }
+
+        // For large docs, analyze dual-coding for paragraphs with 50+ words
+        // For normal docs, analyze all paragraphs with >10 chars
+        const shouldAnalyzeDualCoding = isLarge
+          ? wordCount >= 50
+          : para.length >= 10;
+
+        if (index < 5) {
+          console.log(
+            `[CustomEditor] Para ${index}: wordCount=${wordCount}, shouldAnalyze=${shouldAnalyzeDualCoding}, length=${para.length}`
+          );
+        }
+
+        if (shouldAnalyzeDualCoding) {
+          const suggestions = DualCodingAnalyzer.analyzeParagraph(para, index);
+          if (suggestions.length > 0) {
+            visualsData.push({ index, suggestions });
+          }
+        }
+      });
+    }
+
+    console.log(`[CustomEditor] Analyzed ${paragraphs.length} paragraphs`);
+    console.log(
+      `[CustomEditor] Found ${spacingData.length} spacing items, ${visualsData.length} dual-coding suggestions`
+    );
+    if (visualsData.length > 0) {
+      console.log(
+        `[CustomEditor] First dual-coding suggestion:`,
+        visualsData[0]
+      );
+    }
 
     setAnalysis({ spacing: spacingData, visuals: visualsData });
 
-    // Calculate statistics
+    // Calculate statistics (lightweight for all sizes)
     const words = text.split(/\s+/).filter((w) => w.length > 0).length;
     const characters = text.length;
     const readingTime = Math.ceil(words / 200); // 200 words per minute
-    const sentences = text
-      .split(/[.!?]+/)
-      .filter((s) => s.trim().length > 0).length;
-    const syllables = text.split(/\s+/).reduce((count, word) => {
-      return count + Math.max(1, word.match(/[aeiouy]{1,2}/gi)?.length || 1);
-    }, 0);
-    const readingLevel =
-      sentences > 0 && words > 0
-        ? 0.39 * (words / sentences) + 11.8 * (syllables / words) - 15.59
-        : 0;
+
+    // Skip complex calculations for very large documents (>2000 paragraphs)
+    let readingLevel = 0;
+    if (!isVeryLarge) {
+      const sentences = text
+        .split(/[.!?]+/)
+        .filter((s) => s.trim().length > 0).length;
+      const syllables = text.split(/\s+/).reduce((count, word) => {
+        return count + Math.max(1, word.match(/[aeiouy]{1,2}/gi)?.length || 1);
+      }, 0);
+      readingLevel =
+        sentences > 0 && words > 0
+          ? 0.39 * (words / sentences) + 11.8 * (syllables / words) - 15.59
+          : 0;
+    }
 
     setStatistics({
       words,
@@ -175,31 +245,65 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
     }, 300);
   }, [onUpdate, saveToHistory, analyzeContent]);
 
-  // Initialize content
+  // Initialize content (only on mount)
   useEffect(() => {
     if (editorRef.current && content) {
       const isHtml = /<[^>]+>/.test(content);
-      if (isHtml) {
-        editorRef.current.innerHTML = content;
+
+      // For large HTML content (>100KB), use progressive loading
+      if (isHtml && content.length > 100000) {
+        // Show loading state briefly
+        editorRef.current.innerHTML =
+          '<p style="text-align: center; color: #666; padding: 2rem;">Loading document...</p>';
+
+        // Use requestAnimationFrame to allow UI to update
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (!editorRef.current) return;
+
+            // Set content in next frame
+            editorRef.current.innerHTML = content;
+
+            // Initialize history with initial content
+            const html = editorRef.current.innerHTML;
+            historyRef.current = [html];
+            historyIndexRef.current = 0;
+            setCanUndo(false);
+            setCanRedo(false);
+
+            // Defer analysis to avoid blocking
+            setTimeout(() => {
+              if (!editorRef.current) return;
+              const text = editorRef.current.innerText;
+              analyzeContent(text);
+            }, 100);
+          });
+        });
       } else {
-        editorRef.current.innerHTML = content
-          .split("\n\n")
-          .map((para) => `<p>${para.replace(/\n/g, "<br>")}</p>`)
-          .join("");
+        // Normal loading for smaller content
+        if (isHtml) {
+          editorRef.current.innerHTML = content;
+        } else {
+          editorRef.current.innerHTML = content
+            .split("\n\n")
+            .map((para) => `<p>${para.replace(/\n/g, "<br>")}</p>`)
+            .join("");
+        }
+
+        // Initialize history with initial content
+        const html = editorRef.current.innerHTML;
+        historyRef.current = [html];
+        historyIndexRef.current = 0;
+        setCanUndo(false);
+        setCanRedo(false);
+
+        // Run initial analysis
+        const text = editorRef.current.innerText;
+        analyzeContent(text);
       }
-
-      // Initialize history with initial content
-      const html = editorRef.current.innerHTML;
-      historyRef.current = [html];
-      historyIndexRef.current = 0;
-      setCanUndo(false);
-      setCanRedo(false);
-
-      // Run initial analysis
-      const text = editorRef.current.innerText;
-      analyzeContent(text);
     }
-  }, [analyzeContent]); // Only on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only on mount - content is captured from closure
 
   // Apply concept underlining
   useEffect(() => {
@@ -600,34 +704,58 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
 
   // Render visual suggestions
   const renderSuggestions = () => {
-    if (!editorRef.current || !showVisualSuggestions) return null;
+    if (!editorRef.current || !showVisualSuggestions) {
+      console.log("[CustomEditor] renderSuggestions: early return", {
+        hasEditor: !!editorRef.current,
+        showVisualSuggestions,
+      });
+      return null;
+    }
     // In free mode, always show suggestions. In paid mode, respect focus mode toggle.
-    if (!isFreeMode && focusMode) return null;
+    if (!isFreeMode && focusMode) {
+      console.log("[CustomEditor] renderSuggestions: focus mode active");
+      return null;
+    }
 
     const paragraphs = Array.from(editorRef.current.querySelectorAll("p, div"));
+    console.log(
+      `[CustomEditor] renderSuggestions: rendering ${analysis.visuals.length} suggestions for ${paragraphs.length} DOM paragraphs`
+    );
 
     return analysis.visuals.map((item, idx) => {
       const para = paragraphs[item.index];
-      if (!para) return null;
+      if (!para) {
+        console.log(
+          `[CustomEditor] renderSuggestions: paragraph ${item.index} not found in DOM`
+        );
+        return null;
+      }
 
       const rect = para.getBoundingClientRect();
       const container = editorRef.current?.getBoundingClientRect();
       if (!container) return null;
 
+      console.log(
+        `[CustomEditor] Rendering suggestion ${idx} at index ${item.index}:`,
+        item.suggestions[0]
+      );
+
       return (
         <div
           key={`visual-${idx}`}
-          className="absolute p-2 bg-yellow-50 border-l-3 border-yellow-400 rounded text-xs text-yellow-900 select-none pointer-events-none"
+          className="absolute p-1.5 bg-yellow-50 border-l-3 border-yellow-400 rounded text-xs text-yellow-900 select-none pointer-events-none"
           style={{
             top: `${rect.bottom - container.top + 8}px`,
-            right: `0px`,
-            maxWidth: "225px",
+            right: `20px`,
+            maxWidth: "200px",
           }}
         >
           {item.suggestions.map((s, i) => (
             <div key={i} className="mb-1 last:mb-0">
-              <div className="font-semibold mb-0.5">💡 {s.visualType}</div>
-              <div className="opacity-90">{s.reason}</div>
+              <div className="font-semibold mb-0.5 text-xs">
+                💡 {s.visualType}
+              </div>
+              <div className="opacity-90 text-[11px]">{s.reason}</div>
             </div>
           ))}
         </div>

@@ -62,6 +62,17 @@ export class DualCodingAnalyzer {
     const suggestions: VisualSuggestion[] = [];
     const trimmedPara = text.trim();
 
+    // Skip very short paragraphs
+    if (trimmedPara.length < 50) return suggestions;
+
+    // Debug: log first few paragraphs to see what we're analyzing
+    if (position < 5) {
+      console.log(
+        `[DualCoding] Analyzing paragraph ${position}, length: ${trimmedPara.length}`
+      );
+      console.log(`[DualCoding] Preview:`, trimmedPara.substring(0, 100));
+    }
+
     // Pattern 1: Descriptive spatial/structural language
     const spatialPatterns = [
       /\b(above|below|beneath|adjacent|parallel|perpendicular|horizontal|vertical|diagonal)\b/gi,
@@ -75,13 +86,23 @@ export class DualCodingAnalyzer {
       0
     );
 
-    if (spatialMatches >= 3 && trimmedPara.length > 100) {
+    if (position < 5 && spatialMatches > 0) {
+      console.log(
+        `[DualCoding] Para ${position}: ${spatialMatches} spatial matches`
+      );
+    }
+
+    if (spatialMatches >= 2 && trimmedPara.length > 80) {
+      if (position < 10)
+        console.log(
+          `[DualCoding] Para ${position}: Adding spatial suggestion!`
+        );
       suggestions.push({
         position: position,
         paragraph: trimmedPara.substring(0, 150) + "...",
         reason: "Contains spatial/structural descriptions",
         visualType: "diagram",
-        priority: spatialMatches >= 5 ? "high" : "medium",
+        priority: spatialMatches >= 4 ? "high" : "medium",
         context: this.getContext(prevPara, trimmedPara, nextPara),
       });
     }
@@ -98,13 +119,13 @@ export class DualCodingAnalyzer {
       0
     );
 
-    if (processMatches >= 3 && trimmedPara.length > 100) {
+    if (processMatches >= 2 && trimmedPara.length > 80) {
       suggestions.push({
         position: position,
         paragraph: trimmedPara.substring(0, 150) + "...",
         reason: "Describes a process or sequence",
         visualType: "flowchart",
-        priority: processMatches >= 5 ? "high" : "medium",
+        priority: processMatches >= 4 ? "high" : "medium",
         context: this.getContext(prevPara, trimmedPara, nextPara),
       });
     }
@@ -122,13 +143,13 @@ export class DualCodingAnalyzer {
       0
     );
 
-    if (quantMatches >= 3 && trimmedPara.length > 80) {
+    if (quantMatches >= 2 && trimmedPara.length > 60) {
       suggestions.push({
         position: position,
         paragraph: trimmedPara.substring(0, 150) + "...",
         reason: "Contains quantitative data or comparisons",
         visualType: "graph",
-        priority: quantMatches >= 5 ? "high" : "medium",
+        priority: quantMatches >= 4 ? "high" : "medium",
         context: this.getContext(prevPara, trimmedPara, nextPara),
       });
     }
@@ -147,8 +168,8 @@ export class DualCodingAnalyzer {
     );
 
     if (
-      conceptMatches >= 3 &&
-      trimmedPara.length > 150
+      conceptMatches >= 2 &&
+      trimmedPara.length > 100
       // Note: hasNearbyVisual check removed for single paragraph analysis as it requires full text context
     ) {
       suggestions.push({
@@ -164,8 +185,8 @@ export class DualCodingAnalyzer {
     // Pattern 5: Complex terminology dense paragraphs
     const technicalDensity = this.calculateTechnicalDensity(trimmedPara);
     if (
-      technicalDensity > 0.15 &&
-      trimmedPara.length > 200
+      technicalDensity > 0.12 &&
+      trimmedPara.length > 120
       // Note: hasNearbyVisual check removed for single paragraph analysis
     ) {
       suggestions.push({
@@ -173,7 +194,7 @@ export class DualCodingAnalyzer {
         paragraph: trimmedPara.substring(0, 150) + "...",
         reason: "High density of technical terms",
         visualType: "illustration",
-        priority: technicalDensity > 0.25 ? "high" : "medium",
+        priority: technicalDensity > 0.2 ? "high" : "medium",
         context: this.getContext(prevPara, trimmedPara, nextPara),
       });
     }
@@ -190,7 +211,7 @@ export class DualCodingAnalyzer {
       0
     );
 
-    if (systemMatches >= 4 && trimmedPara.length > 120) {
+    if (systemMatches >= 3 && trimmedPara.length > 100) {
       suggestions.push({
         position: position,
         paragraph: trimmedPara.substring(0, 150) + "...",
