@@ -215,7 +215,113 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
             </p>
           </div>
 
-          {/* Feature 2: Concept Graphs */}
+          {/* Feature 2: Interactive Concept Highlighting */}
+          <div
+            style={{
+              marginBottom: "28px",
+              padding: "20px",
+              backgroundColor: "#f9fafb",
+              borderRadius: "16px",
+              border: "2px solid #e5e7eb",
+            }}
+          >
+            <h3
+              style={{
+                margin: "0 0 12px 0",
+                fontSize: "18px",
+                fontWeight: "600",
+                color: "#111827",
+              }}
+            >
+              💡 Interactive Concept Highlighting
+            </h3>
+            <div
+              style={{
+                padding: "16px",
+                backgroundColor: "white",
+                borderRadius: "12px",
+                border: "1.5px solid #e5e7eb",
+                marginBottom: "12px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: "8px",
+                  marginBottom: "16px",
+                }}
+              >
+                {[
+                  "Neural Network",
+                  "Backpropagation",
+                  "Gradient Descent",
+                  "Activation Function",
+                  "Loss Function",
+                ].map((concept, idx) => (
+                  <div
+                    key={concept}
+                    style={{
+                      padding: "6px 12px",
+                      backgroundColor: idx === 1 ? "#ef8432" : "#f3f4f6",
+                      color: idx === 1 ? "white" : "#374151",
+                      borderRadius: "20px",
+                      fontSize: "12px",
+                      fontWeight: "500",
+                      cursor: "pointer",
+                      border:
+                        idx === 1 ? "2px solid #ef8432" : "1.5px solid #e5e7eb",
+                    }}
+                  >
+                    {concept}
+                    {idx === 1 && (
+                      <span style={{ marginLeft: "6px", opacity: 0.8 }}>
+                        📍 3
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div
+                style={{
+                  padding: "12px",
+                  backgroundColor: "#fef3c7",
+                  borderRadius: "8px",
+                  fontSize: "13px",
+                  lineHeight: "1.6",
+                  color: "#374151",
+                  border: "1px solid #fde68a",
+                }}
+              >
+                Neural{" "}
+                <span
+                  style={{
+                    backgroundColor: "#ef8432",
+                    color: "white",
+                    padding: "2px 6px",
+                    borderRadius: "4px",
+                    fontWeight: "600",
+                  }}
+                >
+                  backpropagation
+                </span>{" "}
+                efficiently adjusts weights across layers...
+              </div>
+            </div>
+            <p
+              style={{
+                margin: "0",
+                fontSize: "13px",
+                color: "#6b7280",
+              }}
+            >
+              Click any concept to highlight all mentions in your document.
+              Navigate between occurrences and track concept distribution
+              patterns.
+            </p>
+          </div>
+
+          {/* Feature 3: Concept Graphs */}
           <div
             style={{
               marginBottom: "28px",
@@ -369,7 +475,7 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
             </p>
           </div>
 
-          {/* Feature 3: Pattern Analysis */}
+          {/* Feature 4: Prerequisite Order Check */}
           <div
             style={{
               marginBottom: "28px",
@@ -387,31 +493,33 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
                 color: "#111827",
               }}
             >
-              🎯 Advanced Pattern Recognition
+              🔍 Prerequisite Order Check
             </h3>
             <div
               style={{ display: "flex", flexDirection: "column", gap: "8px" }}
             >
               {[
                 {
-                  pattern: "Prerequisite Violations",
+                  status: "Out of Order",
+                  description: "Concepts introduced before prerequisites",
+                  count: 4,
+                  severity: "high",
+                },
+                {
+                  status: "In Sequence",
+                  description: "Properly ordered prerequisites",
                   count: 3,
-                  severity: "high",
-                },
-                { pattern: "Missing Examples", count: 7, severity: "medium" },
-                {
-                  pattern: "Concept Overload Sections",
-                  count: 2,
-                  severity: "high",
+                  severity: "good",
                 },
                 {
-                  pattern: "Weak Concept Introduction",
-                  count: 5,
-                  severity: "medium",
+                  status: "Missing Prerequisites",
+                  description: "Referenced but never defined",
+                  count: 1,
+                  severity: "critical",
                 },
               ].map((item) => (
                 <div
-                  key={item.pattern}
+                  key={item.status}
                   style={{
                     padding: "12px 16px",
                     backgroundColor: "white",
@@ -422,9 +530,21 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
                     alignItems: "center",
                   }}
                 >
-                  <span style={{ fontSize: "14px", color: "#374151" }}>
-                    {item.pattern}
-                  </span>
+                  <div style={{ flex: 1 }}>
+                    <div
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: "600",
+                        color: "#374151",
+                        marginBottom: "2px",
+                      }}
+                    >
+                      {item.status}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#9ca3af" }}>
+                      {item.description}
+                    </div>
+                  </div>
                   <div
                     style={{
                       display: "flex",
@@ -439,7 +559,7 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
                         color: "#6b7280",
                       }}
                     >
-                      {item.count} found
+                      {item.count}
                     </span>
                     <div
                       style={{
@@ -447,7 +567,11 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
                         height: "8px",
                         borderRadius: "50%",
                         backgroundColor:
-                          item.severity === "high" ? "#dc2626" : "#ea580c",
+                          item.severity === "critical"
+                            ? "#dc2626"
+                            : item.severity === "high"
+                            ? "#ea580c"
+                            : "#10b981",
                       }}
                     />
                   </div>
@@ -461,12 +585,13 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
                 color: "#6b7280",
               }}
             >
-              Automatically detect learning science issues with precise location
-              tracking and severity ratings.
+              Verify concepts appear after their prerequisites. Detects
+              sequencing violations and missing definitions with visual timeline
+              tracking.
             </p>
           </div>
 
-          {/* Feature 4: Export Options */}
+          {/* Feature 5: Professional Export Options */}
           <div
             style={{
               marginBottom: "28px",
