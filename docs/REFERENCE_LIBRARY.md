@@ -358,7 +358,8 @@ You can now **Report False Positives** directly from the concept list. Look for 
 
 - ✅ Spacing analysis (full)
 - ✅ Dual coding analysis (full)
-- ✅ Upload DOCX/OBT files
+- ✅ Upload DOCX/OBT files (up to 5,000 words)
+- ✅ Save up to 3 analyzed documents
 - ✅ View analysis dashboard
 - ✅ Access all built-in domains
 - ❌ No exports (HTML/DOCX/JSON)

@@ -90,14 +90,15 @@ Tome IQ automates this analysis in seconds.
 
 The free tier is generous enough to demonstrate value but limited enough to encourage upgrades:
 
-- Users see the full analysis capabilities
-- 3 chapters/month allows real testing (not just a demo)
-- Limitation drives upgrade when content volume increases
+- **5,000 words per document** (~20 pages) - Enough for a meaningful chapter
+- **3 saved documents maximum** - Real testing without storage abuse
+- Users see full spacing + dual-coding analysis capabilities
+- Limitations drive upgrade when content volume increases or advanced features needed
 
 ### Upgrade Triggers
 
-- **Free → Starter**: User hits 3-chapter limit, needs regular analysis
-- **Starter → Professional**: User needs unlimited chapters, batch processing, or custom libraries
+- **Free → Starter**: User hits 5K word limit or 3-save limit, needs regular analysis
+- **Starter → Professional**: User needs unlimited documents, batch processing, or custom libraries
 - **Professional → Enterprise**: Team needs collaboration, API access, or white-label solution
 
 ### Pricing Psychology

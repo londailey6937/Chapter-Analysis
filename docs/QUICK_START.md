@@ -20,7 +20,8 @@
 - **Spacing & Pacing Analysis**: Paragraph-by-paragraph cognitive load assessment
 - **Dual-Coding Suggestions**: AI-powered visual opportunity detection
 - Smart sidebar with detailed analysis cards
-- Up to 80 pages per document (1 generous textbook chapter)
+- Up to 5,000 words per document (~20 pages)
+- Save up to 3 analyzed documents
 
 ✅ **Smart Content Understanding**
 
@@ -43,9 +44,9 @@
 
 ## Document Size Support
 
-**Free Tier:** Up to 80 pages (perfect for single chapters)
-**Premium Tier:** Up to 600 pages (full textbooks)
-**Professional Tier:** Up to 1,000 pages (comprehensive references)
+**Free Tier:** Up to 5,000 words (~20 pages) - Perfect for single chapters
+**Premium Tier:** Unlimited words - Analyze entire textbooks
+**Professional Tier:** Unlimited words + batch processing
 
 Supported formats: `.docx` and `.obt`
 
