@@ -421,6 +421,62 @@ export const MATHEMATICS_CONCEPTS: ConceptLibrary = {
       aliases: ["arctangent", "arctan"],
     },
 
+    // ========== HYPERBOLIC FUNCTIONS ==========
+    {
+      name: "hyperbolic sine",
+      category: "Hyperbolic Functions",
+      importance: "detail",
+      aliases: ["sinh"],
+    },
+    {
+      name: "hyperbolic cosine",
+      category: "Hyperbolic Functions",
+      importance: "detail",
+      aliases: ["cosh"],
+    },
+    {
+      name: "hyperbolic tangent",
+      category: "Hyperbolic Functions",
+      importance: "detail",
+      aliases: ["tanh"],
+    },
+    {
+      name: "hyperbolic cosecant",
+      category: "Hyperbolic Functions",
+      importance: "detail",
+      aliases: ["csch"],
+    },
+    {
+      name: "hyperbolic secant",
+      category: "Hyperbolic Functions",
+      importance: "detail",
+      aliases: ["sech"],
+    },
+    {
+      name: "hyperbolic cotangent",
+      category: "Hyperbolic Functions",
+      importance: "detail",
+      aliases: ["coth"],
+    },
+    {
+      name: "inverse hyperbolic sine",
+      category: "Hyperbolic Functions",
+      importance: "detail",
+      aliases: ["arcsinh", "arsinh"],
+    },
+    {
+      name: "inverse hyperbolic cosine",
+      category: "Hyperbolic Functions",
+      importance: "detail",
+      aliases: ["arccosh", "arcosh"],
+    },
+    {
+      name: "inverse hyperbolic tangent",
+      category: "Hyperbolic Functions",
+      importance: "detail",
+      aliases: ["arctanh", "artanh"],
+    },
+
     // ========== TRIGONOMETRIC IDENTITIES ==========
     {
       name: "trigonometric identity",
@@ -528,6 +584,125 @@ export const MATHEMATICS_CONCEPTS: ConceptLibrary = {
       name: "angle of depression",
       category: "Triangles",
       importance: "supporting",
+    },
+
+    // ========== SPHERICAL TRIGONOMETRY ==========
+    {
+      name: "spherical trigonometry",
+      category: "Spherical Trigonometry",
+      importance: "detail",
+    },
+    {
+      name: "great circle",
+      category: "Spherical Trigonometry",
+      importance: "detail",
+    },
+    {
+      name: "spherical triangle",
+      category: "Spherical Trigonometry",
+      importance: "detail",
+    },
+    {
+      name: "spherical excess",
+      category: "Spherical Trigonometry",
+      importance: "detail",
+    },
+    {
+      name: "spherical law of sines",
+      category: "Spherical Trigonometry",
+      importance: "detail",
+    },
+    {
+      name: "spherical law of cosines",
+      category: "Spherical Trigonometry",
+      importance: "detail",
+    },
+    {
+      name: "haversine formula",
+      category: "Spherical Trigonometry",
+      importance: "detail",
+    },
+    {
+      name: "geodesic",
+      category: "Spherical Trigonometry",
+      importance: "detail",
+      aliases: ["geodesic curve"],
+    },
+
+    // ========== ANALYTIC GEOMETRY ==========
+    {
+      name: "analytic geometry",
+      category: "Analytic Geometry",
+      importance: "core",
+      aliases: ["coordinate geometry", "Cartesian geometry"],
+    },
+    {
+      name: "distance formula",
+      category: "Analytic Geometry",
+      importance: "core",
+    },
+    {
+      name: "midpoint formula",
+      category: "Analytic Geometry",
+      importance: "core",
+    },
+    {
+      name: "conic section",
+      category: "Analytic Geometry",
+      importance: "core",
+      aliases: ["conic"],
+    },
+    {
+      name: "circle",
+      category: "Analytic Geometry",
+      importance: "core",
+    },
+    {
+      name: "ellipse",
+      category: "Analytic Geometry",
+      importance: "core",
+    },
+    {
+      name: "parabola",
+      category: "Analytic Geometry",
+      importance: "core",
+    },
+    {
+      name: "hyperbola",
+      category: "Analytic Geometry",
+      importance: "core",
+    },
+    {
+      name: "focus",
+      category: "Analytic Geometry",
+      importance: "supporting",
+      aliases: ["foci"],
+    },
+    {
+      name: "directrix",
+      category: "Analytic Geometry",
+      importance: "supporting",
+    },
+    {
+      name: "eccentricity",
+      category: "Analytic Geometry",
+      importance: "supporting",
+    },
+    {
+      name: "latus rectum",
+      category: "Analytic Geometry",
+      importance: "detail",
+    },
+    {
+      name: "polar coordinates",
+      category: "Analytic Geometry",
+      importance: "core",
+    },
+    {
+      name: "parametric equation",
+      category: "Analytic Geometry",
+      importance: "core",
+      aliases: ["parametric equations"],
     },
 
     // ========== COMPLEX NUMBERS ==========
@@ -752,6 +927,776 @@ export const MATHEMATICS_CONCEPTS: ConceptLibrary = {
       name: "vector addition",
       category: "Vectors",
       importance: "core",
+    },
+    {
+      name: "linear combination",
+      category: "Vectors",
+      importance: "supporting",
+    },
+    {
+      name: "orthogonal vectors",
+      category: "Vectors",
+      importance: "supporting",
+      aliases: ["perpendicular vectors"],
+    },
+
+    // ========== LINEAR ALGEBRA ==========
+    {
+      name: "linear algebra",
+      category: "Linear Algebra",
+      importance: "core",
+    },
+    {
+      name: "vector space",
+      category: "Linear Algebra",
+      importance: "core",
+      aliases: ["linear space"],
+    },
+    {
+      name: "subspace",
+      category: "Linear Algebra",
+      importance: "supporting",
+      aliases: ["linear subspace"],
+    },
+    {
+      name: "span",
+      category: "Linear Algebra",
+      importance: "core",
+      aliases: ["linear span"],
+    },
+    {
+      name: "linear independence",
+      category: "Linear Algebra",
+      importance: "core",
+      aliases: ["linearly independent"],
+    },
+    {
+      name: "linear dependence",
+      category: "Linear Algebra",
+      importance: "supporting",
+      aliases: ["linearly dependent"],
+    },
+    {
+      name: "basis",
+      category: "Linear Algebra",
+      importance: "core",
+      aliases: ["basis vectors"],
+    },
+    {
+      name: "dimension",
+      category: "Linear Algebra",
+      importance: "core",
+      aliases: ["dimensionality"],
+    },
+    {
+      name: "rank",
+      category: "Linear Algebra",
+      importance: "supporting",
+      aliases: ["matrix rank"],
+    },
+    {
+      name: "nullity",
+      category: "Linear Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "null space",
+      category: "Linear Algebra",
+      importance: "supporting",
+      aliases: ["kernel"],
+    },
+    {
+      name: "column space",
+      category: "Linear Algebra",
+      importance: "supporting",
+      aliases: ["range", "image"],
+    },
+    {
+      name: "row space",
+      category: "Linear Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "eigenvalue",
+      category: "Linear Algebra",
+      importance: "core",
+      aliases: ["characteristic value"],
+    },
+    {
+      name: "eigenvector",
+      category: "Linear Algebra",
+      importance: "core",
+      aliases: ["characteristic vector"],
+    },
+    {
+      name: "characteristic polynomial",
+      category: "Linear Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "characteristic equation",
+      category: "Linear Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "diagonalization",
+      category: "Linear Algebra",
+      importance: "supporting",
+      aliases: ["matrix diagonalization"],
+    },
+    {
+      name: "linear transformation",
+      category: "Linear Algebra",
+      importance: "core",
+      aliases: ["linear map", "linear operator"],
+    },
+    {
+      name: "kernel",
+      category: "Linear Algebra",
+      importance: "supporting",
+      aliases: ["null space"],
+    },
+    {
+      name: "range",
+      category: "Linear Algebra",
+      importance: "supporting",
+      aliases: ["image"],
+    },
+    {
+      name: "orthogonality",
+      category: "Linear Algebra",
+      importance: "supporting",
+      aliases: ["orthogonal"],
+    },
+    {
+      name: "orthonormal basis",
+      category: "Linear Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "Gram-Schmidt process",
+      category: "Linear Algebra",
+      importance: "detail",
+      aliases: ["Gram-Schmidt orthogonalization"],
+    },
+    {
+      name: "inner product",
+      category: "Linear Algebra",
+      importance: "supporting",
+      aliases: ["dot product", "scalar product"],
+    },
+    {
+      name: "norm",
+      category: "Linear Algebra",
+      importance: "supporting",
+      aliases: ["magnitude", "length"],
+    },
+    {
+      name: "projection",
+      category: "Linear Algebra",
+      importance: "supporting",
+      aliases: ["orthogonal projection"],
+    },
+    {
+      name: "least squares",
+      category: "Linear Algebra",
+      importance: "supporting",
+      aliases: ["least squares approximation"],
+    },
+
+    // ========== MATRIX ALGEBRA ==========
+    {
+      name: "matrix algebra",
+      category: "Matrix Algebra",
+      importance: "core",
+    },
+    {
+      name: "matrix addition",
+      category: "Matrix Algebra",
+      importance: "core",
+    },
+    {
+      name: "matrix subtraction",
+      category: "Matrix Algebra",
+      importance: "core",
+    },
+    {
+      name: "scalar multiplication",
+      category: "Matrix Algebra",
+      importance: "core",
+    },
+    {
+      name: "matrix product",
+      category: "Matrix Algebra",
+      importance: "core",
+      aliases: ["matrix multiplication"],
+    },
+    {
+      name: "trace",
+      category: "Matrix Algebra",
+      importance: "supporting",
+      aliases: ["trace of a matrix"],
+    },
+    {
+      name: "symmetric matrix",
+      category: "Matrix Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "skew-symmetric matrix",
+      category: "Matrix Algebra",
+      importance: "detail",
+      aliases: ["antisymmetric matrix"],
+    },
+    {
+      name: "diagonal matrix",
+      category: "Matrix Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "upper triangular matrix",
+      category: "Matrix Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "lower triangular matrix",
+      category: "Matrix Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "orthogonal matrix",
+      category: "Matrix Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "singular matrix",
+      category: "Matrix Algebra",
+      importance: "supporting",
+      aliases: ["non-invertible matrix"],
+    },
+    {
+      name: "nonsingular matrix",
+      category: "Matrix Algebra",
+      importance: "supporting",
+      aliases: ["invertible matrix"],
+    },
+    {
+      name: "augmented matrix",
+      category: "Matrix Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "coefficient matrix",
+      category: "Matrix Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "Gaussian elimination",
+      category: "Matrix Algebra",
+      importance: "core",
+      aliases: ["row reduction"],
+    },
+    {
+      name: "Gauss-Jordan elimination",
+      category: "Matrix Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "elementary row operations",
+      category: "Matrix Algebra",
+      importance: "supporting",
+      aliases: ["row operations"],
+    },
+    {
+      name: "pivot",
+      category: "Matrix Algebra",
+      importance: "supporting",
+      aliases: ["pivot element", "leading entry"],
+    },
+    {
+      name: "Cramer's rule",
+      category: "Matrix Algebra",
+      importance: "detail",
+    },
+    {
+      name: "matrix inversion",
+      category: "Matrix Algebra",
+      importance: "core",
+      aliases: ["finding inverse"],
+    },
+    {
+      name: "cofactor",
+      category: "Matrix Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "minor",
+      category: "Matrix Algebra",
+      importance: "supporting",
+      aliases: ["matrix minor"],
+    },
+    {
+      name: "adjugate",
+      category: "Matrix Algebra",
+      importance: "detail",
+      aliases: ["adjoint matrix", "classical adjoint"],
+    },
+
+    // ========== DISCRETE MATHEMATICS ==========
+    {
+      name: "discrete mathematics",
+      category: "Discrete Mathematics",
+      importance: "core",
+    },
+    {
+      name: "graph theory",
+      category: "Discrete Mathematics",
+      importance: "core",
+    },
+    {
+      name: "graph",
+      category: "Discrete Mathematics",
+      importance: "core",
+      aliases: ["network"],
+    },
+    {
+      name: "vertex",
+      category: "Discrete Mathematics",
+      importance: "core",
+      aliases: ["node", "vertices"],
+    },
+    {
+      name: "edge",
+      category: "Discrete Mathematics",
+      importance: "core",
+      aliases: ["arc", "link"],
+    },
+    {
+      name: "directed graph",
+      category: "Discrete Mathematics",
+      importance: "supporting",
+      aliases: ["digraph"],
+    },
+    {
+      name: "undirected graph",
+      category: "Discrete Mathematics",
+      importance: "supporting",
+    },
+    {
+      name: "weighted graph",
+      category: "Discrete Mathematics",
+      importance: "supporting",
+    },
+    {
+      name: "path",
+      category: "Discrete Mathematics",
+      importance: "supporting",
+    },
+    {
+      name: "cycle",
+      category: "Discrete Mathematics",
+      importance: "supporting",
+      aliases: ["circuit"],
+    },
+    {
+      name: "tree",
+      category: "Discrete Mathematics",
+      importance: "supporting",
+    },
+    {
+      name: "binary tree",
+      category: "Discrete Mathematics",
+      importance: "supporting",
+    },
+    {
+      name: "spanning tree",
+      category: "Discrete Mathematics",
+      importance: "detail",
+    },
+    {
+      name: "adjacency matrix",
+      category: "Discrete Mathematics",
+      importance: "supporting",
+    },
+    {
+      name: "degree",
+      category: "Discrete Mathematics",
+      importance: "supporting",
+      aliases: ["vertex degree"],
+    },
+    {
+      name: "Euler path",
+      category: "Discrete Mathematics",
+      importance: "detail",
+      aliases: ["Eulerian path"],
+    },
+    {
+      name: "Hamiltonian path",
+      category: "Discrete Mathematics",
+      importance: "detail",
+    },
+    {
+      name: "combinatorics",
+      category: "Discrete Mathematics",
+      importance: "core",
+    },
+    {
+      name: "recurrence relation",
+      category: "Discrete Mathematics",
+      importance: "supporting",
+      aliases: ["difference equation"],
+    },
+    {
+      name: "algorithm",
+      category: "Discrete Mathematics",
+      importance: "core",
+    },
+
+    // ========== ABSTRACT ALGEBRA ==========
+    {
+      name: "abstract algebra",
+      category: "Abstract Algebra",
+      importance: "core",
+    },
+    {
+      name: "group",
+      category: "Abstract Algebra",
+      importance: "core",
+    },
+    {
+      name: "ring",
+      category: "Abstract Algebra",
+      importance: "core",
+    },
+    {
+      name: "field",
+      category: "Abstract Algebra",
+      importance: "core",
+    },
+    {
+      name: "subgroup",
+      category: "Abstract Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "abelian group",
+      category: "Abstract Algebra",
+      importance: "supporting",
+      aliases: ["commutative group"],
+    },
+    {
+      name: "homomorphism",
+      category: "Abstract Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "isomorphism",
+      category: "Abstract Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "binary operation",
+      category: "Abstract Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "identity element",
+      category: "Abstract Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "inverse element",
+      category: "Abstract Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "closure",
+      category: "Abstract Algebra",
+      importance: "supporting",
+    },
+    {
+      name: "associativity",
+      category: "Abstract Algebra",
+      importance: "supporting",
+      aliases: ["associative property"],
+    },
+    {
+      name: "commutativity",
+      category: "Abstract Algebra",
+      importance: "supporting",
+      aliases: ["commutative property"],
+    },
+
+    // ========== MULTIVARIABLE CALCULUS ==========
+    {
+      name: "multivariable calculus",
+      category: "Multivariable Calculus",
+      importance: "core",
+    },
+    {
+      name: "partial derivative",
+      category: "Multivariable Calculus",
+      importance: "core",
+      aliases: ["partial differentiation"],
+    },
+    {
+      name: "gradient",
+      category: "Multivariable Calculus",
+      importance: "core",
+    },
+    {
+      name: "directional derivative",
+      category: "Multivariable Calculus",
+      importance: "supporting",
+    },
+    {
+      name: "double integral",
+      category: "Multivariable Calculus",
+      importance: "core",
+    },
+    {
+      name: "triple integral",
+      category: "Multivariable Calculus",
+      importance: "supporting",
+    },
+    {
+      name: "line integral",
+      category: "Multivariable Calculus",
+      importance: "supporting",
+    },
+    {
+      name: "surface integral",
+      category: "Multivariable Calculus",
+      importance: "supporting",
+    },
+    {
+      name: "curl",
+      category: "Multivariable Calculus",
+      importance: "supporting",
+    },
+    {
+      name: "divergence",
+      category: "Multivariable Calculus",
+      importance: "supporting",
+    },
+    {
+      name: "Green's theorem",
+      category: "Multivariable Calculus",
+      importance: "detail",
+    },
+    {
+      name: "Stokes' theorem",
+      category: "Multivariable Calculus",
+      importance: "detail",
+    },
+    {
+      name: "divergence theorem",
+      category: "Multivariable Calculus",
+      importance: "detail",
+      aliases: ["Gauss's theorem"],
+    },
+    {
+      name: "Jacobian",
+      category: "Multivariable Calculus",
+      importance: "supporting",
+    },
+    {
+      name: "chain rule",
+      category: "Multivariable Calculus",
+      importance: "core",
+      aliases: ["multivariable chain rule"],
+    },
+    {
+      name: "Lagrange multipliers",
+      category: "Multivariable Calculus",
+      importance: "supporting",
+    },
+
+    // ========== GEOMETRY ==========
+    {
+      name: "geometry",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "Euclidean geometry",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "point",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "line",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "plane",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "parallel",
+      category: "Geometry",
+      importance: "core",
+      aliases: ["parallel lines"],
+    },
+    {
+      name: "perpendicular",
+      category: "Geometry",
+      importance: "core",
+      aliases: ["perpendicular lines"],
+    },
+    {
+      name: "congruent",
+      category: "Geometry",
+      importance: "core",
+      aliases: ["congruence"],
+    },
+    {
+      name: "similar",
+      category: "Geometry",
+      importance: "core",
+      aliases: ["similarity"],
+    },
+    {
+      name: "circle",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "radius",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "diameter",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "circumference",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "area",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "perimeter",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "volume",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "surface area",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "polygon",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "triangle",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "quadrilateral",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "rectangle",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "square",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "parallelogram",
+      category: "Geometry",
+      importance: "supporting",
+    },
+    {
+      name: "trapezoid",
+      category: "Geometry",
+      importance: "supporting",
+    },
+    {
+      name: "rhombus",
+      category: "Geometry",
+      importance: "supporting",
+    },
+    {
+      name: "pentagon",
+      category: "Geometry",
+      importance: "supporting",
+    },
+    {
+      name: "hexagon",
+      category: "Geometry",
+      importance: "supporting",
+    },
+    {
+      name: "sphere",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "cylinder",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "cone",
+      category: "Geometry",
+      importance: "core",
+    },
+    {
+      name: "prism",
+      category: "Geometry",
+      importance: "supporting",
+    },
+    {
+      name: "pyramid",
+      category: "Geometry",
+      importance: "supporting",
+    },
+    {
+      name: "ellipse",
+      category: "Geometry",
+      importance: "supporting",
+    },
+    {
+      name: "parabola",
+      category: "Geometry",
+      importance: "supporting",
+    },
+    {
+      name: "hyperbola",
+      category: "Geometry",
+      importance: "supporting",
+    },
+    {
+      name: "conic section",
+      category: "Geometry",
+      importance: "supporting",
+      aliases: ["conic sections"],
     },
 
     // ========== PROBLEM SOLVING METHODS ==========
@@ -1259,6 +2204,258 @@ export const MATHEMATICS_CONCEPTS: ConceptLibrary = {
       category: "Logic",
       importance: "supporting",
       aliases: ["proof by contradiction"],
+    },
+
+    // ========== DISCRETE MATHEMATICS ==========
+    {
+      name: "discrete mathematics",
+      category: "Discrete Mathematics",
+      importance: "core",
+    },
+    {
+      name: "graph theory",
+      category: "Discrete Mathematics",
+      importance: "core",
+    },
+    {
+      name: "graph",
+      category: "Discrete Mathematics",
+      importance: "core",
+      aliases: ["network"],
+    },
+    {
+      name: "vertex",
+      category: "Discrete Mathematics",
+      importance: "core",
+      aliases: ["node", "vertices"],
+    },
+    {
+      name: "edge",
+      category: "Discrete Mathematics",
+      importance: "core",
+      aliases: ["arc", "link"],
+    },
+    {
+      name: "directed graph",
+      category: "Discrete Mathematics",
+      importance: "supporting",
+      aliases: ["digraph"],
+    },
+    {
+      name: "tree",
+      category: "Discrete Mathematics",
+      importance: "supporting",
+      aliases: ["tree structure"],
+    },
+    {
+      name: "binary tree",
+      category: "Discrete Mathematics",
+      importance: "detail",
+    },
+    {
+      name: "algorithm",
+      category: "Discrete Mathematics",
+      importance: "core",
+    },
+    {
+      name: "recursion",
+      category: "Discrete Mathematics",
+      importance: "supporting",
+      aliases: ["recursive algorithm"],
+    },
+    {
+      name: "combinatorics",
+      category: "Discrete Mathematics",
+      importance: "core",
+    },
+    {
+      name: "counting principle",
+      category: "Discrete Mathematics",
+      importance: "supporting",
+      aliases: ["fundamental counting principle"],
+    },
+    {
+      name: "pigeonhole principle",
+      category: "Discrete Mathematics",
+      importance: "detail",
+    },
+    {
+      name: "binomial coefficient",
+      category: "Discrete Mathematics",
+      importance: "supporting",
+      aliases: ["binomial coefficients"],
+    },
+    {
+      name: "Pascal's triangle",
+      category: "Discrete Mathematics",
+      importance: "supporting",
+    },
+
+    // ========== MULTIVARIABLE CALCULUS ==========
+    {
+      name: "multivariable calculus",
+      category: "Multivariable Calculus",
+      importance: "detail",
+    },
+    {
+      name: "partial derivative",
+      category: "Multivariable Calculus",
+      importance: "detail",
+      aliases: ["partial derivatives"],
+    },
+    {
+      name: "gradient",
+      category: "Multivariable Calculus",
+      importance: "detail",
+      aliases: ["gradient vector"],
+    },
+    {
+      name: "directional derivative",
+      category: "Multivariable Calculus",
+      importance: "detail",
+    },
+    {
+      name: "double integral",
+      category: "Multivariable Calculus",
+      importance: "detail",
+    },
+    {
+      name: "triple integral",
+      category: "Multivariable Calculus",
+      importance: "detail",
+    },
+    {
+      name: "line integral",
+      category: "Multivariable Calculus",
+      importance: "detail",
+    },
+    {
+      name: "surface integral",
+      category: "Multivariable Calculus",
+      importance: "detail",
+    },
+    {
+      name: "curl",
+      category: "Multivariable Calculus",
+      importance: "detail",
+    },
+    {
+      name: "divergence",
+      category: "Multivariable Calculus",
+      importance: "detail",
+    },
+    {
+      name: "Green's theorem",
+      category: "Multivariable Calculus",
+      importance: "detail",
+    },
+    {
+      name: "Stokes' theorem",
+      category: "Multivariable Calculus",
+      importance: "detail",
+    },
+    {
+      name: "divergence theorem",
+      category: "Multivariable Calculus",
+      importance: "detail",
+      aliases: ["Gauss's theorem"],
+    },
+    {
+      name: "Jacobian",
+      category: "Multivariable Calculus",
+      importance: "detail",
+    },
+    {
+      name: "Lagrange multiplier",
+      category: "Multivariable Calculus",
+      importance: "detail",
+      aliases: ["Lagrange multipliers"],
+    },
+
+    // ========== NUMERICAL METHODS ==========
+    {
+      name: "numerical analysis",
+      category: "Numerical Methods",
+      importance: "detail",
+    },
+    {
+      name: "numerical integration",
+      category: "Numerical Methods",
+      importance: "detail",
+    },
+    {
+      name: "trapezoidal rule",
+      category: "Numerical Methods",
+      importance: "detail",
+    },
+    {
+      name: "Simpson's rule",
+      category: "Numerical Methods",
+      importance: "detail",
+    },
+    {
+      name: "Newton's method",
+      category: "Numerical Methods",
+      importance: "detail",
+      aliases: ["Newton-Raphson method"],
+    },
+    {
+      name: "Euler's method",
+      category: "Numerical Methods",
+      importance: "detail",
+    },
+    {
+      name: "finite difference",
+      category: "Numerical Methods",
+      importance: "detail",
+    },
+    {
+      name: "interpolation",
+      category: "Numerical Methods",
+      importance: "detail",
+    },
+    {
+      name: "extrapolation",
+      category: "Numerical Methods",
+      importance: "detail",
+    },
+
+    // ========== OPTIMIZATION ==========
+    {
+      name: "optimization",
+      category: "Optimization",
+      importance: "supporting",
+    },
+    {
+      name: "linear programming",
+      category: "Optimization",
+      importance: "detail",
+    },
+    {
+      name: "objective function",
+      category: "Optimization",
+      importance: "detail",
+    },
+    {
+      name: "constraint",
+      category: "Optimization",
+      importance: "detail",
+      aliases: ["constraints"],
+    },
+    {
+      name: "feasible region",
+      category: "Optimization",
+      importance: "detail",
+    },
+    {
+      name: "simplex method",
+      category: "Optimization",
+      importance: "detail",
+    },
+    {
+      name: "gradient descent",
+      category: "Optimization",
+      importance: "detail",
     },
   ],
 };
