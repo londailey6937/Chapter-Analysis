@@ -564,7 +564,8 @@ export function ReferenceLibraryModal({
                       </td>
                       <td style={{ padding: "0.5rem" }}>600+</td>
                       <td style={{ padding: "0.5rem" }}>
-                        Elementary arithmetic through advanced calculus, linear algebra, discrete math
+                        Elementary arithmetic through advanced calculus, linear
+                        algebra, discrete math
                       </td>
                     </tr>
                     <tr>
@@ -587,11 +588,12 @@ export function ReferenceLibraryModal({
                     </tr>
                     <tr>
                       <td style={{ padding: "0.5rem" }}>
-                        <strong>React</strong>
+                        <strong>Web Development</strong>
                       </td>
-                      <td style={{ padding: "0.5rem" }}>85+</td>
+                      <td style={{ padding: "0.5rem" }}>170+</td>
                       <td style={{ padding: "0.5rem" }}>
-                        React.js development, hooks, components
+                        JavaScript fundamentals, ES6+, React, hooks, DOM, async
+                        patterns
                       </td>
                     </tr>
                   </tbody>
@@ -607,15 +609,45 @@ export function ReferenceLibraryModal({
                   Mathematics Library Details
                 </h3>
                 <p style={{ marginBottom: "1rem", lineHeight: "1.6" }}>
-                  Our comprehensive mathematics library covers elementary through graduate-level concepts with intelligent prerequisite ordering:
+                  Our comprehensive mathematics library covers elementary
+                  through graduate-level concepts with intelligent prerequisite
+                  ordering:
                 </p>
-                <ul style={{ paddingLeft: "1.5rem", marginBottom: "1rem", lineHeight: "1.8" }}>
-                  <li><strong>Level 0 - Elementary:</strong> Arithmetic fundamentals, basic operations, fractions, decimals, percentages, ratios (75+ concepts)</li>
-                  <li><strong>Level 1 - Foundations:</strong> Algebra fundamentals, equations, polynomials, basic geometry, number theory (100+ concepts)</li>
-                  <li><strong>Level 2 - Intermediate:</strong> Functions, graphing, trigonometry, geometry, coordinate geometry (150+ concepts)</li>
-                  <li><strong>Level 3 - Advanced:</strong> Advanced trigonometry, matrices, vectors, linear algebra, discrete mathematics (150+ concepts)</li>
-                  <li><strong>Level 4 - Calculus:</strong> Limits, derivatives, integrals (75+ concepts)</li>
-                  <li><strong>Level 5 - Graduate:</strong> Multivariable calculus, differential equations, optimization (50+ concepts)</li>
+                <ul
+                  style={{
+                    paddingLeft: "1.5rem",
+                    marginBottom: "1rem",
+                    lineHeight: "1.8",
+                  }}
+                >
+                  <li>
+                    <strong>Level 0 - Elementary:</strong> Arithmetic
+                    fundamentals, basic operations, fractions, decimals,
+                    percentages, ratios (75+ concepts)
+                  </li>
+                  <li>
+                    <strong>Level 1 - Foundations:</strong> Algebra
+                    fundamentals, equations, polynomials, basic geometry, number
+                    theory (100+ concepts)
+                  </li>
+                  <li>
+                    <strong>Level 2 - Intermediate:</strong> Functions,
+                    graphing, trigonometry, geometry, coordinate geometry (150+
+                    concepts)
+                  </li>
+                  <li>
+                    <strong>Level 3 - Advanced:</strong> Advanced trigonometry,
+                    matrices, vectors, linear algebra, discrete mathematics
+                    (150+ concepts)
+                  </li>
+                  <li>
+                    <strong>Level 4 - Calculus:</strong> Limits, derivatives,
+                    integrals (75+ concepts)
+                  </li>
+                  <li>
+                    <strong>Level 5 - Graduate:</strong> Multivariable calculus,
+                    differential equations, optimization (50+ concepts)
+                  </li>
                 </ul>
                 <div
                   style={{
@@ -626,9 +658,15 @@ export function ReferenceLibraryModal({
                     marginBottom: "1rem",
                   }}
                 >
-                  <p style={{ margin: 0, fontWeight: "600", color: "#92400e" }}>🔍 Prerequisite Order Check:</p>
+                  <p style={{ margin: 0, fontWeight: "600", color: "#92400e" }}>
+                    🔍 Prerequisite Order Check:
+                  </p>
                   <p style={{ margin: "0.5rem 0 0 0", color: "#78350f" }}>
-                    For mathematics chapters, the system automatically checks if concepts appear before their prerequisites (e.g., calculus before trigonometry). Only flags issues for concepts <em>explicitly mentioned in your document</em> — assumes foundational knowledge from prior chapters.
+                    For mathematics chapters, the system automatically checks if
+                    concepts appear before their prerequisites (e.g., calculus
+                    before trigonometry). Only flags issues for concepts{" "}
+                    <em>explicitly mentioned in your document</em> — assumes
+                    foundational knowledge from prior chapters.
                   </p>
                 </div>
 
@@ -789,10 +827,14 @@ export function ReferenceLibraryModal({
                       learning science evaluation
                     </li>
                     <li>
-                      ⭐ <strong>Interactive Concept Highlighting</strong> - Click any concept to see all mentions throughout the chapter
+                      ⭐ <strong>Interactive Concept Highlighting</strong> -
+                      Click any concept to see all mentions throughout the
+                      chapter
                     </li>
                     <li>
-                      ⭐ <strong>Prerequisite Order Check</strong> - Automatic detection of out-of-sequence concepts (e.g., calculus before trig)
+                      ⭐ <strong>Prerequisite Order Check</strong> - Automatic
+                      detection of out-of-sequence concepts (e.g., calculus
+                      before trig)
                     </li>
                     <li>
                       ⭐ <strong>Export Anywhere</strong> - HTML, DOCX, JSON

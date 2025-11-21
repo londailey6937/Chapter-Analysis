@@ -40,8 +40,7 @@ export type Domain =
   | "physics"
   | "biology"
   | "computing"
-  | "react"
-  | "javascript"
+  | "webdevelopment"
   | "mathematics"
   | "finance"
   | "custom"
@@ -82,18 +81,11 @@ export const AVAILABLE_DOMAINS: DomainInfo[] = [
     icon: "💻",
   },
   {
-    id: "react",
-    label: "React",
+    id: "webdevelopment",
+    label: "Web Development",
     description:
-      "React.js concepts (components, hooks, JSX, state, props, etc.)",
-    icon: "⚛️",
-  },
-  {
-    id: "javascript",
-    label: "JavaScript",
-    description:
-      "JavaScript concepts (closures, promises, async/await, DOM, etc.)",
-    icon: "🟨",
+      "JavaScript and React concepts (functions, hooks, JSX, async/await, DOM, components, state, etc.)",
+    icon: "🌐",
   },
   {
     id: "custom",
