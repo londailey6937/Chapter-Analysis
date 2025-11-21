@@ -356,18 +356,22 @@ You can now **Report False Positives** directly from the concept list. Look for 
 
 **What You Get:**
 
+- ✅ **3 document uploads** (no login required)
+- ✅ Up to 200 pages per document
 - ✅ Spacing analysis (full)
 - ✅ Dual coding analysis (full)
-- ✅ Upload DOCX/OBT files (up to 5,000 words)
-- ✅ Save up to 3 analyzed documents
+- ✅ Upload DOCX/OBT files
 - ✅ View analysis dashboard
 - ✅ Access all built-in domains
+- ✅ **Save up to 3 analyzed documents** (requires free account)
 - ❌ No exports (HTML/DOCX/JSON)
 - ❌ No Writer Mode
 - ❌ No custom domains
 - ❌ Limited to spacing + dual coding only
 
 **Best for:** Trying out the tool, quick checks, students
+
+**Note:** Upload limit resets when you sign up or upgrade to Premium.
 
 ---
 

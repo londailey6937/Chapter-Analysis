@@ -46,7 +46,7 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
             height: "32px",
             borderRadius: "50%",
             border: "none",
-            backgroundColor: "#f3f4f6",
+            backgroundColor: "#f7e6d0",
             color: "#6b7280",
             fontSize: "24px",
             cursor: "pointer",
@@ -64,7 +64,8 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
         <div
           style={{
             padding: "32px 32px 24px",
-            borderBottom: "2px solid #f3f4f6",
+            background: "linear-gradient(135deg, #f5ead9 0%, #eddcc5 100%)",
+            borderBottom: "2px solid #e0c392",
           }}
         >
           <div
@@ -94,7 +95,7 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
               margin: "0 0 8px 0",
               fontSize: "28px",
               fontWeight: "700",
-              color: "#111827",
+              color: "#2c3e50",
             }}
           >
             Tier 2 Full Analysis Suite
@@ -111,9 +112,9 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
             style={{
               marginBottom: "28px",
               padding: "20px",
-              backgroundColor: "#f9fafb",
+              backgroundColor: "#fef5e7",
               borderRadius: "16px",
-              border: "2px solid #e5e7eb",
+              border: "2px solid #e0c392",
             }}
           >
             <h3
@@ -144,9 +145,9 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
                   key={principle.name}
                   style={{
                     padding: "12px",
-                    backgroundColor: "white",
+                    backgroundColor: "#f7e6d0",
                     borderRadius: "12px",
-                    border: "1.5px solid #e5e7eb",
+                    border: "1.5px solid #e0c392",
                   }}
                 >
                   <div
@@ -238,9 +239,9 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
             <div
               style={{
                 padding: "16px",
-                backgroundColor: "white",
+                backgroundColor: "#f7e6d0",
                 borderRadius: "12px",
-                border: "1.5px solid #e5e7eb",
+                border: "1.5px solid #e0c392",
                 marginBottom: "12px",
               }}
             >
@@ -321,14 +322,14 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
             </p>
           </div>
 
-          {/* Feature 3: Concept Graphs */}
+          {/* Feature 3: Concept Graph */}
           <div
             style={{
               marginBottom: "28px",
               padding: "20px",
-              backgroundColor: "#f9fafb",
+              backgroundColor: "#fef5e7",
               borderRadius: "16px",
-              border: "2px solid #e5e7eb",
+              border: "2px solid #e0c392",
             }}
           >
             <h3
@@ -344,9 +345,9 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
             <div
               style={{
                 padding: "24px",
-                backgroundColor: "white",
+                backgroundColor: "#f7e6d0",
                 borderRadius: "12px",
-                border: "1.5px solid #e5e7eb",
+                border: "1.5px solid #e0c392",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -480,9 +481,9 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
             style={{
               marginBottom: "28px",
               padding: "20px",
-              backgroundColor: "#f9fafb",
+              backgroundColor: "#fef5e7",
               borderRadius: "16px",
-              border: "2px solid #e5e7eb",
+              border: "2px solid #e0c392",
             }}
           >
             <h3
@@ -522,9 +523,9 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
                   key={item.status}
                   style={{
                     padding: "12px 16px",
-                    backgroundColor: "white",
+                    backgroundColor: "#f7e6d0",
                     borderRadius: "12px",
-                    border: "1.5px solid #e5e7eb",
+                    border: "1.5px solid #e0c392",
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
@@ -591,14 +592,14 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
             </p>
           </div>
 
-          {/* Feature 5: Professional Export Options */}
+          {/* Feature 5: Professional Export */}
           <div
             style={{
               marginBottom: "28px",
               padding: "20px",
-              backgroundColor: "#f9fafb",
+              backgroundColor: "#fef5e7",
               borderRadius: "16px",
-              border: "2px solid #e5e7eb",
+              border: "2px solid #e0c392",
             }}
           >
             <h3
@@ -623,9 +624,9 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
                   key={format}
                   style={{
                     padding: "16px 12px",
-                    backgroundColor: "white",
+                    backgroundColor: "#f7e6d0",
                     borderRadius: "12px",
-                    border: "1.5px solid #e5e7eb",
+                    border: "1.5px solid #e0c392",
                     textAlign: "center",
                   }}
                 >
@@ -665,9 +666,10 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
             style={{
               marginTop: "32px",
               padding: "24px",
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              background: "linear-gradient(135deg, #fef5e7 0%, #f7e6d0 100%)",
               borderRadius: "16px",
-              color: "white",
+              border: "2px solid #e0c392",
+              color: "#2c3e50",
               textAlign: "center",
             }}
           >
@@ -676,12 +678,17 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
                 margin: "0 0 8px 0",
                 fontSize: "20px",
                 fontWeight: "700",
+                color: "#2c3e50",
               }}
             >
               Ready to unlock these features?
             </h4>
             <p
-              style={{ margin: "0 0 20px 0", fontSize: "14px", opacity: 0.95 }}
+              style={{
+                margin: "0 0 20px 0",
+                fontSize: "14px",
+                color: "#374151",
+              }}
             >
               Upgrade to Premium and get access to the full 10-principle
               analyzer, concept graphs, and professional export tools.
@@ -698,14 +705,14 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
                 onClick={onUpgrade}
                 style={{
                   padding: "12px 32px",
-                  backgroundColor: "white",
-                  color: "#667eea",
+                  backgroundColor: "#ef8432",
+                  color: "white",
                   border: "none",
                   borderRadius: "24px",
                   fontSize: "15px",
                   fontWeight: "700",
                   cursor: "pointer",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+                  boxShadow: "0 4px 12px rgba(239, 132, 50, 0.3)",
                 }}
               >
                 Upgrade to Premium - $9.99/mo
@@ -714,9 +721,9 @@ export const TierTwoPreview: React.FC<TierTwoPreviewProps> = ({
                 onClick={onClose}
                 style={{
                   padding: "12px 24px",
-                  backgroundColor: "rgba(255, 255, 255, 0.2)",
-                  color: "white",
-                  border: "1.5px solid white",
+                  backgroundColor: "white",
+                  color: "#2c3e50",
+                  border: "1.5px solid #e0c392",
                   borderRadius: "24px",
                   fontSize: "14px",
                   fontWeight: "600",

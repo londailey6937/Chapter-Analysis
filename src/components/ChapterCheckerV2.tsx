@@ -809,12 +809,12 @@ export const ChapterCheckerV2: React.FC = () => {
     const tierFeatures = ACCESS_TIERS[accessLevel];
     if (!tierFeatures.fullAnalysis) {
       const wordCount = normalizedPlainText.split(/\s+/).length;
-      const FREE_TIER_WORD_LIMIT = 5000;
+      const FREE_TIER_WORD_LIMIT = 70000; // 200 pages × ~350 words/page
 
       if (wordCount > FREE_TIER_WORD_LIMIT) {
-        setError(
-          `Free tier limit: ${FREE_TIER_WORD_LIMIT.toLocaleString()} words per document. This document has ${wordCount.toLocaleString()} words. Upgrade to Pro for unlimited document size.`
-        );
+        const errorMsg = `Free tier limit: ${FREE_TIER_WORD_LIMIT.toLocaleString()} words per document. This document has ${wordCount.toLocaleString()} words. Upgrade to Premium for unlimited document size.`;
+        console.error("❌ Document rejected:", errorMsg);
+        setError(errorMsg);
         return;
       }
     }
@@ -1830,6 +1830,32 @@ export const ChapterCheckerV2: React.FC = () => {
                     accessLevel={accessLevel}
                   />
 
+                  {/* TEMP: Reset Upload Counter Button - FOR TESTING ONLY */}
+                  {accessLevel === "free" && (
+                    <button
+                      onClick={() => {
+                        localStorage.removeItem("tomeiq_upload_count");
+                        alert(
+                          "Upload counter reset! You now have 3 uploads available."
+                        );
+                      }}
+                      style={{
+                        padding: "8px 16px",
+                        backgroundColor: "#f59e0b",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "8px",
+                        cursor: "pointer",
+                        fontSize: "12px",
+                        fontWeight: "600",
+                        opacity: 0.7,
+                      }}
+                      title="Testing only - Reset upload counter"
+                    >
+                      🔄 Reset Upload Counter (Testing)
+                    </button>
+                  )}
+
                   {/* Action buttons below upload */}
                   {chapterData && !isAnalyzing && (
                     <div
@@ -2001,6 +2027,10 @@ export const ChapterCheckerV2: React.FC = () => {
                       </span>
                       <span style={{ color: "#9ca3af" }}>•</span>
                       <span style={{ fontWeight: 500 }}>
+                        {Math.ceil(wordCount / 250).toLocaleString()} pages
+                      </span>
+                      <span style={{ color: "#9ca3af" }}>•</span>
+                      <span style={{ fontWeight: 500 }}>
                         {charCount.toLocaleString()} chars
                       </span>
                       <span style={{ color: "#9ca3af" }}>•</span>
@@ -2109,7 +2139,7 @@ export const ChapterCheckerV2: React.FC = () => {
                     display: "flex",
                     flexDirection: "column",
                     minHeight: 0,
-                    overflow: "hidden",
+                    overflow: "auto",
                   }}
                 >
                   {/* Image notification banner */}
@@ -2278,6 +2308,8 @@ export const ChapterCheckerV2: React.FC = () => {
             boxShadow: "none",
             padding: 0,
             overflow: "visible",
+            minHeight: 0,
+            maxHeight: "100vh",
           }}
         >
           {!tierFeatures.fullAnalysis ? (
@@ -2286,6 +2318,8 @@ export const ChapterCheckerV2: React.FC = () => {
               className="app-panel"
               style={{
                 flex: 1,
+                minHeight: 0,
+                overflow: "visible",
                 padding: chapterData ? "18px" : "22px",
                 display: "flex",
                 flexDirection: "column",
@@ -2317,7 +2351,7 @@ export const ChapterCheckerV2: React.FC = () => {
                     Tier 1 · Document Insights
                   </strong>
                   <p style={{ margin: "4px 0" }}>
-                    Upload any DOCX or OBT chapter (up to 80 pages) to unlock
+                    Upload any DOCX or OBT chapter (up to 200 pages) to unlock
                     live spacing metrics and dual-coding suggestions directly in
                     the viewer.
                   </p>
@@ -2330,8 +2364,12 @@ export const ChapterCheckerV2: React.FC = () => {
                     }}
                   >
                     <li>
-                      <strong>Upload limit:</strong> Up to 80 pages (generous
-                      single textbook chapter).
+                      <strong>Usage limit:</strong> 3 document uploads (no login
+                      required).
+                    </li>
+                    <li>
+                      <strong>Upload limit:</strong> Up to 200 pages per
+                      document.
                     </li>
                     <li>
                       Spacing overview shows paragraph word counts and density
@@ -2344,6 +2382,10 @@ export const ChapterCheckerV2: React.FC = () => {
                     <li>
                       Search + highlight controls jump to key concept mentions.
                     </li>
+                    <li>
+                      <strong>Save analyses:</strong> Sign up for free to save
+                      up to 3 documents.
+                    </li>
                   </ul>
                 </li>
 
@@ -2353,7 +2395,7 @@ export const ChapterCheckerV2: React.FC = () => {
                   </strong>
                   <p style={{ margin: "4px 0" }}>
                     Run the complete 10-principle evaluator over your draft (up
-                    to 600 pages) for richer learning-science diagnostics and
+                    to 650 pages) for richer learning-science diagnostics and
                     export capabilities.
                   </p>
                   <ul
@@ -2365,7 +2407,7 @@ export const ChapterCheckerV2: React.FC = () => {
                     }}
                   >
                     <li>
-                      <strong>Upload limit:</strong> Up to 600 pages (full
+                      <strong>Upload limit:</strong> Up to 650 pages (full
                       textbooks in chemistry, math, CS, etc.).
                     </li>
                     <li>
@@ -2409,9 +2451,9 @@ export const ChapterCheckerV2: React.FC = () => {
                     }}
                   >
                     <li>
-                      <strong>Upload limit:</strong> Up to 1,000 pages
-                      (comprehensive texts, reference books, handbooks,
-                      long-form manuscripts).
+                      <strong>Upload limit:</strong> Up to 1,000 pages (large
+                      comprehensive texts, reference books, handbooks, long-form
+                      manuscripts).
                     </li>
                     <li>
                       Writer Mode with real-time editing and live analysis

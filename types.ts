@@ -40,7 +40,7 @@ export const ACCESS_TIERS: Record<AccessLevel, AccessFeatures> = {
     writerMode: false,
     unlimitedAnalyses: false,
     prioritySupport: false,
-    maxPages: 80, // Generous single chapter (40-80 pages typical)
+    maxPages: 200, // Multiple chapters or small book
   },
   premium: {
     spacingAnalysis: true,
@@ -52,7 +52,7 @@ export const ACCESS_TIERS: Record<AccessLevel, AccessFeatures> = {
     writerMode: false,
     unlimitedAnalyses: false,
     prioritySupport: false,
-    maxPages: 600, // Full textbook (300-600 pages typical)
+    maxPages: 650, // Full textbook (typical undergraduate textbook)
   },
   professional: {
     spacingAnalysis: true,
@@ -64,7 +64,7 @@ export const ACCESS_TIERS: Record<AccessLevel, AccessFeatures> = {
     writerMode: true,
     unlimitedAnalyses: true,
     prioritySupport: true,
-    maxPages: 1000, // Large comprehensive texts (handbooks, reference books, long-form content)
+    maxPages: 1000, // Large comprehensive single text (reference books, handbooks, long-form content)
   },
 };
 

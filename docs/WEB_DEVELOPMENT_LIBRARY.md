@@ -8,7 +8,7 @@ The Web Development library combines JavaScript and React concepts into a unifie
 
 - **Domain**: `webdevelopment`
 - **Version**: 1.0.0
-- **Total Concepts**: 170+
+- **Total Concepts**: 220+
 - **File**: `src/data/webDevelopmentConceptLibrary.ts`
 
 ## Rationale for Consolidation
@@ -132,6 +132,74 @@ Previously, JavaScript and React were separate libraries with 85+ concepts each.
 - Concurrent Mode, Server Components
 - fragment, portal, StrictMode
 
+### CSS & Styling (40+ concepts)
+
+#### Core Styling
+
+- CSS, selectors, pseudo-classes, pseudo-elements
+
+#### Layout Systems
+
+- **Flexbox**: flexible box model, flex container, flex items
+- **Grid**: CSS Grid, two-dimensional layouts
+- **Responsive**: media queries, breakpoints, viewport
+
+#### Frameworks & Tools
+
+- **Utility-First**: Tailwind CSS
+- **Preprocessors**: Sass, SCSS
+- **Modern CSS**: CSS variables, custom properties
+
+### Build Tools & Bundlers (10+ concepts)
+
+#### Modern Bundlers
+
+- Vite, Webpack, esbuild, Rollup
+
+#### Compilers
+
+- Babel, SWC, TypeScript compiler
+
+#### Task Runners
+
+- npm scripts, build optimization
+
+### Alternative Frameworks (5+ concepts)
+
+#### Component Frameworks
+
+- **Vue**: Progressive framework, approachable API
+- **Svelte**: Compile-time framework, minimal runtime
+
+### TypeScript Advanced (10+ concepts)
+
+#### Type System
+
+- generics, type inference, utility types
+- interface, type aliases, type guards
+
+#### Advanced Features
+
+- Partial, Required, Pick, Omit, Record
+
+### State Management (5+ concepts)
+
+#### Libraries
+
+- **Redux**: Predictable state container, actions, reducers
+- **Zustand**: Lightweight hooks-based state
+- Context API patterns
+
+### Testing Tools (10+ concepts)
+
+#### Unit Testing
+
+- Jest, Vitest, React Testing Library
+
+#### E2E Testing
+
+- Cypress, Playwright, end-to-end workflows
+
 ## Prerequisites Encoding
 
 The library encodes JavaScript → React dependencies:
@@ -188,7 +256,7 @@ The separate **Computer Science** domain remains for general CS topics (algorith
 
 **New Library:**
 
-- `src/data/webDevelopmentConceptLibrary.ts` (1,050 lines, 170+ concepts)
+- `src/data/webDevelopmentConceptLibrary.ts` (1,400+ lines, 220+ concepts)
 
 **Updated Files:**
 
@@ -205,11 +273,14 @@ The separate **Computer Science** domain remains for general CS topics (algorith
 
 Potential additions to the library:
 
-- CSS concepts (flexbox, grid, selectors)
+- ~~CSS concepts (flexbox, grid, selectors)~~ ✅ Added (v1.0.0)
+- ~~Build tools (esbuild, Rollup, SWC)~~ ✅ Added (v1.0.0)
+- ~~Alternative frameworks (Vue, Svelte)~~ ✅ Added (v1.0.0)
+- ~~State management libraries (Redux, Zustand)~~ ✅ Added (v1.0.0)
+- ~~Testing tools (Cypress, Playwright, Vitest)~~ ✅ Added (v1.0.0)
+- ~~TypeScript advanced concepts (generics, utility types)~~ ✅ Added (v1.0.0)
 - Web platform APIs (Service Workers, Web Workers, IndexedDB)
-- Frontend frameworks (Vue, Svelte, Angular)
-- State management libraries (Redux, Zustand, Jotai)
-- Build tools (Vite, Turbopack, esbuild)
-- Testing tools (Cypress, Playwright, Vitest)
+- CSS-in-JS solutions (styled-components, Emotion)
+- GraphQL and API patterns
 
-For now, the library focuses on core JavaScript and React as the foundation of modern web development.
+For now, the library covers core JavaScript, React, CSS, TypeScript, build tools, and modern testing frameworks.

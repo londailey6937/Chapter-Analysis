@@ -29,7 +29,7 @@ export const UpgradePrompt: React.FC<UpgradePromptProps> = ({
     "✓ Everything in Premium, plus:",
     "✓ Writer Mode with Live Analysis",
     "✓ Unlimited Document Analyses",
-    "✓ 1,000 Page Upload Limit",
+    "✓ 1,000 Page Upload Limit (Single Book)",
     "✓ Priority Support",
   ];
 

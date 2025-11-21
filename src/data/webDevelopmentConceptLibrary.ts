@@ -1192,6 +1192,301 @@ export const WEB_DEVELOPMENT_CONCEPTS: ConceptLibrary = {
       description:
         "A tool for highlighting potential problems in an application during development.",
     },
+
+    // ============================================
+    // CSS & STYLING
+    // ============================================
+    {
+      name: "CSS",
+      aliases: ["Cascading Style Sheets", "stylesheet", "styles"],
+      category: "Styling",
+      subcategory: "Core",
+      importance: "core",
+      description: "Language for describing the presentation of web documents.",
+    },
+    {
+      name: "Tailwind CSS",
+      aliases: ["Tailwind", "utility-first CSS", "tailwindcss"],
+      category: "Styling",
+      subcategory: "Frameworks",
+      importance: "supporting",
+      description:
+        "A utility-first CSS framework for rapidly building custom user interfaces.",
+    },
+    {
+      name: "Sass",
+      aliases: [
+        "SCSS",
+        "Syntactically Awesome Style Sheets",
+        "sass preprocessor",
+      ],
+      category: "Styling",
+      subcategory: "Preprocessors",
+      importance: "supporting",
+      description:
+        "A CSS preprocessor that adds features like variables, nesting, and mixins.",
+    },
+    {
+      name: "flexbox",
+      aliases: [
+        "CSS flexbox",
+        "flexible box",
+        "flex container",
+        "flex layout",
+        "display flex",
+      ],
+      category: "Styling",
+      subcategory: "Layout",
+      importance: "core",
+      description:
+        "A CSS layout model for arranging elements in rows or columns with flexible sizing.",
+    },
+    {
+      name: "CSS Grid",
+      aliases: ["grid layout", "CSS grid layout", "display grid", "grid"],
+      category: "Styling",
+      subcategory: "Layout",
+      importance: "core",
+      description:
+        "A two-dimensional CSS layout system for creating complex responsive layouts.",
+    },
+    {
+      name: "media query",
+      aliases: [
+        "media queries",
+        "@media",
+        "responsive design",
+        "breakpoint",
+        "viewport",
+      ],
+      category: "Styling",
+      subcategory: "Responsive",
+      importance: "core",
+      description:
+        "CSS technique for applying styles based on device characteristics like screen width.",
+    },
+    {
+      name: "CSS variables",
+      aliases: [
+        "CSS custom properties",
+        "custom properties",
+        "--variable",
+        "var()",
+      ],
+      category: "Styling",
+      subcategory: "Advanced",
+      importance: "supporting",
+      description:
+        "Custom properties that can be reused throughout CSS documents.",
+    },
+    {
+      name: "pseudo-class",
+      aliases: [
+        "pseudo-classes",
+        ":hover",
+        ":focus",
+        ":active",
+        ":nth-child",
+        "CSS pseudo-class",
+      ],
+      category: "Styling",
+      subcategory: "Selectors",
+      importance: "supporting",
+      description:
+        "A keyword added to selectors that specifies a special state of elements.",
+    },
+    {
+      name: "pseudo-element",
+      aliases: [
+        "pseudo-elements",
+        "::before",
+        "::after",
+        "::first-line",
+        "CSS pseudo-element",
+      ],
+      category: "Styling",
+      subcategory: "Selectors",
+      importance: "supporting",
+      description:
+        "A keyword added to selectors that styles a specific part of an element.",
+    },
+    {
+      name: "CSS selector",
+      aliases: [
+        "selector",
+        "class selector",
+        "id selector",
+        "attribute selector",
+        "combinator",
+      ],
+      category: "Styling",
+      subcategory: "Selectors",
+      importance: "core",
+      description: "Pattern used to select and style HTML elements.",
+    },
+
+    // ============================================
+    // BUILD TOOLS & BUNDLERS
+    // ============================================
+    {
+      name: "esbuild",
+      aliases: ["esbuild bundler", "esbuild compiler"],
+      category: "Build Tools",
+      subcategory: "Bundlers",
+      importance: "supporting",
+      description:
+        "An extremely fast JavaScript bundler and minifier written in Go.",
+    },
+    {
+      name: "Rollup",
+      aliases: ["Rollup.js", "rollup bundler"],
+      category: "Build Tools",
+      subcategory: "Bundlers",
+      importance: "supporting",
+      description:
+        "A module bundler for JavaScript that compiles small pieces of code into libraries or applications.",
+    },
+    {
+      name: "SWC",
+      aliases: ["Speedy Web Compiler", "swc compiler", "@swc"],
+      category: "Build Tools",
+      subcategory: "Compilers",
+      importance: "supporting",
+      description:
+        "A super-fast TypeScript/JavaScript compiler written in Rust, used as an alternative to Babel.",
+    },
+
+    // ============================================
+    // ALTERNATIVE FRAMEWORKS
+    // ============================================
+    {
+      name: "Vue",
+      aliases: ["Vue.js", "Vuejs", "Vue framework"],
+      category: "Frameworks",
+      subcategory: "Component Frameworks",
+      importance: "supporting",
+      description:
+        "A progressive JavaScript framework for building user interfaces with a focus on simplicity.",
+    },
+    {
+      name: "Svelte",
+      aliases: ["Svelte framework", "SvelteKit"],
+      category: "Frameworks",
+      subcategory: "Component Frameworks",
+      importance: "supporting",
+      description:
+        "A component framework that compiles to minimal JavaScript at build time for exceptional performance.",
+    },
+
+    // ============================================
+    // TYPESCRIPT ADVANCED
+    // ============================================
+    {
+      name: "generics",
+      aliases: ["generic types", "type parameters", "<T>", "generic functions"],
+      category: "TypeScript",
+      subcategory: "Advanced Types",
+      importance: "supporting",
+      description:
+        "A way to create reusable components that work with multiple types.",
+      prerequisites: ["TypeScript"],
+    },
+    {
+      name: "type inference",
+      aliases: ["inferred types", "automatic typing", "implicit types"],
+      category: "TypeScript",
+      subcategory: "Type System",
+      importance: "supporting",
+      description:
+        "TypeScript's ability to automatically determine types without explicit annotations.",
+      prerequisites: ["TypeScript"],
+    },
+    {
+      name: "interface",
+      aliases: ["interfaces", "interface declaration", "type interface"],
+      category: "TypeScript",
+      subcategory: "Type Definitions",
+      importance: "core",
+      description:
+        "A TypeScript structure that defines the shape of an object.",
+      prerequisites: ["TypeScript"],
+    },
+    {
+      name: "utility types",
+      aliases: [
+        "Partial",
+        "Required",
+        "Pick",
+        "Omit",
+        "Record",
+        "built-in types",
+      ],
+      category: "TypeScript",
+      subcategory: "Advanced Types",
+      importance: "supporting",
+      description:
+        "Built-in TypeScript types that facilitate common type transformations.",
+      prerequisites: ["TypeScript", "interface"],
+    },
+
+    // ============================================
+    // STATE MANAGEMENT
+    // ============================================
+    {
+      name: "Redux",
+      aliases: [
+        "Redux store",
+        "Redux Toolkit",
+        "RTK",
+        "action",
+        "reducer pattern",
+      ],
+      category: "State Management",
+      subcategory: "Libraries",
+      importance: "supporting",
+      description:
+        "A predictable state container for JavaScript apps, commonly used with React.",
+    },
+    {
+      name: "Zustand",
+      aliases: ["zustand store", "zustand state"],
+      category: "State Management",
+      subcategory: "Libraries",
+      importance: "supporting",
+      description:
+        "A small, fast, and scalable state management solution using hooks.",
+    },
+
+    // ============================================
+    // TESTING TOOLS
+    // ============================================
+    {
+      name: "Vitest",
+      aliases: ["vite test", "vitest runner"],
+      category: "Testing",
+      subcategory: "Unit Testing",
+      importance: "supporting",
+      description:
+        "A blazing fast unit test framework powered by Vite with Jest-compatible API.",
+    },
+    {
+      name: "Cypress",
+      aliases: ["cypress testing", "cypress e2e", "cypress.io"],
+      category: "Testing",
+      subcategory: "E2E Testing",
+      importance: "supporting",
+      description:
+        "A JavaScript end-to-end testing framework for web applications.",
+    },
+    {
+      name: "Playwright",
+      aliases: ["playwright testing", "playwright e2e", "@playwright"],
+      category: "Testing",
+      subcategory: "E2E Testing",
+      importance: "supporting",
+      description:
+        "A framework for reliable end-to-end testing across all modern browsers.",
+    },
   ],
 };
 

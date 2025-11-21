@@ -79,10 +79,73 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
   accessLevel = "free",
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const lastIncrementTime = useRef<number>(0);
+
+  const checkUploadLimit = (): boolean => {
+    // Only enforce limit for free tier
+    if (accessLevel !== "free") return true;
+
+    const uploadKey = "tomeiq_upload_count";
+    const uploadCount = parseInt(localStorage.getItem(uploadKey) || "0", 10);
+
+    if (uploadCount >= 3) {
+      alert(
+        "Free tier limit: 3 document uploads.\n\n" +
+          "You've used all 3 free uploads. Upgrade to Premium for unlimited uploads and full analysis features.\n\n" +
+          "Premium tier includes:\n" +
+          "• Unlimited document uploads\n" +
+          "• Up to 650 pages per document\n" +
+          "• Full 10-principle analysis\n" +
+          "• Export results (HTML, DOCX, JSON)\n" +
+          "• Custom domain creation"
+      );
+      return false;
+    }
+
+    return true;
+  };
+
+  const incrementUploadCount = () => {
+    if (accessLevel !== "free") return;
+
+    // Prevent duplicate increments within 2 seconds
+    const now = Date.now();
+    if (now - lastIncrementTime.current < 2000) {
+      console.log("⏭️ Skipping duplicate upload count increment");
+      return;
+    }
+    lastIncrementTime.current = now;
+
+    const uploadKey = "tomeiq_upload_count";
+    const uploadCount = parseInt(localStorage.getItem(uploadKey) || "0", 10);
+    localStorage.setItem(uploadKey, String(uploadCount + 1));
+
+    const remaining = 3 - (uploadCount + 1);
+    if (remaining > 0) {
+      console.log(
+        `📊 Free tier: ${remaining} upload${
+          remaining === 1 ? "" : "s"
+        } remaining`
+      );
+    } else {
+      console.log(
+        `📊 Free tier: All 3 uploads used. Upgrade to Premium for unlimited uploads.`
+      );
+    }
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Check upload limit before processing
+    if (!checkUploadLimit()) {
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
 
     const fileName = file.name;
     const fileType = file.name.split(".").pop()?.toLowerCase() || "";
@@ -202,16 +265,20 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
             `Document too large: ~${estimatedPages} pages detected.\n\n` +
               `Your ${tierName} tier allows up to ${maxPages} pages.\n\n` +
               (accessLevel === "free"
-                ? "Free tier: Up to 80 pages (1 generous textbook chapter)\n" +
-                  "Premium tier: Up to 600 pages (full textbooks)\n" +
-                  "Professional tier: Up to 1,000 pages (multiple books)\n\n" +
-                  "Please upgrade or split your document into smaller chapters."
+                ? "Free tier: Up to 200 pages (multiple chapters)\n" +
+                  "Premium tier: Up to 650 pages (full textbooks)\n" +
+                  "Professional tier: Up to 1,000 pages (large comprehensive texts)\n\n" +
+                  "Please upgrade or split your document into smaller sections."
                 : accessLevel === "premium"
-                ? "Premium tier: Up to 600 pages (typical undergraduate textbook)\n" +
+                ? "Premium tier: Up to 650 pages (typical undergraduate textbook)\n" +
                   "Professional tier: Up to 1,000 pages (reference books, handbooks)\n\n" +
                   "Please upgrade or split your document."
                 : "Please split your document into smaller sections.")
           );
+          // Reset file input
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
           return;
         }
 
@@ -245,6 +312,12 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
         };
 
         // Document loaded successfully
+        console.log("✅ Document processed, calling onDocumentLoad", {
+          fileName,
+          contentLength: payload.content.length,
+          plainTextLength: payload.plainText.length,
+        });
+        incrementUploadCount();
         onDocumentLoad(payload);
       } else if (fileType === "obt") {
         const textContent = await file.text();
@@ -253,6 +326,10 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
           alert(
             "Could not extract text from the document. Please try a different file."
           );
+          // Reset file input
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
           return;
         }
 
@@ -275,16 +352,20 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
             `Document too large: ~${estimatedPages} pages detected.\n\n` +
               `Your ${tierName} tier allows up to ${maxPages} pages.\n\n` +
               (accessLevel === "free"
-                ? "Free tier: Up to 80 pages (1 generous textbook chapter)\n" +
-                  "Premium tier: Up to 600 pages (full textbooks)\n" +
-                  "Professional tier: Up to 1,000 pages (multiple books)\n\n" +
-                  "Please upgrade or split your document into smaller chapters."
+                ? "Free tier: Up to 200 pages (multiple chapters)\n" +
+                  "Premium tier: Up to 650 pages (full textbooks)\n" +
+                  "Professional tier: Up to 1,000 pages (large comprehensive texts)\n\n" +
+                  "Please upgrade or split your document into smaller sections."
                 : accessLevel === "premium"
-                ? "Premium tier: Up to 600 pages (typical undergraduate textbook)\n" +
+                ? "Premium tier: Up to 650 pages (typical undergraduate textbook)\n" +
                   "Professional tier: Up to 1,000 pages (comprehensive texts)\n\n" +
-                  "Please upgrade or split your document."
+                  "Please upgrade."
                 : "Please split your document into smaller sections.")
           );
+          // Reset file input
+          if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+          }
           return;
         }
 
@@ -297,19 +378,32 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
           imageCount: 0,
         };
 
+        console.log("✅ OBT document processed, calling onDocumentLoad", {
+          fileName,
+          contentLength: textContent.length,
+        });
+        incrementUploadCount();
         onDocumentLoad(payload);
       } else {
         alert("Please upload a .docx or .obt file");
+        // Reset file input
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
         return;
       }
     } catch (error) {
       console.error("❌ Error reading document:", error);
       alert("Error reading document. Please try again.");
-    }
-
-    // Reset input so the same file can be uploaded again
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      // Reset file input after error
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } finally {
+      // Always reset input so the same file can be uploaded again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
