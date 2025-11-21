@@ -759,6 +759,7 @@ export class ConceptExtractor {
         name: conceptName, // Use canonical name from library
         definition: conceptDefinition,
         importance: this.determineImportance(mentions, candidate, index),
+        category: libraryDef?.category, // Add category for prerequisite ordering
         firstMentionPosition: mentions[0]?.position || 0,
         mentions: mentions,
         relatedConcepts: [],

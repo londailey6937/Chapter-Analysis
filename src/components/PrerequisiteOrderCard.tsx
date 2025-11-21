@@ -2,6 +2,10 @@ import React, { useMemo } from "react";
 import type { Concept, ConceptRelationship } from "@/types";
 import { CONCEPT_LIBRARIES } from "@/data/conceptLibraryRegistry";
 import type { Domain } from "@/data/conceptLibraryTypes";
+import {
+  getCategoryPrerequisites,
+  shouldPrecedeCategory,
+} from "@/data/categoryHierarchy";
 
 interface PrerequisiteOrderCardProps {
   concepts?: Concept[];
@@ -101,6 +105,19 @@ export const PrerequisiteOrderCard: React.FC<PrerequisiteOrderCardProps> = ({
           set.add(matchingConcept.id);
         }
       });
+    }
+
+    // Add category-based prerequisites (for mathematics domain)
+    if (activeDomain === "mathematics" && concept.category) {
+      const categoryPrereqs = getCategoryPrerequisites(concept.category);
+      if (categoryPrereqs.length > 0) {
+        // Find any concepts in the document that belong to prerequisite categories
+        concepts.forEach((c) => {
+          if (c.category && categoryPrereqs.includes(c.category)) {
+            set.add(c.id);
+          }
+        });
+      }
     }
 
     // Add from relationship prerequisites

@@ -90,6 +90,7 @@ export interface Concept {
   name: string;
   definition: string;
   importance: "core" | "supporting" | "detail";
+  category?: string; // Mathematical category (e.g., "Algebra Fundamentals", "Calculus")
   firstMentionPosition: number; // Character position in chapter
   mentions: ConceptMention[];
   relatedConcepts: string[]; // IDs of related concepts

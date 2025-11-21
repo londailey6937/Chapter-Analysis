@@ -1,7 +1,7 @@
 /**
  * Mathematics Concept Library
  *
- * Comprehensive library covering algebra, trigonometry, calculus, and advanced mathematics.
+ * Comprehensive library covering elementary arithmetic through advanced mathematics.
  * Organized by major topic areas for efficient concept identification.
  */
 
@@ -9,8 +9,414 @@ import { ConceptLibrary } from "./conceptLibraryTypes";
 
 export const MATHEMATICS_CONCEPTS: ConceptLibrary = {
   domain: "Mathematics",
-  version: "2.0.0",
+  version: "2.1.0",
   concepts: [
+    // ========== ARITHMETIC FUNDAMENTALS ==========
+    {
+      name: "number",
+      category: "Arithmetic Fundamentals",
+      importance: "core",
+      aliases: ["numeral"],
+    },
+    {
+      name: "counting",
+      category: "Arithmetic Fundamentals",
+      importance: "core",
+      aliases: ["count", "enumeration"],
+    },
+    {
+      name: "whole number",
+      category: "Arithmetic Fundamentals",
+      importance: "core",
+      aliases: ["whole numbers"],
+    },
+    {
+      name: "natural number",
+      category: "Arithmetic Fundamentals",
+      importance: "core",
+      aliases: ["counting number", "natural numbers"],
+    },
+    {
+      name: "integer",
+      category: "Arithmetic Fundamentals",
+      importance: "core",
+      aliases: ["integers", "whole numbers including negatives"],
+    },
+    {
+      name: "positive number",
+      category: "Arithmetic Fundamentals",
+      importance: "core",
+      aliases: ["positive", "positive numbers"],
+    },
+    {
+      name: "negative number",
+      category: "Arithmetic Fundamentals",
+      importance: "core",
+      aliases: ["negative", "negative numbers"],
+    },
+    {
+      name: "zero",
+      category: "Arithmetic Fundamentals",
+      importance: "core",
+    },
+    {
+      name: "digit",
+      category: "Arithmetic Fundamentals",
+      importance: "core",
+      aliases: ["digits", "numeral"],
+    },
+    {
+      name: "place value",
+      category: "Arithmetic Fundamentals",
+      importance: "core",
+      aliases: ["positional notation"],
+    },
+    {
+      name: "ones place",
+      category: "Arithmetic Fundamentals",
+      importance: "supporting",
+      aliases: ["units place"],
+    },
+    {
+      name: "tens place",
+      category: "Arithmetic Fundamentals",
+      importance: "supporting",
+    },
+    {
+      name: "hundreds place",
+      category: "Arithmetic Fundamentals",
+      importance: "supporting",
+    },
+    {
+      name: "thousands place",
+      category: "Arithmetic Fundamentals",
+      importance: "supporting",
+    },
+
+    // ========== BASIC OPERATIONS ==========
+    {
+      name: "addition",
+      category: "Basic Operations",
+      importance: "core",
+      aliases: ["add", "sum", "plus"],
+    },
+    {
+      name: "subtraction",
+      category: "Basic Operations",
+      importance: "core",
+      aliases: ["subtract", "minus", "difference"],
+    },
+    {
+      name: "multiplication",
+      category: "Basic Operations",
+      importance: "core",
+      aliases: ["multiply", "times", "product"],
+    },
+    {
+      name: "division",
+      category: "Basic Operations",
+      importance: "core",
+      aliases: ["divide", "quotient"],
+    },
+    {
+      name: "addend",
+      category: "Basic Operations",
+      importance: "supporting",
+      aliases: ["addends"],
+    },
+    {
+      name: "sum",
+      category: "Basic Operations",
+      importance: "core",
+      aliases: ["total"],
+    },
+    {
+      name: "difference",
+      category: "Basic Operations",
+      importance: "core",
+    },
+    {
+      name: "product",
+      category: "Basic Operations",
+      importance: "core",
+    },
+    {
+      name: "quotient",
+      category: "Basic Operations",
+      importance: "core",
+    },
+    {
+      name: "remainder",
+      category: "Basic Operations",
+      importance: "supporting",
+      aliases: ["modulo", "mod"],
+    },
+    {
+      name: "dividend",
+      category: "Basic Operations",
+      importance: "supporting",
+    },
+    {
+      name: "divisor",
+      category: "Basic Operations",
+      importance: "supporting",
+    },
+    {
+      name: "equal",
+      category: "Basic Operations",
+      importance: "core",
+      aliases: ["equals", "equality", "equal sign"],
+    },
+    {
+      name: "greater than",
+      category: "Basic Operations",
+      importance: "core",
+      aliases: ["more than", ">"],
+    },
+    {
+      name: "less than",
+      category: "Basic Operations",
+      importance: "core",
+      aliases: ["fewer than", "<"],
+    },
+    {
+      name: "commutative property",
+      category: "Basic Operations",
+      importance: "supporting",
+      aliases: ["commutative law"],
+    },
+    {
+      name: "associative property",
+      category: "Basic Operations",
+      importance: "supporting",
+      aliases: ["associative law"],
+    },
+    {
+      name: "distributive property",
+      category: "Basic Operations",
+      importance: "supporting",
+      aliases: ["distributive law"],
+    },
+    {
+      name: "identity property",
+      category: "Basic Operations",
+      importance: "supporting",
+    },
+    {
+      name: "inverse operation",
+      category: "Basic Operations",
+      importance: "supporting",
+      aliases: ["opposite operation"],
+    },
+
+    // ========== FRACTIONS ==========
+    {
+      name: "fraction",
+      category: "Fractions",
+      importance: "core",
+      aliases: ["fractions"],
+    },
+    {
+      name: "numerator",
+      category: "Fractions",
+      importance: "core",
+    },
+    {
+      name: "denominator",
+      category: "Fractions",
+      importance: "core",
+    },
+    {
+      name: "proper fraction",
+      category: "Fractions",
+      importance: "supporting",
+    },
+    {
+      name: "improper fraction",
+      category: "Fractions",
+      importance: "supporting",
+    },
+    {
+      name: "mixed number",
+      category: "Fractions",
+      importance: "supporting",
+      aliases: ["mixed fraction"],
+    },
+    {
+      name: "equivalent fraction",
+      category: "Fractions",
+      importance: "core",
+      aliases: ["equivalent fractions"],
+    },
+    {
+      name: "simplify fraction",
+      category: "Fractions",
+      importance: "core",
+      aliases: ["reduce fraction", "simplifying fractions", "lowest terms"],
+    },
+    {
+      name: "common denominator",
+      category: "Fractions",
+      importance: "core",
+      aliases: ["like denominator"],
+    },
+    {
+      name: "least common denominator",
+      category: "Fractions",
+      importance: "supporting",
+      aliases: ["LCD"],
+    },
+    {
+      name: "reciprocal",
+      category: "Fractions",
+      importance: "supporting",
+      aliases: ["multiplicative inverse"],
+    },
+
+    // ========== DECIMALS ==========
+    {
+      name: "decimal",
+      category: "Decimals",
+      importance: "core",
+      aliases: ["decimal number", "decimals"],
+    },
+    {
+      name: "decimal point",
+      category: "Decimals",
+      importance: "core",
+    },
+    {
+      name: "tenths",
+      category: "Decimals",
+      importance: "supporting",
+      aliases: ["tenths place"],
+    },
+    {
+      name: "hundredths",
+      category: "Decimals",
+      importance: "supporting",
+      aliases: ["hundredths place"],
+    },
+    {
+      name: "thousandths",
+      category: "Decimals",
+      importance: "supporting",
+      aliases: ["thousandths place"],
+    },
+    {
+      name: "rounding",
+      category: "Decimals",
+      importance: "core",
+      aliases: ["round", "round off"],
+    },
+    {
+      name: "terminating decimal",
+      category: "Decimals",
+      importance: "supporting",
+    },
+    {
+      name: "repeating decimal",
+      category: "Decimals",
+      importance: "supporting",
+      aliases: ["recurring decimal"],
+    },
+
+    // ========== PERCENTAGES ==========
+    {
+      name: "percent",
+      category: "Percentages",
+      importance: "core",
+      aliases: ["percentage", "%"],
+    },
+    {
+      name: "percent of",
+      category: "Percentages",
+      importance: "core",
+    },
+    {
+      name: "percent increase",
+      category: "Percentages",
+      importance: "supporting",
+    },
+    {
+      name: "percent decrease",
+      category: "Percentages",
+      importance: "supporting",
+    },
+    {
+      name: "discount",
+      category: "Percentages",
+      importance: "supporting",
+    },
+    {
+      name: "sales tax",
+      category: "Percentages",
+      importance: "detail",
+    },
+    {
+      name: "tip",
+      category: "Percentages",
+      importance: "detail",
+      aliases: ["gratuity"],
+    },
+
+    // ========== RATIOS AND PROPORTIONS ==========
+    {
+      name: "ratio",
+      category: "Ratios and Proportions",
+      importance: "core",
+      aliases: ["ratios"],
+    },
+    {
+      name: "proportion",
+      category: "Ratios and Proportions",
+      importance: "core",
+      aliases: ["proportions"],
+    },
+    {
+      name: "rate",
+      category: "Ratios and Proportions",
+      importance: "core",
+      aliases: ["rates"],
+    },
+    {
+      name: "unit rate",
+      category: "Ratios and Proportions",
+      importance: "supporting",
+    },
+    {
+      name: "scale",
+      category: "Ratios and Proportions",
+      importance: "supporting",
+      aliases: ["scale factor"],
+    },
+    {
+      name: "cross multiply",
+      category: "Ratios and Proportions",
+      importance: "supporting",
+      aliases: ["cross multiplication"],
+    },
+
+    // ========== ORDER OF OPERATIONS ==========
+    {
+      name: "order of operations",
+      category: "Order of Operations",
+      importance: "core",
+      aliases: ["PEMDAS", "BODMAS", "BIDMAS"],
+    },
+    {
+      name: "parentheses",
+      category: "Order of Operations",
+      importance: "core",
+      aliases: ["brackets", "grouping symbols"],
+    },
+    {
+      name: "evaluate",
+      category: "Order of Operations",
+      importance: "core",
+      aliases: ["evaluate expression"],
+    },
+
     // ========== ALGEBRA FUNDAMENTALS ==========
     {
       name: "variable",

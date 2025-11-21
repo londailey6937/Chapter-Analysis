@@ -30,6 +30,7 @@ export interface Concept {
   name: string;
   definition: string;
   importance: "core" | "supporting" | "detail";
+  category?: string; // Subject category (e.g., "Algebra Fundamentals", "Calculus")
   firstMentionPosition: number;
   mentions: ConceptMention[];
   relatedConcepts: string[];

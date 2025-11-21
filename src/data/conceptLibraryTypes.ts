@@ -105,7 +105,7 @@ export const AVAILABLE_DOMAINS: DomainInfo[] = [
     id: "mathematics",
     label: "Mathematics",
     description:
-      "Algebra, Trigonometry & Calculus concepts (equations, functions, limits, derivatives, etc.)",
+      "Comprehensive mathematics: Algebra, Geometry, Trigonometry, Calculus, Linear Algebra, Discrete Math (450+ concepts)",
     icon: "🔢",
   },
   {
