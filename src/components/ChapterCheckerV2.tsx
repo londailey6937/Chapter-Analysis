@@ -48,7 +48,12 @@ import {
 import { AnimatedLogo } from "./AnimatedLogo";
 import { AuthModal } from "./AuthModal";
 import { UserMenu } from "./UserMenu";
-import { supabase, saveAnalysis, getCurrentUser } from "@/utils/supabase";
+import {
+  supabase,
+  saveAnalysis,
+  getCurrentUser,
+  getSavedAnalyses,
+} from "@/utils/supabase";
 import { ServerAnalysisTest } from "./ServerAnalysisTest";
 
 const HEADING_LENGTH_LIMIT = 120;
@@ -801,8 +806,8 @@ export const ChapterCheckerV2: React.FC = () => {
           .trim();
 
     // Check document size limit for free users
-    const features = ACCESS_TIERS[accessLevel];
-    if (!features.fullAnalysis) {
+    const tierFeatures = ACCESS_TIERS[accessLevel];
+    if (!tierFeatures.fullAnalysis) {
       const wordCount = normalizedPlainText.split(/\s+/).length;
       const FREE_TIER_WORD_LIMIT = 5000;
 
@@ -849,8 +854,11 @@ export const ChapterCheckerV2: React.FC = () => {
     setSelectedDomain(detected);
 
     // Auto-analyze for free tier (spacing + dual coding only)
-    const features = ACCESS_TIERS[accessLevel];
-    if (!features.fullAnalysis && normalizedPlainText.trim().length >= 200) {
+    const autoAnalyzeFeatures = ACCESS_TIERS[accessLevel];
+    if (
+      !autoAnalyzeFeatures.fullAnalysis &&
+      normalizedPlainText.trim().length >= 200
+    ) {
       console.log("🆓 Free tier: Auto-running spacing + dual coding analysis");
 
       // Run tier one analysis immediately
