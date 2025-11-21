@@ -12,7 +12,7 @@ import {
 } from "./conceptLibraryTypes";
 import { CHEMISTRY_CONCEPTS } from "./chemistryConceptLibrary";
 import { CROSS_DOMAIN_CONCEPTS } from "./crossDomainConcepts";
-import { ALGEBRA_TRIG_CONCEPTS } from "./algebraTrigConceptLibrary";
+import { MATHEMATICS_CONCEPTS } from "./mathematicsConceptLibrary";
 import { financeConceptLibrary } from "./financeConceptLibrary";
 import { COMPUTING_CONCEPTS } from "./computingConceptLibrary";
 import { REACT_CONCEPTS } from "./reactConceptLibrary";
@@ -1214,7 +1214,7 @@ const RAW_CONCEPT_LIBRARIES: Record<Domain, ConceptLibrary> = {
   computing: COMPUTING_CONCEPTS,
   react: REACT_CONCEPTS,
   javascript: JAVASCRIPT_CONCEPTS,
-  mathematics: ALGEBRA_TRIG_CONCEPTS,
+  mathematics: MATHEMATICS_CONCEPTS,
   custom: {
     domain: "custom",
     version: "1.0.0",
