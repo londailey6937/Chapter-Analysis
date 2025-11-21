@@ -237,8 +237,12 @@
   .quickstart-shell {
     padding: 1rem;
     border-radius: 1.25rem;
-    background: linear-gradient(180deg, #f8fafc 0%, #eceffe 100%);
-    border: 1px solid rgba(99, 102, 241, 0.18);
+    background: linear-gradient(
+      180deg,
+      rgb(254 245 231) 0%,
+      rgb(255 247 237) 100%
+    );
+    border: 1px solid rgba(217, 119, 6, 0.15);
     box-shadow: 0 20px 35px rgba(15, 23, 42, 0.08);
   }
 
@@ -251,8 +255,8 @@
   .quickstart-card {
     padding: 1.5rem;
     border-radius: 1rem;
-    background: #ffffff;
-    border: 1px solid rgba(15, 23, 42, 0.08);
+    background: rgb(254 245 231);
+    border: 1px solid rgba(217, 119, 6, 0.12);
     box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
   }
 
@@ -260,13 +264,13 @@
     font-size: 1.125rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
-    color: #111827;
+    color: rgb(17 24 39);
   }
 
   .quickstart-card p {
     margin-bottom: 0.75rem;
     font-size: 0.95rem;
-    color: #374151;
+    color: rgb(55 65 81);
     line-height: 1.6;
   }
 
