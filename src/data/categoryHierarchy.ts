@@ -35,7 +35,8 @@ export const MATHEMATICS_CATEGORY_HIERARCHY: CategoryLevel[] = [
       "Ratios and Proportions",
       "Order of Operations",
     ],
-    description: "Elementary mathematics - counting, arithmetic, fractions, decimals",
+    description:
+      "Elementary mathematics - counting, arithmetic, fractions, decimals",
   },
   {
     level: 1,
@@ -153,26 +154,14 @@ export function getCategoryHierarchy(domain: string): CategoryLevel[] | null {
 /**
  * Category ordering rules as simple prerequisite map
  * Useful for quick lookups
+ *
+ * Note: Basic progressions (Arithmetic → Algebra, Algebra → Advanced topics)
+ * are handled by level hierarchy and don't need explicit prerequisites here.
+ * Only list non-obvious or specific relationships.
  */
 export const CATEGORY_PREREQUISITES: Record<string, string[]> = {
-  // Algebra requires arithmetic
-  "Algebra Fundamentals": ["Basic Operations", "Arithmetic Fundamentals"],
-  Equations: ["Algebra Fundamentals", "Basic Operations"],
-  Polynomials: ["Algebra Fundamentals"],
-
-  // Fractions, decimals, percentages require basic operations
-  Fractions: ["Basic Operations", "Arithmetic Fundamentals"],
-  Decimals: ["Basic Operations", "Fractions"],
-  Percentages: ["Decimals", "Fractions"],
-  "Ratios and Proportions": ["Fractions"],
-  "Order of Operations": ["Basic Operations"],
-
   // Trigonometry requires algebra
-  "Trigonometry Fundamentals": [
-    "Algebra Fundamentals",
-    "Functions",
-    "Equations",
-  ],
+  "Trigonometry Fundamentals": ["Functions", "Equations"],
   "Trigonometric Functions": ["Trigonometry Fundamentals", "Functions"],
   "Trigonometric Identities": ["Trigonometric Functions"],
   "Hyperbolic Functions": ["Trigonometric Functions"],
@@ -182,12 +171,7 @@ export const CATEGORY_PREREQUISITES: Record<string, string[]> = {
   ],
 
   // Calculus requires algebra, functions, trigonometry
-  "Calculus Fundamentals": [
-    "Algebra Fundamentals",
-    "Functions",
-    "Graphing",
-    "Trigonometric Functions",
-  ],
+  "Calculus Fundamentals": ["Functions", "Graphing", "Trigonometric Functions"],
   "Differential Calculus": ["Calculus Fundamentals"],
   "Integral Calculus": ["Differential Calculus"],
   "Multivariable Calculus": [
@@ -198,25 +182,21 @@ export const CATEGORY_PREREQUISITES: Record<string, string[]> = {
   "Differential Equations": ["Differential Calculus", "Integral Calculus"],
 
   // Linear Algebra requires basic algebra and matrices
-  "Linear Algebra": ["Matrices", "Vectors", "Algebra Fundamentals"],
+  "Linear Algebra": ["Matrices", "Vectors"],
 
   // Advanced geometry requires basics
-  "Coordinate Geometry": ["Algebra Fundamentals", "Graphing", "Geometry"],
+  "Coordinate Geometry": ["Graphing", "Geometry"],
   "Analytic Geometry": ["Coordinate Geometry", "Vectors"],
   "3D Shapes": ["Geometry", "Triangles", "Circles"],
 
   // Discrete math foundations
   "Graph Theory": ["Discrete Mathematics", "Set Theory"],
-  Combinatorics: ["Discrete Mathematics", "Algebra Fundamentals"],
+  Combinatorics: ["Discrete Mathematics"],
   Algorithms: ["Discrete Mathematics", "Logic"],
   "Boolean Algebra": ["Logic", "Set Theory"],
 
   // Statistics requires basic algebra
-  "Probability and Statistics": [
-    "Algebra Fundamentals",
-    "Functions",
-    "Sequences and Series",
-  ],
+  "Probability and Statistics": ["Functions", "Sequences and Series"],
 
   // Optimization requires calculus
   Optimization: ["Differential Calculus", "Linear Algebra"],
