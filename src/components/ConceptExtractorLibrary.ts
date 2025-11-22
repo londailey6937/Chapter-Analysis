@@ -132,8 +132,17 @@ export class ConceptExtractor {
 
   private scanForConcepts(text: string): ExtractionMatch[] {
     const matches: ExtractionMatch[] = [];
+    let totalMentions = 0;
+    const MAX_MENTIONS = 5000; // Safety limit to prevent OOM on large docs
 
     for (const definition of this.library) {
+      if (totalMentions > MAX_MENTIONS) {
+        console.warn(
+          "[ConceptExtractor] Max mentions limit reached, stopping extraction."
+        );
+        break;
+      }
+
       const mentionMap = new Map<number, MentionOccurrence>();
 
       const recordMatch = (match: MentionOccurrence) => {
@@ -192,6 +201,7 @@ export class ConceptExtractor {
 
       if (mentions.length > 0) {
         matches.push({ definition, mentions });
+        totalMentions += mentions.length;
       }
     }
 

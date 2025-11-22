@@ -235,9 +235,20 @@ export class DualCodingAnalyzer {
   ): VisualSuggestion[] {
     const suggestions: VisualSuggestion[] = [];
 
+    // Safety check for very large documents
+    let textToAnalyze = text;
+    if (text.length > 500000) {
+      console.warn(
+        "[DualCodingAnalyzer] Text too large, analyzing first 500k chars only."
+      );
+      textToAnalyze = text.substring(0, 500000);
+    }
+
     // Check if input is HTML by looking for common HTML paragraph/block tags
     const inferredHtml =
-      text.includes("<p>") || text.includes("<div>") || text.includes("<h1>");
+      textToAnalyze.includes("<p>") ||
+      textToAnalyze.includes("<div>") ||
+      textToAnalyze.includes("<h1>");
     const isHtml =
       typeof options?.treatAsHtml === "boolean"
         ? options.treatAsHtml
@@ -247,7 +258,7 @@ export class DualCodingAnalyzer {
       "[DualCodingAnalyzer] isHtml:",
       isHtml,
       "text length:",
-      text.length
+      textToAnalyze.length
     );
 
     let paragraphs: { text: string; position: number }[] = [];
@@ -259,17 +270,19 @@ export class DualCodingAnalyzer {
       let match;
       let lastIndex = 0;
 
-      while ((match = blockElementRegex.exec(text)) !== null) {
+      while ((match = blockElementRegex.exec(textToAnalyze)) !== null) {
         const startPos = match.index + match[0].length; // Position after opening tag
         const tagName = match[1];
 
         // Find the closing tag
         const closingTagRegex = new RegExp(`</${tagName}>`, "i");
-        const closeMatch = closingTagRegex.exec(text.substring(startPos));
+        const closeMatch = closingTagRegex.exec(
+          textToAnalyze.substring(startPos)
+        );
 
         if (closeMatch) {
           const endPos = startPos + closeMatch.index;
-          const content = text.substring(startPos, endPos);
+          const content = textToAnalyze.substring(startPos, endPos);
           const plainContent = this.stripHtml(content).trim();
 
           if (plainContent.length > 50) {
@@ -289,12 +302,12 @@ export class DualCodingAnalyzer {
       );
     } else {
       // Plain text: split by double newlines
-      const plainParagraphs = text.split(/\n\n+/);
+      const plainParagraphs = textToAnalyze.split(/\n\n+/);
       let currentPosition = 0;
 
       console.log("[DualCodingAnalyzer] Plain text mode");
       console.log("  Total paragraphs from split:", plainParagraphs.length);
-      console.log("  Text preview:", text.substring(0, 300));
+      console.log("  Text preview:", textToAnalyze.substring(0, 300));
 
       plainParagraphs.forEach((para) => {
         const trimmed = para.trim();
@@ -322,7 +335,7 @@ export class DualCodingAnalyzer {
       const prevPara = paragraphs[index - 1]?.text || "";
 
       // Check for nearby visuals before analyzing
-      if (this.hasNearbyVisual(text, currentPosition)) {
+      if (this.hasNearbyVisual(textToAnalyze, currentPosition)) {
         return;
       }
 

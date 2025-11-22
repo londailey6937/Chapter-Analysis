@@ -346,6 +346,15 @@ export class AnalysisEngine {
     onProgress?.("evaluating-server", "Running secure server-side analysis...");
 
     try {
+      // Check content length to avoid server timeouts/payload limits
+      const MAX_SERVER_ANALYSIS_LENGTH = 100000; // ~20k words
+      if (chapter.content.length > MAX_SERVER_ANALYSIS_LENGTH) {
+        console.warn(
+          `[AnalysisEngine] Content too large for server analysis (${chapter.content.length} chars). Using local evaluation.`
+        );
+        throw new Error("Content too large for server analysis");
+      }
+
       const { data, error } = await supabase.functions.invoke(
         "analyze-concept",
         {
