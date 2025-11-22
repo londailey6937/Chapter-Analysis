@@ -62,6 +62,7 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
   const isUndoRedoRef = useRef(false);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // New feature states
   const [blockType, setBlockType] = useState("p");
@@ -250,57 +251,41 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
     if (editorRef.current && content) {
       const isHtml = /<[^>]+>/.test(content);
 
-      // For large HTML content (>100KB), use progressive loading
-      if (isHtml && content.length > 100000) {
-        // Show loading state briefly
-        editorRef.current.innerHTML =
-          '<p style="text-align: center; color: #666; padding: 2rem;">Loading document...</p>';
+      // Show loading state initially
+      setIsLoading(true);
 
-        // Use requestAnimationFrame to allow UI to update
+      // Use requestAnimationFrame to allow UI to update (show spinner)
+      requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            if (!editorRef.current) return;
+          if (!editorRef.current) return;
 
-            // Set content in next frame
+          if (isHtml) {
             editorRef.current.innerHTML = content;
+          } else {
+            editorRef.current.innerHTML = content
+              .split("\n\n")
+              .map((para) => `<p>${para.replace(/\n/g, "<br>")}</p>`)
+              .join("");
+          }
 
-            // Initialize history with initial content
-            const html = editorRef.current.innerHTML;
-            historyRef.current = [html];
-            historyIndexRef.current = 0;
-            setCanUndo(false);
-            setCanRedo(false);
+          // Initialize history with initial content
+          const html = editorRef.current.innerHTML;
+          historyRef.current = [html];
+          historyIndexRef.current = 0;
+          setCanUndo(false);
+          setCanRedo(false);
 
-            // Defer analysis to avoid blocking
-            setTimeout(() => {
-              if (!editorRef.current) return;
-              const text = editorRef.current.innerText;
-              analyzeContent(text);
-            }, 100);
-          });
+          // Defer analysis to avoid blocking
+          setTimeout(() => {
+            if (!editorRef.current) return;
+            const text = editorRef.current.innerText;
+            analyzeContent(text);
+            setIsLoading(false);
+          }, 100);
         });
-      } else {
-        // Normal loading for smaller content
-        if (isHtml) {
-          editorRef.current.innerHTML = content;
-        } else {
-          editorRef.current.innerHTML = content
-            .split("\n\n")
-            .map((para) => `<p>${para.replace(/\n/g, "<br>")}</p>`)
-            .join("");
-        }
-
-        // Initialize history with initial content
-        const html = editorRef.current.innerHTML;
-        historyRef.current = [html];
-        historyIndexRef.current = 0;
-        setCanUndo(false);
-        setCanRedo(false);
-
-        // Run initial analysis
-        const text = editorRef.current.innerText;
-        analyzeContent(text);
-      }
+      });
+    } else {
+      setIsLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only on mount - content is captured from closure
@@ -1472,6 +1457,44 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
           color: #1d4ed8;
         }
       `}</style>
+
+      {isLoading && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 100,
+            backdropFilter: "blur(2px)",
+          }}
+        >
+          <div className="editor-spinner"></div>
+          <p style={{ marginTop: "1rem", color: "#2c3e50", fontWeight: 500 }}>
+            Loading document...
+          </p>
+          <style>{`
+            .editor-spinner {
+              width: 40px;
+              height: 40px;
+              border: 4px solid #f3f3f3;
+              border-top: 4px solid #3498db;
+              border-radius: 50%;
+              animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      )}
     </div>
   );
 };
