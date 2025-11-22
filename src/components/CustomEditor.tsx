@@ -140,12 +140,6 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
           ? wordCount >= 50
           : para.length >= 10;
 
-        if (index < 5) {
-          console.log(
-            `[CustomEditor] Para ${index}: wordCount=${wordCount}, shouldAnalyze=${shouldAnalyzeDualCoding}, length=${para.length}`
-          );
-        }
-
         if (shouldAnalyzeDualCoding) {
           const suggestions = DualCodingAnalyzer.analyzeParagraph(para, index);
           if (suggestions.length > 0) {
@@ -153,17 +147,6 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
           }
         }
       });
-    }
-
-    console.log(`[CustomEditor] Analyzed ${paragraphs.length} paragraphs`);
-    console.log(
-      `[CustomEditor] Found ${spacingData.length} spacing items, ${visualsData.length} dual-coding suggestions`
-    );
-    if (visualsData.length > 0) {
-      console.log(
-        `[CustomEditor] First dual-coding suggestion:`,
-        visualsData[0]
-      );
     }
 
     setAnalysis({ spacing: spacingData, visuals: visualsData });
@@ -709,24 +692,16 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
   // Render visual suggestions
   const renderSuggestions = () => {
     if (!editorRef.current || !showVisualSuggestions) {
-      console.log("[CustomEditor] renderSuggestions: early return", {
-        hasEditor: !!editorRef.current,
-        showVisualSuggestions,
-      });
       return null;
     }
     // In free mode, always show suggestions. In paid mode, respect focus mode toggle.
     if (!isFreeMode && focusMode) {
-      console.log("[CustomEditor] renderSuggestions: focus mode active");
       return null;
     }
 
     const paragraphs = Array.from(editorRef.current.querySelectorAll("p, div"));
     const wrapperRect = wrapperRef.current?.getBoundingClientRect();
     if (!wrapperRect) return null;
-    console.log(
-      `[CustomEditor] renderSuggestions: rendering ${analysis.visuals.length} suggestions for ${paragraphs.length} DOM paragraphs`
-    );
 
     return analysis.visuals.map((item, idx) => {
       const para = paragraphs[item.index];
@@ -740,11 +715,6 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
       const rect = para.getBoundingClientRect();
       const container = editorRef.current?.getBoundingClientRect();
       if (!container) return null;
-
-      console.log(
-        `[CustomEditor] Rendering suggestion ${idx} at index ${item.index}:`,
-        item.suggestions[0]
-      );
 
       return (
         <div

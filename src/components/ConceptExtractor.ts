@@ -299,12 +299,6 @@ export class ConceptExtractor {
     onProgress?: (step: string, detail?: string) => void
   ): Promise<ConceptGraph> {
     const overallStart = performance.now();
-    console.log(
-      "[ConceptExtractor] Starting extraction, chapter length:",
-      chapter.length,
-      "sections:",
-      sections.length
-    );
     const extractor = new ConceptExtractor();
 
     // Phase 1: Identify candidate concepts
@@ -312,11 +306,6 @@ export class ConceptExtractor {
     const phase1Start = performance.now();
     const candidates = extractor.identifyCandidateConcepts(chapter, sections);
     const phase1Time = performance.now() - phase1Start;
-    console.log(
-      `[ConceptExtractor] Phase 1: Found ${
-        candidates.length
-      } candidates in ${phase1Time.toFixed(2)}ms`
-    );
     await new Promise((resolve) => setTimeout(resolve, 50)); // Yield control
 
     // Phase 2: Score and filter candidates
@@ -324,11 +313,6 @@ export class ConceptExtractor {
     const phase2Start = performance.now();
     const scored = extractor.scoreAndFilterCandidates(candidates, chapter);
     const phase2Time = performance.now() - phase2Start;
-    console.log(
-      `[ConceptExtractor] Phase 2: Scored ${
-        scored.length
-      } concepts in ${phase2Time.toFixed(2)}ms`
-    );
     await new Promise((resolve) => setTimeout(resolve, 50)); // Yield control
 
     // Phase 3: Create concept objects with mentions
@@ -336,11 +320,6 @@ export class ConceptExtractor {
     const phase3Start = performance.now();
     const concepts = extractor.createConceptObjects(scored, chapter);
     const phase3Time = performance.now() - phase3Start;
-    console.log(
-      `[ConceptExtractor] Phase 3: Created ${
-        concepts.length
-      } concept objects in ${phase3Time.toFixed(2)}ms`
-    );
     await new Promise((resolve) => setTimeout(resolve, 50)); // Yield control
 
     // Phase 4: Establish relationships
@@ -348,11 +327,6 @@ export class ConceptExtractor {
     const phase4Start = performance.now();
     const relationships = extractor.establishRelationships(concepts, chapter);
     const phase4Time = performance.now() - phase4Start;
-    console.log(
-      `[ConceptExtractor] Phase 4: Found ${
-        relationships.length
-      } relationships in ${phase4Time.toFixed(2)}ms`
-    );
     await new Promise((resolve) => setTimeout(resolve, 50)); // Yield control
 
     // Phase 5: Build hierarchy
@@ -360,13 +334,6 @@ export class ConceptExtractor {
     const phase5Start = performance.now();
     const hierarchy = extractor.buildHierarchy(concepts);
     const phase5Time = performance.now() - phase5Start;
-    console.log(
-      `[ConceptExtractor] Phase 5: Hierarchy built in ${phase5Time.toFixed(
-        2
-      )}ms - core: ${hierarchy.core.length}, supporting: ${
-        hierarchy.supporting.length
-      }`
-    );
     await new Promise((resolve) => setTimeout(resolve, 50)); // Yield control
 
     // Phase 6: Extract concept sequence
@@ -374,28 +341,9 @@ export class ConceptExtractor {
     const phase6Start = performance.now();
     const sequence = extractor.extractConceptSequence(concepts);
     const phase6Time = performance.now() - phase6Start;
-    console.log(
-      `[ConceptExtractor] Phase 6: Sequence extracted (${
-        sequence.length
-      } items) in ${phase6Time.toFixed(2)}ms`
-    );
     await new Promise((resolve) => setTimeout(resolve, 50)); // Yield control
 
     const overallTime = performance.now() - overallStart;
-    console.log(
-      `[ConceptExtractor] ✅ Extraction complete in ${overallTime.toFixed(
-        2
-      )}ms (${(overallTime / 1000).toFixed(2)}s)`
-    );
-    console.log(
-      `[ConceptExtractor] Phase breakdown: P1=${phase1Time.toFixed(
-        0
-      )}ms P2=${phase2Time.toFixed(0)}ms P3=${phase3Time.toFixed(
-        0
-      )}ms P4=${phase4Time.toFixed(0)}ms P5=${phase5Time.toFixed(
-        0
-      )}ms P6=${phase6Time.toFixed(0)}ms`
-    );
 
     return {
       concepts,
@@ -1302,18 +1250,12 @@ export class ConceptExtractor {
     if (patterns) {
       // Must match at least one technical pattern for these confusing terms
       const hasPattern = patterns.some((pattern) => pattern.test(paragraph));
-      console.log(
-        `[Context Filter] "${term}" at position ${position}: hasPattern=${hasPattern}`
-      );
       return hasPattern;
     }
 
     // For terms without specific patterns, use concept density as fallback
     const conceptDensity = this.countConceptsInParagraph(paragraph);
     const passes = conceptDensity >= 3;
-    console.log(
-      `[Context Filter] "${term}" at position ${position}: density=${conceptDensity}, passes=${passes}`
-    );
     return passes;
   }
 

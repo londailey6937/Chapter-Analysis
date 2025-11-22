@@ -578,13 +578,21 @@ export const ChapterCheckerV2: React.FC = () => {
     const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
     const topDomain = sortedScores[0];
 
+    // Check for strong CSS/web indicators that should boost confidence
+    const hasCSSIndicators = /\b(css|stylesheet|selector|flexbox|grid|html|dom|browser)\b/gi.test(lowerText);
+    
+    // If web-development has CSS indicators, significantly reduce threshold
+    if (topDomain?.[0] === "webdevelopment" && hasCSSIndicators) {
+      return "webdevelopment";
+    }
+
     // Strict requirements to prevent false positives while catching real content:
     // Programming languages need stricter thresholds since common English words can match
     const isProgrammingDomain = [
       "javascript",
       "computing",
       "react",
-      "web-development",
+      "webdevelopment",
     ].includes(topDomain?.[0] || "");
 
     // 1. Programming domains need higher scores (60) vs general domains (30)
@@ -852,7 +860,6 @@ export const ChapterCheckerV2: React.FC = () => {
     }
 
     const detected = detectDomain(normalizedPlainText);
-    console.log(`🔍 Domain detection result: ${detected || "none"}`);
     setDetectedDomain(detected);
     setSelectedDomain(detected);
 

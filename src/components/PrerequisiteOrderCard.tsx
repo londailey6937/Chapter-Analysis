@@ -172,30 +172,8 @@ export const PrerequisiteOrderCard: React.FC<PrerequisiteOrderCardProps> = ({
     let total = 0;
     const issues: PrerequisiteOrderIssue[] = [];
     const missing: MissingPrerequisite[] = [];
-
-    // Debug logging
-    console.log("🔍 Prerequisite Order Check Debug:");
-    console.log("  Total concepts:", concepts.length);
-    console.log("  Domain library:", domainLibrary ? "loaded" : "none");
-    console.log(
-      "  Library prerequisites map size:",
-      libraryPrerequisites?.size || 0
-    );
-    console.log(
-      "  Relationship prerequisites map size:",
-      relationshipPrerequisites.size
-    );
-
     concepts.forEach((concept, idx) => {
       const prereqIds = resolvePrerequisites(concept);
-
-      if (idx < 3) {
-        console.log(
-          `  Concept "${concept.name}":`,
-          prereqIds.length,
-          "prerequisites"
-        );
-      }
 
       if (!prereqIds || prereqIds.length === 0) {
         return;
