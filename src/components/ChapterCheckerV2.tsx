@@ -803,6 +803,11 @@ export const ChapterCheckerV2: React.FC = () => {
       }
     }
     setAccessLevel(level);
+
+    // If switching away from professional tier while in writer mode, switch to analysis
+    if (level !== "professional" && viewMode === "writer") {
+      setViewMode("analysis");
+    }
   };
 
   const handleDocumentScrollDepthChange = (hasScrolled: boolean) => {
@@ -1539,10 +1544,11 @@ export const ChapterCheckerV2: React.FC = () => {
   return (
     <div
       style={{
-        minHeight: "100vh",
+        height: "100vh",
         display: "flex",
         flexDirection: "column",
         backgroundColor: "white",
+        overflow: "hidden",
       }}
     >
       {/* Header */}
@@ -2218,7 +2224,7 @@ export const ChapterCheckerV2: React.FC = () => {
                     display: "flex",
                     flexDirection: "column",
                     minHeight: 0,
-                    overflow: "auto",
+                    overflow: "hidden",
                   }}
                 >
                   {/* Image notification banner */}
@@ -2235,6 +2241,7 @@ export const ChapterCheckerV2: React.FC = () => {
                         display: "flex",
                         alignItems: "center",
                         gap: "8px",
+                        flexShrink: 0,
                       }}
                     >
                       <span>📸</span>
@@ -2249,104 +2256,108 @@ export const ChapterCheckerV2: React.FC = () => {
                     </div>
                   )}
 
-                  <DocumentEditor
-                    key={fileName} // Force new component instance when file changes
-                    initialText={
-                      chapterData.originalPlainText ?? chapterData.plainText
-                    }
-                    htmlContent={
-                      chapterData.editorHtml
-                        ? chapterData.editorHtml
-                        : chapterData.isHybridDocx
-                        ? chapterData.html
-                        : null
-                    }
-                    searchText={
-                      chapterData.originalPlainText ?? chapterData.plainText
-                    }
-                    onTextChange={(text) => {
-                      if (viewMode === "writer" && !tierFeatures.writerMode) {
-                        setUpgradeFeature("Writer Mode");
-                        setUpgradeTarget("professional");
-                        setShowUpgradePrompt(true);
-                        return;
+                  <div style={{ flex: 1, minHeight: 0, position: "relative" }}>
+                    <DocumentEditor
+                      key={fileName} // Force new component instance when file changes
+                      initialText={
+                        chapterData.originalPlainText ?? chapterData.plainText
                       }
-                      if (!canEditChapter) {
-                        return;
+                      htmlContent={
+                        chapterData.editorHtml
+                          ? chapterData.editorHtml
+                          : chapterData.isHybridDocx
+                          ? chapterData.html
+                          : null
                       }
-                      handleTextChange(text);
-                    }}
-                    onContentChange={(content) => {
-                      if (viewMode === "writer" && !tierFeatures.writerMode) {
-                        setUpgradeFeature("Writer Mode");
-                        setUpgradeTarget("professional");
-                        setShowUpgradePrompt(true);
-                        return;
+                      searchText={
+                        chapterData.originalPlainText ?? chapterData.plainText
                       }
-                      if (!canEditChapter) {
-                        return;
+                      onTextChange={(text) => {
+                        if (viewMode === "writer" && !tierFeatures.writerMode) {
+                          setUpgradeFeature("Writer Mode");
+                          setUpgradeTarget("professional");
+                          setShowUpgradePrompt(true);
+                          return;
+                        }
+                        if (!canEditChapter) {
+                          return;
+                        }
+                        handleTextChange(text);
+                      }}
+                      onContentChange={(content) => {
+                        if (viewMode === "writer" && !tierFeatures.writerMode) {
+                          setUpgradeFeature("Writer Mode");
+                          setUpgradeTarget("professional");
+                          setShowUpgradePrompt(true);
+                          return;
+                        }
+                        if (!canEditChapter) {
+                          return;
+                        }
+                        handleEditorContentChange(content);
+                      }}
+                      showSpacingIndicators={true}
+                      showVisualSuggestions={true}
+                      highlightPosition={highlightPosition}
+                      searchWord={searchWord}
+                      searchOccurrence={searchOccurrence}
+                      isFreeMode={!tierFeatures.writerMode}
+                      concepts={
+                        analysis?.conceptGraph?.concepts?.map(
+                          (c: any) => c.name
+                        ) || []
                       }
-                      handleEditorContentChange(content);
-                    }}
-                    showSpacingIndicators={true}
-                    showVisualSuggestions={true}
-                    highlightPosition={highlightPosition}
-                    searchWord={searchWord}
-                    searchOccurrence={searchOccurrence}
-                    isFreeMode={!tierFeatures.writerMode}
-                    concepts={
-                      analysis?.conceptGraph?.concepts?.map(
-                        (c: any) => c.name
-                      ) || []
-                    }
-                    onConceptClick={(conceptName) => {
-                      // Find the concept object
-                      const concept = analysis?.conceptGraph?.concepts?.find(
-                        (c: any) => c.name === conceptName
-                      );
-                      if (concept) {
-                        // Trigger the same logic as clicking in the sidebar
-                        handleConceptClick(concept, 0);
-                      }
-                    }}
-                    onSave={
-                      analysis && viewMode === "writer"
-                        ? () => {
-                            // Save to localStorage
-                            try {
-                              const saveData = {
-                                content: {
-                                  plainText: chapterData?.plainText || "",
-                                  editorHtml: chapterData?.editorHtml || "",
-                                },
-                                fileName: fileName || "untitled",
-                                timestamp: new Date().toISOString(),
-                                analysis: analysis,
-                                isTemplateMode: isTemplateMode,
-                              };
-                              localStorage.setItem(
-                                "tomeiq_autosave",
-                                JSON.stringify(saveData)
-                              );
-                              const time = new Date().toLocaleTimeString();
-                              alert(
-                                `✅ Changes saved locally at ${time}!\n\nYour work will persist across browser sessions.`
-                              );
-                            } catch (error) {
-                              alert("❌ Failed to save. Storage may be full.");
+                      onConceptClick={(conceptName) => {
+                        // Find the concept object
+                        const concept = analysis?.conceptGraph?.concepts?.find(
+                          (c: any) => c.name === conceptName
+                        );
+                        if (concept) {
+                          // Trigger the same logic as clicking in the sidebar
+                          handleConceptClick(concept, 0);
+                        }
+                      }}
+                      onSave={
+                        analysis && viewMode === "writer"
+                          ? () => {
+                              // Save to localStorage
+                              try {
+                                const saveData = {
+                                  content: {
+                                    plainText: chapterData?.plainText || "",
+                                    editorHtml: chapterData?.editorHtml || "",
+                                  },
+                                  fileName: fileName || "untitled",
+                                  timestamp: new Date().toISOString(),
+                                  analysis: analysis,
+                                  isTemplateMode: isTemplateMode,
+                                };
+                                localStorage.setItem(
+                                  "tomeiq_autosave",
+                                  JSON.stringify(saveData)
+                                );
+                                const time = new Date().toLocaleTimeString();
+                                alert(
+                                  `✅ Changes saved locally at ${time}!\n\nYour work will persist across browser sessions.`
+                                );
+                              } catch (error) {
+                                alert(
+                                  "❌ Failed to save. Storage may be full."
+                                );
+                              }
                             }
-                          }
-                        : undefined
-                    }
-                    readOnly={!canEditChapter}
-                    scrollToTopSignal={scrollToTopSignal}
-                    onScrollDepthChange={handleDocumentScrollDepthChange}
-                    isCompactLayout={isCompactEditorLayout}
-                    analysisResult={analysis}
-                    viewMode={viewMode}
-                    isTemplateMode={isTemplateMode}
-                    onExitTemplateMode={() => setIsTemplateMode(false)}
-                  />
+                          : undefined
+                      }
+                      readOnly={!canEditChapter}
+                      scrollToTopSignal={scrollToTopSignal}
+                      onScrollDepthChange={handleDocumentScrollDepthChange}
+                      isCompactLayout={isCompactEditorLayout}
+                      analysisResult={analysis}
+                      viewMode={viewMode}
+                      isTemplateMode={isTemplateMode}
+                      onExitTemplateMode={() => setIsTemplateMode(false)}
+                    />
+                  </div>
                 </div>
               ) : (
                 <div
@@ -2386,9 +2397,8 @@ export const ChapterCheckerV2: React.FC = () => {
             borderRadius: 0,
             boxShadow: "none",
             padding: 0,
-            overflow: "visible",
+            overflow: "hidden",
             minHeight: 0,
-            maxHeight: "100vh",
           }}
         >
           {!tierFeatures.fullAnalysis ? (
@@ -2398,7 +2408,7 @@ export const ChapterCheckerV2: React.FC = () => {
               style={{
                 flex: 1,
                 minHeight: 0,
-                overflow: "visible",
+                overflow: "auto",
                 padding: chapterData ? "18px" : "22px",
                 display: "flex",
                 flexDirection: "column",
@@ -3159,21 +3169,37 @@ export const ChapterCheckerV2: React.FC = () => {
                       }}
                       style={{
                         flex: 1,
-                        padding: "8px",
+                        padding: "12px 16px",
                         backgroundColor:
-                          viewMode === "analysis" ? "white" : "transparent",
-                        color: viewMode === "analysis" ? "#e0c392" : "#2c3e50",
+                          viewMode === "analysis" ? "#ef8432" : "#fef5e7",
+                        color: viewMode === "analysis" ? "white" : "#2c3e50",
                         border:
                           viewMode === "analysis"
-                            ? "2px solid #e0c392"
-                            : "1.5px solid #e0c392",
-                        borderRadius: "20px",
+                            ? "2px solid #ef8432"
+                            : "2px solid #e0c392",
+                        borderRadius: "8px",
                         cursor: "pointer",
-                        fontSize: "14px",
-                        fontWeight: "600",
+                        fontSize: "15px",
+                        fontWeight: viewMode === "analysis" ? "700" : "600",
+                        transition: "all 0.2s",
+                        boxShadow:
+                          viewMode === "analysis"
+                            ? "0 2px 8px rgba(239, 132, 50, 0.3)"
+                            : "none",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (viewMode !== "analysis") {
+                          e.currentTarget.style.backgroundColor = "#f7e6d0";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (viewMode !== "analysis") {
+                          e.currentTarget.style.backgroundColor = "#fef5e7";
+                        }
                       }}
                     >
-                      📊 Analysis
+                      📊 Analysis Mode
+                      {viewMode === "analysis" && " ✓"}
                     </button>
                     <button
                       onClick={() => {
@@ -3189,21 +3215,44 @@ export const ChapterCheckerV2: React.FC = () => {
                       }}
                       style={{
                         flex: 1,
-                        padding: "8px",
+                        padding: "12px 16px",
                         backgroundColor:
-                          viewMode === "writer" ? "white" : "transparent",
-                        color: viewMode === "writer" ? "#f7d8a8" : "#2c3e50",
+                          viewMode === "writer" ? "#ef8432" : "#fef5e7",
+                        color: viewMode === "writer" ? "white" : "#2c3e50",
                         border:
                           viewMode === "writer"
-                            ? "2px solid #f7d8a8"
-                            : "1.5px solid #e0c392",
-                        borderRadius: "20px",
-                        cursor: "pointer",
-                        fontSize: "14px",
-                        fontWeight: "600",
+                            ? "2px solid #ef8432"
+                            : "2px solid #e0c392",
+                        borderRadius: "8px",
+                        cursor: ACCESS_TIERS[accessLevel].writerMode
+                          ? "pointer"
+                          : "not-allowed",
+                        fontSize: "15px",
+                        fontWeight: viewMode === "writer" ? "700" : "600",
+                        transition: "all 0.2s",
+                        boxShadow:
+                          viewMode === "writer"
+                            ? "0 2px 8px rgba(239, 132, 50, 0.3)"
+                            : "none",
+                        opacity: ACCESS_TIERS[accessLevel].writerMode ? 1 : 0.6,
+                      }}
+                      onMouseEnter={(e) => {
+                        if (
+                          viewMode !== "writer" &&
+                          ACCESS_TIERS[accessLevel].writerMode
+                        ) {
+                          e.currentTarget.style.backgroundColor = "#f7e6d0";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (viewMode !== "writer") {
+                          e.currentTarget.style.backgroundColor = "#fef5e7";
+                        }
                       }}
                     >
-                      ✍️ Writer {!ACCESS_TIERS[accessLevel].writerMode && "👑"}
+                      ✍️ Writer Mode
+                      {viewMode === "writer" && " ✓"}
+                      {!ACCESS_TIERS[accessLevel].writerMode && " 👑"}
                     </button>
                   </div>
 

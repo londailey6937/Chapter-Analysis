@@ -13,6 +13,7 @@ interface CustomEditorProps {
   concepts?: string[];
   onConceptClick?: (concept: string) => void;
   isFreeMode?: boolean;
+  viewMode?: "analysis" | "writer";
 }
 
 interface AnalysisData {
@@ -25,6 +26,11 @@ interface AnalysisData {
   visuals: Array<{ index: number; suggestions: any[] }>;
 }
 
+type TextMatch = {
+  start: number;
+  end: number;
+};
+
 export const CustomEditor: React.FC<CustomEditorProps> = ({
   content,
   onUpdate,
@@ -36,6 +42,7 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
   concepts = [],
   onConceptClick,
   isFreeMode = false,
+  viewMode = "analysis",
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -65,6 +72,8 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
   const [showStats, setShowStats] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
   const [textAlign, setTextAlign] = useState("left");
+  const [findMatches, setFindMatches] = useState<TextMatch[]>([]);
+  const [currentMatchIndex, setCurrentMatchIndex] = useState(-1);
   const [statistics, setStatistics] = useState({
     words: 0,
     characters: 0,
@@ -291,10 +300,25 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
 
   // Apply concept underlining
   useEffect(() => {
-    if (!editorRef.current || concepts.length === 0) return;
+    if (!editorRef.current) return;
 
     const applyConceptUnderlines = () => {
       if (!editorRef.current) return;
+
+      // Remove existing wrappers so repeated passes don't nest spans
+      const existingUnderlines =
+        editorRef.current.querySelectorAll(".concept-underline");
+      existingUnderlines.forEach((span) => {
+        const fragment = document.createDocumentFragment();
+        while (span.firstChild) {
+          fragment.appendChild(span.firstChild);
+        }
+        span.replaceWith(fragment);
+      });
+
+      if (concepts.length === 0) {
+        return;
+      }
 
       const walker = document.createTreeWalker(
         editorRef.current,
@@ -461,40 +485,223 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
     setTimeout(() => handleInput(), 0);
   }, [handleInput]);
 
-  // Find text
-  const findInText = useCallback(() => {
-    if (!findText || !editorRef.current) return;
-    const selection = window.getSelection();
-    const range = document.createRange();
+  const createRangeFromOffsets = useCallback((start: number, end: number) => {
+    if (!editorRef.current || start === end) return null;
+
     const walker = document.createTreeWalker(
       editorRef.current,
-      NodeFilter.SHOW_TEXT
+      NodeFilter.SHOW_TEXT,
+      null
     );
 
-    let node;
-    while ((node = walker.nextNode())) {
-      const index = node.textContent
-        ?.toLowerCase()
-        .indexOf(findText.toLowerCase());
-      if (index !== undefined && index !== -1 && node.textContent) {
-        range.setStart(node, index);
-        range.setEnd(node, index + findText.length);
-        selection?.removeAllRanges();
-        selection?.addRange(range);
-        editorRef.current.focus();
+    let charIndex = 0;
+    let currentNode = walker.nextNode() as Text | null;
+    let rangeStartNode: Text | null = null;
+    let rangeStartOffset = 0;
+    let rangeEndNode: Text | null = null;
+    let rangeEndOffset = 0;
+
+    while (currentNode) {
+      const textLength = currentNode.textContent?.length ?? 0;
+      const nextIndex = charIndex + textLength;
+
+      if (!rangeStartNode && start >= charIndex && start <= nextIndex) {
+        rangeStartNode = currentNode;
+        rangeStartOffset = start - charIndex;
+      }
+
+      if (!rangeEndNode && end >= charIndex && end <= nextIndex) {
+        rangeEndNode = currentNode;
+        rangeEndOffset = end - charIndex;
         break;
       }
+
+      charIndex = nextIndex;
+      currentNode = walker.nextNode() as Text | null;
     }
+
+    if (rangeStartNode && rangeEndNode) {
+      const range = document.createRange();
+      range.setStart(rangeStartNode, rangeStartOffset);
+      range.setEnd(rangeEndNode, rangeEndOffset);
+      return range;
+    }
+
+    return null;
+  }, []);
+
+  const findAllMatches = useCallback(() => {
+    if (!editorRef.current || !findText) {
+      setFindMatches([]);
+      setCurrentMatchIndex(0);
+      return [] as TextMatch[];
+    }
+
+    const content = editorRef.current.innerText.toLowerCase();
+    const search = findText.toLowerCase();
+    const matches: TextMatch[] = [];
+
+    let index = 0;
+    while (index < content.length) {
+      const foundAt = content.indexOf(search, index);
+      if (foundAt === -1) break;
+      matches.push({ start: foundAt, end: foundAt + findText.length });
+      index = foundAt + 1; // allow overlaps
+    }
+
+    setFindMatches(matches);
+    setCurrentMatchIndex(-1);
+    return matches;
   }, [findText]);
 
-  // Replace text
+  // Find text
+  const findInText = useCallback(() => {
+    if (!findText) return;
+
+    let matches = findMatches;
+    if (matches.length === 0) {
+      matches = findAllMatches();
+      if (matches.length === 0) return;
+    }
+
+    const nextIndex =
+      currentMatchIndex === -1 ? 0 : (currentMatchIndex + 1) % matches.length;
+    const match = matches[nextIndex];
+    const range = createRangeFromOffsets(match.start, match.end);
+
+    if (!range) {
+      setFindMatches([]);
+      setCurrentMatchIndex(-1);
+      return;
+    }
+
+    setCurrentMatchIndex(nextIndex);
+
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+
+    const targetElement =
+      range.startContainer instanceof Element
+        ? (range.startContainer as Element)
+        : range.startContainer.parentElement;
+
+    targetElement?.scrollIntoView({ block: "center", behavior: "smooth" });
+    editorRef.current?.focus();
+  }, [
+    findText,
+    findMatches,
+    currentMatchIndex,
+    findAllMatches,
+    createRangeFromOffsets,
+  ]);
+
+  const replaceOne = useCallback(() => {
+    if (!editorRef.current || !findText) return;
+
+    const matches = findMatches.length > 0 ? findMatches : findAllMatches();
+    if (matches.length === 0) return;
+
+    const safeIndex =
+      currentMatchIndex === -1
+        ? 0
+        : Math.min(currentMatchIndex, matches.length - 1);
+    const match = matches[safeIndex];
+    const range = createRangeFromOffsets(match.start, match.end);
+
+    if (!range) {
+      setFindMatches([]);
+      setCurrentMatchIndex(-1);
+      return;
+    }
+
+    range.deleteContents();
+    range.insertNode(document.createTextNode(replaceText));
+
+    setFindMatches([]);
+    setCurrentMatchIndex(-1);
+    handleInput();
+  }, [
+    editorRef,
+    findText,
+    replaceText,
+    findMatches,
+    currentMatchIndex,
+    findAllMatches,
+    createRangeFromOffsets,
+    handleInput,
+  ]);
+
+  // Replace all occurrences
   const replaceInText = useCallback(() => {
     if (!editorRef.current || !findText) return;
-    const html = editorRef.current.innerHTML;
-    const newHtml = html.replace(new RegExp(findText, "g"), replaceText);
-    editorRef.current.innerHTML = newHtml;
+
+    const walker = document.createTreeWalker(
+      editorRef.current,
+      NodeFilter.SHOW_TEXT,
+      null
+    );
+
+    const nodesToProcess: {
+      node: Text;
+      matches: Array<{ start: number; end: number }>;
+    }[] = [];
+
+    let nodeCount = 0;
+    const MAX_NODES = 500;
+
+    let currentNode = walker.nextNode() as Text;
+    while (currentNode && nodeCount < MAX_NODES) {
+      const text = currentNode.textContent || "";
+      const matches: Array<{ start: number; end: number }> = [];
+
+      let searchIndex = 0;
+      while (searchIndex < text.length) {
+        const index = text
+          .toLowerCase()
+          .indexOf(findText.toLowerCase(), searchIndex);
+        if (index === -1) break;
+
+        matches.push({ start: index, end: index + findText.length });
+        searchIndex = index + 1;
+      }
+
+      if (matches.length > 0) {
+        nodesToProcess.push({ node: currentNode, matches });
+      }
+
+      currentNode = walker.nextNode() as Text;
+      nodeCount++;
+    }
+
+    nodesToProcess.reverse();
+
+    nodesToProcess.forEach(({ node, matches }) => {
+      const text = node.textContent || "";
+      let newText = text;
+
+      [...matches].reverse().forEach(({ start, end }) => {
+        newText =
+          newText.substring(0, start) + replaceText + newText.substring(end);
+      });
+
+      node.textContent = newText;
+    });
+
+    setFindMatches([]);
+    setCurrentMatchIndex(-1);
     handleInput();
-  }, [findText, replaceText, handleInput]);
+  }, [editorRef, findText, replaceText, handleInput]);
+
+  useEffect(() => {
+    if (!findText) {
+      setFindMatches([]);
+      setCurrentMatchIndex(0);
+    } else {
+      setFindMatches([]);
+      setCurrentMatchIndex(-1);
+    }
+  }, [findText]);
 
   // Clear formatting
   const clearFormatting = useCallback(() => {
@@ -657,6 +864,8 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
     const wrapperRect = wrapperRef.current?.getBoundingClientRect();
     if (!wrapperRect) return null;
 
+    const scrollTop = wrapperRef.current?.scrollTop || 0;
+
     return analysis.spacing.map((item, idx) => {
       const para = paragraphs[item.index];
       if (!para) return null;
@@ -678,7 +887,7 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
             colors[item.tone as keyof typeof colors] || colors.balanced
           } select-none whitespace-nowrap pointer-events-none`}
           style={{
-            top: `${rect.top - wrapperRect.top - 24}px`,
+            top: `${rect.top - wrapperRect.top + scrollTop - 24}px`,
             left: `${container.left - wrapperRect.left - 10}px`,
             transform: "translateX(-100%)",
           }}
@@ -703,6 +912,8 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
     const wrapperRect = wrapperRef.current?.getBoundingClientRect();
     if (!wrapperRect) return null;
 
+    const scrollTop = wrapperRef.current?.scrollTop || 0;
+
     return analysis.visuals.map((item, idx) => {
       const para = paragraphs[item.index];
       if (!para) {
@@ -721,7 +932,7 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
           key={`visual-${idx}`}
           className="absolute p-1.5 bg-yellow-50 border-l-3 border-yellow-400 rounded text-xs text-yellow-900 select-none pointer-events-none"
           style={{
-            top: `${rect.top - wrapperRect.top - 24}px`,
+            top: `${rect.top - wrapperRect.top + scrollTop - 24}px`,
             left: `${container.right - wrapperRect.left + 10}px`,
             maxWidth: "200px",
           }}
@@ -742,10 +953,16 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
   return (
     <div
       className="custom-editor-container"
-      style={{ position: "relative", height: "100%", ...style }}
+      style={{
+        position: "relative",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        ...style,
+      }}
     >
       {/* Toolbar */}
-      {!isFreeMode && (
+      {viewMode === "writer" && !isFreeMode && (
         <div className="toolbar flex flex-wrap items-center gap-2 p-2 border-b bg-gray-50 sticky top-0 z-20 shadow-sm">
           {/* Block type dropdown */}
           <select
@@ -1068,15 +1285,31 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
               if (e.key === "Escape") setShowFindReplace(false);
             }}
           />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={findInText}
+              className="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm"
+              disabled={!findText}
+            >
+              Find Next
+            </button>
+            {findMatches.length > 0 && (
+              <span className="text-xs text-gray-600">
+                {Math.max(0, currentMatchIndex + 1)} / {findMatches.length}
+              </span>
+            )}
+          </div>
           <button
-            onClick={findInText}
-            className="px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm"
+            onClick={replaceOne}
+            disabled={!findText}
+            className="px-3 py-1.5 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            Find
+            Replace
           </button>
           <button
             onClick={replaceInText}
-            className="px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-sm"
+            disabled={!findText}
+            className="px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-sm disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Replace All
           </button>

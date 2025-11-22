@@ -40,6 +40,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
   concepts,
   onConceptClick,
   isFreeMode = false,
+  viewMode,
 }) => {
   // Determine initial content: prefer HTML if available, otherwise text
   const startContent = htmlContent || initialText;
@@ -65,6 +66,7 @@ export const DocumentEditor: React.FC<DocumentEditorProps> = ({
         concepts={concepts}
         onConceptClick={onConceptClick}
         isFreeMode={isFreeMode}
+        viewMode={viewMode as "analysis" | "writer" | undefined}
         style={{ flex: 1, minHeight: 0 }}
       />
     </div>
