@@ -38,6 +38,7 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
   isFreeMode = false,
 }) => {
   const editorRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const [analysis, setAnalysis] = useState<AnalysisData>({
     spacing: [],
     visuals: [],
@@ -670,6 +671,8 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
     if (!isFreeMode && focusMode) return null;
 
     const paragraphs = Array.from(editorRef.current.querySelectorAll("p, div"));
+    const wrapperRect = wrapperRef.current?.getBoundingClientRect();
+    if (!wrapperRect) return null;
 
     return analysis.spacing.map((item, idx) => {
       const para = paragraphs[item.index];
@@ -692,8 +695,9 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
             colors[item.tone as keyof typeof colors] || colors.balanced
           } select-none whitespace-nowrap pointer-events-none`}
           style={{
-            top: `${rect.top - container.top - 24}px`,
-            left: `${rect.left - container.left}px`,
+            top: `${rect.top - wrapperRect.top - 24}px`,
+            left: `${container.left - wrapperRect.left - 10}px`,
+            transform: "translateX(-100%)",
           }}
         >
           {item.label} · {item.wordCount} words
@@ -718,6 +722,8 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
     }
 
     const paragraphs = Array.from(editorRef.current.querySelectorAll("p, div"));
+    const wrapperRect = wrapperRef.current?.getBoundingClientRect();
+    if (!wrapperRect) return null;
     console.log(
       `[CustomEditor] renderSuggestions: rendering ${analysis.visuals.length} suggestions for ${paragraphs.length} DOM paragraphs`
     );
@@ -745,8 +751,8 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
           key={`visual-${idx}`}
           className="absolute p-1.5 bg-yellow-50 border-l-3 border-yellow-400 rounded text-xs text-yellow-900 select-none pointer-events-none"
           style={{
-            top: `${rect.bottom - container.top + 8}px`,
-            right: `20px`,
+            top: `${rect.top - wrapperRect.top - 24}px`,
+            left: `${container.right - wrapperRect.left + 10}px`,
             maxWidth: "200px",
           }}
         >
@@ -769,240 +775,242 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
       style={{ position: "relative", height: "100%", ...style }}
     >
       {/* Toolbar */}
-      <div className="toolbar flex flex-wrap items-center gap-2 p-2 border-b bg-gray-50 sticky top-0 z-20 shadow-sm">
-        {/* Block type dropdown */}
-        <select
-          value={blockType}
-          onChange={(e) => changeBlockType(e.target.value)}
-          className="px-2 py-1.5 rounded border bg-white hover:bg-gray-50 transition-colors text-sm"
-          title="Block Type"
-        >
-          <option value="p">Paragraph</option>
-          <option value="h1">Heading 1</option>
-          <option value="h2">Heading 2</option>
-          <option value="h3">Heading 3</option>
-          <option value="h4">Heading 4</option>
-          <option value="h5">Heading 5</option>
-          <option value="h6">Heading 6</option>
-          <option value="blockquote">Quote</option>
-        </select>
+      {!isFreeMode && (
+        <div className="toolbar flex flex-wrap items-center gap-2 p-2 border-b bg-gray-50 sticky top-0 z-20 shadow-sm">
+          {/* Block type dropdown */}
+          <select
+            value={blockType}
+            onChange={(e) => changeBlockType(e.target.value)}
+            className="px-2 py-1.5 rounded border bg-white hover:bg-gray-50 transition-colors text-sm"
+            title="Block Type"
+          >
+            <option value="p">Paragraph</option>
+            <option value="h1">Heading 1</option>
+            <option value="h2">Heading 2</option>
+            <option value="h3">Heading 3</option>
+            <option value="h4">Heading 4</option>
+            <option value="h5">Heading 5</option>
+            <option value="h6">Heading 6</option>
+            <option value="blockquote">Quote</option>
+          </select>
 
-        <div className="w-px h-6 bg-gray-300" />
+          <div className="w-px h-6 bg-gray-300" />
 
-        {/* Text formatting */}
-        <div className="flex gap-1">
-          <button
-            onClick={() => formatText("bold")}
-            className={`px-3 py-1.5 rounded font-bold transition-colors ${
-              isBold
-                ? "bg-blue-100 text-blue-700"
-                : "hover:bg-gray-200 text-gray-700"
-            }`}
-            title="Bold (⌘B / Ctrl+B)"
-          >
-            B
-          </button>
-          <button
-            onClick={() => formatText("italic")}
-            className={`px-3 py-1.5 rounded italic transition-colors ${
-              isItalic
-                ? "bg-blue-100 text-blue-700"
-                : "hover:bg-gray-200 text-gray-700"
-            }`}
-            title="Italic (⌘I / Ctrl+I)"
-          >
-            I
-          </button>
-          <button
-            onClick={() => formatText("underline")}
-            className={`px-3 py-1.5 rounded underline transition-colors ${
-              isUnderline
-                ? "bg-blue-100 text-blue-700"
-                : "hover:bg-gray-200 text-gray-700"
-            }`}
-            title="Underline (⌘U / Ctrl+U)"
-          >
-            U
-          </button>
-          <button
-            onClick={() => formatText("strikeThrough")}
-            className="px-3 py-1.5 rounded line-through hover:bg-gray-200 text-gray-700 transition-colors"
-            title="Strikethrough"
-          >
-            S
-          </button>
+          {/* Text formatting */}
+          <div className="flex gap-1">
+            <button
+              onClick={() => formatText("bold")}
+              className={`px-3 py-1.5 rounded font-bold transition-colors ${
+                isBold
+                  ? "bg-blue-100 text-blue-700"
+                  : "hover:bg-gray-200 text-gray-700"
+              }`}
+              title="Bold (⌘B / Ctrl+B)"
+            >
+              B
+            </button>
+            <button
+              onClick={() => formatText("italic")}
+              className={`px-3 py-1.5 rounded italic transition-colors ${
+                isItalic
+                  ? "bg-blue-100 text-blue-700"
+                  : "hover:bg-gray-200 text-gray-700"
+              }`}
+              title="Italic (⌘I / Ctrl+I)"
+            >
+              I
+            </button>
+            <button
+              onClick={() => formatText("underline")}
+              className={`px-3 py-1.5 rounded underline transition-colors ${
+                isUnderline
+                  ? "bg-blue-100 text-blue-700"
+                  : "hover:bg-gray-200 text-gray-700"
+              }`}
+              title="Underline (⌘U / Ctrl+U)"
+            >
+              U
+            </button>
+            <button
+              onClick={() => formatText("strikeThrough")}
+              className="px-3 py-1.5 rounded line-through hover:bg-gray-200 text-gray-700 transition-colors"
+              title="Strikethrough"
+            >
+              S
+            </button>
+          </div>
+
+          <div className="w-px h-6 bg-gray-300" />
+
+          {/* Text alignment */}
+          <div className="flex gap-1">
+            <button
+              onClick={() => alignText("left")}
+              className={`px-2 py-1.5 rounded transition-colors ${
+                textAlign === "left"
+                  ? "bg-blue-100 text-blue-700"
+                  : "hover:bg-gray-200 text-gray-700"
+              }`}
+              title="Align Left"
+            >
+              ≡
+            </button>
+            <button
+              onClick={() => alignText("center")}
+              className={`px-2 py-1.5 rounded transition-colors ${
+                textAlign === "center"
+                  ? "bg-blue-100 text-blue-700"
+                  : "hover:bg-gray-200 text-gray-700"
+              }`}
+              title="Align Center"
+            >
+              ≡
+            </button>
+            <button
+              onClick={() => alignText("right")}
+              className={`px-2 py-1.5 rounded transition-colors ${
+                textAlign === "right"
+                  ? "bg-blue-100 text-blue-700"
+                  : "hover:bg-gray-200 text-gray-700"
+              }`}
+              title="Align Right"
+            >
+              ≡
+            </button>
+          </div>
+
+          <div className="w-px h-6 bg-gray-300" />
+
+          {/* Lists */}
+          <div className="flex gap-1">
+            <button
+              onClick={() => formatText("insertUnorderedList")}
+              className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors"
+              title="Bullet List"
+            >
+              • List
+            </button>
+            <button
+              onClick={() => formatText("insertOrderedList")}
+              className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors"
+              title="Numbered List"
+            >
+              1. List
+            </button>
+          </div>
+
+          <div className="w-px h-6 bg-gray-300" />
+
+          {/* Insert options */}
+          <div className="flex gap-1">
+            <button
+              onClick={() => setShowLinkModal(true)}
+              className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors"
+              title="Insert Link (⌘K / Ctrl+K)"
+            >
+              🔗
+            </button>
+            <button
+              onClick={removeLink}
+              className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors"
+              title="Remove Link"
+            >
+              ⛓️‍💥
+            </button>
+            <label className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors cursor-pointer">
+              📸
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+                title="Insert Image"
+              />
+            </label>
+            <button
+              onClick={insertTable}
+              className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors"
+              title="Insert Table"
+            >
+              ⊞
+            </button>
+          </div>
+
+          <div className="w-px h-6 bg-gray-300" />
+
+          {/* Utilities */}
+          <div className="flex gap-1">
+            <button
+              onClick={clearFormatting}
+              className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors text-sm"
+              title="Clear Formatting"
+            >
+              ⌫
+            </button>
+            <button
+              onClick={() => setShowFindReplace(!showFindReplace)}
+              className={`px-3 py-1.5 rounded transition-colors ${
+                showFindReplace
+                  ? "bg-blue-100 text-blue-700"
+                  : "hover:bg-gray-200 text-gray-700"
+              }`}
+              title="Find & Replace (⌘F / Ctrl+F)"
+            >
+              🔍
+            </button>
+          </div>
+
+          <div className="w-px h-6 bg-gray-300" />
+
+          {/* History */}
+          <div className="flex gap-1">
+            <button
+              onClick={performUndo}
+              disabled={!canUndo}
+              className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+              title="Undo (⌘Z / Ctrl+Z)"
+            >
+              ↶
+            </button>
+            <button
+              onClick={performRedo}
+              disabled={!canRedo}
+              className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+              title="Redo (⌘⇧Z / Ctrl+Y)"
+            >
+              ↷
+            </button>
+          </div>
+
+          <div className="w-px h-6 bg-gray-300" />
+
+          {/* View options */}
+          <div className="flex gap-1">
+            <button
+              onClick={() => setShowStats(!showStats)}
+              className={`px-3 py-1.5 rounded transition-colors text-sm ${
+                showStats
+                  ? "bg-blue-100 text-blue-700"
+                  : "hover:bg-gray-200 text-gray-700"
+              }`}
+              title="Show Statistics"
+            >
+              📊
+            </button>
+            <button
+              onClick={() => setFocusMode(!focusMode)}
+              className={`px-3 py-1.5 rounded transition-colors text-sm ${
+                focusMode
+                  ? "bg-blue-100 text-blue-700"
+                  : "hover:bg-gray-200 text-gray-700"
+              }`}
+              title="Focus Mode (Hide Indicators)"
+            >
+              🎯
+            </button>
+          </div>
         </div>
-
-        <div className="w-px h-6 bg-gray-300" />
-
-        {/* Text alignment */}
-        <div className="flex gap-1">
-          <button
-            onClick={() => alignText("left")}
-            className={`px-2 py-1.5 rounded transition-colors ${
-              textAlign === "left"
-                ? "bg-blue-100 text-blue-700"
-                : "hover:bg-gray-200 text-gray-700"
-            }`}
-            title="Align Left"
-          >
-            ≡
-          </button>
-          <button
-            onClick={() => alignText("center")}
-            className={`px-2 py-1.5 rounded transition-colors ${
-              textAlign === "center"
-                ? "bg-blue-100 text-blue-700"
-                : "hover:bg-gray-200 text-gray-700"
-            }`}
-            title="Align Center"
-          >
-            ≡
-          </button>
-          <button
-            onClick={() => alignText("right")}
-            className={`px-2 py-1.5 rounded transition-colors ${
-              textAlign === "right"
-                ? "bg-blue-100 text-blue-700"
-                : "hover:bg-gray-200 text-gray-700"
-            }`}
-            title="Align Right"
-          >
-            ≡
-          </button>
-        </div>
-
-        <div className="w-px h-6 bg-gray-300" />
-
-        {/* Lists */}
-        <div className="flex gap-1">
-          <button
-            onClick={() => formatText("insertUnorderedList")}
-            className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors"
-            title="Bullet List"
-          >
-            • List
-          </button>
-          <button
-            onClick={() => formatText("insertOrderedList")}
-            className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors"
-            title="Numbered List"
-          >
-            1. List
-          </button>
-        </div>
-
-        <div className="w-px h-6 bg-gray-300" />
-
-        {/* Insert options */}
-        <div className="flex gap-1">
-          <button
-            onClick={() => setShowLinkModal(true)}
-            className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors"
-            title="Insert Link (⌘K / Ctrl+K)"
-          >
-            🔗
-          </button>
-          <button
-            onClick={removeLink}
-            className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors"
-            title="Remove Link"
-          >
-            ⛓️‍💥
-          </button>
-          <label className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors cursor-pointer">
-            📸
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-              title="Insert Image"
-            />
-          </label>
-          <button
-            onClick={insertTable}
-            className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors"
-            title="Insert Table"
-          >
-            ⊞
-          </button>
-        </div>
-
-        <div className="w-px h-6 bg-gray-300" />
-
-        {/* Utilities */}
-        <div className="flex gap-1">
-          <button
-            onClick={clearFormatting}
-            className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors text-sm"
-            title="Clear Formatting"
-          >
-            ⌫
-          </button>
-          <button
-            onClick={() => setShowFindReplace(!showFindReplace)}
-            className={`px-3 py-1.5 rounded transition-colors ${
-              showFindReplace
-                ? "bg-blue-100 text-blue-700"
-                : "hover:bg-gray-200 text-gray-700"
-            }`}
-            title="Find & Replace (⌘F / Ctrl+F)"
-          >
-            🔍
-          </button>
-        </div>
-
-        <div className="w-px h-6 bg-gray-300" />
-
-        {/* History */}
-        <div className="flex gap-1">
-          <button
-            onClick={performUndo}
-            disabled={!canUndo}
-            className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-            title="Undo (⌘Z / Ctrl+Z)"
-          >
-            ↶
-          </button>
-          <button
-            onClick={performRedo}
-            disabled={!canRedo}
-            className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-            title="Redo (⌘⇧Z / Ctrl+Y)"
-          >
-            ↷
-          </button>
-        </div>
-
-        <div className="w-px h-6 bg-gray-300" />
-
-        {/* View options */}
-        <div className="flex gap-1">
-          <button
-            onClick={() => setShowStats(!showStats)}
-            className={`px-3 py-1.5 rounded transition-colors text-sm ${
-              showStats
-                ? "bg-blue-100 text-blue-700"
-                : "hover:bg-gray-200 text-gray-700"
-            }`}
-            title="Show Statistics"
-          >
-            📊
-          </button>
-          <button
-            onClick={() => setFocusMode(!focusMode)}
-            className={`px-3 py-1.5 rounded transition-colors text-sm ${
-              focusMode
-                ? "bg-blue-100 text-blue-700"
-                : "hover:bg-gray-200 text-gray-700"
-            }`}
-            title="Focus Mode (Hide Indicators)"
-          >
-            🎯
-          </button>
-        </div>
-      </div>
+      )}
 
       {/* Link Modal */}
       {showLinkModal && (
@@ -1111,6 +1119,7 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
 
       {/* Editor area with indicators */}
       <div
+        ref={wrapperRef}
         className="editor-wrapper"
         style={{ position: "relative", flex: 1, overflow: "auto" }}
       >
@@ -1120,11 +1129,16 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
           onInput={handleInput}
           onPaste={handlePaste}
           onKeyDown={handleKeyDown}
-          className={`editor-content p-4 focus:outline-none ${className || ""}`}
+          className={`editor-content p-12 focus:outline-none ${
+            className || ""
+          }`}
           style={{
             minHeight: "300px",
             maxWidth: "800px",
-            margin: "0 auto",
+            margin: "20px auto",
+            border: "1px solid #d1d5db",
+            backgroundColor: "#ffffff",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
           }}
           suppressContentEditableWarning
         />

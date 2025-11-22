@@ -580,9 +580,12 @@ export const ChapterCheckerV2: React.FC = () => {
 
     // Strict requirements to prevent false positives while catching real content:
     // Programming languages need stricter thresholds since common English words can match
-    const isProgrammingDomain = ["javascript", "computing", "react"].includes(
-      topDomain?.[0] || ""
-    );
+    const isProgrammingDomain = [
+      "javascript",
+      "computing",
+      "react",
+      "web-development",
+    ].includes(topDomain?.[0] || "");
 
     // 1. Programming domains need higher scores (60) vs general domains (30)
     const minScore = isProgrammingDomain ? 60 : 30;
