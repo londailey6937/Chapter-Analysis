@@ -518,6 +518,12 @@ export const ChapterCheckerV2: React.FC = () => {
       (d) => d.id !== "custom" && d.id !== "cross-domain"
     );
 
+    // Define ambiguous terms that appear in multiple domains
+    const ambiguousTerms = new Set([
+      "variable", "function", "element", "set", "class", "property", 
+      "value", "object", "method", "state", "interface", "type"
+    ]);
+
     // Score each domain based on concept matches from their libraries
     for (const domain of domains) {
       const library = CONCEPT_LIBRARIES[domain.id];
@@ -541,8 +547,9 @@ export const ChapterCheckerV2: React.FC = () => {
           const regex = new RegExp(`\\b${escapedName}\\b`, "gi");
           const matches = lowerText.match(regex);
           if (matches) {
-            // All concepts are core, equal weighting
-            const weight = 3;
+            // Reduce weight for ambiguous terms - they need more evidence
+            const isAmbiguous = ambiguousTerms.has(conceptName);
+            const weight = isAmbiguous ? 1 : 3;
             score += matches.length * weight;
             conceptMatched = true;
           }
@@ -558,7 +565,9 @@ export const ChapterCheckerV2: React.FC = () => {
               const aliasRegex = new RegExp(`\\b${escapedAlias}\\b`, "gi");
               const aliasMatches = lowerText.match(aliasRegex);
               if (aliasMatches) {
-                score += aliasMatches.length;
+                const isAmbiguous = ambiguousTerms.has(alias.toLowerCase());
+                const weight = isAmbiguous ? 0.5 : 1;
+                score += aliasMatches.length * weight;
                 conceptMatched = true;
               }
             }
@@ -578,12 +587,19 @@ export const ChapterCheckerV2: React.FC = () => {
     const sortedScores = Object.entries(scores).sort((a, b) => b[1] - a[1]);
     const topDomain = sortedScores[0];
 
-    // Check for strong CSS/web indicators that should boost confidence
-    const hasCSSIndicators = /\b(css|stylesheet|selector|flexbox|grid|html|dom|browser)\b/gi.test(lowerText);
+    // PRIORITY CHECK: Strong domain indicators override scoring
+    // Check for CSS/web-development indicators first
+    const hasCSSIndicators =
+      /\b(css|stylesheet|selector|flexbox|grid|html|dom|browser)\b/gi.test(
+        lowerText
+      );
     
-    // If web-development has CSS indicators, significantly reduce threshold
-    if (topDomain?.[0] === "webdevelopment" && hasCSSIndicators) {
-      return "webdevelopment";
+    // If document has CSS indicators and web-development scored reasonably, use it
+    if (hasCSSIndicators && scores["webdevelopment"] && scores["webdevelopment"] >= 20) {
+      // Check that it has some unique concepts (at least 4)
+      if (uniqueConceptMatches["webdevelopment"]?.size >= 4) {
+        return "webdevelopment";
+      }
     }
 
     // Strict requirements to prevent false positives while catching real content:
