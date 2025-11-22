@@ -16,7 +16,7 @@ export type ParagraphSummary = {
 };
 
 export function countWords(text: string): number {
-  const matches = text.match(/[A-Za-z0-9']+/g);
+  const matches = text.match(/[A-Za-z0-9'’]+/g);
   return matches ? matches.length : 0;
 }
 

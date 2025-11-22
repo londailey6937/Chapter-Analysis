@@ -54,6 +54,7 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
   const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Undo/Redo history
   const historyRef = useRef<string[]>([]);
@@ -161,7 +162,8 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
     setAnalysis({ spacing: spacingData, visuals: visualsData });
 
     // Calculate statistics (lightweight for all sizes)
-    const words = text.split(/\s+/).filter((w) => w.length > 0).length;
+    // Use regex to match ChapterCheckerV2 logic and handle smart quotes
+    const words = (text.match(/[A-Za-z0-9'’]+/g) || []).length;
     const characters = text.length;
     const readingTime = Math.ceil(words / 200); // 200 words per minute
 
@@ -224,8 +226,13 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
     const html = editorRef.current.innerHTML;
     const text = editorRef.current.innerText;
 
-    // Save to undo history
-    saveToHistory(html);
+    // Debounce save to history to prevent performance issues
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    saveTimeoutRef.current = setTimeout(() => {
+      saveToHistory(html);
+    }, 500);
 
     // Debounce updates
     if (updateTimeoutRef.current) {
@@ -558,43 +565,46 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
   const findInText = useCallback(() => {
     if (!findText) return;
 
-    let matches = findMatches;
-    if (matches.length === 0) {
-      matches = findAllMatches();
-      if (matches.length === 0) return;
+    // Use native window.find for better reliability in contentEditable
+    // Arguments: aString, aCaseSensitive, aBackwards, aWrapAround, aWholeWord, aSearchInFrames, aShowDialog
+    const found = (window as any).find(
+      findText,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false
+    );
+
+    if (found) {
+      // Ensure editor has focus so the selection is visible
+      editorRef.current?.focus();
+      // Update match index for UI (approximate)
+      setCurrentMatchIndex((prev) => prev + 1);
+    } else {
+      // Try resetting selection to start and search again (in case wrap didn't work as expected)
+      const selection = window.getSelection();
+      if (selection) {
+        selection.collapse(editorRef.current, 0);
+        const foundRetry = (window as any).find(
+          findText,
+          false,
+          false,
+          true,
+          false,
+          false,
+          false
+        );
+        if (foundRetry) {
+          editorRef.current?.focus();
+          setCurrentMatchIndex(0);
+          return;
+        }
+      }
+      alert("Text not found");
     }
-
-    const nextIndex =
-      currentMatchIndex === -1 ? 0 : (currentMatchIndex + 1) % matches.length;
-    const match = matches[nextIndex];
-    const range = createRangeFromOffsets(match.start, match.end);
-
-    if (!range) {
-      setFindMatches([]);
-      setCurrentMatchIndex(-1);
-      return;
-    }
-
-    setCurrentMatchIndex(nextIndex);
-
-    const selection = window.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-
-    const targetElement =
-      range.startContainer instanceof Element
-        ? (range.startContainer as Element)
-        : range.startContainer.parentElement;
-
-    targetElement?.scrollIntoView({ block: "center", behavior: "smooth" });
-    editorRef.current?.focus();
-  }, [
-    findText,
-    findMatches,
-    currentMatchIndex,
-    findAllMatches,
-    createRangeFromOffsets,
-  ]);
+  }, [findText]);
 
   const replaceOne = useCallback(() => {
     if (!editorRef.current || !findText) return;
@@ -1432,8 +1442,13 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
           display: block;
           margin: 1rem 0;
         }
-        .editor-content ul,
+        .editor-content ul {
+          list-style-type: disc;
+          margin: 1em 0;
+          padding-left: 2em;
+        }
         .editor-content ol {
+          list-style-type: decimal;
           margin: 1em 0;
           padding-left: 2em;
         }
