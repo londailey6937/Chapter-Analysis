@@ -491,6 +491,26 @@ export const ChapterCheckerV2: React.FC = () => {
     [statisticsText]
   );
   const charCount = statisticsText.length;
+
+  // Calculate reading level using Flesch-Kincaid Grade Level
+  const readingLevel = useMemo(() => {
+    if (!statisticsText || wordCount < 10) return 0;
+
+    const sentences = statisticsText
+      .split(/[.!?]+/)
+      .filter((s) => s.trim().length > 0).length;
+
+    if (sentences === 0) return 0;
+
+    const syllables = statisticsText.split(/\s+/).reduce((count, word) => {
+      return count + Math.max(1, word.match(/[aeiouy]{1,2}/gi)?.length || 1);
+    }, 0);
+
+    const grade =
+      0.39 * (wordCount / sentences) + 11.8 * (syllables / wordCount) - 15.59;
+    return Math.max(0, Math.round(grade * 10) / 10);
+  }, [statisticsText, wordCount]);
+
   const autosaveTimestampLabel = useMemo(() => {
     if (!pendingAutosave?.timestamp) {
       return "";
@@ -603,11 +623,15 @@ export const ChapterCheckerV2: React.FC = () => {
       /\b(css|stylesheet|selector|flexbox|grid|html|dom|browser)\b/gi.test(
         lowerText
       );
-    
+
     // Check for CSS syntax patterns (selectors, properties, pseudo-classes)
-    const hasCSSyntax = 
-      /\b(padding|margin|border|background|color|display|position|width|height):/gi.test(lowerText) ||
-      /\b(hover|active|focus|before|after|first-child|last-child)\b/gi.test(lowerText) ||
+    const hasCSSyntax =
+      /\b(padding|margin|border|background|color|display|position|width|height):/gi.test(
+        lowerText
+      ) ||
+      /\b(hover|active|focus|before|after|first-child|last-child)\b/gi.test(
+        lowerText
+      ) ||
       /\.(class|id)[^a-z]/gi.test(lowerText) ||
       /#[0-9a-f]{3,6}\b/gi.test(lowerText); // hex colors
 
@@ -2088,6 +2112,14 @@ export const ChapterCheckerV2: React.FC = () => {
                           return `~${minutes}m read`;
                         })()}
                       </span>
+                      {readingLevel > 0 && (
+                        <>
+                          <span style={{ color: "#9ca3af" }}>•</span>
+                          <span style={{ fontWeight: 500 }}>
+                            Grade {readingLevel}
+                          </span>
+                        </>
+                      )}
                     </div>
                     {analysis && (
                       <>
@@ -2116,33 +2148,37 @@ export const ChapterCheckerV2: React.FC = () => {
                               <span style={{ color: "#9ca3af" }}>•</span>
                             </>
                           )}
-                          <span style={{ fontWeight: 500 }}>
-                            {analysis.conceptGraph?.concepts?.length || 0}{" "}
-                            concepts
+                          {(analysis.conceptGraph?.concepts?.length || 0) >
+                            0 && (
+                            <>
+                              <span style={{ fontWeight: 500 }}>
+                                {analysis.conceptGraph.concepts.length} concepts
+                              </span>
+                              <span style={{ color: "#9ca3af" }}>•</span>
+                              <span style={{ fontWeight: 500 }}>
+                                {(
+                                  analysis.conceptGraph.concepts.length /
+                                  (wordCount / 1000)
+                                ).toFixed(1)}{" "}
+                                per 1k words
+                              </span>
+                              <span style={{ color: "#9ca3af" }}>•</span>
+                            </>
+                          )}
+                          <span
+                            style={{
+                              fontWeight: 600,
+                              color:
+                                analysis.overallScore > 70
+                                  ? "#10b981"
+                                  : analysis.overallScore > 50
+                                  ? "#f59e0b"
+                                  : "#ef4444",
+                            }}
+                          >
+                            Overall Score: {Math.round(analysis.overallScore)}
+                            /100
                           </span>
-                          <span style={{ color: "#9ca3af" }}>•</span>
-                          <span style={{ fontWeight: 500 }}>
-                            {(
-                              (analysis.conceptGraph?.concepts?.length || 0) /
-                              (wordCount / 1000)
-                            ).toFixed(1)}{" "}
-                            per 1k words
-                          </span>
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "12px",
-                            fontWeight: 600,
-                            color:
-                              analysis.overallScore > 70
-                                ? "#10b981"
-                                : analysis.overallScore > 50
-                                ? "#f59e0b"
-                                : "#ef4444",
-                          }}
-                        >
-                          Overall Score: {Math.round(analysis.overallScore)}
-                          /100
                         </div>
                       </>
                     )}
