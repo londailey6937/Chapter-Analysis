@@ -769,7 +769,10 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
           {/* Text formatting */}
           <div className="flex gap-1">
             <button
-              onClick={() => formatText("bold")}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                formatText("bold");
+              }}
               className={`px-3 py-1.5 rounded font-bold transition-colors ${
                 isBold
                   ? "bg-blue-100 text-blue-700"
@@ -780,7 +783,10 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
               B
             </button>
             <button
-              onClick={() => formatText("italic")}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                formatText("italic");
+              }}
               className={`px-3 py-1.5 rounded italic transition-colors ${
                 isItalic
                   ? "bg-blue-100 text-blue-700"
@@ -791,7 +797,10 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
               I
             </button>
             <button
-              onClick={() => formatText("underline")}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                formatText("underline");
+              }}
               className={`px-3 py-1.5 rounded underline transition-colors ${
                 isUnderline
                   ? "bg-blue-100 text-blue-700"
@@ -802,7 +811,10 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
               U
             </button>
             <button
-              onClick={() => formatText("strikeThrough")}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                formatText("strikeThrough");
+              }}
               className="px-3 py-1.5 rounded line-through hover:bg-gray-200 text-gray-700 transition-colors"
               title="Strikethrough"
             >
@@ -815,7 +827,10 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
           {/* Text alignment */}
           <div className="flex gap-1">
             <button
-              onClick={() => alignText("left")}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                alignText("left");
+              }}
               className={`px-2 py-1.5 rounded transition-colors ${
                 textAlign === "left"
                   ? "bg-blue-100 text-blue-700"
@@ -826,7 +841,10 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
               ≡
             </button>
             <button
-              onClick={() => alignText("center")}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                alignText("center");
+              }}
               className={`px-2 py-1.5 rounded transition-colors ${
                 textAlign === "center"
                   ? "bg-blue-100 text-blue-700"
@@ -837,7 +855,10 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
               ≡
             </button>
             <button
-              onClick={() => alignText("right")}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                alignText("right");
+              }}
               className={`px-2 py-1.5 rounded transition-colors ${
                 textAlign === "right"
                   ? "bg-blue-100 text-blue-700"
@@ -854,14 +875,20 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
           {/* Lists */}
           <div className="flex gap-1">
             <button
-              onClick={() => formatText("insertUnorderedList")}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                formatText("insertUnorderedList");
+              }}
               className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors"
               title="Bullet List"
             >
               • List
             </button>
             <button
-              onClick={() => formatText("insertOrderedList")}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                formatText("insertOrderedList");
+              }}
               className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors"
               title="Numbered List"
             >
@@ -1109,6 +1136,8 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
             border: "1px solid #d1d5db",
             backgroundColor: "#ffffff",
             boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+            caretColor: "#2c3e50",
+            cursor: isEditable ? "text" : "default",
           }}
           suppressContentEditableWarning
         />
