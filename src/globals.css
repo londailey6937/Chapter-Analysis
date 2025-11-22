@@ -519,3 +519,38 @@ select:focus option:checked {
   text-decoration-thickness: 3px;
   background-color: rgba(239, 132, 50, 0.1);
 }
+
+/* Improved horizontal scrolling for charts */
+.chart-scroll-container {
+  /* Always show scrollbar on all devices */
+  scrollbar-width: thin;
+  scrollbar-color: #ef8432 #f5e6d3;
+}
+
+/* Webkit (Chrome, Safari, Edge) scrollbar styling */
+.chart-scroll-container::-webkit-scrollbar {
+  height: 12px;
+  background-color: #f5e6d3;
+}
+
+.chart-scroll-container::-webkit-scrollbar-thumb {
+  background-color: #ef8432;
+  border-radius: 6px;
+  border: 2px solid #f5e6d3;
+}
+
+.chart-scroll-container::-webkit-scrollbar-thumb:hover {
+  background-color: #d97326;
+}
+
+.chart-scroll-container::-webkit-scrollbar-track {
+  background-color: #f5e6d3;
+  border-radius: 6px;
+}
+
+/* Ensure scrollbars work on touch devices */
+@supports (-webkit-touch-callout: none) {
+  .chart-scroll-container {
+    -webkit-overflow-scrolling: touch;
+  }
+}

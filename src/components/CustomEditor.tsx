@@ -1245,17 +1245,6 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
           {/* View options */}
           <div className="flex gap-1">
             <button
-              onClick={() => setShowStats(!showStats)}
-              className={`px-3 py-1.5 rounded transition-colors text-sm ${
-                showStats
-                  ? "bg-blue-100 text-blue-700"
-                  : "hover:bg-gray-200 text-gray-700"
-              }`}
-              title="Show Statistics"
-            >
-              📊
-            </button>
-            <button
               onClick={() => setFocusMode(!focusMode)}
               className={`px-3 py-1.5 rounded transition-colors text-sm ${
                 focusMode
@@ -1363,31 +1352,6 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
           >
             Close
           </button>
-        </div>
-      )}
-
-      {/* Statistics Panel */}
-      {showStats && (
-        <div className="border-b bg-blue-50 p-3 flex items-center gap-6 text-sm flex-wrap">
-          <div>
-            <span className="font-semibold">Words:</span> {statistics.words}
-          </div>
-          <div>
-            <span className="font-semibold">Characters:</span>{" "}
-            {statistics.characters}
-          </div>
-          <div>
-            <span className="font-semibold">Paragraphs:</span>{" "}
-            {statistics.paragraphs}
-          </div>
-          <div>
-            <span className="font-semibold">Reading Time:</span>{" "}
-            {statistics.readingTime} min
-          </div>
-          <div>
-            <span className="font-semibold">Reading Level:</span> Grade{" "}
-            {statistics.readingLevel}
-          </div>
         </div>
       )}
 

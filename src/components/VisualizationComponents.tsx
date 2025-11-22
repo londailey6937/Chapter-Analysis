@@ -255,7 +255,12 @@ export const ChapterOverviewTimeline: React.FC<{
           overflowX: sections.length > 60 ? "auto" : "visible",
           overflowY: "visible",
           marginBottom: "16px",
+          // Make scrollbar always visible and easier to use
+          scrollbarWidth: "thin",
+          scrollbarColor: "#ef8432 #f5e6d3",
+          WebkitOverflowScrolling: "touch",
         }}
+        className="chart-scroll-container"
       >
         <ResponsiveContainer
           width={sections.length > 60 ? sections.length * 15 : "100%"}
@@ -1230,6 +1235,7 @@ export const InterleavingPattern: React.FC<{
 
         {/* Interactive sequence grid */}
         <div
+          className="chart-scroll-container"
           style={{
             overflowX: "auto",
             paddingBottom: "8px",
@@ -2442,7 +2448,6 @@ export const ChapterAnalysisDashboard: React.FC<{
             padding: 20px;
             background: var(--bg-panel);
             max-width: 100%;
-            overflow-x: auto;
           }
           .viz-container h3 {
             margin-top: 0;

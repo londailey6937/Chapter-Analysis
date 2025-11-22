@@ -176,12 +176,15 @@ type LayoutMode = "desktop" | "laptop" | "tablet";
 type SelectedDomain = Domain | "none";
 
 const resolveLayoutMode = (width: number): LayoutMode => {
+  // Tablet: ≤1024px (iPad and smaller)
   if (width <= 1024) {
     return "tablet";
   }
-  if (width <= 1520) {
+  // Laptop: 1025-1680px (13-16 inch laptops)
+  if (width <= 1680) {
     return "laptop";
   }
+  // Desktop: >1680px (27 inch and larger monitors)
   return "desktop";
 };
 
@@ -1886,7 +1889,7 @@ export const ChapterCheckerV2: React.FC = () => {
                   gap: "12px",
                   alignItems: "flex-start",
                   justifyContent: "space-between",
-                  flexWrap: "wrap",
+                  flexWrap: "nowrap",
                 }}
               >
                 {/* Left: Upload button and action buttons */}
@@ -2081,6 +2084,7 @@ export const ChapterCheckerV2: React.FC = () => {
                       backgroundColor: "#f5ead9",
                       borderRadius: "12px",
                       border: "1.5px solid #e0c392",
+                      flexShrink: 0,
                     }}
                   >
                     <span style={{ fontWeight: "600", fontSize: "14px" }}>
@@ -2381,11 +2385,15 @@ export const ChapterCheckerV2: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Analysis Panel (37% in all modes) */}
+        {/* Right: Analysis Panel (responsive: 40% desktop, 30% laptop) */}
         <div
           className="app-panel"
           style={{
-            flex: isStackedLayout ? "1 1 100%" : "37 1 0", // 37% in all modes
+            flex: isStackedLayout
+              ? "1 1 100%"
+              : layoutMode === "desktop"
+              ? "40 1 0"
+              : "30 1 0",
             maxWidth: "100%",
             minWidth: analysisMinWidth,
             display: "flex",
