@@ -339,6 +339,8 @@ Our analysis engine uses a sophisticated **Two-Pass Logic** to ensure both accur
 
 ### The Matching Workflow
 
+> 📋 **Display Note:** This section appears with Cream background (#fef5e7) and Tan border (#e0c392) in the UI.
+
 1. **Strict Match (Pass 1):** We first look for the exact, canonical name of the concept (e.g., "Real option exercise rule"). This ensures the most specific terminology is recognized.
 2. **Flexible Match (Pass 2):** If the exact name isn't found, we scan for approved aliases and variations (e.g., "exercise rule"). This captures natural language usage while mapping it back to the core concept.
 
@@ -364,8 +366,10 @@ You can now **Report False Positives** directly from the concept list. Look for 
 - ✅ View analysis dashboard
 - ✅ Access all built-in domains
 - ✅ **Save up to 3 analyzed documents** (requires free account)
+- ✅ Read-only document viewer
 - ❌ No exports (HTML/DOCX/JSON)
-- ❌ No Writer Mode
+- ❌ No Writer Mode (no editing capabilities)
+- ❌ No rich text editor
 - ❌ No custom domains
 - ❌ Limited to spacing + dual coding only
 
@@ -408,24 +412,32 @@ You can now **Report False Positives** directly from the concept list. Look for 
 **What You Get:**
 
 - ✅ Everything in Premium
-- ✅ **Writer Mode** (edit + live updates)
-- ✅ **Real-time highlighting** as you type
+- ✅ **Writer Mode** (full rich text editing + live analysis)
+- ✅ **Professional rich text editor** with formatting toolbar
+- ✅ **Real-time analysis indicators** as you type
 - ✅ **Unlimited analyses**
-- ✅ **Bulk exports** (DOCX + JSON bundles)
-- ✅ Version tracking
-- ✅ Team collaboration features
+- ✅ **Advanced exports** (HTML + DOCX with embedded analysis)
+- ✅ **Template library** with AI integration (Claude)
 - ✅ Priority support + consultation
 
-**Best for:** Publishers, textbook authors, instructional designers, teams
+**Best for:** Publishers, textbook authors, instructional designers, professional content creators
 
 **Writer Mode Features:**
 
-- Live editing pane
-- Real-time spacing indicators update
+- Rich text editing with full formatting toolbar
+- Bold, italic, underline, headings, lists
+- Image upload and paste support
+- Tables, links, and alignment controls
+- Keyboard shortcuts (Cmd/Ctrl+B, I, U, K, F, Z)
+- Real-time spacing indicators update as you type
+- Live dual-coding callouts appear inline
 - Search and highlight concept mentions
-- Track changes as you revise
-- Export final drafts with embedded analysis
-- Compare before/after versions
+- Find & replace functionality
+- Undo/redo with 50-state history
+- Statistics panel (word count, reading time, Flesch-Kincaid level)
+- Focus mode (hide indicators for distraction-free writing)
+- Auto-save to browser storage
+- Export with embedded analysis and styling
 
 ---
 
@@ -445,11 +457,12 @@ You can now **Report False Positives** directly from the concept list. Look for 
 ```
 ┌────────────────────────────┬────────────────────────┐
 │  Editable Document (65%)   │  Analysis Panel (35%)  │
-│                            │                        │
-│  [Edit your text here...]  │  • Spacing Overview    │
-│                            │  • Dual Coding Alerts  │
-│  [Live indicators appear]  │  • Concept Mentions    │
-│                            │  • Search/Highlight    │
+│  [Formatting Toolbar]      │                        │
+│                            │  • Spacing Overview    │
+│  [Edit your text here...]  │  • Dual Coding Alerts  │
+│                            │  • Concept Mentions    │
+│  [Live indicators appear]  │  • Search/Highlight    │
+│                            │  • Statistics          │
 └────────────────────────────┴────────────────────────┘
 ```
 
@@ -458,6 +471,7 @@ You can now **Report False Positives** directly from the concept list. Look for 
 ```
 ┌────────────────────────────┐
 │  Editable Document (100%)  │
+│  [Formatting Toolbar]      │
 │                            │
 │  [Edit your text here...]  │
 │                            │
@@ -465,35 +479,69 @@ You can now **Report False Positives** directly from the concept list. Look for 
 └────────────────────────────┘
 ```
 
-### Editing Features
+### Editing Features (Professional Tier Only)
 
-**Text Editing:**
+**Rich Text Formatting:**
 
-- Type directly in the editor pane
-- Copy/paste formatted text
-- Word count updates live
-- Auto-saves as you type (browser storage)
+- **Bold** (Cmd/Ctrl+B), **Italic** (Cmd/Ctrl+I), **Underline** (Cmd/Ctrl+U)
+- Headings (H1, H2, H3) and paragraph styles
+- Bulleted and numbered lists
+- Text alignment (left, center, right, justify)
+- Insert links (Cmd/Ctrl+K) and tables
+- Upload or paste images directly
+- Clear formatting option
+- Undo (Cmd/Ctrl+Z) / Redo (Cmd/Ctrl+Shift+Z or Ctrl+Y)
+- 50-state undo/redo history
 
-**Spacing Controls:**
+**Live Analysis Integration:**
 
 - Toggle spacing indicators on/off
 - Dashed lines show paragraph boundaries
-- Color badges indicate paragraph health
-- Click badge to see specific guidance
+- Color badges (cream/tan backgrounds) indicate paragraph health
+- Toggle dual-coding visual callouts on/off
+- Yellow boxes appear inline showing suggestions
+- Priority badges (high/medium/low) guide urgency
+- Real-time updates as you type
 
-**Dual Coding Controls:**
+**Search & Navigation:**
 
-- Toggle visual callouts on/off
-- Yellow boxes appear inline with text
-- Click to see detailed suggestion
-- Priority badges guide urgency
-
-**Search & Highlight:**
-
-- Search for concepts mentioned in analysis
-- Click concept name to highlight all mentions
+- Find & Replace (Cmd/Ctrl+F) with full-text search
+- Search for specific concepts from analysis
+- Click concept names to highlight all mentions
 - Navigate between occurrences
-- See frequency count
+- See frequency counts
+- Match highlighting with navigation
+
+**Statistics & Tools:**
+
+- Live word count and character count
+- Reading time estimation
+- Flesch-Kincaid reading level calculation
+- Paragraph count tracking
+- Focus mode toggle (hide indicators for distraction-free writing)
+- Auto-save to browser localStorage
+- Statistics panel toggle
+
+**Content Management:**
+
+- Copy/paste preserves formatting
+- Paste images from clipboard
+- Drag and drop functionality
+- Auto-save every edit (300ms debounce)
+- Browser storage backup
+- Export with full formatting preserved
+
+**Keyboard Shortcuts:**
+
+- **Cmd/Ctrl+B** - Bold
+- **Cmd/Ctrl+I** - Italic
+- **Cmd/Ctrl+U** - Underline
+- **Cmd/Ctrl+K** - Insert link
+- **Cmd/Ctrl+F** - Find & replace
+- **Cmd/Ctrl+Z** - Undo
+- **Cmd/Ctrl+Shift+Z** (Mac) or **Ctrl+Y** (Windows) - Redo
+
+💡 **Pro Tip:** Use keyboard shortcuts for faster editing, or click the toolbar buttons for visual feedback!
 
 ### Export from Writer Mode
 
@@ -501,9 +549,9 @@ You can now **Report False Positives** directly from the concept list. Look for 
 
 1. **📄 Export DOCX** - Save your edits as Word document with embedded analysis
 2. **🌐 Export HTML** - Generate styled HTML with highlights
-3. **Export JSON** - Download raw analysis data
+3. **📊 Export JSON** - Download raw analysis data
 
-**Tip:** Export after each major revision to track improvement!
+**Tip:** Use Writer Mode's full formatting capabilities and export to preserve all styling and analysis markers!
 
 ---
 
@@ -519,25 +567,37 @@ You can now **Report False Positives** directly from the concept list. Look for 
 
 ### Spacing Indicators
 
-| Background Color     | Border | Meaning                              |
-| -------------------- | ------ | ------------------------------------ |
-| Light Blue (#DBEAFE) | Blue   | Good paragraph length (60-160 words) |
-| Orange (#FEF3C7)     | Orange | Too compact (<60 words)              |
-| Red (#FEE2E2)        | Red    | Too extended (>160 words)            |
+**Colors match docs/colorPalette.md - Cream & Tan Backgrounds**
+
+| Background Color    | Border           | Meaning                              |
+| ------------------- | ---------------- | ------------------------------------ |
+| Cream (#FEF5E7)     | Tan (#E0C392)    | Good paragraph length (60-160 words) |
+| Light Tan (#F7E6D0) | Orange (#EF8432) | Too compact (<60 words)              |
+| Pale Tan (#F5EAD9)  | Orange (#EF8432) | Too extended (>160 words)            |
 
 ### Dual Coding Callouts
 
-| Background       | Border | Priority Badge                          |
-| ---------------- | ------ | --------------------------------------- |
-| Yellow (#FEF9C3) | Orange | Red (High), Orange (Medium), Gray (Low) |
+| Background             | Border           | Priority Badge                          |
+| ---------------------- | ---------------- | --------------------------------------- |
+| Cream/Yellow (#FEF9C3) | Orange (#EF8432) | Red (High), Orange (Medium), Gray (Low) |
 
 ### Priority Badges
 
 | Badge Text          | Color               | When Used              |
 | ------------------- | ------------------- | ---------------------- |
-| **High Priority**   | 🔴 Red (#DC2626)    | Critical suggestions   |
-| **Medium Priority** | 🟡 Orange (#F59E0B) | Beneficial suggestions |
+| **High Priority**   | 🔴 Red (#EF4444)    | Critical suggestions   |
+| **Medium Priority** | 🟡 Orange (#F97316) | Beneficial suggestions |
 | **Low Priority**    | ⚪ Gray (#6B7280)   | Optional suggestions   |
+
+### Card & UI Backgrounds
+
+**Following docs/colorPalette.md standards:**
+
+- **Main cards**: Cream (#FEF5E7)
+- **Hover states**: Light Tan (#F7E6D0)
+- **Borders**: Soft Tan (#E0C392)
+- **Primary CTA**: Tome Orange (#EF8432)
+- **Text**: Navy (#2C3E50)
 
 ---
 

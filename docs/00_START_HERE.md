@@ -4,21 +4,44 @@
 
 ---
 
-## ⚡ Quick Start (3 Steps)
+## ⚡ Quick Start (4 Steps)
 
-### 1️⃣ Install Dependencies
+### 1️⃣ Set Up Environment Variables
+
+```bash
+# Copy the example environment file
+cp .env.example .env
+
+# Edit .env with your actual credentials
+# See .env.example for required variables
+```
+
+**Required variables**:
+
+- `VITE_SUPABASE_URL` - Your Supabase project URL
+- `VITE_SUPABASE_ANON_KEY` - Supabase anonymous key
+- `VITE_STRIPE_PUBLISHABLE_KEY` - Stripe publishable key
+- `VITE_SYNCFUSION_LICENSE_KEY` - Syncfusion license key
+
+**Optional**:
+
+- `VITE_CLAUDE_API_KEY` - For AI template generation (Professional tier)
+
+See [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) for detailed setup instructions.
+
+### 2️⃣ Install Dependencies
 
 ```bash
 npm install
 ```
 
-### 2️⃣ Start Development Server
+### 3️⃣ Start Development Server
 
 ```bash
 npm run dev
 ```
 
-### 3️⃣ Open Your Browser
+### 4️⃣ Open Your Browser
 
 - Opens at `http://localhost:5173` (or next available port)
 - Upload a .docx file or type/paste content directly
@@ -76,6 +99,37 @@ Before diving in, check out our latest features:
 - **Location:** Bottom of Analysis panel
 
 **→ See [RECENT_CHANGES.md](./RECENT_CHANGES.md) for complete details**
+
+---
+
+## 📚 Essential Documentation
+
+New to the app? Start with these guides:
+
+### Getting Started
+
+- **[00_START_HERE.md](./00_START_HERE.md)** - You are here! Quick start guide
+- **[QUICK_START.md](./QUICK_START.md)** - Detailed setup walkthrough
+- **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** - 🆕 Solutions to common problems
+
+### Core Features
+
+- **[TEMPLATE_GUIDE.md](./TEMPLATE_GUIDE.md)** - 🆕 AI-powered template system
+- **[CUSTOM_DOMAIN_GUIDE.md](./CUSTOM_DOMAIN_GUIDE.md)** - 🆕 Create your own concept libraries
+- **[HTML_EXPORT_GUIDE.md](./HTML_EXPORT_GUIDE.md)** - Export and styling options
+- **[UNIFIED_EXPORT_SYSTEM.md](./UNIFIED_EXPORT_SYSTEM.md)** - Technical export details
+
+### For Developers
+
+- **[COMPONENT_REFERENCE.md](./COMPONENT_REFERENCE.md)** - 🆕 Complete component architecture
+- **[TECHNICAL_ARCHITECTURE.md](./TECHNICAL_ARCHITECTURE.md)** - System design and patterns
+- **[STRIPE_INTEGRATION.md](./STRIPE_INTEGRATION.md)** - 🆕 Payment setup and webhooks
+
+### Reference
+
+- **[REFERENCE_LIBRARY.md](./REFERENCE_LIBRARY.md)** - Complete feature documentation
+- **[SYSTEM_OVERVIEW.md](./SYSTEM_OVERVIEW.md)** - High-level architecture
+- **[RECENT_CHANGES.md](./RECENT_CHANGES.md)** - Latest updates and features
 
 ---
 
@@ -312,6 +366,38 @@ function TextAreaInput({
 ```css
 /* In src/styles/globals.css */
 .btn-primary       /* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
+/* Primary button */
 /* Primary button */
 /* Primary button */
 /* Primary button */

@@ -61,8 +61,8 @@ export function ReferenceLibraryModal({
 
                 <div
                   style={{
-                    backgroundColor: "#f0f9ff",
-                    borderLeft: "4px solid #0ea5e9",
+                    backgroundColor: "#fef5e7",
+                    borderLeft: "4px solid #ef8432",
                     padding: "1rem",
                     marginBottom: "1.5rem",
                     borderRadius: "0 0.5rem 0.5rem 0",
@@ -71,7 +71,7 @@ export function ReferenceLibraryModal({
                   <h5
                     style={{
                       margin: "0 0 0.5rem 0",
-                      color: "#0369a1",
+                      color: "#ef8432",
                       fontSize: "1rem",
                     }}
                   >
@@ -689,10 +689,10 @@ export function ReferenceLibraryModal({
 
                 <div
                   style={{
-                    background: "#dbeafe",
+                    background: "#fef5e7",
                     padding: "1rem",
                     borderRadius: "8px",
-                    border: "1px solid #3b82f6",
+                    border: "1px solid #e0c392",
                   }}
                 >
                   <p style={{ margin: 0, fontWeight: "600" }}>💡 Tip:</p>
@@ -718,18 +718,18 @@ export function ReferenceLibraryModal({
 
                 <div
                   style={{
-                    background: "#ecfdf5",
+                    background: "#fef5e7",
                     padding: "1rem",
                     borderRadius: "8px",
                     marginBottom: "1.5rem",
-                    border: "2px solid #10b981",
+                    border: "2px solid #e0c392",
                   }}
                 >
                   <h3
                     style={{
                       marginTop: 0,
                       marginBottom: "0.5rem",
-                      color: "#065f46",
+                      color: "#2c3e50",
                       display: "flex",
                       alignItems: "center",
                       gap: "0.5rem",
@@ -741,10 +741,6 @@ export function ReferenceLibraryModal({
                     <strong>Powerful Features, Zero Cost:</strong>
                   </p>
                   <ul style={{ paddingLeft: "1.5rem", margin: 0 }}>
-                    <li>
-                      ✅ <strong>Professional Rich Text Editor</strong> with
-                      formatting, images, and live analysis
-                    </li>
                     <li>
                       ✅ <strong>Spacing & Pacing Analysis</strong>{" "}
                       (paragraph-by-paragraph)
@@ -758,14 +754,16 @@ export function ReferenceLibraryModal({
                     <li>✅ Upload DOCX files with images (up to 200 pages)</li>
                     <li>✅ All 8 built-in academic domains</li>
                     <li>✅ Auto-domain detection</li>
-                    <li>✅ Real-time editing with live analysis</li>
+                    <li>✅ Read-only document viewer</li>
+                    <li>❌ No editing capabilities (view-only)</li>
+                    <li>❌ No rich text editor</li>
                   </ul>
                   <p
                     style={{
                       marginTop: "0.75rem",
                       marginBottom: "0.5rem",
                       fontSize: "0.9rem",
-                      color: "#059669",
+                      color: "#ef8432",
                       fontWeight: "600",
                     }}
                   >
@@ -790,7 +788,7 @@ export function ReferenceLibraryModal({
                       marginTop: "0.75rem",
                       marginBottom: 0,
                       fontSize: "0.9rem",
-                      color: "#065f46",
+                      color: "#2c3e50",
                       fontStyle: "italic",
                     }}
                   >
@@ -802,18 +800,18 @@ export function ReferenceLibraryModal({
 
                 <div
                   style={{
-                    background: "#fef3c7",
+                    background: "#fef5e7",
                     padding: "1rem",
                     borderRadius: "8px",
                     marginBottom: "1.5rem",
-                    border: "2px solid #f59e0b",
+                    border: "2px solid #e0c392",
                   }}
                 >
                   <h3
                     style={{
                       marginTop: 0,
                       marginBottom: "0.5rem",
-                      color: "#92400e",
+                      color: "#2c3e50",
                     }}
                   >
                     👑 Premium Tier - Unlock Everything
@@ -859,16 +857,16 @@ export function ReferenceLibraryModal({
                     style={{
                       marginTop: "0.75rem",
                       padding: "0.75rem",
-                      background: "#fffbeb",
+                      background: "#fef5e7",
                       borderRadius: "6px",
-                      border: "1px solid #fbbf24",
+                      border: "1px solid #e0c392",
                     }}
                   >
                     <p
                       style={{
                         margin: 0,
                         fontSize: "0.9rem",
-                        color: "#78350f",
+                        color: "#2c3e50",
                       }}
                     >
                       <strong>💡 Why Upgrade?</strong> Free tier proves the AI
@@ -882,7 +880,7 @@ export function ReferenceLibraryModal({
                       marginTop: "0.75rem",
                       marginBottom: 0,
                       fontSize: "0.9rem",
-                      color: "#92400e",
+                      color: "#2c3e50",
                       fontStyle: "italic",
                     }}
                   >
@@ -894,18 +892,18 @@ export function ReferenceLibraryModal({
 
                 <div
                   style={{
-                    background: "#f7e6d0",
+                    background: "#fef5e7",
                     padding: "1rem",
                     borderRadius: "8px",
                     marginBottom: "1rem",
-                    border: "1px solid #ef8432",
+                    border: "2px solid #e0c392",
                   }}
                 >
                   <h3
                     style={{
                       marginTop: 0,
                       marginBottom: "0.5rem",
-                      color: "#374151",
+                      color: "#2c3e50",
                     }}
                   >
                     Professional Tier 💼
@@ -924,15 +922,13 @@ export function ReferenceLibraryModal({
                     <li>
                       ✅ <strong>Unlimited analyses</strong>
                     </li>
-                    <li>✅ Version tracking</li>
-                    <li>✅ Team collaboration features</li>
                   </ul>
                   <p
                     style={{
                       marginTop: "0.5rem",
                       marginBottom: 0,
                       fontSize: "0.9rem",
-                      color: "#6b7280",
+                      color: "#2c3e50",
                     }}
                   >
                     <strong>Best for:</strong> Publishers, textbook authors,
@@ -1445,10 +1441,10 @@ export function ReferenceLibraryModal({
                 </h3>
                 <div
                   style={{
-                    background: "#dbeafe",
+                    background: "#fef5e7",
                     padding: "1rem",
                     borderRadius: "8px",
-                    border: "1px solid #3b82f6",
+                    border: "1px solid #e0c392",
                   }}
                 >
                   <p style={{ marginBottom: "0.5rem", fontWeight: "600" }}>

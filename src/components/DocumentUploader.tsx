@@ -80,6 +80,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const lastIncrementTime = useRef<number>(0);
+  const [isProcessing, setIsProcessing] = React.useState(false);
 
   const checkUploadLimit = (): boolean => {
     // Only enforce limit for free tier
@@ -146,6 +147,11 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
       }
       return;
     }
+
+    setIsProcessing(true);
+
+    // Allow UI to update before starting heavy processing
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
     const fileName = file.name;
     const fileType = file.name.split(".").pop()?.toLowerCase() || "";
@@ -400,6 +406,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
         fileInputRef.current.value = "";
       }
     } finally {
+      setIsProcessing(false);
       // Always reset input so the same file can be uploaded again
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -421,31 +428,54 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
       <label
         htmlFor="document-upload-input"
         style={{
-          display: "inline-block",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "8px",
           padding: "12px 24px",
           backgroundColor: "white",
-          color: disabled ? "#9ca3af" : "#c16659",
-          border: disabled ? "1.5px solid #d1d5db" : "1.5px solid #c16659",
+          color: disabled || isProcessing ? "#9ca3af" : "#c16659",
+          border:
+            disabled || isProcessing
+              ? "1.5px solid #d1d5db"
+              : "1.5px solid #c16659",
           borderRadius: "20px",
-          cursor: disabled ? "not-allowed" : "pointer",
+          cursor: disabled || isProcessing ? "not-allowed" : "pointer",
           fontWeight: "600",
           fontSize: "14px",
           transition: "all 0.2s",
           opacity: disabled ? 0.6 : 1,
         }}
         onMouseEnter={(e) => {
-          if (!disabled) {
+          if (!disabled && !isProcessing) {
             e.currentTarget.style.backgroundColor = "#f7e6d0";
           }
         }}
         onMouseLeave={(e) => {
-          if (!disabled) {
+          if (!disabled && !isProcessing) {
             e.currentTarget.style.backgroundColor = "#ffffff";
           }
         }}
       >
-        📄 Upload Document
+        {isProcessing ? (
+          <>
+            <span className="upload-spinner"></span>
+            Processing...
+          </>
+        ) : (
+          <>📄 Upload Document</>
+        )}
       </label>
+      <style>{`
+        .upload-spinner {
+          width: 16px;
+          height: 16px;
+          border: 2px solid #e5e7eb;
+          border-top: 2px solid #c16659;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          display: inline-block;
+        }
+      `}</style>
       <div
         style={{
           marginTop: "8px",

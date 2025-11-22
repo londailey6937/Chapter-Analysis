@@ -326,8 +326,14 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
 
       textNodes.forEach((textNode) => {
         const text = textNode.textContent || "";
-        let html = text;
-        let hasMatch = false;
+        if (!text.trim()) return;
+
+        const matches: {
+          start: number;
+          end: number;
+          concept: string;
+          canonicalConcept: string;
+        }[] = [];
 
         // Sort concepts by length (longest first) to avoid partial matches
         const sortedConcepts = [...concepts].sort(
@@ -335,22 +341,65 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
         );
 
         sortedConcepts.forEach((concept) => {
-          const regex = new RegExp(
-            `\\b(${concept.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})\\b`,
-            "gi"
-          );
-          if (regex.test(html)) {
-            html = html.replace(
-              regex,
-              '<span class="concept-underline" data-concept="$1">$1</span>'
+          const escapedConcept = concept.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const regex = new RegExp(`\\b(${escapedConcept})\\b`, "gi");
+
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            const start = match.index;
+            const end = start + match[0].length;
+
+            // Check for overlap with existing matches
+            const isOverlapping = matches.some(
+              (m) => start < m.end && end > m.start
             );
-            hasMatch = true;
+
+            if (!isOverlapping) {
+              matches.push({
+                start,
+                end,
+                concept: match[0], // The actual text in the document
+                canonicalConcept: concept, // The concept ID/name
+              });
+            }
           }
         });
 
-        if (hasMatch && textNode.parentElement) {
+        if (matches.length === 0) return;
+
+        // Sort matches by position
+        matches.sort((a, b) => a.start - b.start);
+
+        let newHtml = "";
+        let lastIndex = 0;
+
+        const escapeHtml = (str: string) => {
+          return str
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+        };
+
+        matches.forEach((m) => {
+          // Append text before match (escaped)
+          newHtml += escapeHtml(text.substring(lastIndex, m.start));
+
+          // Append replacement
+          newHtml += `<span class="concept-underline" data-concept="${escapeHtml(
+            m.canonicalConcept
+          )}">${escapeHtml(m.concept)}</span>`;
+
+          lastIndex = m.end;
+        });
+
+        // Append remaining text (escaped)
+        newHtml += escapeHtml(text.substring(lastIndex));
+
+        if (textNode.parentElement) {
           const tempDiv = document.createElement("div");
-          tempDiv.innerHTML = html;
+          tempDiv.innerHTML = newHtml;
           const fragment = document.createDocumentFragment();
           while (tempDiv.firstChild) {
             fragment.appendChild(tempDiv.firstChild);
