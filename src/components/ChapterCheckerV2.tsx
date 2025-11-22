@@ -520,8 +520,18 @@ export const ChapterCheckerV2: React.FC = () => {
 
     // Define ambiguous terms that appear in multiple domains
     const ambiguousTerms = new Set([
-      "variable", "function", "element", "set", "class", "property", 
-      "value", "object", "method", "state", "interface", "type"
+      "variable",
+      "function",
+      "element",
+      "set",
+      "class",
+      "property",
+      "value",
+      "object",
+      "method",
+      "state",
+      "interface",
+      "type",
     ]);
 
     // Score each domain based on concept matches from their libraries
@@ -594,10 +604,17 @@ export const ChapterCheckerV2: React.FC = () => {
         lowerText
       );
     
-    // If document has CSS indicators and web-development scored reasonably, use it
-    if (hasCSSIndicators && scores["webdevelopment"] && scores["webdevelopment"] >= 20) {
-      // Check that it has some unique concepts (at least 4)
-      if (uniqueConceptMatches["webdevelopment"]?.size >= 4) {
+    // Check for CSS syntax patterns (selectors, properties, pseudo-classes)
+    const hasCSSyntax = 
+      /\b(padding|margin|border|background|color|display|position|width|height):/gi.test(lowerText) ||
+      /\b(hover|active|focus|before|after|first-child|last-child)\b/gi.test(lowerText) ||
+      /\.(class|id)[^a-z]/gi.test(lowerText) ||
+      /#[0-9a-f]{3,6}\b/gi.test(lowerText); // hex colors
+
+    // If document has strong CSS evidence, force web-development
+    if ((hasCSSIndicators || hasCSSyntax) && scores["webdevelopment"]) {
+      // Very low threshold - just needs ANY web-development concepts
+      if (uniqueConceptMatches["webdevelopment"]?.size >= 2) {
         return "webdevelopment";
       }
     }
