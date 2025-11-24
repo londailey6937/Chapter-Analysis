@@ -875,7 +875,23 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
       while (node && node !== editorRef.current) {
         const tag = node.tagName?.toLowerCase();
         if (
-          ["p", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote"].includes(tag)
+          [
+            "p",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+            "blockquote",
+            "pullquote",
+            "pre",
+            "footnote",
+            "citation",
+            "toc",
+            "index",
+            "figure",
+          ].includes(tag)
         ) {
           setBlockType(tag);
           break;
@@ -1023,6 +1039,13 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
             <option value="h5">Heading 5</option>
             <option value="h6">Heading 6</option>
             <option value="blockquote">Quote</option>
+            <option value="pullquote">Pull Quote</option>
+            <option value="pre">Code Block</option>
+            <option value="footnote">Footnote</option>
+            <option value="citation">Bibliography/Citation</option>
+            <option value="toc">Table of Contents</option>
+            <option value="index">Index</option>
+            <option value="figure">Figure</option>
           </select>
 
           <div className="w-px h-6 bg-gray-300" />
@@ -1433,6 +1456,113 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
           margin: 1em 0;
           color: #666;
           font-style: italic;
+        }
+        .editor-content pullquote {
+          border-left: 4px solid #ef8432;
+          border-right: 4px solid #ef8432;
+          padding: 1em 1.5em;
+          margin: 1.5em 0;
+          color: #2c3e50;
+          font-style: italic;
+          font-size: 1.25em;
+          text-align: center;
+          background-color: #fef5e7;
+        }
+        .editor-content pre {
+          background-color: #f5f5f5;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          padding: 1em;
+          margin: 1em 0;
+          overflow-x: auto;
+          font-family: 'Courier New', Courier, monospace;
+          font-size: 0.9em;
+          line-height: 1.4;
+        }
+        .editor-content footnote {
+          display: block;
+          font-size: 0.85em;
+          color: #666;
+          border-top: 1px solid #e0e0e0;
+          padding-top: 0.5em;
+          margin: 1.5em 0 0.5em 0;
+        }
+        .editor-content footnote::before {
+          content: "Note: ";
+          font-weight: bold;
+          color: #2c3e50;
+        }
+        .editor-content citation {
+          display: block;
+          font-size: 0.9em;
+          color: #2c3e50;
+          padding-left: 2em;
+          text-indent: -2em;
+          margin: 0.5em 0;
+          line-height: 1.6;
+        }
+        .editor-content toc {
+          display: block;
+          background-color: #fef5e7;
+          border: 2px solid #e0c392;
+          border-radius: 8px;
+          padding: 1.5em;
+          margin: 2em 0;
+        }
+        .editor-content toc::before {
+          content: "Table of Contents";
+          display: block;
+          font-size: 1.25em;
+          font-weight: bold;
+          color: #2c3e50;
+          margin-bottom: 1em;
+          border-bottom: 2px solid #ef8432;
+          padding-bottom: 0.5em;
+        }
+        .editor-content index {
+          display: block;
+          background-color: #f5ead9;
+          border: 2px solid #e0c392;
+          border-radius: 8px;
+          padding: 1.5em;
+          margin: 2em 0;
+          column-count: 2;
+          column-gap: 2em;
+        }
+        .editor-content index::before {
+          content: "Index";
+          display: block;
+          font-size: 1.25em;
+          font-weight: bold;
+          color: #2c3e50;
+          margin-bottom: 1em;
+          border-bottom: 2px solid #ef8432;
+          padding-bottom: 0.5em;
+          column-span: all;
+        }
+        .editor-content figure {
+          display: block;
+          margin: 2em auto;
+          padding: 1em;
+          background-color: #ffffff;
+          border: 2px solid #e0c392;
+          border-radius: 8px;
+          text-align: center;
+          max-width: 90%;
+        }
+        .editor-content figure img {
+          max-width: 100%;
+          height: auto;
+          display: block;
+          margin: 0 auto 0.5em auto;
+        }
+        .editor-content figcaption {
+          font-size: 0.9em;
+          color: #374151;
+          font-style: italic;
+          margin-top: 0.5em;
+          padding-top: 0.5em;
+          border-top: 1px solid #e0c392;
         }
         .editor-content img {
           max-width: 100%;
