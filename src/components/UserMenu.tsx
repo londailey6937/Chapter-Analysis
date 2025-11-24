@@ -125,24 +125,16 @@ export const UserMenu: React.FC<UserMenuProps> = ({ onAuthRequired }) => {
           (e.currentTarget.style.backgroundColor = "#ffffff")
         }
       >
-        <div
+        <img
+          src="/favicon.svg"
+          alt="User"
           style={{
             width: "32px",
             height: "32px",
-            backgroundColor: "#2c3e50",
             borderRadius: "50%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "white",
-            fontWeight: "600",
-            fontSize: "14px",
+            objectFit: "cover",
           }}
-        >
-          {profile?.full_name?.[0]?.toUpperCase() ||
-            user.email?.[0]?.toUpperCase() ||
-            "U"}
-        </div>
+        />
         <span
           style={{
             fontSize: "14px",
