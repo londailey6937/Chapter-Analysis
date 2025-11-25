@@ -551,75 +551,6 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
     setTimeout(() => handleInput(), 0);
   }, [handleInput]);
 
-  const createRangeFromOffsets = useCallback((start: number, end: number) => {
-    if (!editorRef.current || start === end) return null;
-
-    const walker = document.createTreeWalker(
-      editorRef.current,
-      NodeFilter.SHOW_TEXT,
-      null
-    );
-
-    let charIndex = 0;
-    let currentNode = walker.nextNode() as Text | null;
-    let rangeStartNode: Text | null = null;
-    let rangeStartOffset = 0;
-    let rangeEndNode: Text | null = null;
-    let rangeEndOffset = 0;
-
-    while (currentNode) {
-      const textLength = currentNode.textContent?.length ?? 0;
-      const nextIndex = charIndex + textLength;
-
-      if (!rangeStartNode && start >= charIndex && start <= nextIndex) {
-        rangeStartNode = currentNode;
-        rangeStartOffset = start - charIndex;
-      }
-
-      if (!rangeEndNode && end >= charIndex && end <= nextIndex) {
-        rangeEndNode = currentNode;
-        rangeEndOffset = end - charIndex;
-        break;
-      }
-
-      charIndex = nextIndex;
-      currentNode = walker.nextNode() as Text | null;
-    }
-
-    if (rangeStartNode && rangeEndNode) {
-      const range = document.createRange();
-      range.setStart(rangeStartNode, rangeStartOffset);
-      range.setEnd(rangeEndNode, rangeEndOffset);
-      return range;
-    }
-
-    return null;
-  }, []);
-
-  const findAllMatches = useCallback(() => {
-    if (!editorRef.current || !findText) {
-      setFindMatches([]);
-      setCurrentMatchIndex(0);
-      return [] as TextMatch[];
-    }
-
-    const content = editorRef.current.innerText.toLowerCase();
-    const search = findText.toLowerCase();
-    const matches: TextMatch[] = [];
-
-    let index = 0;
-    while (index < content.length) {
-      const foundAt = content.indexOf(search, index);
-      if (foundAt === -1) break;
-      matches.push({ start: foundAt, end: foundAt + findText.length });
-      index = foundAt + 1; // allow overlaps
-    }
-
-    setFindMatches(matches);
-    setCurrentMatchIndex(-1);
-    return matches;
-  }, [findText]);
-
   // Find text
   const findInText = useCallback(() => {
     if (!findText) return;
@@ -668,38 +599,43 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
   const replaceOne = useCallback(() => {
     if (!editorRef.current || !findText) return;
 
-    const matches = findMatches.length > 0 ? findMatches : findAllMatches();
-    if (matches.length === 0) return;
-
-    const safeIndex =
-      currentMatchIndex === -1
-        ? 0
-        : Math.min(currentMatchIndex, matches.length - 1);
-    const match = matches[safeIndex];
-    const range = createRangeFromOffsets(match.start, match.end);
-
-    if (!range) {
-      setFindMatches([]);
-      setCurrentMatchIndex(-1);
+    const selection = window.getSelection();
+    // If no selection or selection is not within editor, try to find first
+    if (
+      !selection ||
+      selection.rangeCount === 0 ||
+      !editorRef.current.contains(selection.anchorNode)
+    ) {
+      findInText();
       return;
     }
 
-    range.deleteContents();
-    range.insertNode(document.createTextNode(replaceText));
+    const range = selection.getRangeAt(0);
+    const selectedText = range.toString();
 
-    setFindMatches([]);
-    setCurrentMatchIndex(-1);
-    handleInput();
-  }, [
-    editorRef,
-    findText,
-    replaceText,
-    findMatches,
-    currentMatchIndex,
-    findAllMatches,
-    createRangeFromOffsets,
-    handleInput,
-  ]);
+    // Check if selected text matches findText (case insensitive)
+    if (selectedText.toLowerCase() === findText.toLowerCase()) {
+      // Replace
+      range.deleteContents();
+      const newTextNode = document.createTextNode(replaceText);
+      range.insertNode(newTextNode);
+
+      // Move selection after replacement
+      range.setStartAfter(newTextNode);
+      range.setEndAfter(newTextNode);
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      // Trigger updates
+      handleInput();
+
+      // Find next
+      findInText();
+    } else {
+      // If selection doesn't match, find next
+      findInText();
+    }
+  }, [findText, replaceText, findInText, handleInput]);
 
   // Replace all occurrences
   const replaceInText = useCallback(() => {
@@ -1349,8 +1285,8 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
         </div>
       )}
 
-      {/* Find & Replace Panel */}
-      {showFindReplace && (
+      {/* Find & Replace Panel - only show in writer mode */}
+      {showFindReplace && viewMode === "writer" && (
         <div className="border-b bg-yellow-50 p-3 flex items-center gap-3 flex-wrap">
           <input
             type="text"
