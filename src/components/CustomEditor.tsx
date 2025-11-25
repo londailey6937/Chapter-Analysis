@@ -63,6 +63,7 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [layoutKey, setLayoutKey] = useState(0);
 
   // New feature states
   const [blockType, setBlockType] = useState("p");
@@ -190,6 +191,30 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
       readingTime,
       readingLevel: Math.max(0, Math.round(readingLevel * 10) / 10),
     });
+  }, []);
+
+  // Force layout recalculation when viewMode or isFreeMode changes
+  useEffect(() => {
+    // Use multiple RAF and a small timeout to ensure DOM has fully settled
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          setLayoutKey((prev) => prev + 1);
+        }, 50);
+      });
+    });
+  }, [viewMode, isFreeMode]);
+
+  // Recalculate on window resize to handle any layout shifts
+  useEffect(() => {
+    const handleResize = () => {
+      requestAnimationFrame(() => {
+        setLayoutKey((prev) => prev + 1);
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Save to history
@@ -925,14 +950,17 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
     if (!wrapperRect) return null;
 
     const scrollTop = wrapperRef.current?.scrollTop || 0;
+    const scrollLeft = wrapperRef.current?.scrollLeft || 0;
+
+    // Force read of layout properties to ensure fresh values
+    const editorOffsetLeft = editorRef.current?.offsetLeft || 0;
+    const editorComputedLeft = editorOffsetLeft;
 
     return analysis.spacing.map((item, idx) => {
       const para = paragraphs[item.index];
       if (!para) return null;
 
       const rect = para.getBoundingClientRect();
-      const container = editorRef.current?.getBoundingClientRect();
-      if (!container) return null;
 
       const colors = {
         compact: "bg-blue-100 text-blue-800 border-blue-200",
@@ -942,14 +970,14 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
 
       return (
         <div
-          key={`spacing-${idx}`}
+          key={`spacing-${idx}-${layoutKey}`}
           className={`absolute text-xs px-2 py-0.5 rounded-full border shadow-sm z-10 ${
             colors[item.tone as keyof typeof colors] || colors.balanced
           } select-none whitespace-nowrap pointer-events-none`}
           style={{
-            top: `${rect.top - wrapperRect.top + scrollTop - 24}px`,
-            left: `${container.left - wrapperRect.left - 10}px`,
-            transform: "translateX(-100%)",
+            top: `${rect.top - wrapperRect.top + scrollTop}px`,
+            left: `${editorComputedLeft - 10}px`,
+            transform: "translateY(-50%) translateX(-100%)",
           }}
         >
           {item.label} · {item.wordCount} words
@@ -974,6 +1002,11 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
 
     const scrollTop = wrapperRef.current?.scrollTop || 0;
 
+    // Force read of layout properties to ensure fresh values
+    const editorOffsetLeft = editorRef.current?.offsetLeft || 0;
+    const editorWidth = editorRef.current?.offsetWidth || 0;
+    const editorComputedRight = editorOffsetLeft + editorWidth;
+
     return analysis.visuals.map((item, idx) => {
       const para = paragraphs[item.index];
       if (!para) {
@@ -984,17 +1017,16 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
       }
 
       const rect = para.getBoundingClientRect();
-      const container = editorRef.current?.getBoundingClientRect();
-      if (!container) return null;
 
       return (
         <div
-          key={`visual-${idx}`}
+          key={`visual-${idx}-${layoutKey}`}
           className="absolute p-1.5 bg-yellow-50 border-l-3 border-yellow-400 rounded text-xs text-yellow-900 select-none pointer-events-none"
           style={{
-            top: `${rect.top - wrapperRect.top + scrollTop - 24}px`,
-            left: `${container.right - wrapperRect.left + 10}px`,
+            top: `${rect.top - wrapperRect.top + scrollTop}px`,
+            left: `${editorComputedRight + 10}px`,
             maxWidth: "200px",
+            transform: "translateY(0)",
           }}
         >
           {item.suggestions.map((s, i) => (
@@ -1402,6 +1434,8 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
             boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
             caretColor: "#2c3e50",
             cursor: isEditable ? "text" : "default",
+            position: "relative",
+            zIndex: 1,
           }}
           suppressContentEditableWarning
         />

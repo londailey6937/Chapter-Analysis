@@ -407,7 +407,7 @@ const deriveSectionsFromText = (rawText: string): Section[] => {
 
 export const ChapterCheckerV2: React.FC = () => {
   // Access control state
-  const [accessLevel, setAccessLevel] = useState<AccessLevel>("free");
+  const [accessLevel, setAccessLevel] = useState<AccessLevel>("professional");
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
   const [showTierTwoPreview, setShowTierTwoPreview] = useState(false);
   const [upgradeTarget, setUpgradeTarget] = useState<
@@ -1583,14 +1583,16 @@ export const ChapterCheckerV2: React.FC = () => {
               flexWrap: "wrap",
               alignItems: "center",
               gap: "1rem",
+              justifyContent: "space-between",
             }}
           >
+            {/* Left: Logo and Navigation */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
-                flex: "1 1 360px",
+                flex: "0 1 auto",
                 minWidth: "280px",
               }}
             >
@@ -1652,93 +1654,236 @@ export const ChapterCheckerV2: React.FC = () => {
               </div>
             </div>
 
-            {/* Save Button (only show if analysis exists and user has access) */}
-            {analysis && accessLevel !== "free" && (
+            {/* Center: Document Stats */}
+            {fileName && (
               <div
-                style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}
+                style={{
+                  fontSize: "13px",
+                  color: "#2c3e50",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "6px",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  textAlign: "center",
+                  minWidth: "240px",
+                  padding: "10px 18px",
+                  backgroundColor: "#f5ead9",
+                  borderRadius: "12px",
+                  border: "1.5px solid #e0c392",
+                  flexShrink: 0,
+                  flex: "0 1 auto",
+                  order: 0,
+                }}
               >
-                <button
-                  onClick={handleSaveAnalysis}
-                  disabled={isSaving}
+                <span style={{ fontWeight: "600", fontSize: "14px" }}>
+                  📄 {fileName}
+                </span>
+                <div
                   style={{
-                    padding: "8px 16px",
-                    backgroundColor: isSaving ? "#e2e8f0" : "#ffffff",
-                    color: isSaving ? "#64748b" : "#2c3e50",
-                    border: isSaving ? "none" : "2px solid #ef8432",
-                    borderRadius: "20px",
-                    cursor: isSaving ? "not-allowed" : "pointer",
-                    fontSize: "14px",
-                    fontWeight: "600",
-                    whiteSpace: "nowrap",
-                    transition: "background-color 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isSaving)
-                      e.currentTarget.style.backgroundColor = "#f7e6d0";
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isSaving)
-                      e.currentTarget.style.backgroundColor = "#ffffff";
+                    display: "flex",
+                    gap: "8px",
+                    fontSize: "12px",
+                    flexWrap: "wrap",
+                    justifyContent: "center",
                   }}
                 >
-                  {isSaving ? "Saving..." : "💾 Save Analysis"}
-                </button>
-                {saveMessage && (
-                  <span
+                  <span style={{ fontWeight: 500 }}>
+                    {wordCount.toLocaleString()} words
+                  </span>
+                  <span style={{ color: "#9ca3af" }}>•</span>
+                  <span style={{ fontWeight: 500 }}>
+                    {Math.ceil(wordCount / 250).toLocaleString()} pages
+                  </span>
+                  <span style={{ color: "#9ca3af" }}>•</span>
+                  <span style={{ fontWeight: 500 }}>
+                    {charCount.toLocaleString()} chars
+                  </span>
+                  <span style={{ color: "#9ca3af" }}>•</span>
+                  <span style={{ fontWeight: 500 }}>
+                    {(() => {
+                      const totalMinutes = Math.ceil(wordCount / 200);
+                      const hours = Math.floor(totalMinutes / 60);
+                      const minutes = totalMinutes % 60;
+                      if (hours > 0) {
+                        return `~${hours}h ${minutes}m read`;
+                      }
+                      return `~${minutes}m read`;
+                    })()}
+                  </span>
+                  {readingLevel > 0 && (
+                    <>
+                      <span style={{ color: "#9ca3af" }}>•</span>
+                      <span style={{ fontWeight: 500 }}>
+                        Grade {readingLevel}
+                      </span>
+                    </>
+                  )}
+                </div>
+
+                {/* Genre display - show when domain is selected */}
+                {selectedDomain && selectedDomain !== "none" && (
+                  <div
                     style={{
+                      display: "flex",
+                      gap: "8px",
                       fontSize: "12px",
-                      color: saveMessage.includes("✅") ? "#10b981" : "#ef4444",
-                      fontWeight: "600",
+                      flexWrap: "wrap",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      padding: "6px 12px",
+                      backgroundColor: "#fff",
+                      borderRadius: "8px",
+                      border: "1px solid #e0c392",
                     }}
                   >
-                    {saveMessage}
-                  </span>
+                    <span style={{ fontWeight: 500, color: "#64748b" }}>
+                      Genre:
+                    </span>
+                    <span
+                      style={{
+                        fontWeight: 600,
+                        color: "#ef8432",
+                        textTransform: "capitalize",
+                      }}
+                    >
+                      {selectedDomain === "custom" ? "Custom" : selectedDomain}
+                    </span>
+                  </div>
+                )}
+
+                {analysis && (
+                  <>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "8px",
+                        fontSize: "12px",
+                        flexWrap: "wrap",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {selectedDomain && selectedDomain !== "none" && (
+                        <>
+                          <span
+                            style={{
+                              fontWeight: 600,
+                              color: "#ef8432",
+                              textTransform: "capitalize",
+                            }}
+                          >
+                            {selectedDomain === "custom"
+                              ? "Custom"
+                              : selectedDomain}
+                          </span>
+                          <span style={{ color: "#9ca3af" }}>•</span>
+                        </>
+                      )}
+                      {(analysis.conceptGraph?.concepts?.length || 0) > 0 && (
+                        <>
+                          <span style={{ fontWeight: 500 }}>
+                            {analysis.conceptGraph.concepts.length} concepts
+                          </span>
+                          <span style={{ color: "#9ca3af" }}>•</span>
+                          <span style={{ fontWeight: 500 }}>
+                            {(
+                              analysis.conceptGraph.concepts.length /
+                              (wordCount / 1000)
+                            ).toFixed(1)}{" "}
+                            per 1k words
+                          </span>
+                          <span style={{ color: "#9ca3af" }}>•</span>
+                        </>
+                      )}
+                      <span
+                        style={{
+                          fontWeight: 600,
+                          color:
+                            analysis.overallScore > 70
+                              ? "#10b981"
+                              : analysis.overallScore > 50
+                              ? "#f59e0b"
+                              : "#ef4444",
+                        }}
+                      >
+                        Overall Score: {Math.round(analysis.overallScore)}
+                        /100
+                      </span>
+                    </div>
+                  </>
                 )}
               </div>
             )}
 
-            {/* User Menu / Auth */}
-            <UserMenu onAuthRequired={() => setIsAuthModalOpen(true)} />
-
-            {/* Access Level Selector (for demo purposes) */}
+            {/* Right: User Menu and Access Tier */}
             <div
               style={{
-                marginLeft: "auto",
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
-                flex: "0 0 auto",
-                justifyContent: "flex-end",
-                maxWidth: "400px",
-                padding: "8px 12px",
-                border: "2px solid #ef8432",
-                borderRadius: "20px",
-                backgroundColor: "#f7e6d0",
+                flex: "0 1 auto",
               }}
             >
-              <span
+              {viewMode === "writer" && (
+                <button
+                  onClick={() => {
+                    setViewMode("analysis");
+                    setHighlightPosition(null);
+                  }}
+                  style={{
+                    padding: "8px 16px",
+                    backgroundColor: "#ef8432",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "20px",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                    fontSize: "14px",
+                    boxShadow: "0 2px 4px rgba(239, 132, 50, 0.3)",
+                    marginRight: "8px",
+                  }}
+                >
+                  Exit Writer Mode
+                </button>
+              )}
+              <UserMenu onAuthRequired={() => setIsAuthModalOpen(true)} />
+
+              {/* Access Level Selector (for demo purposes) */}
+              <div
                 style={{
-                  fontSize: "0.875rem",
-                  opacity: 0.9,
-                  whiteSpace: "nowrap",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  padding: "8px 12px",
+                  border: "2px solid #ef8432",
+                  borderRadius: "20px",
+                  backgroundColor: "#f7e6d0",
                 }}
               >
-                Access Tier:
-              </span>
-              <CustomDropdown
-                value={accessLevel}
-                onChange={(value) =>
-                  handleAccessLevelChange(value as AccessLevel)
-                }
-                options={[
-                  { value: "free", label: "Free (Spacing + Dual Coding)" },
-                  { value: "premium", label: "Premium (Full Analysis)" },
-                  {
-                    value: "professional",
-                    label: "Professional (Writer Mode)",
-                  },
-                ]}
-              />
+                <span
+                  style={{
+                    fontSize: "0.875rem",
+                    opacity: 0.9,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  Access Tier:
+                </span>
+                <CustomDropdown
+                  value={accessLevel}
+                  onChange={(value) =>
+                    handleAccessLevelChange(value as AccessLevel)
+                  }
+                  options={[
+                    { value: "free", label: "Free (Spacing + Dual Coding)" },
+                    { value: "premium", label: "Premium (Full Analysis)" },
+                    {
+                      value: "professional",
+                      label: "Professional (Writer Mode)",
+                    },
+                  ]}
+                />
+              </div>
             </div>
           </div>
         </header>
@@ -1874,6 +2019,7 @@ export const ChapterCheckerV2: React.FC = () => {
               padding: 0,
               backgroundColor: "#f5ead9",
               background: "#f5ead9",
+              display: viewMode === "writer" ? "none" : "block",
             }}
           >
             <div
@@ -1881,23 +2027,19 @@ export const ChapterCheckerV2: React.FC = () => {
               style={{
                 padding: "16px",
                 scrollMarginTop: "140px",
+                display: viewMode === "writer" ? "none" : "block",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  gap: "12px",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  flexWrap: "nowrap",
-                }}
-              >
-                {/* Left: Upload button and action buttons */}
+              {/* Centered button layout matching QuillPilot */}
+              {viewMode !== "writer" && (
                 <div
                   style={{
                     display: "flex",
-                    flexDirection: "column",
-                    gap: "12px",
+                    gap: "8px",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexWrap: "wrap",
+                    marginBottom: chapterData ? "16px" : "0",
                   }}
                 >
                   <DocumentUploader
@@ -1906,46 +2048,12 @@ export const ChapterCheckerV2: React.FC = () => {
                     accessLevel={accessLevel}
                   />
 
-                  {/* TEMP: Reset Upload Counter Button - FOR TESTING ONLY */}
-                  {accessLevel === "free" && (
-                    <button
-                      onClick={() => {
-                        localStorage.removeItem("tomeiq_upload_count");
-                        alert(
-                          "Upload counter reset! You now have 3 uploads available."
-                        );
-                      }}
-                      style={{
-                        padding: "8px 16px",
-                        backgroundColor: "#f59e0b",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "8px",
-                        cursor: "pointer",
-                        fontSize: "12px",
-                        fontWeight: "600",
-                        opacity: 0.7,
-                      }}
-                      title="Testing only - Reset upload counter"
-                    >
-                      🔄 Reset Upload Counter (Testing)
-                    </button>
-                  )}
-
-                  {/* Action buttons below upload */}
                   {chapterData && !isAnalyzing && (
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "12px",
-                        alignItems: "center",
-                        flexWrap: "wrap",
-                      }}
-                    >
+                    <>
                       <button
                         onClick={handleClear}
                         style={{
-                          padding: "10px 18px",
+                          padding: "8px 14px",
                           backgroundColor: "white",
                           color: "#2c3e50",
                           border: "1.5px solid #e0c392",
@@ -1955,6 +2063,7 @@ export const ChapterCheckerV2: React.FC = () => {
                           fontWeight: "600",
                           textAlign: "center",
                           transition: "background-color 0.2s",
+                          flexShrink: 0,
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.backgroundColor = "#f7e6d0";
@@ -1969,7 +2078,7 @@ export const ChapterCheckerV2: React.FC = () => {
                       <button
                         onClick={handleExportDocx}
                         style={{
-                          padding: "10px 18px",
+                          padding: "8px 14px",
                           backgroundColor: "white",
                           color: "#2c3e50",
                           border: "1.5px solid #e0c392",
@@ -1979,6 +2088,7 @@ export const ChapterCheckerV2: React.FC = () => {
                           fontWeight: "600",
                           textAlign: "center",
                           transition: "background-color 0.2s",
+                          flexShrink: 0,
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.backgroundColor = "#f7e6d0";
@@ -1993,7 +2103,7 @@ export const ChapterCheckerV2: React.FC = () => {
                       <button
                         onClick={handleExportHtml}
                         style={{
-                          padding: "10px 18px",
+                          padding: "8px 14px",
                           backgroundColor: "white",
                           color: "#2c3e50",
                           border: "1.5px solid #e0c392",
@@ -2003,6 +2113,7 @@ export const ChapterCheckerV2: React.FC = () => {
                           fontWeight: "600",
                           textAlign: "center",
                           transition: "background-color 0.2s",
+                          flexShrink: 0,
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.backgroundColor = "#f7e6d0";
@@ -2042,7 +2153,7 @@ export const ChapterCheckerV2: React.FC = () => {
                           }
                         }}
                         style={{
-                          padding: "10px 18px",
+                          padding: "8px 14px",
                           backgroundColor: "white",
                           color: "#2c3e50",
                           border: "1.5px solid #e0c392",
@@ -2052,6 +2163,7 @@ export const ChapterCheckerV2: React.FC = () => {
                           fontWeight: "600",
                           textAlign: "center",
                           transition: "background-color 0.2s",
+                          flexShrink: 0,
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.backgroundColor = "#f7e6d0";
@@ -2059,142 +2171,14 @@ export const ChapterCheckerV2: React.FC = () => {
                         onMouseLeave={(e) => {
                           e.currentTarget.style.backgroundColor = "white";
                         }}
-                        title="Check auto-save status"
+                        title="Check auto-save status and clear if needed"
                       >
                         💾 Auto-save info
                       </button>
-                    </div>
+                    </>
                   )}
                 </div>
-
-                {/* Right: Document info */}
-                {fileName && (
-                  <div
-                    style={{
-                      fontSize: "13px",
-                      color: "#2c3e50",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "6px",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      textAlign: "center",
-                      minWidth: "240px",
-                      padding: "10px 18px",
-                      backgroundColor: "#f5ead9",
-                      borderRadius: "12px",
-                      border: "1.5px solid #e0c392",
-                      flexShrink: 0,
-                    }}
-                  >
-                    <span style={{ fontWeight: "600", fontSize: "14px" }}>
-                      📄 {fileName}
-                    </span>
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: "8px",
-                        fontSize: "12px",
-                        flexWrap: "wrap",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <span style={{ fontWeight: 500 }}>
-                        {wordCount.toLocaleString()} words
-                      </span>
-                      <span style={{ color: "#9ca3af" }}>•</span>
-                      <span style={{ fontWeight: 500 }}>
-                        {Math.ceil(wordCount / 250).toLocaleString()} pages
-                      </span>
-                      <span style={{ color: "#9ca3af" }}>•</span>
-                      <span style={{ fontWeight: 500 }}>
-                        {charCount.toLocaleString()} chars
-                      </span>
-                      <span style={{ color: "#9ca3af" }}>•</span>
-                      <span style={{ fontWeight: 500 }}>
-                        {(() => {
-                          const totalMinutes = Math.ceil(wordCount / 200);
-                          const hours = Math.floor(totalMinutes / 60);
-                          const minutes = totalMinutes % 60;
-                          if (hours > 0) {
-                            return `~${hours}h ${minutes}m read`;
-                          }
-                          return `~${minutes}m read`;
-                        })()}
-                      </span>
-                      {readingLevel > 0 && (
-                        <>
-                          <span style={{ color: "#9ca3af" }}>•</span>
-                          <span style={{ fontWeight: 500 }}>
-                            Grade {readingLevel}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                    {analysis && (
-                      <>
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: "8px",
-                            fontSize: "12px",
-                            flexWrap: "wrap",
-                            justifyContent: "center",
-                          }}
-                        >
-                          {selectedDomain && selectedDomain !== "none" && (
-                            <>
-                              <span
-                                style={{
-                                  fontWeight: 600,
-                                  color: "#ef8432",
-                                  textTransform: "capitalize",
-                                }}
-                              >
-                                {selectedDomain === "custom"
-                                  ? "Custom"
-                                  : selectedDomain}
-                              </span>
-                              <span style={{ color: "#9ca3af" }}>•</span>
-                            </>
-                          )}
-                          {(analysis.conceptGraph?.concepts?.length || 0) >
-                            0 && (
-                            <>
-                              <span style={{ fontWeight: 500 }}>
-                                {analysis.conceptGraph.concepts.length} concepts
-                              </span>
-                              <span style={{ color: "#9ca3af" }}>•</span>
-                              <span style={{ fontWeight: 500 }}>
-                                {(
-                                  analysis.conceptGraph.concepts.length /
-                                  (wordCount / 1000)
-                                ).toFixed(1)}{" "}
-                                per 1k words
-                              </span>
-                              <span style={{ color: "#9ca3af" }}>•</span>
-                            </>
-                          )}
-                          <span
-                            style={{
-                              fontWeight: 600,
-                              color:
-                                analysis.overallScore > 70
-                                  ? "#10b981"
-                                  : analysis.overallScore > 50
-                                  ? "#f59e0b"
-                                  : "#ef4444",
-                            }}
-                          >
-                            Overall Score: {Math.round(analysis.overallScore)}
-                            /100
-                          </span>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           </div>
 
@@ -2231,35 +2215,6 @@ export const ChapterCheckerV2: React.FC = () => {
                     overflow: "hidden",
                   }}
                 >
-                  {/* Image notification banner */}
-                  {chapterData.imageCount > 0 && (
-                    <div
-                      style={{
-                        padding: "10px 14px",
-                        backgroundColor: "#f5ead9",
-                        border: "1.5px solid #e0c392",
-                        marginBottom: "12px",
-                        borderRadius: "8px",
-                        fontSize: "13px",
-                        color: "#2c3e50",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <span>📸</span>
-                      <span>
-                        <strong style={{ color: "#ef8432" }}>
-                          {chapterData.imageCount} image
-                          {chapterData.imageCount > 1 ? "s" : ""} detected
-                        </strong>{" "}
-                        - Images are preserved in HTML exports. Editor shows
-                        text structure with spacing/dual-coding analysis.
-                      </span>
-                    </div>
-                  )}
-
                   <div style={{ flex: 1, minHeight: 0, position: "relative" }}>
                     <DocumentEditor
                       key={fileName} // Force new component instance when file changes
@@ -2386,1161 +2341,1180 @@ export const ChapterCheckerV2: React.FC = () => {
         </div>
 
         {/* Right: Analysis Panel (responsive: 40% desktop, 30% laptop) */}
-        <div
-          className="app-panel"
-          style={{
-            flex: isStackedLayout
-              ? "1 1 100%"
-              : layoutMode === "desktop"
-              ? "40 1 0"
-              : "30 1 0",
-            maxWidth: "100%",
-            minWidth: analysisMinWidth,
-            display: "flex",
-            flexDirection: "column",
-            marginTop: isStackedLayout ? "16px" : 0,
-            backgroundColor: "transparent",
-            background: "transparent",
-            border: "none",
-            borderRadius: 0,
-            boxShadow: "none",
-            padding: 0,
-            overflow: "hidden",
-            minHeight: 0,
-          }}
-        >
-          {!tierFeatures.fullAnalysis ? (
-            <div
-              ref={analysisControlsRef}
-              className="app-panel"
-              style={{
-                flex: 1,
-                minHeight: 0,
-                overflow: "auto",
-                padding: chapterData ? "18px" : "22px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "16px",
-                justifyContent: "flex-start",
-                backgroundColor: "#f5e6d3",
-                border: "1.5px solid #ef8432",
-                boxShadow: "0 12px 24px rgba(15,23,42,0.08)",
-              }}
-            >
-              <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>
-                Analysis Controls
-              </h2>
-              <ul
-                style={{
-                  margin: 0,
-                  paddingLeft: "20px",
-                  color: "#2c3e50",
-                  fontSize: "13px",
-                  lineHeight: 1.6,
-                  listStyleType: "disc",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "12px",
-                }}
-              >
-                <li>
-                  <strong style={{ color: "#111827" }}>
-                    Tier 1 · Document Insights
-                  </strong>
-                  <p style={{ margin: "4px 0" }}>
-                    Upload any DOCX or OBT chapter (up to 200 pages) to unlock
-                    live spacing metrics and dual-coding suggestions directly in
-                    the viewer.
-                  </p>
-                  <ul
-                    style={{
-                      margin: 0,
-                      paddingLeft: "18px",
-                      lineHeight: 1.6,
-                      listStyleType: "circle",
-                    }}
-                  >
-                    <li>
-                      <strong>Usage limit:</strong> 3 document uploads (no login
-                      required).
-                    </li>
-                    <li>
-                      <strong>Upload limit:</strong> Up to 200 pages per
-                      document.
-                    </li>
-                    <li>
-                      Spacing overview shows paragraph word counts and density
-                      trends.
-                    </li>
-                    <li>
-                      Dual-coding panel recommends visuals for sequences,
-                      spatial descriptions, and quantitative passages.
-                    </li>
-                    <li>
-                      Search + highlight controls jump to key concept mentions.
-                    </li>
-                    <li>
-                      <strong>Save analyses:</strong> Sign up for free to save
-                      up to 3 documents.
-                    </li>
-                  </ul>
-                </li>
-
-                <li>
-                  <strong style={{ color: "#111827" }}>
-                    Tier 2 · Full Analysis Suite
-                  </strong>
-                  <p style={{ margin: "4px 0" }}>
-                    Run the complete 10-principle evaluator over your draft (up
-                    to 650 pages) for richer learning-science diagnostics and
-                    export capabilities.
-                  </p>
-                  <ul
-                    style={{
-                      margin: 0,
-                      paddingLeft: "18px",
-                      lineHeight: 1.6,
-                      listStyleType: "circle",
-                    }}
-                  >
-                    <li>
-                      <strong>Upload limit:</strong> Up to 650 pages (full
-                      textbooks in chemistry, math, CS, etc.).
-                    </li>
-                    <li>
-                      Principle-by-principle scoring with severity badges and
-                      supporting evidence.
-                    </li>
-                    <li>
-                      Concept relationship graphs show coverage depth, overlap,
-                      and gaps.
-                    </li>
-                    <li>
-                      Auto-generated recommendations with rationale and
-                      suggested edits.
-                    </li>
-                    <li>
-                      Export results as DOCX, JSON, or HTML for documentation
-                      and sharing.
-                    </li>
-                    <li>
-                      Create and save custom domain libraries for specialized
-                      subjects.
-                    </li>
-                  </ul>
-                </li>
-
-                <li>
-                  <strong style={{ color: "#111827" }}>
-                    Tier 3 · Pro Collaboration Mode
-                  </strong>
-                  <p style={{ margin: "4px 0" }}>
-                    Everything in Premium plus real-time editing, unlimited
-                    analyses (up to 1,000 pages), and priority support for
-                    professional teams.
-                  </p>
-                  <ul
-                    style={{
-                      margin: 0,
-                      paddingLeft: "18px",
-                      lineHeight: 1.6,
-                      listStyleType: "circle",
-                    }}
-                  >
-                    <li>
-                      <strong>Upload limit:</strong> Up to 1,000 pages (large
-                      comprehensive texts, reference books, handbooks, long-form
-                      manuscripts).
-                    </li>
-                    <li>
-                      Writer Mode with real-time editing and live analysis
-                      updates as you type.
-                    </li>
-                    <li>
-                      Unlimited document analyses with no restrictions or
-                      quotas.
-                    </li>
-                    <li>
-                      Priority support with faster response times for technical
-                      assistance.
-                    </li>
-                    <li>
-                      Advanced customization and team collaboration features.
-                    </li>
-                    <li>
-                      Version tracking and comprehensive export options for
-                      workflow integration.
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-
-              <div
-                style={{
-                  marginTop: "16px",
-                  paddingTop: "16px",
-                  borderTop: "1px solid #e0c392",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "8px",
-                }}
-              >
-                <strong style={{ fontSize: "14px", color: "#111827" }}>
-                  Ready for more?
-                </strong>
-                <p style={{ margin: 0, fontSize: "13px", color: "#2c3e50" }}>
-                  Switch to Tier 2 to run the full 10-principle analyzer with
-                  concept graphs, recommendations, and exportable reports.
-                </p>
-                <button
-                  onClick={() => {
-                    setShowTierTwoPreview(true);
-                  }}
-                  style={{
-                    alignSelf: "flex-start",
-                    padding: "10px 20px",
-                    backgroundColor: "white",
-                    color: "#2c3e50",
-                    border: "1.5px solid #2c3e50",
-                    borderRadius: "20px",
-                    fontSize: "13px",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    transition: "background-color 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = "#f7e6d0";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "white";
-                  }}
-                >
-                  Preview Tier 2 Features
-                </button>
-              </div>
-
-              {!chapterData && (
-                <div
-                  style={{
-                    marginTop: "16px",
-                    fontSize: "13px",
-                    color: "#2c3e50",
-                    backgroundColor: "#e0c392",
-                    padding: "12px",
-                    borderRadius: "20px",
-                  }}
-                >
-                  Upload a chapter to generate spacing summaries and dual-coding
-                  insights.
-                </div>
-              )}
-            </div>
-          ) : (
-            <div
-              style={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                gap: "16px",
-                minHeight: 0,
-                padding: 0,
-                margin: 0,
-              }}
-            >
+        {/* Hide sidebar in writer mode for clean interface */}
+        {viewMode !== "writer" && (
+          <div
+            className="app-panel"
+            style={{
+              flex: isStackedLayout
+                ? "1 1 100%"
+                : layoutMode === "desktop"
+                ? "40 1 0"
+                : "30 1 0",
+              maxWidth: "100%",
+              minWidth: analysisMinWidth,
+              display: "flex",
+              flexDirection: "column",
+              marginTop: isStackedLayout ? "16px" : 0,
+              backgroundColor: "transparent",
+              background: "transparent",
+              border: "none",
+              borderRadius: 0,
+              boxShadow: "none",
+              padding: 0,
+              overflow: "hidden",
+              minHeight: 0,
+            }}
+          >
+            {!tierFeatures.fullAnalysis ? (
               <div
                 ref={analysisControlsRef}
                 className="app-panel"
                 style={{
-                  padding: "16px",
+                  flex: 1,
+                  minHeight: 0,
+                  overflow: "auto",
+                  padding: chapterData ? "18px" : "22px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "16px",
+                  justifyContent: "flex-start",
                   backgroundColor: "#f5e6d3",
-                  background: "#f5e6d3",
-                  border: "1.5px solid #e0c392",
-                  boxShadow: "0 10px 25px rgba(15,23,42,0.08)",
+                  border: "1.5px solid #ef8432",
+                  boxShadow: "0 12px 24px rgba(15,23,42,0.08)",
                 }}
               >
-                <h2 style={{ margin: "0 0 6px 0", fontSize: "18px" }}>
+                <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 700 }}>
                   Analysis Controls
                 </h2>
-                <p
+                <ul
                   style={{
-                    margin: "0 0 12px 0",
-                    fontSize: "13px",
+                    margin: 0,
+                    paddingLeft: "20px",
                     color: "#2c3e50",
+                    fontSize: "13px",
+                    lineHeight: 1.6,
+                    listStyleType: "disc",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
                   }}
                 >
-                  Select the domain that best matches your chapter content for
-                  accurate concept recognition and analysis.
-                </p>
-
-                <div style={{ marginBottom: "16px" }}>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: "12px",
-                      fontWeight: "600",
-                      marginBottom: "4px",
-                      color: "#2c3e50",
-                    }}
-                  >
-                    Detected Domain:
-                  </label>{" "}
-                  {!showDomainSelector ? (
-                    <div
+                  <li>
+                    <strong style={{ color: "#111827" }}>
+                      Tier 1 · Document Insights
+                    </strong>
+                    <p style={{ margin: "4px 0" }}>
+                      Upload any DOCX or OBT chapter (up to 200 pages) to unlock
+                      live spacing metrics and dual-coding suggestions directly
+                      in the viewer.
+                    </p>
+                    <ul
                       style={{
-                        width: "100%",
-                        padding: "12px",
-                        border: selectedDomain
-                          ? "2px solid #ef8432"
-                          : "2px solid #c16659",
-                        borderRadius: "20px",
-                        fontSize: "14px",
-                        backgroundColor: "white",
-                        color: selectedDomain ? "#ef8432" : "#c16659",
-                        fontWeight: "600",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        gap: "8px",
+                        margin: 0,
+                        paddingLeft: "18px",
+                        lineHeight: 1.6,
+                        listStyleType: "circle",
                       }}
                     >
-                      {selectedDomain === "none" ? (
-                        <>
-                          <span>📝 None / General Content</span>
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: "6px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <span
-                              style={{ fontSize: "12px", fontWeight: "normal" }}
-                            >
-                              ✓ Manual selection
-                            </span>
-                            <button
-                              onClick={() => setShowDomainSelector(true)}
-                              disabled={isAnalyzing}
-                              style={{
-                                padding: "4px 10px",
-                                backgroundColor: "white",
-                                color: "#2c3e50",
-                                border: "1.5px solid #2c3e50",
-                                borderRadius: "16px",
-                                fontSize: "11px",
-                                fontWeight: "600",
-                                cursor: isAnalyzing ? "not-allowed" : "pointer",
-                                opacity: isAnalyzing ? 0.5 : 1,
-                                transition: "background-color 0.2s",
-                              }}
-                              onMouseEnter={(e) => {
-                                if (!isAnalyzing)
-                                  e.currentTarget.style.backgroundColor =
-                                    "#f7e6d0";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = "white";
-                              }}
-                            >
-                              Change
-                            </button>
-                          </div>
-                        </>
-                      ) : selectedDomain ? (
-                        <>
-                          <span>
-                            {selectedDomain === "custom" ? (
-                              <>🎨 {customDomainName || "Custom Domain"}</>
-                            ) : (
-                              <>
-                                {
-                                  sortedDomains.find(
-                                    (d) => d.id === selectedDomain
-                                  )?.icon
-                                }{" "}
-                                {sortedDomains.find(
-                                  (d) => d.id === selectedDomain
-                                )?.label || selectedDomain}
-                              </>
-                            )}
-                          </span>
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: "6px",
-                              alignItems: "center",
-                            }}
-                          >
-                            <span
-                              style={{ fontSize: "12px", fontWeight: "normal" }}
-                            >
-                              {selectedDomain === "custom"
-                                ? "✓ Custom"
-                                : "✓ Auto-detected"}
-                            </span>
-                            <button
-                              onClick={() => setShowDomainSelector(true)}
-                              disabled={isAnalyzing}
-                              style={{
-                                padding: "4px 10px",
-                                backgroundColor: "white",
-                                color: "#2c3e50",
-                                border: "1.5px solid #2c3e50",
-                                borderRadius: "16px",
-                                fontSize: "11px",
-                                fontWeight: "600",
-                                cursor: isAnalyzing ? "not-allowed" : "pointer",
-                                opacity: isAnalyzing ? 0.5 : 1,
-                                transition: "background-color 0.2s",
-                              }}
-                              onMouseEnter={(e) => {
-                                if (!isAnalyzing)
-                                  e.currentTarget.style.backgroundColor =
-                                    "#f7e6d0";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = "white";
-                              }}
-                            >
-                              Change
-                            </button>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <span>⚠️ Domain not detected: upload document</span>
-                          <div style={{ display: "flex", gap: "6px" }}>
-                            <button
-                              onClick={() => setShowDomainSelector(true)}
-                              style={{
-                                padding: "4px 12px",
-                                backgroundColor: "white",
-                                color: "#2c3e50",
-                                border: "1.5px solid #2c3e50",
-                                borderRadius: "16px",
-                                fontSize: "12px",
-                                fontWeight: "600",
-                                cursor: "pointer",
-                                transition: "background-color 0.2s",
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor =
-                                  "#f7e6d0";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = "white";
-                              }}
-                            >
-                              Select Domain
-                            </button>
-                            <button
-                              onClick={() => {
-                                // Check access level for custom domains
-                                const features = ACCESS_TIERS[accessLevel];
-                                if (!features.customDomains) {
-                                  setUpgradeFeature("Custom Domains");
-                                  setUpgradeTarget("premium");
-                                  setShowUpgradePrompt(true);
-                                  return;
-                                }
-                                setShowCustomDomainDialog(true);
-                              }}
-                              style={{
-                                padding: "4px 12px",
-                                backgroundColor: "white",
-                                color: ACCESS_TIERS[accessLevel].customDomains
-                                  ? "#f7d8a8"
-                                  : "#2c3e50",
-                                border: ACCESS_TIERS[accessLevel].customDomains
-                                  ? "1.5px solid #f7d8a8"
-                                  : "1.5px solid #e0c392",
-                                borderRadius: "16px",
-                                fontSize: "12px",
-                                fontWeight: "600",
-                                cursor: ACCESS_TIERS[accessLevel].customDomains
-                                  ? "pointer"
-                                  : "not-allowed",
-                                transition: "background-color 0.2s",
-                              }}
-                              onMouseEnter={(e) => {
-                                if (ACCESS_TIERS[accessLevel].customDomains)
-                                  e.currentTarget.style.backgroundColor =
-                                    "#f7e6d0";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = "white";
-                              }}
-                            >
-                              Create Custom{" "}
-                              {!ACCESS_TIERS[accessLevel].customDomains && "🔒"}
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  ) : (
-                    <div
+                      <li>
+                        <strong>Usage limit:</strong> 3 document uploads (no
+                        login required).
+                      </li>
+                      <li>
+                        <strong>Upload limit:</strong> Up to 200 pages per
+                        document.
+                      </li>
+                      <li>
+                        Spacing overview shows paragraph word counts and density
+                        trends.
+                      </li>
+                      <li>
+                        Dual-coding panel recommends visuals for sequences,
+                        spatial descriptions, and quantitative passages.
+                      </li>
+                      <li>
+                        Search + highlight controls jump to key concept
+                        mentions.
+                      </li>
+                      <li>
+                        <strong>Save analyses:</strong> Sign up for free to save
+                        up to 3 documents.
+                      </li>
+                    </ul>
+                  </li>
+
+                  <li>
+                    <strong style={{ color: "#111827" }}>
+                      Tier 2 · Full Analysis Suite
+                    </strong>
+                    <p style={{ margin: "4px 0" }}>
+                      Run the complete 10-principle evaluator over your draft
+                      (up to 650 pages) for richer learning-science diagnostics
+                      and export capabilities.
+                    </p>
+                    <ul
                       style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "8px",
+                        margin: 0,
+                        paddingLeft: "18px",
+                        lineHeight: 1.6,
+                        listStyleType: "circle",
                       }}
                     >
-                      <select
-                        value={selectedDomain || ""}
-                        onChange={(e) => {
-                          const value = e.target.value;
+                      <li>
+                        <strong>Upload limit:</strong> Up to 650 pages (full
+                        textbooks in chemistry, math, CS, etc.).
+                      </li>
+                      <li>
+                        Principle-by-principle scoring with severity badges and
+                        supporting evidence.
+                      </li>
+                      <li>
+                        Concept relationship graphs show coverage depth,
+                        overlap, and gaps.
+                      </li>
+                      <li>
+                        Auto-generated recommendations with rationale and
+                        suggested edits.
+                      </li>
+                      <li>
+                        Export results as DOCX, JSON, or HTML for documentation
+                        and sharing.
+                      </li>
+                      <li>
+                        Create and save custom domain libraries for specialized
+                        subjects.
+                      </li>
+                    </ul>
+                  </li>
 
-                          // Handle "none" selection - clear domain
-                          if (value === "none") {
-                            setSelectedDomain("none");
-                            setDetectedDomain(null);
-                            setShowDomainSelector(false);
-                            return;
-                          }
+                  <li>
+                    <strong style={{ color: "#111827" }}>
+                      Tier 3 · Pro Collaboration Mode
+                    </strong>
+                    <p style={{ margin: "4px 0" }}>
+                      Everything in Premium plus real-time editing, unlimited
+                      analyses (up to 1,000 pages), and priority support for
+                      professional teams.
+                    </p>
+                    <ul
+                      style={{
+                        margin: 0,
+                        paddingLeft: "18px",
+                        lineHeight: 1.6,
+                        listStyleType: "circle",
+                      }}
+                    >
+                      <li>
+                        <strong>Upload limit:</strong> Up to 1,000 pages (large
+                        comprehensive texts, reference books, handbooks,
+                        long-form manuscripts).
+                      </li>
+                      <li>
+                        Writer Mode with real-time editing and live analysis
+                        updates as you type.
+                      </li>
+                      <li>
+                        Unlimited document analyses with no restrictions or
+                        quotas.
+                      </li>
+                      <li>
+                        Priority support with faster response times for
+                        technical assistance.
+                      </li>
+                      <li>
+                        Advanced customization and team collaboration features.
+                      </li>
+                      <li>
+                        Version tracking and comprehensive export options for
+                        workflow integration.
+                      </li>
+                    </ul>
+                  </li>
+                </ul>
 
-                          // Check if it's a saved custom domain
-                          if (value.startsWith("custom:")) {
-                            const domainName = value.substring(7); // Remove "custom:" prefix
-                            const savedDomain = getCustomDomain(domainName);
-                            if (savedDomain) {
-                              setCustomDomainName(savedDomain.name);
-                              setCustomConcepts(
-                                convertToConceptDefinitions(savedDomain)
-                              );
-                              setSelectedDomain("custom");
-                              localStorage.setItem(
-                                "tomeiq_last_custom_domain",
-                                savedDomain.name
-                              );
-                            }
-                          } else {
-                            setSelectedDomain(value as Domain);
-                          }
-                          setShowDomainSelector(false);
-                        }}
-                        disabled={isAnalyzing}
-                        style={{
-                          width: "100%",
-                          padding: "10px",
-                          border: "2px solid #2c3e50",
-                          borderRadius: "20px",
-                          fontSize: "14px",
-                          outline: "none",
-                        }}
-                      >
-                        <option value="">-- Select a domain --</option>
-                        <option value="none">📝 None / General Content</option>
-                        {sortedDomains.map((domain) => (
-                          <option key={domain.id} value={domain.id}>
-                            {domain.icon} {domain.label}
-                          </option>
-                        ))}
-                        {/* Show saved custom domains if user has access */}
-                        {ACCESS_TIERS[accessLevel].customDomains &&
-                          loadCustomDomains().length > 0 && (
-                            <>
-                              <option disabled>──────────</option>
-                              <optgroup label="📁 Your Custom Domains">
-                                {loadCustomDomains().map((domain) => (
-                                  <option
-                                    key={`custom:${domain.name}`}
-                                    value={`custom:${domain.name}`}
-                                  >
-                                    🎨 {domain.name}
-                                  </option>
-                                ))}
-                              </optgroup>
-                            </>
-                          )}
-                      </select>
-                      <div style={{ display: "flex", gap: "6px" }}>
-                        <button
-                          onClick={() => setShowDomainSelector(false)}
-                          style={{
-                            flex: 1,
-                            padding: "6px",
-                            backgroundColor: "white",
-                            color: "#2c3e50",
-                            border: "1.5px solid #2c3e50",
-                            borderRadius: "16px",
-                            fontSize: "12px",
-                            fontWeight: "600",
-                            cursor: "pointer",
-                            transition: "background-color 0.2s",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#f7e6d0";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = "white";
-                          }}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={() => {
-                            // Check access level for custom domains
-                            const features = ACCESS_TIERS[accessLevel];
-                            if (!features.customDomains) {
-                              setUpgradeFeature("Custom Domains");
-                              setUpgradeTarget("premium");
-                              setShowUpgradePrompt(true);
-                              setShowDomainSelector(false);
-                              return;
-                            }
-                            setShowCustomDomainDialog(true);
-                          }}
-                          style={{
-                            flex: 1,
-                            padding: "6px",
-                            backgroundColor: "white",
-                            color: ACCESS_TIERS[accessLevel].customDomains
-                              ? "#f7d8a8"
-                              : "#2c3e50",
-                            border: ACCESS_TIERS[accessLevel].customDomains
-                              ? "1.5px solid #f7d8a8"
-                              : "1.5px solid #e0c392",
-                            borderRadius: "16px",
-                            fontSize: "12px",
-                            fontWeight: "600",
-                            cursor: ACCESS_TIERS[accessLevel].customDomains
-                              ? "pointer"
-                              : "not-allowed",
-                            transition: "background-color 0.2s",
-                          }}
-                          onMouseEnter={(e) => {
-                            if (ACCESS_TIERS[accessLevel].customDomains)
-                              e.currentTarget.style.backgroundColor = "#f7e6d0";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = "white";
-                          }}
-                        >
-                          Create Custom{" "}
-                          {!ACCESS_TIERS[accessLevel].customDomains && "🔒"}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <button
-                  onClick={handleAnalyzeChapter}
-                  disabled={
-                    !chapterText.trim() ||
-                    isAnalyzing ||
-                    (!selectedDomain && selectedDomain !== "none")
-                  }
+                <div
                   style={{
-                    width: "100%",
-                    padding: "12px",
-                    backgroundColor: "white",
-                    color:
-                      chapterText.trim() &&
-                      !isAnalyzing &&
-                      (selectedDomain || selectedDomain === "none")
-                        ? "#ef8432"
-                        : "#2c3e50",
-                    border:
-                      chapterText.trim() &&
-                      !isAnalyzing &&
-                      (selectedDomain || selectedDomain === "none")
-                        ? "2px solid #ef8432"
-                        : "2px solid #e0c392",
-                    borderRadius: "20px",
-                    fontSize: "16px",
-                    fontWeight: "600",
-                    cursor:
-                      chapterText.trim() &&
-                      !isAnalyzing &&
-                      (selectedDomain || selectedDomain === "none")
-                        ? "pointer"
-                        : "not-allowed",
-                    transition: "background-color 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (
-                      chapterText.trim() &&
-                      !isAnalyzing &&
-                      (selectedDomain || selectedDomain === "none")
-                    )
-                      e.currentTarget.style.backgroundColor = "#f7e6d0";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "white";
+                    marginTop: "16px",
+                    paddingTop: "16px",
+                    borderTop: "1px solid #e0c392",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "8px",
                   }}
                 >
-                  {isAnalyzing ? "⏳ Analyzing..." : "🔍 Analyze Chapter"}
-                </button>
-
-                {/* Free tier info */}
-                {accessLevel === "free" && chapterText && !isAnalyzing && (
-                  <div
+                  <strong style={{ fontSize: "14px", color: "#111827" }}>
+                    Ready for more?
+                  </strong>
+                  <p style={{ margin: 0, fontSize: "13px", color: "#2c3e50" }}>
+                    Switch to Tier 2 to run the full 10-principle analyzer with
+                    concept graphs, recommendations, and exportable reports.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setShowTierTwoPreview(true);
+                    }}
                     style={{
-                      marginTop: "12px",
-                      padding: "12px",
+                      alignSelf: "flex-start",
+                      padding: "10px 20px",
                       backgroundColor: "white",
-                      borderLeft: "4px solid #2c3e50",
+                      color: "#2c3e50",
+                      border: "1.5px solid #2c3e50",
                       borderRadius: "20px",
                       fontSize: "13px",
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontWeight: "600",
-                        marginBottom: "6px",
-                        color: "#2c3e50",
-                      }}
-                    >
-                      🎁 Free Preview Available
-                    </div>
-                    <div style={{ color: "#1e3a8a" }}>
-                      <strong>Spacing Analysis:</strong> See optimal concept
-                      repetition patterns for better retention.
-                      <br />
-                      <strong>Dual Coding:</strong> Get AI suggestions for where
-                      to add visuals, diagrams, and illustrations.
-                      <br />
-                      <br />
-                      <span style={{ fontSize: "12px", opacity: 0.9 }}>
-                        💡 Upgrade to Premium for full 10-principle analysis
-                        with concept graphs, pattern recognition, and detailed
-                        recommendations.
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {error && (
-                  <div
-                    style={{
-                      marginTop: "12px",
-                      padding: "12px",
-                      backgroundColor: "white",
-                      color: "#991b1b",
-                      borderRadius: "20px",
-                      fontSize: "14px",
-                    }}
-                  >
-                    ⚠️ {error}
-                  </div>
-                )}
-
-                {progress && (
-                  <div
-                    style={{
-                      marginTop: "12px",
-                      padding: "12px",
-                      backgroundColor: "white",
-                      color: "#2c3e50",
-                      borderRadius: "20px",
-                      fontSize: "14px",
-                    }}
-                  >
-                    {progress}
-                  </div>
-                )}
-              </div>
-
-              {/* Analysis Results */}
-              {analysis && (
-                <div
-                  ref={analysisPanelRef}
-                  className="app-panel"
-                  style={{
-                    flex: 1,
-                    overflow: "auto",
-                    padding: "16px",
-                    backgroundColor:
-                      viewMode === "analysis" ? "#ead6c1" : "#f5e0c4",
-                    border:
-                      viewMode === "analysis"
-                        ? "1.5px solid #e0c392"
-                        : "1.5px solid #f7d8a8",
-                  }}
-                >
-                  <div
-                    style={{
-                      marginBottom: "16px",
-                      display: "flex",
-                      gap: "8px",
-                    }}
-                  >
-                    <button
-                      onClick={() => {
-                        setViewMode("analysis");
-                        // Clear highlight position when switching to analysis mode
-                        // to prevent unwanted jumps
-                        setHighlightPosition(null);
-                      }}
-                      style={{
-                        flex: 1,
-                        padding: "12px 16px",
-                        backgroundColor:
-                          viewMode === "analysis" ? "#ef8432" : "#fef5e7",
-                        color: viewMode === "analysis" ? "white" : "#2c3e50",
-                        border:
-                          viewMode === "analysis"
-                            ? "2px solid #ef8432"
-                            : "2px solid #e0c392",
-                        borderRadius: "8px",
-                        cursor: "pointer",
-                        fontSize: "15px",
-                        fontWeight: viewMode === "analysis" ? "700" : "600",
-                        transition: "all 0.2s",
-                        boxShadow:
-                          viewMode === "analysis"
-                            ? "0 2px 8px rgba(239, 132, 50, 0.3)"
-                            : "none",
-                      }}
-                      onMouseEnter={(e) => {
-                        if (viewMode !== "analysis") {
-                          e.currentTarget.style.backgroundColor = "#f7e6d0";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (viewMode !== "analysis") {
-                          e.currentTarget.style.backgroundColor = "#fef5e7";
-                        }
-                      }}
-                    >
-                      📊 Analysis Mode
-                      {viewMode === "analysis" && " ✓"}
-                    </button>
-                    <button
-                      onClick={() => {
-                        // Check access for Writer Mode
-                        const features = ACCESS_TIERS[accessLevel];
-                        if (!features.writerMode) {
-                          setUpgradeFeature("Writer Mode");
-                          setUpgradeTarget("professional");
-                          setShowUpgradePrompt(true);
-                          return;
-                        }
-                        setViewMode("writer");
-                      }}
-                      style={{
-                        flex: 1,
-                        padding: "12px 16px",
-                        backgroundColor:
-                          viewMode === "writer" ? "#ef8432" : "#fef5e7",
-                        color: viewMode === "writer" ? "white" : "#2c3e50",
-                        border:
-                          viewMode === "writer"
-                            ? "2px solid #ef8432"
-                            : "2px solid #e0c392",
-                        borderRadius: "8px",
-                        cursor: ACCESS_TIERS[accessLevel].writerMode
-                          ? "pointer"
-                          : "not-allowed",
-                        fontSize: "15px",
-                        fontWeight: viewMode === "writer" ? "700" : "600",
-                        transition: "all 0.2s",
-                        boxShadow:
-                          viewMode === "writer"
-                            ? "0 2px 8px rgba(239, 132, 50, 0.3)"
-                            : "none",
-                        opacity: ACCESS_TIERS[accessLevel].writerMode ? 1 : 0.6,
-                      }}
-                      onMouseEnter={(e) => {
-                        if (
-                          viewMode !== "writer" &&
-                          ACCESS_TIERS[accessLevel].writerMode
-                        ) {
-                          e.currentTarget.style.backgroundColor = "#f7e6d0";
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (viewMode !== "writer") {
-                          e.currentTarget.style.backgroundColor = "#fef5e7";
-                        }
-                      }}
-                    >
-                      ✍️ Writer Mode
-                      {viewMode === "writer" && " ✓"}
-                      {!ACCESS_TIERS[accessLevel].writerMode && " 👑"}
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={handleExport}
-                    disabled={!ACCESS_TIERS[accessLevel].exportResults}
-                    style={{
-                      width: "100%",
-                      padding: "8px",
-                      backgroundColor: "white",
-                      color: ACCESS_TIERS[accessLevel].exportResults
-                        ? "#2c3e50"
-                        : "#2c3e50",
-                      border: ACCESS_TIERS[accessLevel].exportResults
-                        ? "1.5px solid #2c3e50"
-                        : "1.5px solid #e0c392",
-                      borderRadius: "20px",
-                      cursor: ACCESS_TIERS[accessLevel].exportResults
-                        ? "pointer"
-                        : "not-allowed",
-                      fontSize: "14px",
-                      fontWeight: "600",
-                      marginBottom: "16px",
+                      fontWeight: 600,
+                      cursor: "pointer",
                       transition: "background-color 0.2s",
                     }}
                     onMouseEnter={(e) => {
-                      if (ACCESS_TIERS[accessLevel].exportResults)
+                      e.currentTarget.style.backgroundColor = "#f7e6d0";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "white";
+                    }}
+                  >
+                    Preview Tier 2 Features
+                  </button>
+                </div>
+
+                {!chapterData && (
+                  <div
+                    style={{
+                      marginTop: "16px",
+                      fontSize: "13px",
+                      color: "#2c3e50",
+                      backgroundColor: "#e0c392",
+                      padding: "12px",
+                      borderRadius: "20px",
+                    }}
+                  >
+                    Upload a chapter to generate spacing summaries and
+                    dual-coding insights.
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "16px",
+                  minHeight: 0,
+                  padding: 0,
+                  margin: 0,
+                }}
+              >
+                <div
+                  ref={analysisControlsRef}
+                  className="app-panel"
+                  style={{
+                    padding: "16px",
+                    backgroundColor: "#f5e6d3",
+                    background: "#f5e6d3",
+                    border: "1.5px solid #e0c392",
+                    boxShadow: "0 10px 25px rgba(15,23,42,0.08)",
+                    display: "block",
+                  }}
+                >
+                  <h2 style={{ margin: "0 0 6px 0", fontSize: "18px" }}>
+                    Analysis Controls
+                  </h2>
+                  <p
+                    style={{
+                      margin: "0 0 12px 0",
+                      fontSize: "13px",
+                      color: "#2c3e50",
+                    }}
+                  >
+                    Select the domain that best matches your chapter content for
+                    accurate concept recognition and analysis.
+                  </p>
+
+                  <div style={{ marginBottom: "16px" }}>
+                    <label
+                      style={{
+                        display: "block",
+                        fontSize: "12px",
+                        fontWeight: "600",
+                        marginBottom: "4px",
+                        color: "#2c3e50",
+                      }}
+                    >
+                      Detected Domain:
+                    </label>{" "}
+                    {!showDomainSelector ? (
+                      <div
+                        style={{
+                          width: "100%",
+                          padding: "12px",
+                          border: selectedDomain
+                            ? "2px solid #ef8432"
+                            : "2px solid #c16659",
+                          borderRadius: "20px",
+                          fontSize: "14px",
+                          backgroundColor: "white",
+                          color: selectedDomain ? "#ef8432" : "#c16659",
+                          fontWeight: "600",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: "8px",
+                        }}
+                      >
+                        {selectedDomain === "none" ? (
+                          <>
+                            <span>📝 None / General Content</span>
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "6px",
+                                alignItems: "center",
+                              }}
+                            >
+                              <span
+                                style={{
+                                  fontSize: "12px",
+                                  fontWeight: "normal",
+                                }}
+                              >
+                                ✓ Manual selection
+                              </span>
+                              <button
+                                onClick={() => setShowDomainSelector(true)}
+                                disabled={isAnalyzing}
+                                style={{
+                                  padding: "4px 10px",
+                                  backgroundColor: "white",
+                                  color: "#2c3e50",
+                                  border: "1.5px solid #2c3e50",
+                                  borderRadius: "16px",
+                                  fontSize: "11px",
+                                  fontWeight: "600",
+                                  cursor: isAnalyzing
+                                    ? "not-allowed"
+                                    : "pointer",
+                                  opacity: isAnalyzing ? 0.5 : 1,
+                                  transition: "background-color 0.2s",
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (!isAnalyzing)
+                                    e.currentTarget.style.backgroundColor =
+                                      "#f7e6d0";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    "white";
+                                }}
+                              >
+                                Change
+                              </button>
+                            </div>
+                          </>
+                        ) : selectedDomain ? (
+                          <>
+                            <span>
+                              {selectedDomain === "custom" ? (
+                                <>🎨 {customDomainName || "Custom Domain"}</>
+                              ) : (
+                                <>
+                                  {
+                                    sortedDomains.find(
+                                      (d) => d.id === selectedDomain
+                                    )?.icon
+                                  }{" "}
+                                  {sortedDomains.find(
+                                    (d) => d.id === selectedDomain
+                                  )?.label || selectedDomain}
+                                </>
+                              )}
+                            </span>
+                            <div
+                              style={{
+                                display: "flex",
+                                gap: "6px",
+                                alignItems: "center",
+                              }}
+                            >
+                              <span
+                                style={{
+                                  fontSize: "12px",
+                                  fontWeight: "normal",
+                                }}
+                              >
+                                {selectedDomain === "custom"
+                                  ? "✓ Custom"
+                                  : "✓ Auto-detected"}
+                              </span>
+                              <button
+                                onClick={() => setShowDomainSelector(true)}
+                                disabled={isAnalyzing}
+                                style={{
+                                  padding: "4px 10px",
+                                  backgroundColor: "white",
+                                  color: "#2c3e50",
+                                  border: "1.5px solid #2c3e50",
+                                  borderRadius: "16px",
+                                  fontSize: "11px",
+                                  fontWeight: "600",
+                                  cursor: isAnalyzing
+                                    ? "not-allowed"
+                                    : "pointer",
+                                  opacity: isAnalyzing ? 0.5 : 1,
+                                  transition: "background-color 0.2s",
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (!isAnalyzing)
+                                    e.currentTarget.style.backgroundColor =
+                                      "#f7e6d0";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    "white";
+                                }}
+                              >
+                                Change
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <span>⚠️ Domain not detected: upload document</span>
+                            <div style={{ display: "flex", gap: "6px" }}>
+                              <button
+                                onClick={() => setShowDomainSelector(true)}
+                                style={{
+                                  padding: "4px 12px",
+                                  backgroundColor: "white",
+                                  color: "#2c3e50",
+                                  border: "1.5px solid #2c3e50",
+                                  borderRadius: "16px",
+                                  fontSize: "12px",
+                                  fontWeight: "600",
+                                  cursor: "pointer",
+                                  transition: "background-color 0.2s",
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    "#f7e6d0";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    "white";
+                                }}
+                              >
+                                Select Domain
+                              </button>
+                              <button
+                                onClick={() => {
+                                  // Check access level for custom domains
+                                  const features = ACCESS_TIERS[accessLevel];
+                                  if (!features.customDomains) {
+                                    setUpgradeFeature("Custom Domains");
+                                    setUpgradeTarget("premium");
+                                    setShowUpgradePrompt(true);
+                                    return;
+                                  }
+                                  setShowCustomDomainDialog(true);
+                                }}
+                                style={{
+                                  padding: "4px 12px",
+                                  backgroundColor: "white",
+                                  color: ACCESS_TIERS[accessLevel].customDomains
+                                    ? "#f7d8a8"
+                                    : "#2c3e50",
+                                  border: ACCESS_TIERS[accessLevel]
+                                    .customDomains
+                                    ? "1.5px solid #f7d8a8"
+                                    : "1.5px solid #e0c392",
+                                  borderRadius: "16px",
+                                  fontSize: "12px",
+                                  fontWeight: "600",
+                                  cursor: ACCESS_TIERS[accessLevel]
+                                    .customDomains
+                                    ? "pointer"
+                                    : "not-allowed",
+                                  transition: "background-color 0.2s",
+                                }}
+                                onMouseEnter={(e) => {
+                                  if (ACCESS_TIERS[accessLevel].customDomains)
+                                    e.currentTarget.style.backgroundColor =
+                                      "#f7e6d0";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor =
+                                    "white";
+                                }}
+                              >
+                                Create Custom{" "}
+                                {!ACCESS_TIERS[accessLevel].customDomains &&
+                                  "🔒"}
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "8px",
+                        }}
+                      >
+                        <select
+                          value={selectedDomain || ""}
+                          onChange={(e) => {
+                            const value = e.target.value;
+
+                            // Handle "none" selection - clear domain
+                            if (value === "none") {
+                              setSelectedDomain("none");
+                              setDetectedDomain(null);
+                              setShowDomainSelector(false);
+                              return;
+                            }
+
+                            // Check if it's a saved custom domain
+                            if (value.startsWith("custom:")) {
+                              const domainName = value.substring(7); // Remove "custom:" prefix
+                              const savedDomain = getCustomDomain(domainName);
+                              if (savedDomain) {
+                                setCustomDomainName(savedDomain.name);
+                                setCustomConcepts(
+                                  convertToConceptDefinitions(savedDomain)
+                                );
+                                setSelectedDomain("custom");
+                                localStorage.setItem(
+                                  "tomeiq_last_custom_domain",
+                                  savedDomain.name
+                                );
+                              }
+                            } else {
+                              setSelectedDomain(value as Domain);
+                            }
+                            setShowDomainSelector(false);
+                          }}
+                          disabled={isAnalyzing}
+                          style={{
+                            width: "100%",
+                            padding: "10px",
+                            border: "2px solid #2c3e50",
+                            borderRadius: "20px",
+                            fontSize: "14px",
+                            outline: "none",
+                          }}
+                        >
+                          <option value="">-- Select a domain --</option>
+                          <option value="none">
+                            📝 None / General Content
+                          </option>
+                          {sortedDomains.map((domain) => (
+                            <option key={domain.id} value={domain.id}>
+                              {domain.icon} {domain.label}
+                            </option>
+                          ))}
+                          {/* Show saved custom domains if user has access */}
+                          {ACCESS_TIERS[accessLevel].customDomains &&
+                            loadCustomDomains().length > 0 && (
+                              <>
+                                <option disabled>──────────</option>
+                                <optgroup label="📁 Your Custom Domains">
+                                  {loadCustomDomains().map((domain) => (
+                                    <option
+                                      key={`custom:${domain.name}`}
+                                      value={`custom:${domain.name}`}
+                                    >
+                                      🎨 {domain.name}
+                                    </option>
+                                  ))}
+                                </optgroup>
+                              </>
+                            )}
+                        </select>
+                        <div style={{ display: "flex", gap: "6px" }}>
+                          <button
+                            onClick={() => setShowDomainSelector(false)}
+                            style={{
+                              flex: 1,
+                              padding: "6px",
+                              backgroundColor: "white",
+                              color: "#2c3e50",
+                              border: "1.5px solid #2c3e50",
+                              borderRadius: "16px",
+                              fontSize: "12px",
+                              fontWeight: "600",
+                              cursor: "pointer",
+                              transition: "background-color 0.2s",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = "#f7e6d0";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = "white";
+                            }}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={() => {
+                              // Check access level for custom domains
+                              const features = ACCESS_TIERS[accessLevel];
+                              if (!features.customDomains) {
+                                setUpgradeFeature("Custom Domains");
+                                setUpgradeTarget("premium");
+                                setShowUpgradePrompt(true);
+                                setShowDomainSelector(false);
+                                return;
+                              }
+                              setShowCustomDomainDialog(true);
+                            }}
+                            style={{
+                              flex: 1,
+                              padding: "6px",
+                              backgroundColor: "white",
+                              color: ACCESS_TIERS[accessLevel].customDomains
+                                ? "#f7d8a8"
+                                : "#2c3e50",
+                              border: ACCESS_TIERS[accessLevel].customDomains
+                                ? "1.5px solid #f7d8a8"
+                                : "1.5px solid #e0c392",
+                              borderRadius: "16px",
+                              fontSize: "12px",
+                              fontWeight: "600",
+                              cursor: ACCESS_TIERS[accessLevel].customDomains
+                                ? "pointer"
+                                : "not-allowed",
+                              transition: "background-color 0.2s",
+                            }}
+                            onMouseEnter={(e) => {
+                              if (ACCESS_TIERS[accessLevel].customDomains)
+                                e.currentTarget.style.backgroundColor =
+                                  "#f7e6d0";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = "white";
+                            }}
+                          >
+                            Create Custom{" "}
+                            {!ACCESS_TIERS[accessLevel].customDomains && "🔒"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={handleAnalyzeChapter}
+                    disabled={
+                      !chapterText.trim() ||
+                      isAnalyzing ||
+                      (!selectedDomain && selectedDomain !== "none")
+                    }
+                    style={{
+                      width: "100%",
+                      padding: "12px",
+                      backgroundColor: "white",
+                      color:
+                        chapterText.trim() &&
+                        !isAnalyzing &&
+                        (selectedDomain || selectedDomain === "none")
+                          ? "#ef8432"
+                          : "#2c3e50",
+                      border:
+                        chapterText.trim() &&
+                        !isAnalyzing &&
+                        (selectedDomain || selectedDomain === "none")
+                          ? "2px solid #ef8432"
+                          : "2px solid #e0c392",
+                      borderRadius: "20px",
+                      fontSize: "16px",
+                      fontWeight: "600",
+                      cursor:
+                        chapterText.trim() &&
+                        !isAnalyzing &&
+                        (selectedDomain || selectedDomain === "none")
+                          ? "pointer"
+                          : "not-allowed",
+                      transition: "background-color 0.2s",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (
+                        chapterText.trim() &&
+                        !isAnalyzing &&
+                        (selectedDomain || selectedDomain === "none")
+                      )
                         e.currentTarget.style.backgroundColor = "#f7e6d0";
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.backgroundColor = "white";
                     }}
                   >
-                    📥 Export JSON{" "}
-                    {!ACCESS_TIERS[accessLevel].exportResults && "🔒"}
+                    {isAnalyzing ? "⏳ Analyzing..." : "🔍 Analyze Chapter"}
                   </button>
 
-                  {viewMode === "writer" && analysis && (
+                  {/* Free tier info */}
+                  {accessLevel === "free" && chapterText && !isAnalyzing && (
+                    <div
+                      style={{
+                        marginTop: "12px",
+                        padding: "12px",
+                        backgroundColor: "white",
+                        borderLeft: "4px solid #2c3e50",
+                        borderRadius: "20px",
+                        fontSize: "13px",
+                        lineHeight: 1.6,
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontWeight: "600",
+                          marginBottom: "6px",
+                          color: "#2c3e50",
+                        }}
+                      >
+                        🎁 Free Preview Available
+                      </div>
+                      <div style={{ color: "#1e3a8a" }}>
+                        <strong>Spacing Analysis:</strong> See optimal concept
+                        repetition patterns for better retention.
+                        <br />
+                        <strong>Dual Coding:</strong> Get AI suggestions for
+                        where to add visuals, diagrams, and illustrations.
+                        <br />
+                        <br />
+                        <span style={{ fontSize: "12px", opacity: 0.9 }}>
+                          💡 Upgrade to Premium for full 10-principle analysis
+                          with concept graphs, pattern recognition, and detailed
+                          recommendations.
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {error && (
+                    <div
+                      style={{
+                        marginTop: "12px",
+                        padding: "12px",
+                        backgroundColor: "white",
+                        color: "#991b1b",
+                        borderRadius: "20px",
+                        fontSize: "14px",
+                      }}
+                    >
+                      ⚠️ {error}
+                    </div>
+                  )}
+
+                  {progress && (
+                    <div
+                      style={{
+                        marginTop: "12px",
+                        padding: "12px",
+                        backgroundColor: "white",
+                        color: "#2c3e50",
+                        borderRadius: "20px",
+                        fontSize: "14px",
+                      }}
+                    >
+                      {progress}
+                    </div>
+                  )}
+                </div>
+
+                {/* Analysis Results */}
+                {analysis && (
+                  <div
+                    ref={analysisPanelRef}
+                    className="app-panel"
+                    style={{
+                      flex: 1,
+                      overflow: "auto",
+                      padding: "16px",
+                      backgroundColor:
+                        viewMode === "analysis" ? "#ead6c1" : "#f5e0c4",
+                      border:
+                        viewMode === "analysis"
+                          ? "1.5px solid #e0c392"
+                          : "1.5px solid #f7d8a8",
+                    }}
+                  >
+                    <div
+                      style={{
+                        marginBottom: "16px",
+                        display: "flex",
+                        gap: "8px",
+                      }}
+                    >
+                      <button
+                        onClick={() => {
+                          setViewMode("analysis");
+                          // Clear highlight position when switching to analysis mode
+                          // to prevent unwanted jumps
+                          setHighlightPosition(null);
+                        }}
+                        style={{
+                          flex: 1,
+                          padding: "12px 16px",
+                          backgroundColor:
+                            viewMode === "analysis" ? "#ef8432" : "#fef5e7",
+                          color: viewMode === "analysis" ? "white" : "#2c3e50",
+                          border:
+                            viewMode === "analysis"
+                              ? "2px solid #ef8432"
+                              : "2px solid #e0c392",
+                          borderRadius: "8px",
+                          cursor: "pointer",
+                          fontSize: "15px",
+                          fontWeight: viewMode === "analysis" ? "700" : "600",
+                          transition: "all 0.2s",
+                          boxShadow:
+                            viewMode === "analysis"
+                              ? "0 2px 8px rgba(239, 132, 50, 0.3)"
+                              : "none",
+                        }}
+                        onMouseEnter={(e) => {
+                          if (viewMode !== "analysis") {
+                            e.currentTarget.style.backgroundColor = "#f7e6d0";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (viewMode !== "analysis") {
+                            e.currentTarget.style.backgroundColor = "#fef5e7";
+                          }
+                        }}
+                      >
+                        📊 Analysis Mode
+                        {viewMode === "analysis" && " ✓"}
+                      </button>
+                      <button
+                        onClick={() => {
+                          // Check access for Writer Mode
+                          const features = ACCESS_TIERS[accessLevel];
+                          if (!features.writerMode) {
+                            setUpgradeFeature("Writer Mode");
+                            setUpgradeTarget("professional");
+                            setShowUpgradePrompt(true);
+                            return;
+                          }
+                          setViewMode("writer");
+                        }}
+                        style={{
+                          flex: 1,
+                          padding: "12px 16px",
+                          backgroundColor: "#fef5e7",
+                          color: "#2c3e50",
+                          border: "2px solid #e0c392",
+                          borderRadius: "8px",
+                          cursor: ACCESS_TIERS[accessLevel].writerMode
+                            ? "pointer"
+                            : "not-allowed",
+                          fontSize: "15px",
+                          fontWeight: "600",
+                          transition: "all 0.2s",
+                          boxShadow: "none",
+                          opacity: ACCESS_TIERS[accessLevel].writerMode
+                            ? 1
+                            : 0.6,
+                        }}
+                        onMouseEnter={(e) => {
+                          if (ACCESS_TIERS[accessLevel].writerMode) {
+                            e.currentTarget.style.backgroundColor = "#f7e6d0";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "#fef5e7";
+                        }}
+                      >
+                        ✍️ Writer Mode
+                        {!ACCESS_TIERS[accessLevel].writerMode && " 👑"}
+                      </button>
+                    </div>
+
                     <button
-                      onClick={() => setShowTemplateSelector(true)}
+                      onClick={handleExport}
+                      disabled={!ACCESS_TIERS[accessLevel].exportResults}
                       style={{
                         width: "100%",
                         padding: "8px",
                         backgroundColor: "white",
-                        color: "#f7d8a8",
-                        border: "1.5px solid #f7d8a8",
+                        color: ACCESS_TIERS[accessLevel].exportResults
+                          ? "#2c3e50"
+                          : "#2c3e50",
+                        border: ACCESS_TIERS[accessLevel].exportResults
+                          ? "1.5px solid #2c3e50"
+                          : "1.5px solid #e0c392",
                         borderRadius: "20px",
-                        cursor: "pointer",
+                        cursor: ACCESS_TIERS[accessLevel].exportResults
+                          ? "pointer"
+                          : "not-allowed",
                         fontSize: "14px",
                         fontWeight: "600",
                         marginBottom: "16px",
+                        transition: "background-color 0.2s",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (ACCESS_TIERS[accessLevel].exportResults)
+                          e.currentTarget.style.backgroundColor = "#f7e6d0";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "white";
                       }}
                     >
-                      🤖 Generate AI Template
+                      📥 Export JSON{" "}
+                      {!ACCESS_TIERS[accessLevel].exportResults && "🔒"}
                     </button>
-                  )}
 
-                  {viewMode === "analysis" ? (
-                    <>
-                      {!ACCESS_TIERS[accessLevel].fullAnalysis && (
-                        <InlineUpgradePrompt
-                          targetLevel="premium"
-                          feature="Full Analysis - 10 Learning Principles"
-                          description="Unlock comprehensive analysis with all 10 evidence-based learning principles, concept graphs, pattern recognition, and detailed recommendations."
-                          onUpgrade={() => {
-                            setUpgradeFeature("Full Analysis");
-                            setUpgradeTarget("premium");
-                            setShowUpgradePrompt(true);
+                    {analysis && false && (
+                      <button
+                        onClick={() => setShowTemplateSelector(true)}
+                        style={{
+                          width: "100%",
+                          padding: "8px",
+                          backgroundColor: "white",
+                          color: "#f7d8a8",
+                          border: "1.5px solid #f7d8a8",
+                          borderRadius: "20px",
+                          cursor: "pointer",
+                          fontSize: "14px",
+                          fontWeight: "600",
+                          marginBottom: "16px",
+                        }}
+                      >
+                        🤖 Generate AI Template
+                      </button>
+                    )}
+
+                    {viewMode === "analysis" ? (
+                      <>
+                        {!ACCESS_TIERS[accessLevel].fullAnalysis && (
+                          <InlineUpgradePrompt
+                            targetLevel="premium"
+                            feature="Full Analysis - 10 Learning Principles"
+                            description="Unlock comprehensive analysis with all 10 evidence-based learning principles, concept graphs, pattern recognition, and detailed recommendations."
+                            onUpgrade={() => {
+                              setUpgradeFeature("Full Analysis");
+                              setUpgradeTarget("premium");
+                              setShowUpgradePrompt(true);
+                            }}
+                          />
+                        )}
+                        <ChapterAnalysisDashboard
+                          analysis={analysis}
+                          concepts={analysis.conceptGraph?.concepts || []}
+                          onConceptClick={handleConceptClick}
+                          highlightedConceptId={highlightedConceptId}
+                          currentMentionIndex={currentMentionIndex}
+                          accessLevel={accessLevel}
+                          hasDomain={
+                            selectedDomain !== "none" && selectedDomain !== null
+                          }
+                          activeDomain={selectedDomain}
+                          relationships={
+                            analysis.conceptGraph?.relationships || []
+                          }
+                          generalConcepts={
+                            selectedDomain === "none"
+                              ? generalConcepts
+                              : undefined
+                          }
+                          onGeneralConceptClick={(position, term) => {
+                            setHighlightPosition(position);
+                            setSearchWord(term);
+                            setSearchOccurrence(0);
                           }}
                         />
-                      )}
-                      <ChapterAnalysisDashboard
-                        analysis={analysis}
-                        concepts={analysis.conceptGraph?.concepts || []}
-                        onConceptClick={handleConceptClick}
-                        highlightedConceptId={highlightedConceptId}
-                        currentMentionIndex={currentMentionIndex}
-                        accessLevel={accessLevel}
-                        hasDomain={
-                          selectedDomain !== "none" && selectedDomain !== null
-                        }
-                        activeDomain={selectedDomain}
-                        relationships={
-                          analysis.conceptGraph?.relationships || []
-                        }
-                        generalConcepts={
-                          selectedDomain === "none"
-                            ? generalConcepts
-                            : undefined
-                        }
-                        onGeneralConceptClick={(position, term) => {
-                          setHighlightPosition(position);
-                          setSearchWord(term);
-                          setSearchOccurrence(0);
+                      </>
+                    ) : (
+                      <div
+                        style={{
+                          padding: "20px",
+                          backgroundColor: "transparent",
+                          borderRadius: "24px",
+                          overflowY: "auto",
+                          overflowX: "hidden",
+                          maxHeight: "calc(100vh - 220px)",
+                          WebkitOverflowScrolling: "touch",
                         }}
-                      />
-                    </>
-                  ) : (
-                    <div
-                      style={{
-                        padding: "20px",
-                        backgroundColor: "transparent",
-                        borderRadius: "24px",
-                        overflowY: "auto",
-                        overflowX: "hidden",
-                        maxHeight: "calc(100vh - 220px)",
-                        WebkitOverflowScrolling: "touch",
-                      }}
-                      tabIndex={0}
-                    >
-                      <h3 className="section-header">✍️ Writing Suggestions</h3>
+                        tabIndex={0}
+                      >
+                        <h3 className="section-header">
+                          ✍️ Writing Suggestions
+                        </h3>
 
-                      {/* Principle Scores */}
-                      <div style={{ marginBottom: "24px" }}>
-                        <h4
-                          style={{
-                            fontSize: "14px",
-                            fontWeight: "600",
-                            marginBottom: "12px",
-                            color: "#2c3e50",
-                          }}
-                        >
-                          Learning Principles
-                        </h4>
-                        {analysis.principles
-                          ?.slice(0, 5)
-                          .map((principle: any) => (
-                            <div
-                              key={principle.principle}
-                              style={{
-                                marginBottom: "8px",
-                                padding: "8px 12px",
-                                backgroundColor: "#fef5e7",
-                                borderRadius: "20px",
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                              }}
-                            >
-                              <span
-                                style={{ fontSize: "13px", fontWeight: "500" }}
-                              >
-                                {principle.principle
-                                  .replace(/([A-Z])/g, " $1")
-                                  .trim()}
-                              </span>
-                              <span
-                                style={{
-                                  fontSize: "14px",
-                                  fontWeight: "600",
-                                  color:
-                                    principle.score > 70
-                                      ? "#10b981"
-                                      : principle.score > 50
-                                      ? "#f59e0b"
-                                      : "#ef4444",
-                                }}
-                              >
-                                {Math.round(principle.score)}/100
-                              </span>
-                            </div>
-                          ))}
-                      </div>
-
-                      {/* Recommendations */}
-                      <div>
-                        <h4
-                          style={{
-                            fontSize: "14px",
-                            fontWeight: "600",
-                            marginBottom: "12px",
-                            color: "#2c3e50",
-                          }}
-                        >
-                          Top Recommendations
-                        </h4>
-                        {analysis.recommendations
-                          ?.slice(0, 8)
-                          .map((rec: any) => (
-                            <div
-                              key={rec.id}
-                              style={{
-                                marginBottom: "12px",
-                                padding: "12px",
-                                backgroundColor: "#fff",
-                                border: `2px solid ${
-                                  rec.priority === "high"
-                                    ? "#ef4444"
-                                    : rec.priority === "medium"
-                                    ? "#f59e0b"
-                                    : "#e0c392"
-                                }`,
-                                borderRadius: "20px",
-                              }}
-                            >
+                        {/* Principle Scores */}
+                        <div style={{ marginBottom: "24px" }}>
+                          <h4
+                            style={{
+                              fontSize: "14px",
+                              fontWeight: "600",
+                              marginBottom: "12px",
+                              color: "#2c3e50",
+                            }}
+                          >
+                            Learning Principles
+                          </h4>
+                          {analysis.principles
+                            ?.slice(0, 5)
+                            .map((principle: any) => (
                               <div
+                                key={principle.principle}
                                 style={{
+                                  marginBottom: "8px",
+                                  padding: "8px 12px",
+                                  backgroundColor: "#fef5e7",
+                                  borderRadius: "20px",
                                   display: "flex",
-                                  alignItems: "start",
-                                  gap: "8px",
-                                  marginBottom: "6px",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
                                 }}
                               >
                                 <span
                                   style={{
-                                    fontSize: "10px",
-                                    fontWeight: "600",
-                                    padding: "2px 6px",
-                                    borderRadius: "16px",
-                                    backgroundColor:
-                                      rec.priority === "high"
-                                        ? "#fee2e2"
-                                        : rec.priority === "medium"
-                                        ? "#fef3c7"
-                                        : "#f2ebe3",
-                                    color:
-                                      rec.priority === "high"
-                                        ? "#991b1b"
-                                        : rec.priority === "medium"
-                                        ? "#92400e"
-                                        : "#2c3e50",
-                                    textTransform: "uppercase",
-                                  }}
-                                >
-                                  {rec.priority}
-                                </span>
-                                <h5
-                                  style={{
-                                    margin: 0,
                                     fontSize: "13px",
-                                    fontWeight: "600",
-                                    flex: 1,
+                                    fontWeight: "500",
                                   }}
                                 >
-                                  {rec.title}
-                                </h5>
+                                  {principle.principle
+                                    .replace(/([A-Z])/g, " $1")
+                                    .trim()}
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: "14px",
+                                    fontWeight: "600",
+                                    color:
+                                      principle.score > 70
+                                        ? "#10b981"
+                                        : principle.score > 50
+                                        ? "#f59e0b"
+                                        : "#ef4444",
+                                  }}
+                                >
+                                  {Math.round(principle.score)}/100
+                                </span>
                               </div>
-                              <p
+                            ))}
+                        </div>
+
+                        {/* Recommendations */}
+                        <div>
+                          <h4
+                            style={{
+                              fontSize: "14px",
+                              fontWeight: "600",
+                              marginBottom: "12px",
+                              color: "#2c3e50",
+                            }}
+                          >
+                            Top Recommendations
+                          </h4>
+                          {analysis.recommendations
+                            ?.slice(0, 8)
+                            .map((rec: any) => (
+                              <div
+                                key={rec.id}
                                 style={{
-                                  margin: "0",
-                                  fontSize: "12px",
-                                  color: "#2c3e50",
-                                  lineHeight: "1.5",
+                                  marginBottom: "12px",
+                                  padding: "12px",
+                                  backgroundColor: "#fff",
+                                  border: `2px solid ${
+                                    rec.priority === "high"
+                                      ? "#ef4444"
+                                      : rec.priority === "medium"
+                                      ? "#f59e0b"
+                                      : "#e0c392"
+                                  }`,
+                                  borderRadius: "20px",
                                 }}
                               >
-                                {rec.description}
-                              </p>
-                            </div>
-                          ))}
-                      </div>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "start",
+                                    gap: "8px",
+                                    marginBottom: "6px",
+                                  }}
+                                >
+                                  <span
+                                    style={{
+                                      fontSize: "10px",
+                                      fontWeight: "600",
+                                      padding: "2px 6px",
+                                      borderRadius: "16px",
+                                      backgroundColor:
+                                        rec.priority === "high"
+                                          ? "#fee2e2"
+                                          : rec.priority === "medium"
+                                          ? "#fef3c7"
+                                          : "#f2ebe3",
+                                      color:
+                                        rec.priority === "high"
+                                          ? "#991b1b"
+                                          : rec.priority === "medium"
+                                          ? "#92400e"
+                                          : "#2c3e50",
+                                      textTransform: "uppercase",
+                                    }}
+                                  >
+                                    {rec.priority}
+                                  </span>
+                                  <h5
+                                    style={{
+                                      margin: 0,
+                                      fontSize: "13px",
+                                      fontWeight: "600",
+                                      flex: 1,
+                                    }}
+                                  >
+                                    {rec.title}
+                                  </h5>
+                                </div>
+                                <p
+                                  style={{
+                                    margin: "0",
+                                    fontSize: "12px",
+                                    color: "#2c3e50",
+                                    lineHeight: "1.5",
+                                  }}
+                                >
+                                  {rec.description}
+                                </p>
+                              </div>
+                            ))}
+                        </div>
 
-                      {/* Missing Concepts - Professional Tier Feature */}
-                      {ACCESS_TIERS[accessLevel].writerMode &&
-                        selectedDomain &&
-                        CONCEPT_LIBRARIES[selectedDomain] && (
-                          <div style={{ marginTop: "24px" }}>
-                            <MissingConceptSuggestions
-                              domain={
-                                getAvailableDomains().find(
-                                  (d) => d.id === selectedDomain
-                                )?.label || selectedDomain
-                              }
-                              libraryConcepts={
-                                CONCEPT_LIBRARIES[selectedDomain]?.concepts ||
-                                []
-                              }
-                              identifiedConcepts={
-                                analysis.conceptGraph?.concepts || []
-                              }
-                              chapterText={chapterText}
-                            />
-                          </div>
-                        )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+                        {/* Missing Concepts - Professional Tier Feature */}
+                        {ACCESS_TIERS[accessLevel].writerMode &&
+                          selectedDomain &&
+                          CONCEPT_LIBRARIES[selectedDomain] && (
+                            <div style={{ marginTop: "24px" }}>
+                              <MissingConceptSuggestions
+                                domain={
+                                  getAvailableDomains().find(
+                                    (d) => d.id === selectedDomain
+                                  )?.label || selectedDomain
+                                }
+                                libraryConcepts={
+                                  CONCEPT_LIBRARIES[selectedDomain]?.concepts ||
+                                  []
+                                }
+                                identifiedConcepts={
+                                  analysis.conceptGraph?.concepts || []
+                                }
+                                chapterText={chapterText}
+                              />
+                            </div>
+                          )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {shouldShowBackToTop && (

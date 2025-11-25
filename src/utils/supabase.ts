@@ -57,7 +57,11 @@ export const getUserProfile = async (): Promise<Profile | null> => {
     .single();
 
   if (error) {
-    console.error("Error fetching profile:", error);
+    // Silently handle profile errors - profiles table may not exist yet
+    // App functions fine without user profiles
+    if (error.code !== "PGRST205") {
+      console.error("Error fetching profile:", error);
+    }
     return null;
   }
 

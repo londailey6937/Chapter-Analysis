@@ -101,7 +101,7 @@ export const MissingConceptSuggestions: React.FC<
           .slice(0, showAll ? missingConcepts.length : 10)
           .map((missing, index) => (
             <div
-              key={missing.concept.name}
+              key={`${missing.concept.name}-${index}`}
               className="border border-gray-200 rounded-lg bg-white hover:shadow-md transition-shadow"
             >
               {/* Collapsed View */}
