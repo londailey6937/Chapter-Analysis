@@ -625,43 +625,6 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
         </button>
       )}
 
-      {/* Reset Count Button - Only show for free tier when testing */}
-      {accessLevel === "free" &&
-        (() => {
-          const uploadCount = parseInt(
-            localStorage.getItem("tomeiq_upload_count") || "0",
-            10
-          );
-          return uploadCount > 0 ? (
-            <button
-              onClick={() => {
-                localStorage.setItem("tomeiq_upload_count", "0");
-                alert("Upload count reset! You have 3 uploads available.");
-                window.location.reload();
-              }}
-              style={{
-                padding: "8px 16px",
-                backgroundColor: "#fee2e2",
-                color: "#991b1b",
-                border: "1.5px solid #fecaca",
-                borderRadius: "20px",
-                cursor: "pointer",
-                fontWeight: "600",
-                fontSize: "12px",
-                transition: "all 0.2s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#fecaca";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#fee2e2";
-              }}
-            >
-              🔄 Reset Count
-            </button>
-          ) : null;
-        })()}
-
       <style>{`
         .upload-spinner {
           width: 16px;

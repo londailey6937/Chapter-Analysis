@@ -1757,44 +1757,12 @@ export const ChapterCheckerV2: React.FC = () => {
                     <div
                       style={{
                         display: "flex",
-                        gap: "8px",
-                        fontSize: "12px",
-                        flexWrap: "wrap",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                        fontSize: "14px",
                         justifyContent: "center",
                       }}
                     >
-                      {selectedDomain && selectedDomain !== "none" && (
-                        <>
-                          <span
-                            style={{
-                              fontWeight: 600,
-                              color: "#ef8432",
-                              textTransform: "capitalize",
-                            }}
-                          >
-                            {selectedDomain === "custom"
-                              ? "Custom"
-                              : selectedDomain}
-                          </span>
-                          <span style={{ color: "#9ca3af" }}>•</span>
-                        </>
-                      )}
-                      {(analysis.conceptGraph?.concepts?.length || 0) > 0 && (
-                        <>
-                          <span style={{ fontWeight: 500 }}>
-                            {analysis.conceptGraph.concepts.length} concepts
-                          </span>
-                          <span style={{ color: "#9ca3af" }}>•</span>
-                          <span style={{ fontWeight: 500 }}>
-                            {(
-                              analysis.conceptGraph.concepts.length /
-                              (wordCount / 1000)
-                            ).toFixed(1)}{" "}
-                            per 1k words
-                          </span>
-                          <span style={{ color: "#9ca3af" }}>•</span>
-                        </>
-                      )}
                       <span
                         style={{
                           fontWeight: 600,
@@ -2035,11 +2003,12 @@ export const ChapterCheckerV2: React.FC = () => {
                 <div
                   style={{
                     display: "flex",
-                    gap: "8px",
+                    gap: "6px",
                     alignItems: "center",
                     justifyContent: "center",
                     flexWrap: "wrap",
                     marginBottom: chapterData ? "16px" : "0",
+                    maxWidth: "100%",
                   }}
                 >
                   <DocumentUploader
@@ -2053,13 +2022,13 @@ export const ChapterCheckerV2: React.FC = () => {
                       <button
                         onClick={handleClear}
                         style={{
-                          padding: "8px 14px",
+                          padding: "6px 10px",
                           backgroundColor: "white",
                           color: "#2c3e50",
                           border: "1.5px solid #e0c392",
                           borderRadius: "12px",
                           cursor: "pointer",
-                          fontSize: "13px",
+                          fontSize: "12px",
                           fontWeight: "600",
                           textAlign: "center",
                           transition: "background-color 0.2s",
@@ -2078,13 +2047,13 @@ export const ChapterCheckerV2: React.FC = () => {
                       <button
                         onClick={handleExportDocx}
                         style={{
-                          padding: "8px 14px",
+                          padding: "6px 10px",
                           backgroundColor: "white",
                           color: "#2c3e50",
                           border: "1.5px solid #e0c392",
                           borderRadius: "12px",
                           cursor: "pointer",
-                          fontSize: "13px",
+                          fontSize: "12px",
                           fontWeight: "600",
                           textAlign: "center",
                           transition: "background-color 0.2s",
@@ -2103,13 +2072,13 @@ export const ChapterCheckerV2: React.FC = () => {
                       <button
                         onClick={handleExportHtml}
                         style={{
-                          padding: "8px 14px",
+                          padding: "6px 10px",
                           backgroundColor: "white",
                           color: "#2c3e50",
                           border: "1.5px solid #e0c392",
                           borderRadius: "12px",
                           cursor: "pointer",
-                          fontSize: "13px",
+                          fontSize: "12px",
                           fontWeight: "600",
                           textAlign: "center",
                           transition: "background-color 0.2s",
@@ -2126,55 +2095,57 @@ export const ChapterCheckerV2: React.FC = () => {
                         🌐 Export HTML
                       </button>
 
-                      <button
-                        onClick={() => {
-                          try {
-                            const autosaved =
-                              localStorage.getItem("tomeiq_autosave");
-                            if (autosaved) {
-                              const saved = JSON.parse(autosaved);
-                              const savedTime = new Date(
-                                saved.timestamp
-                              ).toLocaleString();
-                              const clear = window.confirm(
-                                `💾 Auto-save Status\n\nLast saved: ${savedTime}\nFile: ${saved.fileName}\n\nClick OK to clear auto-saved data, or Cancel to keep it.`
-                              );
-                              if (clear) {
-                                localStorage.removeItem("tomeiq_autosave");
-                                alert("🗑️ Auto-saved data cleared!");
+                      {accessLevel === "free" && (
+                        <button
+                          onClick={() => {
+                            try {
+                              const autosaved =
+                                localStorage.getItem("tomeiq_autosave");
+                              if (autosaved) {
+                                const saved = JSON.parse(autosaved);
+                                const savedTime = new Date(
+                                  saved.timestamp
+                                ).toLocaleString();
+                                const clear = window.confirm(
+                                  `💾 Auto-save Status\n\nLast saved: ${savedTime}\nFile: ${saved.fileName}\n\nClick OK to clear auto-saved data, or Cancel to keep it.`
+                                );
+                                if (clear) {
+                                  localStorage.removeItem("tomeiq_autosave");
+                                  alert("🗑️ Auto-saved data cleared!");
+                                }
+                              } else {
+                                alert(
+                                  "ℹ️ No auto-saved data found.\n\nYour work is automatically saved as you edit in Writer Mode."
+                                );
                               }
-                            } else {
-                              alert(
-                                "ℹ️ No auto-saved data found.\n\nYour work is automatically saved as you edit in Writer Mode."
-                              );
+                            } catch (error) {
+                              alert("⚠️ Error checking auto-save status");
                             }
-                          } catch (error) {
-                            alert("⚠️ Error checking auto-save status");
-                          }
-                        }}
-                        style={{
-                          padding: "8px 14px",
-                          backgroundColor: "white",
-                          color: "#2c3e50",
-                          border: "1.5px solid #e0c392",
-                          borderRadius: "12px",
-                          cursor: "pointer",
-                          fontSize: "13px",
-                          fontWeight: "600",
-                          textAlign: "center",
-                          transition: "background-color 0.2s",
-                          flexShrink: 0,
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#f7e6d0";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "white";
-                        }}
-                        title="Check auto-save status and clear if needed"
-                      >
-                        💾 Auto-save info
-                      </button>
+                          }}
+                          style={{
+                            padding: "6px 10px",
+                            backgroundColor: "white",
+                            color: "#2c3e50",
+                            border: "1.5px solid #e0c392",
+                            borderRadius: "12px",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                            fontWeight: "600",
+                            textAlign: "center",
+                            transition: "background-color 0.2s",
+                            flexShrink: 0,
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#f7e6d0";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "white";
+                          }}
+                          title="Check auto-save status and clear if needed"
+                        >
+                          💾 Auto-save info
+                        </button>
+                      )}
                     </>
                   )}
                 </div>
@@ -2592,6 +2563,46 @@ export const ChapterCheckerV2: React.FC = () => {
                     dual-coding insights.
                   </div>
                 )}
+
+                {/* Reset Count Button - Testing only */}
+                {(() => {
+                  const uploadCount = parseInt(
+                    localStorage.getItem("tomeiq_upload_count") || "0",
+                    10
+                  );
+                  return uploadCount > 0 ? (
+                    <button
+                      onClick={() => {
+                        localStorage.setItem("tomeiq_upload_count", "0");
+                        alert(
+                          "Upload count reset! You have 3 uploads available."
+                        );
+                        window.location.reload();
+                      }}
+                      style={{
+                        marginTop: "8px",
+                        padding: "6px 12px",
+                        backgroundColor: "#fee2e2",
+                        color: "#991b1b",
+                        border: "1.5px solid #fecaca",
+                        borderRadius: "20px",
+                        cursor: "pointer",
+                        fontWeight: "600",
+                        fontSize: "11px",
+                        transition: "all 0.2s",
+                        alignSelf: "flex-start",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#fecaca";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "#fee2e2";
+                      }}
+                    >
+                      🔄 Reset Count
+                    </button>
+                  ) : null;
+                })()}
               </div>
             ) : (
               <div
