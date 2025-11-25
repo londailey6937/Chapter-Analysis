@@ -5,6 +5,7 @@ import { DualCodingAnalyzer } from "@/utils/dualCodingAnalyzer";
 interface CustomEditorProps {
   content: string;
   onUpdate?: (content: { html: string; text: string }) => void;
+  onSave?: () => void;
   isEditable?: boolean;
   className?: string;
   style?: React.CSSProperties;
@@ -34,6 +35,7 @@ type TextMatch = {
 export const CustomEditor: React.FC<CustomEditorProps> = ({
   content,
   onUpdate,
+  onSave,
   isEditable = true,
   className,
   style,
@@ -795,6 +797,12 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
           e.preventDefault();
           formatText("underline");
           break;
+        case "s":
+          if (onSave) {
+            e.preventDefault();
+            onSave();
+          }
+          break;
         case "k":
           e.preventDefault();
           setShowLinkModal(true);
@@ -992,6 +1000,21 @@ export const CustomEditor: React.FC<CustomEditorProps> = ({
       {/* Toolbar */}
       {viewMode === "writer" && !isFreeMode && (
         <div className="toolbar flex flex-wrap items-center gap-2 p-2 border-b bg-gray-50 sticky top-0 z-20 shadow-sm">
+          {/* Save Button */}
+          {onSave && (
+            <>
+              <div className="flex gap-1">
+                <button
+                  onClick={onSave}
+                  className="px-3 py-1.5 rounded hover:bg-gray-200 text-gray-700 transition-colors font-medium flex items-center gap-1"
+                  title="Save (⌘S / Ctrl+S)"
+                >
+                  <span>💾</span> Save
+                </button>
+              </div>
+              <div className="w-px h-6 bg-gray-300" />
+            </>
+          )}
           {/* Block type dropdown */}
           <select
             value={blockType}

@@ -30,6 +30,7 @@ import {
 import AnalysisWorker from "@/workers/analysisWorker?worker";
 import { buildTierOneAnalysisSummary } from "@/utils/tierOneAnalysis";
 import { exportToHtml } from "@/utils/htmlExport";
+import { exportToDocx } from "@/utils/docxExport";
 import {
   TEMPLATE_LIBRARY,
   getTemplateById,
@@ -1411,7 +1412,6 @@ export const ChapterCheckerV2: React.FC = () => {
     }
 
     try {
-      const { exportToDocx } = await import("@/utils/docxExport");
       const richHtmlContent =
         chapterData.editorHtml ??
         (chapterData.isHybridDocx ? chapterData.html : null) ??
