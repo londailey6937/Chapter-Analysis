@@ -1003,6 +1003,41 @@ export function ReferenceLibraryModal({
                   </li>
                 </ul>
 
+                <h3
+                  style={{
+                    marginTop: "1.5rem",
+                    marginBottom: "0.5rem",
+                    color: "#374151",
+                  }}
+                >
+                  Auto-Save & Data Safety
+                </h3>
+                <p style={{ marginBottom: "1rem", lineHeight: "1.6" }}>
+                  Your work in Writer Mode is protected by a robust auto-save
+                  system:
+                </p>
+                <ul style={{ marginBottom: "1rem", paddingLeft: "1.5rem" }}>
+                  <li style={{ marginBottom: "0.5rem" }}>
+                    <strong>Continuous Saving:</strong> Changes are
+                    automatically saved to your browser's local storage as you
+                    type.
+                  </li>
+                  <li style={{ marginBottom: "0.5rem" }}>
+                    <strong>Manual Save:</strong> You can also click the{" "}
+                    <strong>Save</strong> button (or press Cmd+S/Ctrl+S) to
+                    force a save immediately.
+                  </li>
+                  <li style={{ marginBottom: "0.5rem" }}>
+                    <strong>Session Persistence:</strong> If you close the tab
+                    or browser, your work will be there when you return.
+                  </li>
+                  <li style={{ marginBottom: "0.5rem" }}>
+                    <strong>Privacy:</strong> Data is stored locally on your
+                    device, not on our servers (unless you explicitly choose to
+                    sync).
+                  </li>
+                </ul>
+
                 <div
                   style={{
                     background: "#fef5e7",

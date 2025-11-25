@@ -554,6 +554,11 @@ export function NavigationMenu({
                 desc: "Add domain vocabulary",
               },
               {
+                icon: "💾",
+                title: "Auto-Save",
+                desc: "Work saved locally automatically",
+              },
+              {
                 icon: "🎛️",
                 title: "Configurable",
                 desc: "Section hints & TOC management",
